@@ -1,9 +1,9 @@
 {% extends 'places/base.html' %}
-
+{% load static %}
 {% block extra_head %}
-<!-- Leaflet CSS and JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Remove Leaflet -->
+<!-- Add Google Maps -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
 {% endblock %}
 
 {% block content %}
@@ -128,77 +128,69 @@
 </div>
 
 <script>
-    // Initialize map
-    const map = L.map('map').setView([37.5665, 126.9780], 13); // Seoul coordinates
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Store markers
-    const markers = {};
-
-    // Add markers for each place
-    {% for place in places %}
-    markers[{{ place.id }}] = L.marker([{{ place.latitude }}, {{ place.longitude }}])
-        .bindPopup(`
-            <div class="text-center">
-                <h3 class="font-semibold">{{ place.name }}</h3>
-                <p class="text-sm text-gray-600">{{ place.category|title }}</p>
-                <a href="{% url 'places:place_detail' place.id %}" 
-                   class="text-primary-600 hover:text-primary-700 text-sm">
-                    View Details
-                </a>
-            </div>
-        `)
-        .addTo(map);
-    {% endfor %}
-
-    // Highlight marker when clicking on list item
-    function highlightMarker(placeId) {
-        Object.values(markers).forEach(marker => {
-            marker.setIcon(L.Icon.Default.prototype);
+    // Initialize Google Map
+    function initMap() {
+        // Center on Seoul by default
+        const seoul = { lat: 37.5665, lng: 126.9780 };
+        const map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: seoul,
         });
-        
-        const marker = markers[placeId];
-        if (marker) {
-            marker.openPopup();
-            map.panTo(marker.getLatLng());
-        }
+
+        // Store markers
+        const markers = {};
+
+        // Add markers for each place
+        {% for place in places %}
+        markers[{{ place.id }}] = new google.maps.Marker({
+            position: { lat: {{ place.latitude }}, lng: {{ place.longitude }} },
+            map: map,
+            title: '{{ place.name }}',
+            
+        });
+
+        const infowindow{{ place.id }} = new google.maps.InfoWindow({
+            content: `
+                <div class="text-center">
+                    <h3 class="font-semibold">{{ place.name }}</h3>
+                    <p class="text-sm text-gray-600">{{ place.category|title }}</p>
+                    <a href="{% url 'places:place_detail' place.id %}" 
+                       class="text-primary-600 hover:text-primary-700 text-sm">
+                        View Details
+                    </a>
+                </div>
+            `
+        });
+
+        markers[{{ place.id }}].addListener('click', () => {
+            infowindow{{ place.id }}.open(map, markers[{{ place.id }}]);
+        });
+        {% endfor %}
+
+        // Highlight marker when clicking on list item
+        window.highlightMarker = function(placeId) {
+            const marker = markers[placeId];
+            if (marker) {
+                map.panTo(marker.getPosition());
+                google.maps.event.trigger(marker, 'click');
+            }
+        };
     }
 
-    // Add event listeners for select filters only
+    // Add event listeners for filters
     document.querySelectorAll('select').forEach(element => {
         element.addEventListener('change', function() {
             this.closest('form').submit();
         });
     });
 
-    // Better search input handling
+    // Search input handling
     const searchInput = document.querySelector('input[name="q"]');
-    let timeout = null;
-
-    // Handle search on Enter key
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             this.closest('form').submit();
         }
     });
-
-    // Optional: Add a search button
-    const searchForm = searchInput.closest('form');
-    const searchButton = document.createElement('button');
-    searchButton.type = 'submit';
-    searchButton.className = 'absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary-600';
-    searchButton.innerHTML = `
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-    `;
-    
-    // Update search input container to be relative for the search button
-    searchInput.parentElement.className += ' relative';
-    searchInput.parentElement.appendChild(searchButton);
 </script>
 {% endblock %}

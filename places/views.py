@@ -10,6 +10,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import uuid
 from django.db.models.functions import Round
+from django.conf import settings
 
 User = get_user_model()
 
@@ -63,7 +64,8 @@ def explore(request):
             'category': category,
             'search_query': search_query,
             'min_rating': min_rating,
-        }
+        },
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
     })
 
 def place_detail(request, pk):
@@ -79,6 +81,7 @@ def place_detail(request, pk):
         'place': place,
         'reviews': reviews,
         'user_has_reviewed': user_has_reviewed,
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
     })
 
 def upload_photo(photo):
@@ -116,6 +119,7 @@ def submit_place(request):
     
     return render(request, 'places/submit_place.html', {
         'form': form,
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
     })
 
 def about(request):

@@ -1,9 +1,9 @@
 {% extends 'places/base.html' %}
 
 {% block extra_head %}
-<!-- Leaflet CSS and JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Remove Leaflet -->
+<!-- Add Google Maps -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
 {% endblock %}
 
 {% block content %}
@@ -186,31 +186,45 @@
 </div>
 
 <script>
-    // Initialize map
-    const map = L.map('map').setView([37.5665, 126.9780], 13); // Seoul coordinates
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
+    let map;
     let marker;
 
-    // Handle map clicks
-    map.on('click', function(e) {
-        const lat = e.latlng.lat;
-        const lng = e.latlng.lng;
-        
-        // Update hidden inputs
-        document.getElementById('id_latitude').value = lat;
-        document.getElementById('id_longitude').value = lng;
-        
-        // Update or add marker
-        if (marker) {
-            marker.setLatLng(e.latlng);
-        } else {
-            marker = L.marker(e.latlng).addTo(map);
-        }
-    });
+    function initMap() {
+        // Center on Seoul by default
+        const seoul = { lat: 37.5665, lng: 126.9780 };
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: seoul,
+        });
+
+        // Add click listener to map
+        map.addListener('click', function(e) {
+            const lat = e.latLng.lat();
+            const lng = e.latLng.lng();
+            
+            // Update hidden inputs
+            document.getElementById('id_latitude').value = lat;
+            document.getElementById('id_longitude').value = lng;
+            
+            // Update or add marker
+            if (marker) {
+                marker.setPosition(e.latLng);
+            } else {
+                marker = new google.maps.Marker({
+                    position: e.latLng,
+                    map: map,
+                    draggable: true
+                });
+
+                // Update coordinates when marker is dragged
+                marker.addListener('dragend', function() {
+                    const position = marker.getPosition();
+                    document.getElementById('id_latitude').value = position.lat();
+                    document.getElementById('id_longitude').value = position.lng();
+                });
+            }
+        });
+    }
 
     // Photo preview
     document.getElementById('photos').addEventListener('change', function(e) {

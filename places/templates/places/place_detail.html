@@ -3,9 +3,9 @@
 {% load place_extras %}
 
 {% block extra_head %}
-<!-- Leaflet CSS and JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Remove Leaflet -->
+<!-- Add Google Maps -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
 <!-- Swiper for image gallery -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -218,26 +218,40 @@
 <script>
     // Initialize Swiper
     const swiper = new Swiper('.swiper', {
-        pagination: {
-            el: '.swiper-pagination',
-        },
+        pagination: { el: '.swiper-pagination' },
         navigation: {
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
         },
     });
 
-    // Initialize map
-    const map = L.map('map').setView([{{ place.latitude }}, {{ place.longitude }}], 15);
+    // Initialize Google Map
+    function initMap() {
+        const location = { lat: {{ place.latitude }}, lng: {{ place.longitude }} };
+        const map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15,
+            center: location,
+        });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+        const marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            title: '{{ place.name }}'
+        });
 
-    L.marker([{{ place.latitude }}, {{ place.longitude }}])
-        .addTo(map)
-        .bindPopup('{{ place.name }}')
-        .openPopup();
+        const infowindow = new google.maps.InfoWindow({
+            content: `
+                <div class="text-center">
+                    <h3 class="font-semibold">{{ place.name }}</h3>
+                    <p class="text-sm text-gray-600">{{ place.address }}</p>
+                </div>
+            `
+        });
+
+        marker.addListener('click', () => {
+            infowindow.open(map, marker);
+        });
+    }
 
     // Star rating interaction
     document.querySelectorAll('input[name="rating"] + label').forEach(label => {
