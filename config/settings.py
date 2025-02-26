@@ -132,8 +132,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTH_USER_MODEL = 'users.User'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyBLh6P24tMbFdDy6vNw031kahmGuxLRXeg'
+
+LOGIN_URL = 'users:login'  # URL where users will be redirected when login is required
+LOGIN_REDIRECT_URL = 'places:home'  # URL where users will be redirected after successful login
+LOGOUT_REDIRECT_URL = 'places:home'  # URL where users will be redirected after logout

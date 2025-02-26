@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Add Google Maps -->
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}" async defer></script>
+    <!-- Add Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -72,10 +74,37 @@
                     </select>
                     
                     {% if user.is_authenticated %}
-                        <div class="relative ml-3">
-                            <a href="{% url 'users:profile' %}" class="flex text-sm rounded-full focus:outline-none">
+                        <div class="relative ml-3" x-data="{ open: false }" @click.away="open = false">
+                            <button type="button" 
+                                    @click="open = !open" 
+                                    class="flex items-center text-sm rounded-full focus:outline-none">
                                 <span class="text-gray-700">{{ user.username }}</span>
-                            </a>
+                                <i class="fas fa-chevron-down ml-1 text-gray-400"></i>
+                            </button>
+                            
+                            <!-- Dropdown menu -->
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                                <a href="{% url 'users:profile' %}" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </a>
+                                <a href="{% url 'users:edit_profile' %}" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-cog mr-2"></i>Settings
+                                </a>
+                                <div class="border-t border-gray-100"></div>
+                                <a href="{% url 'users:logout' %}" 
+                                   class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </div>
                         </div>
                     {% else %}
                         <a href="{% url 'users:login' %}" class="text-primary-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium">
@@ -89,6 +118,50 @@
             </div>
         </div>
     </nav>
+
+    <!-- Add Messages/Notifications -->
+    {% if messages %}
+    <div class="messages-container fixed top-4 right-4 z-50 space-y-2">
+        {% for message in messages %}
+        <div class="message bg-white rounded-lg shadow-lg p-4 max-w-md transform transition-all duration-300 {% if message.tags %}{{ message.tags }}{% endif %}"
+             role="alert">
+            <div class="flex items-center">
+                <!-- Success Message -->
+                {% if message.tags == 'success' %}
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">{{ message }}</p>
+                </div>
+                <!-- Error Message -->
+                {% elif message.tags == 'error' %}
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-red-800">{{ message }}</p>
+                </div>
+                <!-- Info Message -->
+                {% else %}
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-blue-800">{{ message }}</p>
+                </div>
+                {% endif %}
+                <!-- Close Button -->
+                <div class="ml-auto pl-3">
+                    <button type="button" class="close-message text-gray-400 hover:text-gray-500">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Main Content -->
     <main>
@@ -136,5 +209,33 @@
             </div>
         </div>
     </footer>
+
+    <!-- Add this script before the closing body tag -->
+    <script>
+        // Handle message dismissal
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-dismiss messages after 5 seconds
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(message => {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                }, 5000);
+            });
+
+            // Handle manual dismissal
+            document.querySelectorAll('.close-message').forEach(button => {
+                button.addEventListener('click', () => {
+                    const message = button.closest('.message');
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

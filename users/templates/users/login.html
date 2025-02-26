@@ -14,6 +14,7 @@
 {% block auth_content %}
 <form method="POST" class="space-y-6">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
     
     {% if messages %}
     <div class="rounded-md bg-red-50 p-4 mb-4">

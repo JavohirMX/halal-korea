@@ -91,7 +91,7 @@ def upload_photo(photo):
     
     # Save file and return path
     path = default_storage.save(filename, ContentFile(photo.read()))
-    return default_storage.url(path)
+    return path  # Return just the path, not the full URL
 
 @login_required
 def submit_place(request):
@@ -107,7 +107,10 @@ def submit_place(request):
             if photos:
                 photo_urls = []
                 for photo in photos:
+                    # Update the photo URL to include MEDIA_URL
                     photo_url = upload_photo(photo)
+                    if not photo_url.startswith(('http://', 'https://')):
+                        photo_url = settings.MEDIA_URL + photo_url
                     photo_urls.append(photo_url)
                 place.photo_urls = photo_urls
             

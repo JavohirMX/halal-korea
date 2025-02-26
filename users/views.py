@@ -65,11 +65,17 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
+            # Get the next URL from either POST data or GET parameters
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
             return redirect('places:home')
         else:
             messages.error(request, 'Invalid username or password.')
     
-    return render(request, 'users/login.html')
+    return render(request, 'users/login.html', {
+        'next': request.GET.get('next', '')  # Pass the next parameter to the template
+    })
 
 def logout_view(request):
     logout(request)
