@@ -3,6 +3,51 @@
 {% block extra_head %}
 <!-- Remove Leaflet -->
 <!-- Add Google Maps -->
+<script>
+    // Define initMap globally
+    function initMap() {
+        // Center on Seoul by default
+        const seoul = { lat: 37.5665, lng: 126.9780 };
+        const mapElement = document.getElementById('map');
+        
+        if (mapElement) {
+            const map = new google.maps.Map(mapElement, {
+                zoom: 12,
+                center: seoul,
+            });
+
+            let marker = null;
+
+            // Add click listener to map
+            map.addListener('click', function(e) {
+                const lat = e.latLng.lat();
+                const lng = e.latLng.lng();
+                
+                // Update hidden inputs
+                document.getElementById('id_latitude').value = lat;
+                document.getElementById('id_longitude').value = lng;
+                
+                // Update or add marker
+                if (marker) {
+                    marker.setPosition(e.latLng);
+                } else {
+                    marker = new google.maps.Marker({
+                        position: e.latLng,
+                        map: map,
+                        draggable: true
+                    });
+
+                    // Update coordinates when marker is dragged
+                    marker.addListener('dragend', function() {
+                        const position = marker.getPosition();
+                        document.getElementById('id_latitude').value = position.lat();
+                        document.getElementById('id_longitude').value = position.lng();
+                    });
+                }
+            });
+        }
+    }
+</script>
 <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
 {% endblock %}
 
@@ -186,46 +231,6 @@
 </div>
 
 <script>
-    let map;
-    let marker;
-
-    function initMap() {
-        // Center on Seoul by default
-        const seoul = { lat: 37.5665, lng: 126.9780 };
-        map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 12,
-            center: seoul,
-        });
-
-        // Add click listener to map
-        map.addListener('click', function(e) {
-            const lat = e.latLng.lat();
-            const lng = e.latLng.lng();
-            
-            // Update hidden inputs
-            document.getElementById('id_latitude').value = lat;
-            document.getElementById('id_longitude').value = lng;
-            
-            // Update or add marker
-            if (marker) {
-                marker.setPosition(e.latLng);
-            } else {
-                marker = new google.maps.Marker({
-                    position: e.latLng,
-                    map: map,
-                    draggable: true
-                });
-
-                // Update coordinates when marker is dragged
-                marker.addListener('dragend', function() {
-                    const position = marker.getPosition();
-                    document.getElementById('id_latitude').value = position.lat();
-                    document.getElementById('id_longitude').value = position.lng();
-                });
-            }
-        });
-    }
-
     // Photo preview
     document.getElementById('photos').addEventListener('change', function(e) {
         const preview = document.getElementById('photo-preview');
