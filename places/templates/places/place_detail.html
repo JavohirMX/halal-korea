@@ -3,9 +3,6 @@
 {% load place_extras %}
 
 {% block extra_head %}
-<!-- Remove Leaflet -->
-<!-- Add Google Maps -->
-<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
 <!-- Swiper for image gallery -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -252,6 +249,11 @@
             infowindow.open(map, marker);
         });
     }
+
+    // Call initMap when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
 
     // Star rating interaction
     document.querySelectorAll('input[name="rating"] + label').forEach(label => {

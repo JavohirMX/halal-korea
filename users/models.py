@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 # User model
 class User(AbstractUser):
@@ -18,11 +18,21 @@ class User(AbstractUser):
         verbose_name='user permissions',
     )
     
-    preferred_language = models.CharField(max_length=10, choices=[
-        ('EN', 'English'),
-        ('KR', 'Korean'),
-        ('UZ', 'Uzbek'),
-    ], default='EN')
-    
     created_at = models.DateTimeField(auto_now_add=True)
+    favorite_places = models.ManyToManyField(
+        'places.HalalPlace',
+        related_name='favorited_by',
+        blank=True
+    )
+    
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('ko', 'Korean'),
+        ('uz', 'Uzbek'),
+    ]
+    preferred_language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
+    
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'users_user'  # Explicitly set the table name

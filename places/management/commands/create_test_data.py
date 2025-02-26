@@ -7,51 +7,71 @@ import random
 User = get_user_model()
 
 class Command(BaseCommand):
-    help = 'Creates test data for the Halal Places project'
+    help = 'Creates test data for development'
 
     def handle(self, *args, **kwargs):
         # Create test users
         self.stdout.write('Creating test users...')
-        test_users = []
-        for i in range(3):
+        users = []
+        for i in range(5):
             user, created = User.objects.get_or_create(
                 username=f'testuser{i}',
                 email=f'testuser{i}@example.com',
-                defaults={'preferred_language': 'EN'}
+                defaults={'password': 'testpass123'}
             )
             if created:
-                user.set_password('password123')
+                user.set_password('testpass123')
                 user.save()
-            test_users.append(user)
-
+            users.append(user)
+        
         # Create test places
         self.stdout.write('Creating test places...')
-        test_places = []
-        for i in range(5):
-            place = HalalPlace.objects.create(
-                name=f'Test Restaurant {i}',
-                description=f'This is a test restaurant {i}',
-                category='restaurant',
-                latitude=37.5665 + random.random(),
-                longitude=126.9780 + random.random(),
-                address=f'Test Address {i}, Seoul',
-                phone_number=f'010-1234-{i:04d}',
-                website=f'http://test{i}.com',
-                status='approved',
+        places = []
+        categories = ['restaurant', 'market', 'mosque']
+        statuses = ['pending', 'approved', 'rejected']
+        
+        for i in range(20):
+            place, created = HalalPlace.objects.get_or_create(
+                name=f'Test Place {i}',
+                defaults={
+                    'description': f'This is test place {i}',
+                    'category': random.choice(categories),
+                    'latitude': 37.5665 + random.uniform(-0.1, 0.1),
+                    'longitude': 126.9780 + random.uniform(-0.1, 0.1),
+                    'address': f'Test Address {i}, Seoul',
+                    'phone_number': f'010-1234-{i:04d}',
+                    'website': f'http://example{i}.com',
+                    'status': random.choice(statuses),
+                    'submitted_by': random.choice(users)
+                }
             )
-            test_places.append(place)
-
+            if created:
+                places.append(place)
+        
         # Create test reviews
         self.stdout.write('Creating test reviews...')
-        for user in test_users:
-            for place in test_places:
-                Review.objects.get_or_create(
-                    user=user,
+        approved_places = HalalPlace.objects.filter(status='approved')
+        for place in approved_places:
+            # Get users who haven't reviewed this place yet
+            existing_reviewers = Review.objects.filter(place=place).values_list('user', flat=True)
+            available_users = [user for user in users if user.id not in existing_reviewers]
+            
+            # Create reviews with remaining users
+            num_reviews = min(random.randint(1, 5), len(available_users))
+            for user in random.sample(available_users, num_reviews):
+                Review.objects.create(
                     place=place,
-                    defaults={
-                        'rating': random.randint(1, 5),
-                        'comment': f'Test review for {place.name}'
-                    }
+                    user=user,
+                    rating=random.randint(1, 5),
+                    comment=f'This is a test review for {place.name}'
                 )
+        
+        # Add favorite places
+        self.stdout.write('Adding favorite places...')
+        for user in users:
+            # Get random number of approved places to favorite
+            num_favorites = random.randint(1, min(5, approved_places.count()))
+            places_to_favorite = random.sample(list(approved_places), num_favorites)
+            user.favorite_places.add(*places_to_favorite)
 
-        self.stdout.write(self.style.SUCCESS('Successfully created test data!')) 
+        self.stdout.write(self.style.SUCCESS('Successfully created test data')) 

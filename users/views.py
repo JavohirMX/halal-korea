@@ -3,40 +3,41 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.contrib.auth.models import User
+from .models import User
 from places.models import HalalPlace
-from .forms import UserProfileForm, UserRegistrationForm
+from .forms import UserProfileForm, UserRegistrationForm, UserUpdateForm
+from reviews.models import Review
 
 @login_required
 def profile(request, username=None):
     if username:
-        profile_user = get_object_or_404(User, username=username)
+        user = get_object_or_404(User, username=username)
     else:
-        profile_user = request.user
-    
+        user = request.user
+        
+    reviews = Review.objects.filter(user=user).select_related('place')
+    favorite_places = user.favorite_places.filter(status='approved')
+    submitted_places = HalalPlace.objects.filter(submitted_by=user).order_by('-created_at')
+
     context = {
-        'profile_user': profile_user,
-        'reviews': profile_user.reviews.select_related('place').order_by('-created_at'),
-        'favorite_places': profile_user.favorite_places.filter(status='approved'),
-        'submitted_places': profile_user.submitted_places.all(),
+        'user': user,
+        'reviews': reviews,
+        'favorite_places': favorite_places,
+        'submitted_places': submitted_places,
+        'is_own_profile': user == request.user,
     }
-    
     return render(request, 'users/profile.html', context)
 
 @login_required
 def edit_profile(request):
     if request.method == 'POST':
-        form = UserProfileForm(
-            request.POST, 
-            request.FILES, 
-            instance=request.user
-        )
+        form = UserUpdateForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Profile updated successfully!')
-            return redirect('profile')
+            return redirect('users:profile')
     else:
-        form = UserProfileForm(instance=request.user)
+        form = UserUpdateForm(instance=request.user)
     
     return render(request, 'users/edit_profile.html', {'form': form})
 

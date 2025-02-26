@@ -1,8 +1,7 @@
 {% extends 'places/base.html' %}
 
 {% block extra_head %}
-<!-- Remove Leaflet -->
-<!-- Add Google Maps -->
+<!-- Remove any Google Maps script since it's in base.html -->
 <script>
     // Define initMap globally
     function initMap() {
@@ -47,8 +46,13 @@
             });
         }
     }
+
+    // Initialize map when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
+
 {% endblock %}
 
 {% block content %}

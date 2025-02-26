@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Add Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Add Google Maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}" async defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -71,9 +73,9 @@
                     
                     {% if user.is_authenticated %}
                         <div class="relative ml-3">
-                            <button type="button" class="flex text-sm rounded-full focus:outline-none">
+                            <a href="{% url 'users:profile' %}" class="flex text-sm rounded-full focus:outline-none">
                                 <span class="text-gray-700">{{ user.username }}</span>
-                            </button>
+                            </a>
                         </div>
                     {% else %}
                         <a href="{% url 'users:login' %}" class="text-primary-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium">
