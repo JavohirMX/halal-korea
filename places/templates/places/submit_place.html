@@ -200,7 +200,10 @@
                 <div class="space-y-6 pt-6 border-t border-gray-200">
                     <h2 class="text-xl font-semibold text-gray-900">Photos</h2>
                     
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
+                         id="drop-zone"
+                         ondragover="handleDragOver(event)"
+                         ondrop="handleDrop(event)">
                         <div class="space-y-1 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" 
@@ -235,24 +238,135 @@
 </div>
 
 <script>
-    // Photo preview
-    document.getElementById('photos').addEventListener('change', function(e) {
-        const preview = document.getElementById('photo-preview');
-        preview.innerHTML = '';
-        
-        [...e.target.files].forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const div = document.createElement('div');
-                div.className = 'relative aspect-w-1 aspect-h-1';
-                div.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview" class="object-cover rounded-lg">
-                `;
-                preview.appendChild(div);
-            }
-            reader.readAsDataURL(file);
-        });
+    // Photo preview and drag & drop handling
+    const photoInput = document.getElementById('photos');
+    const dropZone = document.getElementById('drop-zone');
+    const preview = document.getElementById('photo-preview');
+    let currentFiles = []; // Keep track of current files
+
+    // Handle file selection through input
+    photoInput.addEventListener('change', function(e) {
+        const newFiles = Array.from(e.target.files);
+        handleFiles(newFiles, true);
     });
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop zone when dragging over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        dropZone.classList.add('border-primary-500', 'bg-primary-50');
+    }
+
+    function unhighlight(e) {
+        dropZone.classList.remove('border-primary-500', 'bg-primary-50');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(Array.from(files), true);
+    }
+
+    function handleFiles(newFiles, append = false) {
+        // If not appending, clear everything
+        if (!append) {
+            preview.innerHTML = '';
+            currentFiles = [];
+        }
+
+        // Add new files to current files
+        newFiles.forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            
+            // Check if file already exists
+            const isDuplicate = currentFiles.some(existingFile => 
+                existingFile.name === file.name && 
+                existingFile.size === file.size
+            );
+
+            if (!isDuplicate) {
+                currentFiles.push(file);
+                createPreview(file);
+            }
+        });
+
+        // Update the file input
+        const dataTransfer = new DataTransfer();
+        currentFiles.forEach(file => dataTransfer.items.add(file));
+        photoInput.files = dataTransfer.files;
+    }
+
+    function createPreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'relative aspect-square';
+            div.innerHTML = `
+                <div class="h-full">
+                    <img src="${e.target.result}" 
+                         alt="Preview" 
+                         class="w-full h-full object-cover rounded-lg">
+                    <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                        <button type="button" 
+                                class="text-white hover:text-red-500 p-2"
+                                onclick="removePhoto(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removePhoto(button) {
+        const photoDiv = button.closest('.relative');
+        const index = Array.from(preview.children).indexOf(photoDiv);
+        
+        // Remove from preview with animation
+        photoDiv.style.transition = 'all 0.3s ease';
+        photoDiv.style.opacity = '0';
+        photoDiv.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+            // Remove from currentFiles array
+            currentFiles.splice(index, 1);
+            
+            // Clear and rebuild preview
+            preview.innerHTML = '';
+            
+            // Recreate all previews
+            currentFiles.forEach(file => {
+                createPreview(file);
+            });
+            
+            // Update the file input
+            const dt = new DataTransfer();
+            currentFiles.forEach(file => dt.items.add(file));
+            photoInput.files = dt.files;
+        }, 300);
+    }
 
     // Form validation
     document.querySelector('form').addEventListener('submit', function(e) {
