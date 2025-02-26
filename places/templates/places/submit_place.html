@@ -1,0 +1,245 @@
+{% extends 'places/base.html' %}
+
+{% block extra_head %}
+<!-- Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-3xl font-bold text-gray-900">Submit a Halal Place</h1>
+            <p class="mt-2 text-gray-600">
+                Help our community grow by adding a halal restaurant, market, or mosque
+            </p>
+        </div>
+
+        <!-- Form -->
+        <div class="bg-white rounded-lg shadow-sm p-6 md:p-8">
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Basic Information -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-gray-900">Basic Information</h2>
+                    
+                    <!-- Name -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Place Name *</label>
+                        <input type="text" 
+                               name="name" 
+                               id="name" 
+                               required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700">Category *</label>
+                        <select name="category" 
+                                id="category" 
+                                required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                            <option value="">Select a category</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="market">Market</option>
+                            <option value="mosque">Mosque</option>
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description *</label>
+                        <textarea name="description" 
+                                  id="description" 
+                                  rows="4" 
+                                  required
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                  placeholder="Please provide details about the place, such as the type of food served, halal certification, or facilities available."></textarea>
+                    </div>
+                </div>
+
+                <!-- Location Information -->
+                <div class="space-y-6 pt-6 border-t border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Location</h2>
+
+                    <!-- Address -->
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700">Address *</label>
+                        <input type="text" 
+                               name="address" 
+                               id="address" 
+                               required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    </div>
+
+                    <!-- Map -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pin Location on Map *</label>
+                        <div id="map" class="h-64 rounded-lg border border-gray-300"></div>
+                        {{ form.latitude }}
+                        {{ form.longitude }}
+                        <p class="mt-2 text-sm text-gray-500">
+                            Click on the map to set the exact location
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="space-y-6 pt-6 border-t border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Contact Information</h2>
+
+                    <!-- Phone -->
+                    <div>
+                        <label for="phone_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="tel" 
+                               name="phone_number" 
+                               id="phone_number" 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    </div>
+
+                    <!-- Website -->
+                    <div>
+                        <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
+                        <input type="url" 
+                               name="website" 
+                               id="website" 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                               placeholder="https://">
+                    </div>
+                </div>
+
+                <!-- Map Links -->
+                <div class="space-y-6 pt-6 border-t border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Map Links</h2>
+
+                    <!-- Google Maps -->
+                    <div>
+                        <label for="google_map_link" class="block text-sm font-medium text-gray-700">Google Maps Link</label>
+                        <input type="url" 
+                               name="google_map_link" 
+                               id="google_map_link" 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                               placeholder="https://maps.google.com/...">
+                    </div>
+
+                    <!-- Naver Maps -->
+                    <div>
+                        <label for="naver_map_link" class="block text-sm font-medium text-gray-700">Naver Maps Link</label>
+                        <input type="url" 
+                               name="naver_map_link" 
+                               id="naver_map_link" 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                               placeholder="https://map.naver.com/...">
+                    </div>
+
+                    <!-- Kakao Maps -->
+                    <div>
+                        <label for="kakao_map_link" class="block text-sm font-medium text-gray-700">Kakao Maps Link</label>
+                        <input type="url" 
+                               name="kakao_map_link" 
+                               id="kakao_map_link" 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                               placeholder="https://map.kakao.com/...">
+                    </div>
+                </div>
+
+                <!-- Photos -->
+                <div class="space-y-6 pt-6 border-t border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Photos</h2>
+                    
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                        <div class="space-y-1 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" 
+                                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="photos" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
+                                    <span>Upload photos</span>
+                                    <input id="photos" name="photos" type="file" class="sr-only" multiple accept="image/*">
+                                </label>
+                                <p class="pl-1">or drag and drop</p>
+                            </div>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
+                        </div>
+                    </div>
+                    <div id="photo-preview" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6 border-t border-gray-200">
+                    <button type="submit" 
+                            class="w-full bg-primary-600 text-white px-4 py-3 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Submit Place
+                    </button>
+                    <p class="mt-2 text-sm text-gray-500 text-center">
+                        * Required fields
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize map
+    const map = L.map('map').setView([37.5665, 126.9780], 13); // Seoul coordinates
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker;
+
+    // Handle map clicks
+    map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        // Update hidden inputs
+        document.getElementById('id_latitude').value = lat;
+        document.getElementById('id_longitude').value = lng;
+        
+        // Update or add marker
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+    });
+
+    // Photo preview
+    document.getElementById('photos').addEventListener('change', function(e) {
+        const preview = document.getElementById('photo-preview');
+        preview.innerHTML = '';
+        
+        [...e.target.files].forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative aspect-w-1 aspect-h-1';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview" class="object-cover rounded-lg">
+                `;
+                preview.appendChild(div);
+            }
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const lat = document.getElementById('id_latitude').value;
+        const lng = document.getElementById('id_longitude').value;
+        
+        if (!lat || !lng) {
+            e.preventDefault();
+            alert('Please select a location on the map');
+        }
+    });
+</script>
+{% endblock %}

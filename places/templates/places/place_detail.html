@@ -1,0 +1,253 @@
+{% extends 'places/base.html' %}
+{% load static %}
+{% load place_extras %}
+
+{% block extra_head %}
+<!-- Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Swiper for image gallery -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-4" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li><a href="{% url 'places:home' %}" class="text-gray-500 hover:text-primary-600">Home</a></li>
+            <li><span class="text-gray-400 mx-2">/</span></li>
+            <li><a href="{% url 'places:explore' %}" class="text-gray-500 hover:text-primary-600">Explore</a></li>
+            <li><span class="text-gray-400 mx-2">/</span></li>
+            <li class="text-gray-700">{{ place.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Images and Details -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Image Gallery -->
+            {% if place.photo_urls %}
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="swiper">
+                    <div class="swiper-wrapper">
+                        {% for photo_url in place.photo_urls %}
+                        <div class="swiper-slide">
+                            <img src="{{ photo_url }}" 
+                                 alt="{{ place.name }}" 
+                                 class="w-full h-96 object-cover">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Place Details -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">{{ place.name }}</h1>
+                        <div class="mt-2 flex items-center">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
+                                {{ place.category|title }}
+                            </span>
+                            <div class="ml-4 flex items-center">
+                                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <span class="ml-1 text-gray-700">{{ place.average_rating|default:"New" }}</span>
+                                <span class="ml-1 text-gray-500">({{ place.reviews.count }} reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <button class="text-gray-400 hover:text-primary-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                    </button>
+                    {% endif %}
+                </div>
+
+                <div class="mt-6 space-y-4">
+                    <p class="text-gray-700">{{ place.description }}</p>
+                    
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        {{ place.address }}
+                    </div>
+
+                    {% if place.phone_number %}
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
+                        <a href="tel:{{ place.phone_number }}" class="hover:text-primary-600">
+                            {{ place.phone_number }}
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if place.website %}
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                        </svg>
+                        <a href="{{ place.website }}" target="_blank" class="hover:text-primary-600">
+                            Visit Website
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Map Links -->
+                <div class="mt-6 flex flex-wrap gap-3">
+                    {% if place.google_map_link %}
+                    <a href="{{ place.google_map_link }}" target="_blank" 
+                       class="inline-flex items-center px-4 py-2 border border-primary-600 rounded-md text-primary-600 hover:bg-primary-50">
+                        <img src="{% static 'images/google-maps-icon.png' %}" alt="Google Maps" class="w-5 h-5 mr-2">
+                        Google Maps
+                    </a>
+                    {% endif %}
+                    {% if place.naver_map_link %}
+                    <a href="{{ place.naver_map_link }}" target="_blank" 
+                       class="inline-flex items-center px-4 py-2 border border-primary-600 rounded-md text-primary-600 hover:bg-primary-50">
+                        <img src="{% static 'images/naver-maps-icon.png' %}" alt="Naver Maps" class="w-5 h-5 mr-2">
+                        Naver Maps
+                    </a>
+                    {% endif %}
+                    {% if place.kakao_map_link %}
+                    <a href="{{ place.kakao_map_link }}" target="_blank" 
+                       class="inline-flex items-center px-4 py-2 border border-primary-600 rounded-md text-primary-600 hover:bg-primary-50">
+                        <img src="{% static 'images/kakao-maps-icon.png' %}" alt="Kakao Maps" class="w-5 h-5 mr-2">
+                        Kakao Maps
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Reviews</h2>
+                
+                {% if user.is_authenticated %}
+                <!-- Review Form -->
+                <form method="post" action="{% url 'reviews:add_review' place.id %}" class="mb-8">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Rating</label>
+                            <div class="flex items-center mt-1">
+                                {% for i in "12345" %}
+                                <input type="radio" name="rating" value="{{ i }}" class="hidden" id="star{{ i }}">
+                                <label for="star{{ i }}" class="cursor-pointer p-1">
+                                    <svg class="w-8 h-8 text-gray-300 hover:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Comment</label>
+                            <textarea name="comment" rows="4" 
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+                        </div>
+                        <button type="submit" 
+                                class="w-full bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700">
+                            Submit Review
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+
+                <!-- Reviews List -->
+                <div class="space-y-6">
+                    {% for review in place.reviews.all %}
+                    <div class="border-b border-gray-200 pb-6 last:border-b-0">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center">
+                                    <span class="font-medium text-gray-900">{{ review.user.username }}</span>
+                                    <span class="mx-2 text-gray-300">•</span>
+                                    <div class="flex items-center">
+                                        {% for i in review.rating|make_range %}
+                                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-gray-600">{{ review.comment }}</p>
+                            </div>
+                            <span class="text-sm text-gray-500">
+                                {{ review.created_at|timesince }} ago
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-gray-500 text-center">No reviews yet. Be the first to review!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Map -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-sm p-4 sticky top-4">
+                <div id="map" class="h-96 rounded-lg"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize Swiper
+    const swiper = new Swiper('.swiper', {
+        pagination: {
+            el: '.swiper-pagination',
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+
+    // Initialize map
+    const map = L.map('map').setView([{{ place.latitude }}, {{ place.longitude }}], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([{{ place.latitude }}, {{ place.longitude }}])
+        .addTo(map)
+        .bindPopup('{{ place.name }}')
+        .openPopup();
+
+    // Star rating interaction
+    document.querySelectorAll('input[name="rating"] + label').forEach(label => {
+        label.addEventListener('mouseover', function() {
+            const rating = this.previousElementSibling.value;
+            document.querySelectorAll('input[name="rating"] + label svg').forEach((star, index) => {
+                star.classList.toggle('text-yellow-400', index < rating);
+                star.classList.toggle('text-gray-300', index >= rating);
+            });
+        });
+    });
+</script>
+{% endblock %}

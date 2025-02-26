@@ -1,0 +1,56 @@
+{% extends 'places/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <h2>{{ profile_user.username }}'s Profile</h2>
+            {% if request.user == profile_user %}
+                <a href="{% url 'users:edit_profile' %}" class="btn btn-primary mb-3">Edit Profile</a>
+            {% endif %}
+            <div class="card">
+                <div class="card-body">
+                    <p><strong>Email:</strong> {{ profile_user.email }}</p>
+                    <p><strong>Joined:</strong> {{ profile_user.created_at|date }}</p>
+                    <p><strong>Language:</strong> {{ profile_user.get_preferred_language_display }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <h3>Reviews</h3>
+            {% for review in reviews %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'places:place_detail' pk=review.place.pk %}">
+                                {{ review.place.name }}
+                            </a>
+                        </h5>
+                        <p class="card-text">{{ review.comment }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">Rating: {{ review.rating }}/5</small>
+                        </p>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No reviews yet.</p>
+            {% endfor %}
+
+            <h3>Favorite Places</h3>
+            {% for place in favorite_places %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'places:place_detail' pk=place.pk %}">
+                                {{ place.name }}
+                            </a>
+                        </h5>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No favorite places yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

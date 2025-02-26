@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Halal Korea{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        input:focus, textarea:focus, select:focus {
+            outline: none !important;
+            border-color: #22c55e !important;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{% url 'places:home' %}" class="text-primary-600 font-bold text-xl">
+                            Halal Korea
+                        </a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="{% url 'places:explore' %}" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                            Explore
+                        </a>
+                        <a href="{% url 'places:submit_place' %}" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                            Submit Place
+                        </a>
+                        <a href="{% url 'places:about' %}" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                            About
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <!-- Language Selector -->
+                    <select class="mr-4 rounded-md border-gray-300 text-sm">
+                        <option value="EN">English</option>
+                        <option value="KR">한국어</option>
+                        <option value="UZ">O'zbek</option>
+                    </select>
+                    
+                    {% if user.is_authenticated %}
+                        <div class="relative ml-3">
+                            <button type="button" class="flex text-sm rounded-full focus:outline-none">
+                                <span class="text-gray-700">{{ user.username }}</span>
+                            </button>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="text-primary-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium">
+                            Log in
+                        </a>
+                        <a href="{% url 'users:register' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                            Sign up
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white mt-12">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1">
+                    <h3 class="text-primary-600 font-bold text-lg mb-4">Halal Korea</h3>
+                    <p class="text-gray-600 text-sm">
+                        Helping you find halal food and services across Korea.
+                    </p>
+                </div>
+                <div class="col-span-1">
+                    <h4 class="font-semibold text-gray-900 mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'places:explore' %}" class="text-gray-600 hover:text-primary-600">Explore</a></li>
+                        <li><a href="{% url 'places:submit_place' %}" class="text-gray-600 hover:text-primary-600">Submit Place</a></li>
+                        <li><a href="{% url 'places:about' %}" class="text-gray-600 hover:text-primary-600">About</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h4 class="font-semibold text-gray-900 mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-primary-600">Restaurants</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary-600">Markets</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary-600">Mosques</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h4 class="font-semibold text-gray-900 mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="text-gray-600">info@halalkorea.com</li>
+                        <li class="text-gray-600">+82 10-1234-5678</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-200 pt-8">
+                <p class="text-center text-gray-400 text-sm">
+                    © 2024 Halal Korea. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

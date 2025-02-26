@@ -1,0 +1,206 @@
+{% extends 'places/base.html' %}
+{% load static %}
+
+{% block title %}Halal Korea - Find Halal Places in Korea{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative bg-primary-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center">
+            <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                Find Halal Places in Korea
+            </h1>
+            <p class="mt-3 max-w-md mx-auto text-base text-primary-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                Discover halal restaurants, markets, and mosques across South Korea.
+            </p>
+            
+            <!-- Search Bar -->
+            <div class="mt-10 max-w-xl mx-auto">
+                <form action="{% url 'places:explore' %}" method="GET" class="flex rounded-md shadow-sm">
+                    <input type="text" 
+                           name="q"
+                           class="flex-1 rounded-l-lg px-4 py-3 border-0 focus:ring-2 focus:ring-primary-500" 
+                           placeholder="Search for restaurants, markets, or mosques...">
+                    <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-r-lg text-white bg-primary-700 hover:bg-primary-800">
+                        Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Section -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Restaurants -->
+        <a href="{% url 'places:explore' %}?category=restaurant" class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-utensils w-8 h-8 text-primary-600 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">Restaurants</h3>
+                    <p class="mt-1 text-sm text-gray-500">Find halal restaurants near you</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Markets -->
+        <a href="{% url 'places:explore' %}?category=market" class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-shopping-basket w-8 h-8 text-primary-600 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">Markets</h3>
+                    <p class="mt-1 text-sm text-gray-500">Discover halal grocery stores</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Mosques -->
+        <a href="{% url 'places:explore' %}?category=mosque" class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-mosque w-8 h-8 text-primary-600 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">Mosques</h3>
+                    <p class="mt-1 text-sm text-gray-500">Locate nearby mosques</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Featured Places Section -->
+<div class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Featured Places</h2>
+        <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {% for place in featured_places %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                {% if place.photo_urls %}
+                <img src="{{ place.photo_urls.0 }}" alt="{{ place.name }}" class="w-full h-48 object-cover">
+                {% endif %}
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-900">{{ place.name }}</h3>
+                    <p class="text-sm text-primary-600 mt-1">{{ place.category|title }}</p>
+                    <p class="mt-2 text-gray-600 line-clamp-2">{{ place.description }}</p>
+                    <div class="mt-4 flex justify-between items-center">
+                        <a href="{% url 'places:place_detail' place.id %}" class="text-primary-600 hover:text-primary-700">
+                            View details
+                        </a>
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <span class="ml-1 text-gray-600">{{ place.avg_rating|default:"New" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Google Maps JavaScript API -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initHomeMap" async defer></script>
+<script>
+    function initHomeMap() {
+        // Center on Seoul by default
+        const seoul = { lat: 37.5665, lng: 126.9780 };
+        const map = new google.maps.Map(document.getElementById("homeMap"), {
+            zoom: 12,
+            center: seoul,
+        });
+        
+        // If user allows location, center on their position
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+                    map.setCenter(userLocation);
+                    
+                    // Add marker for user's location
+                    new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 10,
+                            fillColor: "#4285F4",
+                            fillOpacity: 1,
+                            strokeColor: "#FFFFFF",
+                            strokeWeight: 2,
+                        },
+                        title: "Your Location",
+                    });
+                }
+            );
+        }
+        
+        // Add markers for nearby places
+        {% for place in nearby_places %}
+            const marker{{ place.id }} = new google.maps.Marker({
+                position: { lat: {{ place.latitude }}, lng: {{ place.longitude }} },
+                map: map,
+                title: "{{ place.name }}",
+                icon: {% if place.category == 'restaurant' %}
+                        "{% static 'img/restaurant-marker.png' %}"
+                      {% elif place.category == 'market' %}
+                        "{% static 'img/market-marker.png' %}"
+                      {% elif place.category == 'mosque' %}
+                        "{% static 'img/mosque-marker.png' %}"
+                      {% endif %}
+            });
+            
+            const infowindow{{ place.id }} = new google.maps.InfoWindow({
+                content: `
+                    <div class="map-info-window">
+                        <h5>{{ place.name }}</h5>
+                        <p><i class="fas fa-map-marker-alt text-danger me-1"></i> {{ place.address }}</p>
+                        <a href="{% url 'places:place_detail' place.id %}" class="btn btn-sm btn-primary">View Details</a>
+                    </div>
+                `
+            });
+            
+            marker{{ place.id }}.addListener("click", () => {
+                infowindow{{ place.id }}.open(map, marker{{ place.id }});
+            });
+        {% endfor %}
+    }
+</script>
+<!-- Counter Animation -->
+<script>
+    $(document).ready(function() {
+        $('.counter').each(function() {
+            const $this = $(this);
+            const countTo = parseInt($this.text(), 10);
+            
+            $({ countNum: 0 }).animate({
+                countNum: countTo
+            }, {
+                duration: 2000,
+                easing: 'swing',
+                step: function() {
+                    $this.text(Math.floor(this.countNum));
+                },
+                complete: function() {
+                    $this.text(this.countNum);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
