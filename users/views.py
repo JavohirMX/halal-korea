@@ -5,8 +5,9 @@ from django.contrib import messages
 from django.http import JsonResponse
 from .models import User
 from places.models import HalalPlace
-from .forms import UserProfileForm, UserRegistrationForm, UserUpdateForm
+from .forms import UserRegistrationForm, UserUpdateForm
 from reviews.models import Review
+from django.views.decorators.http import require_POST
 
 @login_required
 def profile(request, username=None):
@@ -42,6 +43,7 @@ def edit_profile(request):
     return render(request, 'users/edit_profile.html', {'form': form})
 
 @login_required
+@require_POST
 def toggle_favorite(request, place_id):
     place = get_object_or_404(HalalPlace, id=place_id)
     user = request.user
@@ -53,10 +55,7 @@ def toggle_favorite(request, place_id):
         user.favorite_places.add(place)
         status = 'added'
     
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({'status': status})
-    
-    return redirect('place_detail', pk=place_id)
+    return JsonResponse({'status': status})
 
 def login_view(request):
     if request.method == 'POST':

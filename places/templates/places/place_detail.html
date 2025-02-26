@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+{% csrf_token %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
     <nav class="flex mb-4" aria-label="Breadcrumb">
@@ -64,11 +65,10 @@
                         </div>
                     </div>
                     {% if user.is_authenticated %}
-                    <button class="text-gray-400 hover:text-primary-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                        </svg>
+                    <button id="favorite-button" 
+                            data-place-id="{{ place.id }}"
+                            class="text-gray-400 hover:text-red-600 focus:outline-none">
+                        <i class="fas fa-heart {% if place in user.favorite_places.all %}text-red-600{% else %}text-gray-400{% endif %}"></i>
                     </button>
                     {% endif %}
                 </div>
@@ -264,6 +264,31 @@
                 star.classList.toggle('text-gray-300', index >= rating);
             });
         });
+    });
+
+    // Update favorite functionality
+    document.getElementById('favorite-button')?.addEventListener('click', function() {
+        const placeId = this.dataset.placeId;
+        const heartIcon = this.querySelector('i');
+        
+        fetch(`/users/toggle-favorite/${placeId}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'added') {
+                heartIcon.classList.remove('text-gray-400');
+                heartIcon.classList.add('text-red-600');
+            } else {
+                heartIcon.classList.remove('text-red-600');
+                heartIcon.classList.add('text-gray-400');
+            }
+        })
+        .catch(error => console.error('Error:', error));
     });
 </script>
 {% endblock %}

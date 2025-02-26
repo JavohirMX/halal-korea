@@ -11,4 +11,5 @@ urlpatterns = [
     path('profile/<str:username>/', views.profile, name='user_profile'),
     path('profile/', views.profile, name='profile'),
     path('favorite/toggle/<int:place_id>/', views.toggle_favorite, name='toggle_favorite'),
+    path('toggle-favorite/<int:place_id>/', views.toggle_favorite, name='toggle_favorite'),
 ]
