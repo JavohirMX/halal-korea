@@ -44,75 +44,152 @@
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
+    <nav class="bg-white shadow-lg" x-data="{ isOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
+                <!-- Left side -->
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
                         <a href="{% url 'places:home' %}" class="text-primary-600 font-bold text-xl">
                             Halal Korea
                         </a>
                     </div>
+                    <!-- Desktop Menu -->
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{% url 'places:explore' %}" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
-                            Explore
+                        <a href="{% url 'places:explore' %}" 
+                           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center">
+                            <i class="fas fa-search mr-2"></i>Explore
                         </a>
-                        <a href="{% url 'places:submit_place' %}" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
-                            Submit Place
+                        <a href="{% url 'places:submit_place' %}" 
+                           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center">
+                            <i class="fas fa-plus mr-2"></i>Submit Place
                         </a>
-                        <a href="{% url 'places:about' %}" class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
-                            About
+                        <a href="{% url 'places:about' %}" 
+                           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>About
                         </a>
                     </div>
                 </div>
+
+                <!-- Right side -->
                 <div class="flex items-center">
                     <!-- Language Selector -->
-                    <select class="mr-4 rounded-md border-gray-300 text-sm">
+                    <select class="mr-4 rounded-md border-gray-300 text-sm hidden sm:block">
                         <option value="EN">English</option>
                         <option value="KR">한국어</option>
                         <option value="UZ">O'zbek</option>
                     </select>
                     
-                    {% if user.is_authenticated %}
-                        <div class="relative ml-3" x-data="{ open: false }" @click.away="open = false">
-                            <button type="button" 
-                                    @click="open = !open" 
-                                    class="flex items-center text-sm rounded-full focus:outline-none">
-                                <span class="text-gray-700">{{ user.username }}</span>
-                                <i class="fas fa-chevron-down ml-1 text-gray-400"></i>
-                            </button>
-                            
-                            <!-- Dropdown menu -->
-                            <div x-show="open"
-                                 x-transition:enter="transition ease-out duration-100"
-                                 x-transition:enter-start="transform opacity-0 scale-95"
-                                 x-transition:enter-end="transform opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-75"
-                                 x-transition:leave-start="transform opacity-100 scale-100"
-                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-                                <a href="{% url 'users:profile' %}" 
-                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-user mr-2"></i>Profile
-                                </a>
-                                <a href="{% url 'users:edit_profile' %}" 
-                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-cog mr-2"></i>Settings
-                                </a>
-                                <div class="border-t border-gray-100"></div>
-                                <a href="{% url 'users:logout' %}" 
-                                   class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                                </a>
+                    <!-- Desktop Auth Menu -->
+                    <div class="hidden sm:flex sm:items-center">
+                        {% if user.is_authenticated %}
+                            <div class="relative ml-3" x-data="{ open: false }" @click.away="open = false">
+                                <button type="button" 
+                                        @click="open = !open" 
+                                        class="flex items-center text-sm rounded-full focus:outline-none">
+                                    <span class="text-gray-700">{{ user.username }}</span>
+                                    <i class="fas fa-chevron-down ml-1 text-gray-400"></i>
+                                </button>
+                                
+                                <!-- Dropdown menu -->
+                                <div x-show="open"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                                    <a href="{% url 'users:profile' %}" 
+                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-user mr-2"></i>Profile
+                                    </a>
+                                    <a href="{% url 'users:edit_profile' %}" 
+                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-cog mr-2"></i>Settings
+                                    </a>
+                                    <div class="border-t border-gray-100"></div>
+                                    <a href="{% url 'users:logout' %}" 
+                                       class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                    </a>
+                                </div>
                             </div>
+                        {% else %}
+                            <a href="{% url 'users:login' %}" class="text-primary-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium">
+                                Log in
+                            </a>
+                            <a href="{% url 'users:register' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                Sign up
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <div class="flex items-center sm:hidden">
+                        <button @click="isOpen = !isOpen" 
+                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
+                            <span class="sr-only">Open main menu</span>
+                            <i class="fas fa-bars text-xl" x-show="!isOpen"></i>
+                            <i class="fas fa-times text-xl" x-show="isOpen"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile menu -->
+            <div class="sm:hidden" x-show="isOpen" 
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="transform opacity-100 scale-100"
+                 x-transition:leave-end="transform opacity-0 scale-95">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="{% url 'places:explore' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                        <i class="fas fa-search mr-2"></i>Explore
+                    </a>
+                    <a href="{% url 'places:submit_place' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                        <i class="fas fa-plus mr-2"></i>Submit Place
+                    </a>
+                    <a href="{% url 'places:about' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                        <i class="fas fa-info-circle mr-2"></i>About
+                    </a>
+                    
+                    <!-- Language Selector for Mobile -->
+                    <div class="px-3 py-2">
+                        <select class="w-full rounded-md border-gray-300 text-sm">
+                            <option value="EN">English</option>
+                            <option value="KR">한국어</option>
+                            <option value="UZ">O'zbek</option>
+                        </select>
+                    </div>
+
+                    <!-- Mobile Auth Menu -->
+                    {% if user.is_authenticated %}
+                        <div class="border-t border-gray-200 pt-4">
+                            <div class="px-3 py-2 text-sm font-medium text-gray-500">
+                                Signed in as <span class="font-bold text-gray-700">{{ user.username }}</span>
+                            </div>
+                            <a href="{% url 'users:profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="{% url 'users:edit_profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <a href="{% url 'users:logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 hover:bg-gray-50">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
                         </div>
                     {% else %}
-                        <a href="{% url 'users:login' %}" class="text-primary-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium">
-                            Log in
-                        </a>
-                        <a href="{% url 'users:register' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                            Sign up
-                        </a>
+                        <div class="border-t border-gray-200 pt-4">
+                            <a href="{% url 'users:login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 hover:bg-gray-50">
+                                Log in
+                            </a>
+                            <a href="{% url 'users:register' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 hover:bg-gray-50">
+                                Sign up
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
