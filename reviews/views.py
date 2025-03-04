@@ -1,64 +1,147 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
+from django.core.exceptions import ValidationError
+from django.views.decorators.http import require_http_methods
 from .models import Review
 from places.models import HalalPlace
-from .forms import ReviewForm
 
 @login_required
+@require_http_methods(["POST"])
 def add_review(request, place_id):
-    place = get_object_or_404(HalalPlace, id=place_id)
+    """Add a new review for a place."""
+    place = get_object_or_404(HalalPlace, id=place_id, status='approved')
     
-    # Check if user has already reviewed
+    # Check if user has already reviewed this place
     if Review.objects.filter(user=request.user, place=place).exists():
         messages.error(request, 'You have already reviewed this place.')
         return redirect('places:place_detail', pk=place_id)
     
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.user = request.user
-            review.place = place
-            review.save()
-            messages.success(request, 'Review added successfully!')
-            return redirect('places:place_detail', pk=place_id)
-    else:
-        form = ReviewForm()
+    try:
+        # Get form data
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment', '').strip()
+        
+        # Validate rating
+        if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+            raise ValidationError('Please provide a valid rating between 1 and 5.')
+        
+        # Create review
+        review = Review.objects.create(
+            user=request.user,
+            place=place,
+            rating=int(rating),
+            comment=comment
+        )
+        
+        messages.success(request, 'Your review has been added successfully!')
+        
+        # Return JSON response for AJAX requests
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Review added successfully',
+                'review': {
+                    'rating': review.rating,
+                    'content': review.comment,
+                    'created_at': review.created_at.strftime('%B %d, %Y'),
+                    'user': request.user.username
+                }
+            })
+            
+    except ValidationError as e:
+        messages.error(request, str(e))
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+    except Exception:
+        messages.error(request, 'An error occurred while submitting your review.')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'error',
+                'message': 'An error occurred while submitting your review.'
+            }, status=500)
     
-    return render(request, 'reviews/add_review.html', {
-        'form': form,
-        'place': place
-    })
+    return redirect('places:place_detail', pk=place_id)
 
 @login_required
 def edit_review(request, review_id):
-    review = get_object_or_404(Review, id=review_id, user=request.user)
-    
-    if request.method == 'POST':
-        form = ReviewForm(request.POST, instance=review)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Review updated successfully!')
-            return redirect('places:place_detail', pk=review.place.id)
-    else:
-        form = ReviewForm(instance=review)
-    
-    return render(request, 'reviews/edit_review.html', {
-        'form': form,
-        'review': review
-    })
-
-@login_required
-def delete_review(request, review_id):
+    """Edit an existing review."""
     review = get_object_or_404(Review, id=review_id, user=request.user)
     place_id = review.place.id
     
     if request.method == 'POST':
-        review.delete()
-        messages.success(request, 'Review deleted successfully!')
-        return redirect('places:place_detail', pk=place_id)
+        try:
+            rating = request.POST.get('rating')
+            comment = request.POST.get('comment', '').strip()
+            
+            # Validate rating
+            if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+                raise ValidationError('Please provide a valid rating between 1 and 5.')
+            
+            # Update review
+            review.rating = int(rating)
+            review.comment = comment
+            review.save()
+            
+            messages.success(request, 'Your review has been updated successfully!')
+            
+            # Return JSON response for AJAX requests
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Review updated successfully',
+                    'review': {
+                        'rating': review.rating,
+                        'content': review.comment,
+                        'created_at': review.created_at.strftime('%B %d, %Y')
+                    }
+                })
+                
+        except ValidationError as e:
+            messages.error(request, str(e))
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'error',
+                    'message': str(e)
+                }, status=400)
+        except Exception:
+            messages.error(request, 'An error occurred while updating your review.')
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'An error occurred while updating your review.'
+                }, status=500)
     
-    return render(request, 'reviews/delete_review.html', {
-        'review': review
-    })
+    return redirect('places:place_detail', pk=place_id)
+
+@login_required
+@require_http_methods(["POST", "DELETE"])
+def delete_review(request, review_id):
+    """Delete a review."""
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+    place_id = review.place.id
+    
+    try:
+        review.delete()
+        messages.success(request, 'Your review has been deleted successfully!')
+        
+        # Return JSON response for AJAX requests
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Review deleted successfully'
+            })
+            
+    except Exception:
+        messages.error(request, 'An error occurred while deleting your review.')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'error',
+                'message': 'An error occurred while deleting your review.'
+            }, status=500)
+    
+    return redirect('places:place_detail', pk=place_id)

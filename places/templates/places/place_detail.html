@@ -142,36 +142,127 @@
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Reviews</h3>
                 
                 {% if user.is_authenticated %}
-                <form method="POST" action="{% url 'reviews:add_review' place.id %}" class="mb-6">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Your Rating
-                        </label>
-                        <div class="flex items-center space-x-1">
-                            {% for i in "12345" %}
-                            <input type="radio" name="rating" value="{{ forloop.counter }}" class="hidden" id="star{{ forloop.counter }}">
-                            <label for="star{{ forloop.counter }}" class="cursor-pointer">
-                                <svg class="w-6 h-6 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                </svg>
+                    {% for review in place.reviews.all %}
+                        {% if review.user == user %}
+                            <!-- User's existing review with edit/delete options -->
+                            <div class="mb-6 border-b border-gray-200 dark:border-gray-700 pb-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">Your Review</h4>
+                                    <div class="flex space-x-2">
+                                        <button onclick="toggleEditForm()" 
+                                                class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <form action="{% url 'reviews:delete_review' review.id %}" 
+                                              method="POST" 
+                                              class="inline"
+                                              onsubmit="return confirm('Are you sure you want to delete your review?');">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <!-- Current review display -->
+                                <div id="current-review">
+                                    <div class="flex items-center mb-2">
+                                        {% for i in "12345" %}
+                                        <svg class="w-5 h-5 {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" 
+                                             fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        {% endfor %}
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-400">{{ review.comment }}</p>
+                                </div>
+                                
+                                <!-- Edit form (hidden by default) -->
+                                <form id="edit-review-form" 
+                                      action="{% url 'reviews:edit_review' review.id %}" 
+                                      method="POST" 
+                                      class="hidden">
+                                    {% csrf_token %}
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Rating
+                                        </label>
+                                        <div class="flex items-center space-x-1">
+                                            {% for i in "12345" %}
+                                            <input type="radio" 
+                                                   name="rating" 
+                                                   value="{{ forloop.counter }}" 
+                                                   class="hidden" 
+                                                   id="edit-star{{ forloop.counter }}"
+                                                   {% if forloop.counter == review.rating %}checked{% endif %}>
+                                            <label for="edit-star{{ forloop.counter }}" class="cursor-pointer">
+                                                <svg class="w-6 h-6 {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" 
+                                                     fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                </svg>
+                                            </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Your Review
+                                        </label>
+                                        <textarea name="comment" 
+                                                  rows="4" 
+                                                  class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">{{ review.comment }}</textarea>
+                                    </div>
+                                    <div class="flex space-x-3">
+                                        <button type="submit" 
+                                                class="gradient-bg-hover text-white font-medium py-2 px-4 rounded-md transition-all duration-200">
+                                            Update Review
+                                        </button>
+                                        <button type="button" 
+                                                onclick="toggleEditForm()" 
+                                                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if not user_has_reviewed %}
+                    <!-- New review form -->
+                    <form method="POST" action="{% url 'reviews:add_review' place.id %}" class="mb-6">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Your Rating
                             </label>
-                            {% endfor %}
+                            <div class="flex items-center space-x-1">
+                                {% for i in "12345" %}
+                                <input type="radio" name="rating" value="{{ forloop.counter }}" class="hidden" id="star{{ forloop.counter }}">
+                                <label for="star{{ forloop.counter }}" class="cursor-pointer">
+                                    <svg class="w-6 h-6 text-gray-300 dark:text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </label>
+                                {% endfor %}
+                            </div>
                         </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Your Review
-                        </label>
-                        <textarea name="content" rows="4" 
-                                  class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
-                                  placeholder="Share your experience..."></textarea>
-                    </div>
-                    <button type="submit" 
-                            class="w-full gradient-bg-hover text-white font-medium py-2 px-4 rounded-md transition-all duration-200">
-                        Submit Review
-                    </button>
-                </form>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Your Review
+                            </label>
+                            <textarea name="content" rows="4" 
+                                      class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                                      placeholder="Share your experience..."></textarea>
+                        </div>
+                        <button type="submit" 
+                                class="w-full gradient-bg-hover text-white font-medium py-2 px-4 rounded-md transition-all duration-200">
+                            Submit Review
+                        </button>
+                    </form>
+                    {% endif %}
                 {% endif %}
 
                 <!-- Reviews List -->
@@ -197,7 +288,7 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="mt-2 text-gray-600 dark:text-gray-400">{{ review.content }}</p>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400">{{ review.comment }}</p>
                     </div>
                     {% empty %}
                     <p class="text-gray-500 dark:text-gray-400 text-center">No reviews yet. Be the first to review!</p>
@@ -226,9 +317,11 @@
     });
 
     // Initialize Google Map
-    function initMap() {
+    async function initMap() {
         const location = { lat: {{ place.latitude }}, lng: {{ place.longitude }} };
-        const map = new google.maps.Map(document.getElementById('map'), {
+        const { Map } = await google.maps.importLibrary("maps")
+
+        map = new Map(document.getElementById("map"), {
             zoom: 15,
             center: location,
         });
@@ -259,39 +352,137 @@
     });
 
     // Star rating interaction
-    document.querySelectorAll('input[name="rating"] + label').forEach(label => {
-        label.addEventListener('mouseover', function() {
-            const rating = this.previousElementSibling.value;
-            document.querySelectorAll('input[name="rating"] + label svg').forEach((star, index) => {
-                star.classList.toggle('text-yellow-400', index < rating);
-                star.classList.toggle('text-gray-300', index >= rating);
-            });
+    const ratingInputs = document.querySelectorAll('input[name="rating"]');
+    const ratingStars = document.querySelectorAll('input[name="rating"] + label svg');
+
+    // Initialize with any existing rating
+    let currentRating = document.querySelector('input[name="rating"]:checked')?.value || 0;
+
+    function updateStars(rating, isHover = false) {
+        ratingStars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('text-gray-300', 'dark:text-gray-600');
+                star.classList.add('text-yellow-400');
+            } else {
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300', 'dark:text-gray-600');
+            }
+        });
+    }
+
+    ratingInputs.forEach(input => {
+        const label = input.nextElementSibling;
+        
+        // Hover effects
+        label.addEventListener('mouseenter', () => {
+            updateStars(parseInt(input.value), true);
+        });
+        
+        label.addEventListener('mouseleave', () => {
+            updateStars(currentRating);
+        });
+        
+        // Click handling
+        input.addEventListener('change', () => {
+            currentRating = parseInt(input.value);
+            updateStars(currentRating);
         });
     });
 
-    // Update favorite functionality
-    document.getElementById('favorite-button')?.addEventListener('click', function() {
-        const placeId = this.dataset.placeId;
-        const heartIcon = this.querySelector('i');
+    // Favorite button functionality
+    const favoriteButton = document.getElementById('favorite-button');
+    if (favoriteButton) {
+        favoriteButton.addEventListener('click', async function() {
+            const heartIcon = this.querySelector('i');
+            const placeId = this.dataset.placeId;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Optimistic UI update
+            const isCurrentlyFavorited = heartIcon.classList.contains('text-red-600');
+            heartIcon.classList.toggle('text-red-600', !isCurrentlyFavorited);
+            heartIcon.classList.toggle('text-gray-400', isCurrentlyFavorited);
+
+            try {
+                const response = await fetch(`/users/toggle-favorite/${placeId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                
+                // Revert UI if server response doesn't match optimistic update
+                if ((data.status === 'added') !== !isCurrentlyFavorited) {
+                    heartIcon.classList.toggle('text-red-600');
+                    heartIcon.classList.toggle('text-gray-400');
+                }
+
+                // Optional: Show success message
+                const message = data.status === 'added' ? 'Added to favorites' : 'Removed from favorites';
+                // You could add a toast notification here if desired
+
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                // Revert UI on error
+                heartIcon.classList.toggle('text-red-600');
+                heartIcon.classList.toggle('text-gray-400');
+                // Optional: Show error message to user
+            }
+        });
+    }
+
+    function toggleEditForm() {
+        const currentReview = document.getElementById('current-review');
+        const editForm = document.getElementById('edit-review-form');
         
-        fetch(`/users/toggle-favorite/${placeId}/`, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'added') {
-                heartIcon.classList.remove('text-gray-400');
-                heartIcon.classList.add('text-red-600');
-            } else {
-                heartIcon.classList.remove('text-red-600');
-                heartIcon.classList.add('text-gray-400');
-            }
-        })
-        .catch(error => console.error('Error:', error));
+        if (editForm.classList.contains('hidden')) {
+            currentReview.classList.add('hidden');
+            editForm.classList.remove('hidden');
+        } else {
+            currentReview.classList.remove('hidden');
+            editForm.classList.add('hidden');
+        }
+    }
+
+    // Initialize edit form star rating
+    const editRatingInputs = document.querySelectorAll('input[name="rating"][id^="edit-star"]');
+    const editRatingStars = document.querySelectorAll('input[name="rating"][id^="edit-star"] + label svg');
+    let currentEditRating = document.querySelector('input[name="rating"][id^="edit-star"]:checked')?.value || 0;
+
+    editRatingInputs.forEach(input => {
+        const label = input.nextElementSibling;
+        
+        label.addEventListener('mouseenter', () => {
+            updateEditStars(parseInt(input.value));
+        });
+        
+        label.addEventListener('mouseleave', () => {
+            updateEditStars(currentEditRating);
+        });
+        
+        input.addEventListener('change', () => {
+            currentEditRating = parseInt(input.value);
+            updateEditStars(currentEditRating);
+        });
     });
+
+    function updateEditStars(rating) {
+        editRatingStars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('text-gray-300', 'dark:text-gray-600');
+                star.classList.add('text-yellow-400');
+            } else {
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300', 'dark:text-gray-600');
+            }
+        });
+    }
 </script>
 {% endblock %}
