@@ -95,7 +95,7 @@
                 <!-- Total Places -->
                 <div class="glass-card rounded-lg p-6 text-center">
                     <div class="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">
-                        <span class="counter">{{ total_places }}</span>
+                        <span class="counter" data-target="{{ total_places }}">0</span>
                     </div>
                     <p class="text-gray-600 dark:text-gray-400">Verified Places</p>
                 </div>
@@ -103,7 +103,7 @@
                 <!-- Total Reviews -->
                 <div class="glass-card rounded-lg p-6 text-center">
                     <div class="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">
-                        <span class="counter">{{ total_reviews }}</span>
+                        <span class="counter" data-target="{{ total_reviews }}">0</span>
                     </div>
                     <p class="text-gray-600 dark:text-gray-400">Community Reviews</p>
                 </div>
@@ -111,7 +111,7 @@
                 <!-- Total Users -->
                 <div class="glass-card rounded-lg p-6 text-center">
                     <div class="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">
-                        <span class="counter">{{ total_users }}</span>
+                        <span class="counter" data-target="{{ total_users }}">0</span>
                     </div>
                     <p class="text-gray-600 dark:text-gray-400">Active Users</p>
                 </div>
@@ -149,4 +149,45 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Function to animate the counters
+        function animateCounters() {
+            $('.counter').each(function() {
+                const $this = $(this);
+                const countTo = $this.data('target');
+                
+                $({ countNum: $this.text() }).animate({
+                    countNum: countTo
+                }, {
+                    duration: 2000,
+                    easing: 'swing',
+                    step: function() {
+                        $this.text(Math.floor(this.countNum));
+                    },
+                    complete: function() {
+                        $this.text(this.countNum);
+                    }
+                });
+            });
+        }
+
+        // Trigger the animation when the stats section is in view
+        $(window).on('scroll', function() {
+            const statsSection = $('.bg-gray-50');
+            const sectionTop = statsSection.offset().top;
+            const sectionHeight = statsSection.outerHeight();
+            const windowScroll = $(this).scrollTop() + $(this).height();
+
+            if (windowScroll > sectionTop && windowScroll < sectionTop + sectionHeight) {
+                animateCounters();
+                $(window).off('scroll'); // Remove the scroll event after animation
+            }
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %}
