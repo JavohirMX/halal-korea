@@ -135,3 +135,6 @@ def about(request):
         'total_users': User.objects.count(),
     }
     return render(request, 'places/about.html', stats)
+
+def donate(request):
+    return render(request, 'places/donate.html')
