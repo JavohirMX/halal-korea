@@ -1,154 +1,164 @@
 {% extends 'places/base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="lg:grid lg:grid-cols-12 lg:gap-x-5">
-        <!-- Profile Sidebar -->
-        <aside class="py-6 px-2 sm:px-6 lg:py-0 lg:px-0 lg:col-span-3">
-            <nav class="space-y-1">
-                <a href="{% url 'users:profile' %}" 
-                   class="bg-gray-50 text-primary-600 hover:bg-white group rounded-md px-3 py-2 flex items-center text-sm font-medium">
-                    <i class="fas fa-user-circle text-primary-500 group-hover:text-primary-500 flex-shrink-0 -ml-1 mr-3 h-6 w-6"></i>
-                    <span class="truncate">Profile</span>
-                </a>
-                <a href="{% url 'users:edit_profile' %}"
-                   class="text-gray-900 hover:bg-gray-50 group rounded-md px-3 py-2 flex items-center text-sm font-medium">
-                    <i class="fas fa-cog text-gray-400 group-hover:text-gray-500 flex-shrink-0 -ml-1 mr-3 h-6 w-6"></i>
-                    <span class="truncate">Settings</span>
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Profile Content -->
-        <div class="space-y-6 sm:px-6 lg:px-0 lg:col-span-9">
-            <!-- Basic Info -->
-            <div class="shadow sm:rounded-md sm:overflow-hidden">
-                <div class="bg-white py-6 px-4 space-y-6 sm:p-6">
-                    <div>
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">Profile</h3>
-                        <p class="mt-1 text-sm text-gray-500">
-                            {% if is_own_profile %}
-                                This is your profile information.
-                            {% else %}
-                                Profile information for {{ user.username }}.
-                            {% endif %}
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-6">
-                        <div class="col-span-3">
-                            <label class="block text-sm font-medium text-gray-700">Username</label>
-                            <div class="mt-1 flex items-center">
-                                <span class="text-gray-900">{{ user.username }}</span>
-                            </div>
-                        </div>
-
-                        <div class="col-span-3">
-                            <label class="block text-sm font-medium text-gray-700">Email</label>
-                            <div class="mt-1 flex items-center">
-                                <span class="text-gray-900">{{ user.email }}</span>
-                            </div>
-                        </div>
-                    </div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Profile Header -->
+    <div class="glass-card rounded-lg p-6 mb-8">
+        <div class="flex items-center space-x-6">
+            <div class="flex-shrink-0">
+                {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" 
+                     alt="{{ user.username }}" 
+                     class="h-24 w-24 rounded-full object-cover">
+                {% else %}
+                <div class="h-24 w-24 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center">
+                    <i class="fas fa-user text-4xl text-primary-600 dark:text-primary-400"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ user.username }}</h1>
+                <p class="text-gray-600 dark:text-gray-400">{{ user.email }}</p>
+                <div class="mt-2">
+                    <a href="{% url 'users:edit_profile' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <i class="fas fa-edit mr-2"></i>
+                        Edit Profile
+                    </a>
                 </div>
             </div>
-
-            <!-- Reviews -->
-            <div class="shadow sm:rounded-md sm:overflow-hidden">
-                <div class="bg-white py-6 px-4 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Your Reviews</h3>
-                    {% if reviews %}
-                        <div class="space-y-4">
-                            {% for review in reviews %}
-                            <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <a href="{% url 'places:place_detail' review.place.id %}" 
-                                           class="text-primary-600 hover:text-primary-700 font-medium">
-                                            {{ review.place.name }}
-                                        </a>
-                                        <div class="mt-1 flex items-center">
-                                            {% for i in "12345" %}
-                                            <i class="fas fa-star {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %}"></i>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    <span class="text-sm text-gray-500">
-                                        {{ review.created_at|date:"M d, Y" }}
-                                    </span>
-                                </div>
-                                <p class="mt-2 text-gray-600">{{ review.comment }}</p>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-gray-500">You haven't written any reviews yet.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Favorite Places -->
-            <div class="shadow sm:rounded-md sm:overflow-hidden">
-                <div class="bg-white py-6 px-4 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Favorite Places</h3>
-                    {% if favorite_places %}
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            {% for place in favorite_places %}
-                            <div class="border rounded-lg p-4">
-                                <a href="{% url 'places:place_detail' place.id %}" 
-                                   class="text-primary-600 hover:text-primary-700 font-medium">
-                                    {{ place.name }}
-                                </a>
-                                <p class="text-sm text-gray-500 mt-1">{{ place.get_category_display }}</p>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-gray-500">You haven't added any places to your favorites yet.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Submitted Places -->
-            <div class="shadow sm:rounded-md sm:overflow-hidden">
-                <div class="bg-white py-6 px-4 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Places You've Submitted</h3>
-                    {% if submitted_places %}
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            {% for place in submitted_places %}
-                            <div class="border rounded-lg p-4">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <a href="{% url 'places:place_detail' place.id %}" 
-                                           class="text-primary-600 hover:text-primary-700 font-medium">
-                                            {{ place.name }}
-                                        </a>
-                                        <p class="text-sm text-gray-500 mt-1">{{ place.get_category_display }}</p>
-                                    </div>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                {% if place.status == 'approved' %}bg-green-100 text-green-800
-                                                {% elif place.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                                {% else %}bg-red-100 text-red-800{% endif %}">
-                                        {{ place.get_status_display }}
-                                    </span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-gray-500">You haven't submitted any places yet.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% if is_own_profile %}
-                <!-- Show edit button only on own profile -->
-                <a href="{% url 'users:edit_profile' %}" 
-                   class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
-                    Edit Profile
-                </a>
-            {% endif %}
         </div>
     </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <button class="tab-button border-primary-500 text-primary-600 dark:text-primary-400 border-b-2 py-4 px-1 text-sm font-medium active" 
+                    data-tab="favorites">
+                Favorite Places
+            </button>
+            <button class="tab-button text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 border-b-2 border-transparent py-4 px-1 text-sm font-medium" 
+                    data-tab="reviews">
+                My Reviews
+            </button>
+        </nav>
+    </div>
+
+    <!-- Favorites Tab -->
+    <div id="favorites-tab" class="tab-content">
+        {% if favorite_places %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for place in favorite_places %}
+            <div class="glass-card rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                {% if place.photo_urls %}
+                <img src="{{ place.photo_urls.0 }}" 
+                     alt="{{ place.name }}" 
+                     class="w-full h-48 object-cover">
+                {% endif %}
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
+                    <p class="text-sm text-primary-600 dark:text-primary-400">{{ place.category|title }}</p>
+                    <div class="mt-2 flex items-center">
+                        <div class="flex items-center">
+                            {% for i in "12345" %}
+                            <svg class="w-4 h-4 {% if forloop.counter <= place.average_rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" 
+                                 fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            {% endfor %}
+                        </div>
+                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                            ({{ place.reviews.count }})
+                        </span>
+                    </div>
+                    <a href="{% url 'places:place_detail' place.id %}" 
+                       class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                        View Details →
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-heart text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+            <p class="text-gray-600 dark:text-gray-400">You haven't favorited any places yet.</p>
+            <a href="{% url 'places:explore' %}" 
+               class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                Explore Places →
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Reviews Tab -->
+    <div id="reviews-tab" class="tab-content hidden">
+        {% if user.reviews.all %}
+        <div class="space-y-6">
+            {% for review in user.reviews.all %}
+            <div class="glass-card rounded-lg p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <a href="{% url 'places:place_detail' review.place.id %}" 
+                           class="text-lg font-semibold text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
+                            {{ review.place.name }}
+                        </a>
+                        <div class="flex items-center mt-1">
+                            {% for i in "12345" %}
+                            <svg class="w-4 h-4 {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" 
+                                 fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            {% endfor %}
+                            <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                                {{ review.created_at|date:"M d, Y" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">{{ review.content }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-comment text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+            <p class="text-gray-600 dark:text-gray-400">You haven't written any reviews yet.</p>
+            <a href="{% url 'places:explore' %}" 
+               class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                Explore Places →
+            </a>
+        </div>
+        {% endif %}
+    </div>
 </div>
+
+<script>
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.dataset.tab;
+                
+                // Update button styles
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('border-primary-500', 'text-primary-600', 'dark:text-primary-400');
+                    btn.classList.add('text-gray-500', 'dark:text-gray-400', 'border-transparent');
+                });
+                button.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-transparent');
+                button.classList.add('border-primary-500', 'text-primary-600', 'dark:text-primary-400');
+
+                // Show/hide content
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+            });
+        });
+    });
+</script>
 {% endblock %}

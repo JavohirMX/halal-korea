@@ -1,50 +1,47 @@
 {% extends 'places/base.html' %}
 
 {% block extra_head %}
-<!-- Remove any Google Maps script since it's in base.html -->
 <script>
     // Define initMap globally
-    function initMap() {
+    async function initMap() {
         // Center on Seoul by default
         const seoul = { lat: 37.5665, lng: 126.9780 };
-        const mapElement = document.getElementById('map');
+        const { Map } = await google.maps.importLibrary("maps")
+        map = new Map(document.getElementById("map"), {
+            zoom: 12,
+            center: seoul,
+        });
         
-        if (mapElement) {
-            const map = new google.maps.Map(mapElement, {
-                zoom: 12,
-                center: seoul,
-            });
+        let marker = null;
 
-            let marker = null;
+        // Add click listener to map
+        map.addListener('click', function(e) {
+            const lat = e.latLng.lat();
+            const lng = e.latLng.lng();
+            
+            // Update hidden inputs
+            document.getElementById('id_latitude').value = lat;
+            document.getElementById('id_longitude').value = lng;
+            
+            // Update or add marker
+            if (marker) {
+                marker.setPosition(e.latLng);
+            } else {
+                marker = new google.maps.Marker({
+                    position: e.latLng,
+                    map: map,
+                    draggable: true
+                });
 
-            // Add click listener to map
-            map.addListener('click', function(e) {
-                const lat = e.latLng.lat();
-                const lng = e.latLng.lng();
-                
-                // Update hidden inputs
-                document.getElementById('id_latitude').value = lat;
-                document.getElementById('id_longitude').value = lng;
-                
-                // Update or add marker
-                if (marker) {
-                    marker.setPosition(e.latLng);
-                } else {
-                    marker = new google.maps.Marker({
-                        position: e.latLng,
-                        map: map,
-                        draggable: true
-                    });
-
-                    // Update coordinates when marker is dragged
-                    marker.addListener('dragend', function() {
-                        const position = marker.getPosition();
-                        document.getElementById('id_latitude').value = position.lat();
-                        document.getElementById('id_longitude').value = position.lng();
-                    });
-                }
-            });
-        }
+                // Update coordinates when marker is dragged
+                marker.addListener('dragend', function() {
+                    const position = marker.getPosition();
+                    document.getElementById('id_latitude').value = position.lat();
+                    document.getElementById('id_longitude').value = position.lng();
+                });
+            }
+        });
+        
     }
 
     // Initialize map when the page loads
@@ -56,190 +53,172 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-12">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <h1 class="text-3xl font-bold text-gray-900">Submit a Halal Place</h1>
-            <p class="mt-2 text-gray-600">
-                Help our community grow by adding a halal restaurant, market, or mosque
-            </p>
-        </div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Submit a New Place</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Help others find halal places by submitting a new location</p>
+    </div>
 
-        <!-- Form -->
-        <div class="bg-white rounded-lg shadow-sm p-6 md:p-8">
-            <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                {% csrf_token %}
+    <!-- Form Container -->
+    <div class="glass-card rounded-lg p-6">
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
 
-                <!-- Basic Information -->
-                <div class="space-y-6">
-                    <h2 class="text-xl font-semibold text-gray-900">Basic Information</h2>
-                    
-                    <!-- Name -->
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Place Name *</label>
+            <!-- Basic Information -->
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Place Name <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative mt-1">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-store text-gray-400"></i>
+                        </div>
                         <input type="text" 
                                name="name" 
-                               id="name" 
-                               required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                               required 
+                               placeholder="Enter place name"
+                               class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
                     </div>
+                </div>
 
-                    <!-- Category -->
-                    <div>
-                        <label for="category" class="block text-sm font-medium text-gray-700">Category *</label>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Category <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative mt-1">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-tag text-gray-400"></i>
+                        </div>
                         <select name="category" 
-                                id="category" 
-                                required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                required 
+                                class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
                             <option value="">Select a category</option>
                             <option value="restaurant">Restaurant</option>
                             <option value="market">Market</option>
                             <option value="mosque">Mosque</option>
                         </select>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Description -->
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Description *</label>
-                        <textarea name="description" 
-                                  id="description" 
-                                  rows="4" 
-                                  required
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                  placeholder="Please provide details about the place, such as the type of food served, halal certification, or facilities available."></textarea>
+            <!-- Description -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Description <span class="text-red-500">*</span>
+                </label>
+                <div class="relative mt-1">
+                    <textarea name="description" 
+                              rows="4" 
+                              required 
+                              placeholder="Describe the place..."
+                              class="block w-full p-3 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"></textarea>
+                    <div class="absolute bottom-2 right-2 text-xs text-gray-400">
+                        <span id="char-count">0</span>/500
                     </div>
                 </div>
+            </div>
 
-                <!-- Location Information -->
-                <div class="space-y-6 pt-6 border-t border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">Location</h2>
+            <!-- Location -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Location
+                </label>
+                <div class="h-64 rounded-lg overflow-hidden mb-2">
+                    <div id="map" class="w-full h-full dark:brightness-90"></div>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Click on the map to set the location
+                </p>
+                <input type="hidden" name="latitude" id="id_latitude" required>
+                <input type="hidden" name="longitude" id="id_longitude" required>
+            </div>
 
-                    <!-- Address -->
-                    <div>
-                        <label for="address" class="block text-sm font-medium text-gray-700">Address *</label>
-                        <input type="text" 
-                               name="address" 
-                               id="address" 
-                               required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                    </div>
+            <!-- Address and Contact -->
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Address
+                    </label>
+                    <input type="text" 
+                           name="address" 
+                           required 
+                           class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                </div>
 
-                    <!-- Map -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Pin Location on Map *</label>
-                        <div id="map" class="h-64 rounded-lg border border-gray-300"></div>
-                        {{ form.latitude }}
-                        {{ form.longitude }}
-                        <p class="mt-2 text-sm text-gray-500">
-                            Click on the map to set the exact location
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Phone Number
+                    </label>
+                    <input type="tel" 
+                           name="phone_number" 
+                           class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                </div>
+            </div>
+
+            <!-- Website and Map Links -->
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Website
+                    </label>
+                    <input type="url" 
+                           name="website" 
+                           class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Google Maps Link
+                    </label>
+                    <input type="url" 
+                           name="google_map_link" 
+                           class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                </div>
+            </div>
+
+            <!-- Photos -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Photos
+                </label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-primary-500 dark:hover:border-primary-400 transition-colors duration-200">
+                    <div class="space-y-1 text-center">
+                        <i class="fas fa-image text-gray-400 dark:text-gray-600 text-3xl mb-3"></i>
+                        <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                            <label for="photo-input" class="relative cursor-pointer rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 focus-within:outline-none">
+                                <span>Upload photos</span>
+                                <input id="photo-input" 
+                                       name="photos" 
+                                       type="file" 
+                                       multiple 
+                                       accept="image/*" 
+                                       class="sr-only">
+                            </label>
+                            <p class="pl-1">or drag and drop</p>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            PNG, JPG, GIF up to 10MB each
                         </p>
                     </div>
                 </div>
+                <div id="photo-preview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4"></div>
+            </div>
 
-                <!-- Contact Information -->
-                <div class="space-y-6 pt-6 border-t border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">Contact Information</h2>
-
-                    <!-- Phone -->
-                    <div>
-                        <label for="phone_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <input type="tel" 
-                               name="phone_number" 
-                               id="phone_number" 
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500">
-                    </div>
-
-                    <!-- Website -->
-                    <div>
-                        <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
-                        <input type="url" 
-                               name="website" 
-                               id="website" 
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                               placeholder="https://">
-                    </div>
-                </div>
-
-                <!-- Map Links -->
-                <div class="space-y-6 pt-6 border-t border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">Map Links</h2>
-
-                    <!-- Google Maps -->
-                    <div>
-                        <label for="google_map_link" class="block text-sm font-medium text-gray-700">Google Maps Link</label>
-                        <input type="url" 
-                               name="google_map_link" 
-                               id="google_map_link" 
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                               placeholder="https://maps.google.com/...">
-                    </div>
-
-                    <!-- Naver Maps -->
-                    <div>
-                        <label for="naver_map_link" class="block text-sm font-medium text-gray-700">Naver Maps Link</label>
-                        <input type="url" 
-                               name="naver_map_link" 
-                               id="naver_map_link" 
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                               placeholder="https://map.naver.com/...">
-                    </div>
-
-                    <!-- Kakao Maps -->
-                    <div>
-                        <label for="kakao_map_link" class="block text-sm font-medium text-gray-700">Kakao Maps Link</label>
-                        <input type="url" 
-                               name="kakao_map_link" 
-                               id="kakao_map_link" 
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                               placeholder="https://map.kakao.com/...">
-                    </div>
-                </div>
-
-                <!-- Photos -->
-                <div class="space-y-6 pt-6 border-t border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">Photos</h2>
-                    
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
-                         id="drop-zone"
-                         ondragover="handleDragOver(event)"
-                         ondrop="handleDrop(event)">
-                        <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" 
-                                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <div class="flex text-sm text-gray-600">
-                                <label for="photos" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
-                                    <span>Upload photos</span>
-                                    <input id="photos" name="photos" type="file" class="sr-only" multiple accept="image/*">
-                                </label>
-                                <p class="pl-1">or drag and drop</p>
-                            </div>
-                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
-                        </div>
-                    </div>
-                    <div id="photo-preview" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="pt-6 border-t border-gray-200">
-                    <button type="submit" 
-                            class="w-full bg-primary-600 text-white px-4 py-3 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                        Submit Place
-                    </button>
-                    <p class="mt-2 text-sm text-gray-500 text-center">
-                        * Required fields
-                    </p>
-                </div>
-            </form>
-        </div>
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+                <button type="submit" 
+                        class="gradient-bg-hover text-white font-medium py-2 px-4 rounded-md transition-all duration-200">
+                    Submit Place
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
     // Photo preview and drag & drop handling
-    const photoInput = document.getElementById('photos');
+    const photoInput = document.getElementById('photo-input');
     const dropZone = document.getElementById('drop-zone');
     const preview = document.getElementById('photo-preview');
     let currentFiles = []; // Keep track of current files
@@ -376,6 +355,26 @@
         if (!lat || !lng) {
             e.preventDefault();
             alert('Please select a location on the map');
+        }
+    });
+
+    const textarea = document.querySelector('textarea[name="description"]');
+    const charCount = document.getElementById('char-count');
+
+    textarea.addEventListener('input', function() {
+        const count = this.value.length;
+        charCount.textContent = count;
+        
+        if (count > 450) {
+            charCount.classList.add('text-yellow-500');
+        } else {
+            charCount.classList.remove('text-yellow-500');
+        }
+        
+        if (count > 500) {
+            charCount.classList.add('text-red-500');
+        } else {
+            charCount.classList.remove('text-red-500');
         }
     });
 </script>

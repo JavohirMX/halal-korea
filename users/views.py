@@ -8,6 +8,8 @@ from places.models import HalalPlace
 from .forms import UserRegistrationForm, UserUpdateForm
 from reviews.models import Review
 from django.views.decorators.http import require_POST
+from django.db.models import Avg
+from django.db.models.functions import Round
 
 @login_required
 def profile(request, username=None):
@@ -19,7 +21,10 @@ def profile(request, username=None):
     reviews = Review.objects.filter(user=user).select_related('place')
     favorite_places = user.favorite_places.filter(status='approved')
     submitted_places = HalalPlace.objects.filter(submitted_by=user).order_by('-created_at')
-
+    # Annotate with average rating
+    favorite_places = favorite_places.annotate(
+        average_rating=Round(Avg('reviews__rating'), 1)
+    )
     context = {
         'user': user,
         'reviews': reviews,

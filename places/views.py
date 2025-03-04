@@ -18,8 +18,8 @@ def home(request):
     featured_places = HalalPlace.objects.filter(
         status='approved'
     ).annotate(
-        avg_rating=Round(Avg('reviews__rating'), 1)
-    ).order_by('-avg_rating')[:6]
+        average_rating=Round(Avg('reviews__rating'), 1)
+    ).order_by('-average_rating')[:6]
     
     return render(request, 'places/home.html', {
         'featured_places': featured_places,
@@ -76,7 +76,10 @@ def place_detail(request, pk):
     user_has_reviewed = False
     if request.user.is_authenticated:
         user_has_reviewed = reviews.filter(user=request.user).exists()
-    
+    # Annotate with average rating
+    place = HalalPlace.objects.annotate(
+        average_rating=Round(Avg('reviews__rating'), 1)
+    ).get(pk=place.pk)
     return render(request, 'places/place_detail.html', {
         'place': place,
         'reviews': reviews,

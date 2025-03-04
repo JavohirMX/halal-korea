@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,11 +10,17 @@
     <!-- Add Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Add Google Maps -->
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}" async defer></script>
+    <script>
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+          key: "{{ google_maps_api_key }}",
+          v: "beta",
+        });
+      </script>
     <!-- Add Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -27,6 +35,19 @@
                             700: '#15803d',
                             800: '#166534',
                             900: '#14532d',
+                        },
+                        teal: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        },
+                        backdropBlur: {
+                            'xs': '2px',
+                        },
+                        backgroundImage: {
+                            'gradient-primary': 'linear-gradient(to right, var(--tw-gradient-stops))',
+                            'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
                         }
                     }
                 }
@@ -39,33 +60,172 @@
             border-color: #22c55e !important;
             box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
         }
+        
+        .glass-effect {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.8), 
+                rgba(255, 255, 255, 0.6)
+            );
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .glass-effect-dark {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .hover-glass:hover {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #059669;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .gradient-border {
+            border-image: linear-gradient(to right, #22c55e, #10b981) 1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #22c55e, #10b981);
+        }
+
+        .gradient-bg-hover {
+            background-size: 200% 200%;
+            background-image: linear-gradient(to right, #22c55e, #10b981, #22c55e);
+            transition: all 0.5s ease;
+        }
+
+        .gradient-bg-hover:hover {
+            background-position: 100% 0;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Dark mode overrides */
+        .dark {
+            color-scheme: dark;
+        }
+
+        .dark .glass-effect {
+            background: linear-gradient(135deg, 
+                rgba(17, 24, 39, 0.8), 
+                rgba(17, 24, 39, 0.6)
+            );
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark .glass-card {
+            background: rgba(17, 24, 39, 0.7);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark .glass-card:hover {
+            background: rgba(17, 24, 39, 0.8);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Dark scrollbar */
+        .dark ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #22c55e;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #16a34a;
+        }
+
+        /* Theme toggle animation */
+        .theme-toggle-icon {
+            transition: transform 0.5s ease;
+        }
+
+        .theme-toggle-icon.rotate {
+            transform: rotate(360deg);
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg" x-data="{ isOpen: false }">
+    <nav class="fixed w-full z-50 glass-effect dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800" x-data="{ isOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Left side -->
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="{% url 'places:home' %}" class="text-primary-600 font-bold text-xl">
-                            Halal Korea
+                        <a href="{% url 'places:home' %}" class="text-xl font-bold">
+                            <span class="bg-gradient-to-r from-primary-500 via-primary-400 to-teal-400 bg-clip-text text-transparent">
+                                Halal Korea
+                            </span>
                         </a>
                     </div>
                     <!-- Desktop Menu -->
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                         <a href="{% url 'places:explore' %}" 
-                           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center">
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-search mr-2"></i>Explore
                         </a>
                         <a href="{% url 'places:submit_place' %}" 
-                           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center">
-                            <i class="fas fa-plus mr-2"></i>Submit Place
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
+                            <i class="fas fa-plus-circle mr-2"></i>Submit Place
                         </a>
                         <a href="{% url 'places:about' %}" 
-                           class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center">
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-info-circle mr-2"></i>About
                         </a>
                     </div>
@@ -73,95 +233,121 @@
 
                 <!-- Right side -->
                 <div class="flex items-center">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" 
+                            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                        <i class="fas fa-sun text-yellow-500 theme-toggle-icon hidden dark:inline-block"></i>
+                        <i class="fas fa-moon text-gray-700 dark:text-gray-400 theme-toggle-icon dark:hidden"></i>
+                    </button>
+                    
                     <!-- Language Selector -->
-                    <select class="mr-4 rounded-md border-gray-300 text-sm hidden sm:block">
-                        <option value="EN">English</option>
-                        <option value="KR">한국어</option>
-                        <option value="UZ">O'zbek</option>
+                    <select class="ml-4 mr-4 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm hidden sm:block">
+                        <option value="EN">🇺🇸 English</option>
+                        <option value="KR">🇰🇷 한국어</option>
+                        <option value="UZ">🇺🇿 O'zbek</option>
                     </select>
                     
                     <!-- Desktop Auth Menu -->
                     <div class="hidden sm:flex sm:items-center">
                         {% if user.is_authenticated %}
-                            <div class="relative ml-3" x-data="{ open: false }" @click.away="open = false">
-                                <button type="button" 
-                                        @click="open = !open" 
-                                        class="flex items-center text-sm rounded-full focus:outline-none">
-                                    <span class="text-gray-700">{{ user.username }}</span>
-                                    <i class="fas fa-chevron-down ml-1 text-gray-400"></i>
+                            <div class="ml-3 relative" x-data="{ open: false }">
+                                <button @click="open = !open" 
+                                        class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900">
+                                    {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="h-8 w-8 rounded-full">
+                                    {% else %}
+                                    <div class="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center">
+                                        <i class="fas fa-user text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    {% endif %}
                                 </button>
                                 
                                 <!-- Dropdown menu -->
-                                <div x-show="open"
+                                <div x-show="open" 
+                                     @click.away="open = false"
+                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
                                      x-transition:enter="transition ease-out duration-100"
                                      x-transition:enter-start="transform opacity-0 scale-95"
                                      x-transition:enter-end="transform opacity-100 scale-100"
                                      x-transition:leave="transition ease-in duration-75"
                                      x-transition:leave-start="transform opacity-100 scale-100"
-                                     x-transition:leave-end="transform opacity-0 scale-95"
-                                     class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-                                    <a href="{% url 'users:profile' %}" 
-                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        <i class="fas fa-user mr-2"></i>Profile
-                                    </a>
-                                    <a href="{% url 'users:edit_profile' %}" 
-                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        <i class="fas fa-cog mr-2"></i>Settings
-                                    </a>
-                                    <div class="border-t border-gray-100"></div>
-                                    <a href="{% url 'users:logout' %}" 
-                                       class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                                    </a>
+                                     x-transition:leave-end="transform opacity-0 scale-95">
+                                    <div class="py-1">
+                                        <a href="{% url 'users:profile' %}" 
+                                           class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                            <i class="fas fa-user mr-2"></i>Profile
+                                        </a>
+                                        <a href="{% url 'users:edit_profile' %}" 
+                                           class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                            <i class="fas fa-cog mr-2"></i>Settings
+                                        </a>
+                                        <form method="POST" action="{% url 'users:logout' %}">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <i class="fas fa-sign-out-alt mr-2"></i>Log out
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         {% else %}
-                            <a href="{% url 'users:login' %}" class="text-primary-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="{% url 'users:login' %}" 
+                               class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
                                 Log in
                             </a>
-                            <a href="{% url 'users:register' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                            <a href="{% url 'users:register' %}" 
+                               class="ml-4 gradient-bg-hover text-white px-4 py-2 rounded-md text-sm font-medium">
                                 Sign up
                             </a>
                         {% endif %}
                     </div>
 
                     <!-- Mobile menu button -->
-                    <div class="flex items-center sm:hidden">
+                    <div class="flex items-center sm:hidden ml-4">
                         <button @click="isOpen = !isOpen" 
-                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
-                            <span class="sr-only">Open main menu</span>
-                            <i class="fas fa-bars text-xl" x-show="!isOpen"></i>
-                            <i class="fas fa-times text-xl" x-show="isOpen"></i>
+                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
+                            <svg class="h-6 w-6" x-bind:class="{'hidden': isOpen, 'block': !isOpen }" 
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                            <svg class="h-6 w-6" x-bind:class="{'block': isOpen, 'hidden': !isOpen }" 
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- Mobile menu -->
-            <div class="sm:hidden" x-show="isOpen" 
-                 x-transition:enter="transition ease-out duration-100"
-                 x-transition:enter-start="transform opacity-0 scale-95"
-                 x-transition:enter-end="transform opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-75"
-                 x-transition:leave-start="transform opacity-100 scale-100"
-                 x-transition:leave-end="transform opacity-0 scale-95">
+            <div x-show="isOpen" 
+                 class="sm:hidden glass-effect dark:bg-gray-900/95 rounded-b-lg"
+                 x-transition:enter="transition ease-out duration-100 transform"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-75 transform"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
                 <div class="px-2 pt-2 pb-3 space-y-1">
-                    <a href="{% url 'places:explore' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                    <a href="{% url 'places:explore' %}" 
+                       class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
                         <i class="fas fa-search mr-2"></i>Explore
                     </a>
-                    <a href="{% url 'places:submit_place' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
-                        <i class="fas fa-plus mr-2"></i>Submit Place
+                    <a href="{% url 'places:submit_place' %}" 
+                       class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <i class="fas fa-plus-circle mr-2"></i>Submit Place
                     </a>
-                    <a href="{% url 'places:about' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                    <a href="{% url 'places:about' %}" 
+                       class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
                         <i class="fas fa-info-circle mr-2"></i>About
                     </a>
                     
                     <!-- Language Selector for Mobile -->
                     <div class="px-3 py-2">
-                        <select class="w-full rounded-md border-gray-300 text-sm">
+                        <select class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm">
                             <option value="EN">English</option>
                             <option value="KR">한국어</option>
-                            <option value="UZ">O'zbek</option>
                         </select>
                     </div>
 
@@ -171,22 +357,22 @@
                             <div class="px-3 py-2 text-sm font-medium text-gray-500">
                                 Signed in as <span class="font-bold text-gray-700">{{ user.username }}</span>
                             </div>
-                            <a href="{% url 'users:profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                            <a href="{% url 'users:profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50">
                                 <i class="fas fa-user mr-2"></i>Profile
                             </a>
-                            <a href="{% url 'users:edit_profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50">
+                            <a href="{% url 'users:edit_profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50">
                                 <i class="fas fa-cog mr-2"></i>Settings
                             </a>
-                            <a href="{% url 'users:logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 hover:bg-gray-50">
+                            <a href="{% url 'users:logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 hover:bg-primary-50">
                                 <i class="fas fa-sign-out-alt mr-2"></i>Logout
                             </a>
                         </div>
                     {% else %}
                         <div class="border-t border-gray-200 pt-4">
-                            <a href="{% url 'users:login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 hover:bg-gray-50">
+                            <a href="{% url 'users:login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50">
                                 Log in
                             </a>
-                            <a href="{% url 'users:register' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 hover:bg-gray-50">
+                            <a href="{% url 'users:register' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50">
                                 Sign up
                             </a>
                         </div>
@@ -196,11 +382,14 @@
         </div>
     </nav>
 
+    <!-- Add a spacer for the fixed navbar -->
+    <div class="h-16"></div>
+
     <!-- Add Messages/Notifications -->
     {% if messages %}
     <div class="messages-container fixed top-4 right-4 z-50 space-y-2">
         {% for message in messages %}
-        <div class="message bg-white rounded-lg shadow-lg p-4 max-w-md transform transition-all duration-300 {% if message.tags %}{{ message.tags }}{% endif %}"
+        <div class="message glass-effect dark:bg-gray-800 rounded-lg shadow-lg p-4 max-w-md transform transition-all duration-300 {% if message.tags %}{{ message.tags }}{% endif %}"
              role="alert">
             <div class="flex items-center">
                 <!-- Success Message -->
@@ -246,43 +435,97 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white mt-12">
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div class="col-span-1">
-                    <h3 class="text-primary-600 font-bold text-lg mb-4">Halal Korea</h3>
-                    <p class="text-gray-600 text-sm">
-                        Helping you find halal food and services across Korea.
+                <!-- About Section -->
+                <div class="col-span-1 md:col-span-2">
+                    <a href="{% url 'places:home' %}" class="text-xl font-bold">
+                        <span class="bg-gradient-to-r from-primary-500 via-primary-400 to-teal-400 bg-clip-text text-transparent">
+                            Halal Korea
+                        </span>
+                    </a>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400">
+                        Helping Muslims find halal food and services across South Korea. Join our community and discover verified halal places.
                     </p>
+                    <div class="mt-6 flex space-x-4">
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
                 </div>
-                <div class="col-span-1">
-                    <h4 class="font-semibold text-gray-900 mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'places:explore' %}" class="text-gray-600 hover:text-primary-600">Explore</a></li>
-                        <li><a href="{% url 'places:submit_place' %}" class="text-gray-600 hover:text-primary-600">Submit Place</a></li>
-                        <li><a href="{% url 'places:about' %}" class="text-gray-600 hover:text-primary-600">About</a></li>
+                </div>
+                
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li>
+                            <a href="{% url 'places:explore' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                                Explore Places
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'places:submit_place' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                                Submit a Place
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'places:about' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                                About Us
+                            </a>
+                        </li>
                     </ul>
                 </div>
-                <div class="col-span-1">
-                    <h4 class="font-semibold text-gray-900 mb-4">Categories</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-600 hover:text-primary-600">Restaurants</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-primary-600">Markets</a></li>
-                        <li><a href="#" class="text-gray-600 hover:text-primary-600">Mosques</a></li>
-                    </ul>
-                </div>
-                <div class="col-span-1">
-                    <h4 class="font-semibold text-gray-900 mb-4">Contact</h4>
-                    <ul class="space-y-2">
-                        <li class="text-gray-600">info@halalkorea.com</li>
-                        <li class="text-gray-600">+82 10-1234-5678</li>
+
+                <!-- Contact Info -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">Contact</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li class="flex items-center text-gray-600 dark:text-gray-400">
+                            <i class="fas fa-envelope w-5"></i>
+                            <a href="mailto:contact@halalkorea.com" class="ml-2 hover:text-primary-600 dark:hover:text-primary-400">
+                                contact@halalkorea.com
+                            </a>
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-400">
+                            <i class="fas fa-phone w-5"></i>
+                            <a href="tel:+821012345678" class="ml-2 hover:text-primary-600 dark:hover:text-primary-400">
+                                +82 10-1234-5678
+                            </a>
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-400">
+                            <i class="fas fa-map-marker-alt w-5"></i>
+                            <span class="ml-2">Seoul, South Korea</span>
+                        </li>
                     </ul>
                 </div>
             </div>
-            <div class="mt-8 border-t border-gray-200 pt-8">
-                <p class="text-center text-gray-400 text-sm">
-                    © {% now "Y" %} Halal Korea. All rights reserved.
-                </p>
+
+            <!-- Bottom Bar -->
+            <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">
+                        © {% now "Y" %} Halal Korea. All rights reserved.
+                    </p>
+                    <div class="mt-4 md:mt-0 flex space-x-6">
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                            Privacy Policy
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                            Terms of Service
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                            Cookie Policy
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
@@ -312,6 +555,29 @@
                     }, 300);
                 });
             });
+        });
+    </script>
+
+    <!-- Add theme toggle script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for saved theme preference, otherwise use system preference
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            // Theme toggle function
+            window.toggleTheme = function() {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.theme = isDark ? 'dark' : 'light';
+                
+                // Animate icon
+                const icon = document.querySelector('.theme-toggle-icon');
+                icon.classList.add('rotate');
+                setTimeout(() => icon.classList.remove('rotate'), 500);
+            }
         });
     </script>
 </body>

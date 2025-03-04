@@ -9,7 +9,7 @@
 
 {% block content %}
 <!-- Hero Section -->
-<div class="relative bg-primary-600">
+<div class="relative bg-gradient-to-br from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div class="text-center">
             <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
@@ -24,9 +24,9 @@
                 <form action="{% url 'places:explore' %}" method="GET" class="flex rounded-md shadow-sm">
                     <input type="text" 
                            name="q"
-                           class="flex-1 rounded-l-lg px-4 py-3 border-0 focus:ring-2 focus:ring-primary-500" 
+                           class="flex-1 rounded-l-lg px-4 py-3 border-0 focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400" 
                            placeholder="Search for restaurants, markets, or mosques...">
-                    <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-r-lg text-white bg-primary-700 hover:bg-primary-800">
+                    <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-r-lg text-white gradient-bg-hover">
                         Search
                     </button>
                 </form>
@@ -39,40 +39,43 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <!-- Restaurants -->
-        <a href="{% url 'places:explore' %}?category=restaurant" class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+        <a href="{% url 'places:explore' %}?category=restaurant" 
+           class="glass-card rounded-lg p-6 transition-all duration-200">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-utensils w-8 h-8 text-primary-600 text-2xl"></i>
+                    <i class="fas fa-utensils w-8 h-8 text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900">Restaurants</h3>
-                    <p class="mt-1 text-sm text-gray-500">Find halal restaurants near you</p>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Restaurants</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Find halal restaurants near you</p>
                 </div>
             </div>
         </a>
 
         <!-- Markets -->
-        <a href="{% url 'places:explore' %}?category=market" class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+        <a href="{% url 'places:explore' %}?category=market" 
+           class="glass-card rounded-lg p-6 transition-all duration-200">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-shopping-basket w-8 h-8 text-primary-600 text-2xl"></i>
+                    <i class="fas fa-shopping-basket w-8 h-8 text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900">Markets</h3>
-                    <p class="mt-1 text-sm text-gray-500">Discover halal grocery stores</p>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Markets</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Discover halal grocery stores</p>
                 </div>
             </div>
         </a>
 
         <!-- Mosques -->
-        <a href="{% url 'places:explore' %}?category=mosque" class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+        <a href="{% url 'places:explore' %}?category=mosque" 
+           class="glass-card rounded-lg p-6 transition-all duration-200">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-mosque w-8 h-8 text-primary-600 text-2xl"></i>
+                    <i class="fas fa-mosque w-8 h-8 text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900">Mosques</h3>
-                    <p class="mt-1 text-sm text-gray-500">Locate nearby mosques</p>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Mosques</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Find nearby mosques</p>
                 </div>
             </div>
         </a>
@@ -80,28 +83,43 @@
 </div>
 
 <!-- Featured Places Section -->
-<div class="bg-gray-50 py-12">
+<div class="bg-gray-50 dark:bg-gray-900 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-8">Featured Places</h2>
-        <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">
+            Featured Places
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for place in featured_places %}
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="glass-card rounded-lg overflow-hidden transition-all duration-200">
                 {% if place.photo_urls %}
-                <img src="{{ place.photo_urls.0 }}" alt="{{ place.name }}" class="w-full h-48 object-cover">
+                <img src="{{ place.photo_urls.0 }}" 
+                     alt="{{ place.name }}" 
+                     class="w-full h-48 object-cover">
                 {% endif %}
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold text-gray-900">{{ place.name }}</h3>
-                    <p class="text-sm text-primary-600 mt-1">{{ place.category|title }}</p>
-                    <p class="mt-2 text-gray-600 line-clamp-2">{{ place.description }}</p>
-                    <div class="mt-4 flex justify-between items-center">
-                        <a href="{% url 'places:place_detail' place.id %}" class="text-primary-600 hover:text-primary-700">
-                            View details
-                        </a>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        {{ place.name }}
+                    </h3>
+                    <p class="text-sm text-primary-600 dark:text-primary-400">
+                        {{ place.category|title }}
+                    </p>
+                    <div class="mt-2 flex items-center">
                         <div class="flex items-center">
-                            <i class="fas fa-star text-yellow-400"></i>
-                            <span class="ml-1 text-gray-600">{{ place.avg_rating|default:"New" }}</span>
+                            {% for i in "12345" %}
+                            <svg class="w-4 h-4 {% if forloop.counter <= place.average_rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" 
+                                 fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            {% endfor %}
                         </div>
+                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                            ({{ place.reviews.count }} reviews)
+                        </span>
                     </div>
+                    <a href="{% url 'places:place_detail' place.id %}" 
+                       class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm">
+                        View Details →
+                    </a>
                 </div>
             </div>
             {% endfor %}

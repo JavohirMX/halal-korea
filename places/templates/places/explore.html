@@ -7,42 +7,63 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Explore Halal Places</h1>
-        <p class="mt-2 text-gray-600">Discover halal restaurants, markets, and mosques across Korea</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Explore Halal Places</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Discover halal restaurants, markets, and prayer spaces across South Korea</p>
     </div>
 
     <!-- Search and Filters -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
         <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <!-- Search Bar -->
             <div class="md:col-span-2">
-                <input type="text" 
-                       name="q"
-                       value="{{ request.GET.q }}"
-                       class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500"
-                       placeholder="Search by name or location...">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" 
+                           name="q"
+                           value="{{ request.GET.q }}"
+                           class="pl-10 w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
+                           placeholder="Search by name or location...">
+                </div>
             </div>
             
             <!-- Category Filter -->
             <div>
-                <select name="category" 
-                        class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500">
-                    <option value="">All Categories</option>
-                    <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>Restaurants</option>
-                    <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>Markets</option>
-                    <option value="mosque" {% if request.GET.category == 'mosque' %}selected{% endif %}>Mosques</option>
-                </select>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-filter text-gray-400"></i>
+                    </div>
+                    <select name="category" 
+                            class="pl-10 w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
+                        <option value="">All Categories</option>
+                        <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>Restaurants</option>
+                        <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>Markets</option>
+                        <option value="mosque" {% if request.GET.category == 'mosque' %}selected{% endif %}>Mosques</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </div>
+                </div>
             </div>
             
             <!-- Rating Filter -->
             <div>
-                <select name="rating" 
-                        class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500">
-                    <option value="">All Ratings</option>
-                    <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ Stars</option>
-                    <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3+ Stars</option>
-                    <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2+ Stars</option>
-                </select>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-star text-gray-400"></i>
+                    </div>
+                    <select name="rating" 
+                            class="pl-10 w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
+                        <option value="">All Ratings</option>
+                        <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ Stars</option>
+                        <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3+ Stars</option>
+                        <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2+ Stars</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -52,7 +73,7 @@
         <!-- Places List -->
         <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto">
             {% for place in places %}
-            <div class="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
                  data-lat="{{ place.latitude }}"
                  data-lng="{{ place.longitude }}"
                  onclick="highlightMarker({{ place.id }})">
@@ -64,22 +85,22 @@
                 
                 <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">{{ place.name }}</h3>
-                        <p class="text-sm text-primary-600">{{ place.category|title }}</p>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
+                        <p class="text-sm text-primary-600 dark:text-primary-400">{{ place.category|title }}</p>
                     </div>
-                    <div class="flex items-center bg-primary-50 px-2 py-1 rounded">
+                    <div class="flex items-center bg-primary-50 dark:bg-primary-900/50 px-2 py-1 rounded">
                         <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-700">
+                        <span class="ml-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ place.average_rating|default:"New" }}
                         </span>
                     </div>
                 </div>
                 
-                <p class="mt-2 text-gray-600 text-sm line-clamp-2">{{ place.description }}</p>
+                <p class="mt-2 text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{{ place.description }}</p>
                 
-                <div class="mt-4 flex items-center text-sm text-gray-500">
+                <div class="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -92,22 +113,26 @@
                 <div class="mt-4 flex space-x-2">
                     {% if place.google_map_link %}
                     <a href="{{ place.google_map_link }}" target="_blank" 
-                       class="text-sm text-primary-600 hover:text-primary-700">
+                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                         Google Maps
                     </a>
                     {% endif %}
                     {% if place.naver_map_link %}
                     <a href="{{ place.naver_map_link }}" target="_blank" 
-                       class="text-sm text-primary-600 hover:text-primary-700">
+                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                         Naver Maps
                     </a>
                     {% endif %}
                     {% if place.kakao_map_link %}
                     <a href="{{ place.kakao_map_link }}" target="_blank" 
-                       class="text-sm text-primary-600 hover:text-primary-700">
+                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                         Kakao Maps
                     </a>
                     {% endif %}
+                    <a href="{% url 'places:place_detail' place.id %}" 
+                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                        View Details
+                    </a>
                 </div>
             </div>
             {% empty %}
@@ -119,17 +144,19 @@
 
         <!-- Map -->
         <div class="lg:col-span-2 rounded-lg overflow-hidden h-[calc(100vh-300px)]">
-            <div id="map" class="w-full h-full"></div>
+            <div id="map" class="w-full h-full dark:brightness-90"></div>
         </div>
     </div>
 </div>
 
 <script>
     // Initialize Google Map
-    function initMap() {
+    async function initMap() {
         // Center on Seoul by default
         const seoul = { lat: 37.5665, lng: 126.9780 };
-        const map = new google.maps.Map(document.getElementById('map'), {
+        const { Map } = await google.maps.importLibrary("maps")
+
+        map = new Map(document.getElementById("map"), {
             zoom: 12,
             center: seoul,
         });
