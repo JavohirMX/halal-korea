@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="bg-white dark:bg-gray-900">
+<div>
     <!-- Hero Section -->
     <div class="relative bg-gradient-to-br from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Features Section -->
-    <div class="bg-gray-50 dark:bg-gray-800/50 py-16">
+    <div class="py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-12">What We Offer</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Stats Section -->
-    <div class="bg-gray-50 dark:bg-gray-800/50">
+    <div class="stats-section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
                 <!-- Total Places -->
@@ -177,7 +177,7 @@
 
         // Trigger the animation when the stats section is in view
         $(window).on('scroll', function() {
-            const statsSection = $('.bg-gray-50');
+            const statsSection = $('.stats-section');
             const sectionTop = statsSection.offset().top;
             const sectionHeight = statsSection.outerHeight();
             const windowScroll = $(this).scrollTop() + $(this).height();

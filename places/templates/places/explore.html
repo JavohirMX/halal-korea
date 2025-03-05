@@ -23,7 +23,7 @@
                     <input type="text" 
                            name="q"
                            value="{{ request.GET.q }}"
-                           class="pl-10 w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
+                           class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
                            placeholder="Search by name or location...">
                 </div>
             </div>
@@ -35,7 +35,7 @@
                         <i class="fas fa-filter text-gray-400"></i>
                     </div>
                     <select name="category" 
-                            class="pl-10 w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
+                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
                         <option value="">All Categories</option>
                         <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>Restaurants</option>
                         <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>Markets</option>
@@ -54,7 +54,7 @@
                         <i class="fas fa-star text-gray-400"></i>
                     </div>
                     <select name="rating" 
-                            class="pl-10 w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
+                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
                         <option value="">All Ratings</option>
                         <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ Stars</option>
                         <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3+ Stars</option>
