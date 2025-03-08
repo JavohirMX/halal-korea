@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'places',
     'reviews',
     'users',
+    'prayer_times',
     
 ]
 

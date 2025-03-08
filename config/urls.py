@@ -24,4 +24,6 @@ urlpatterns = [
     path('', include('places.urls')),
     path('users/', include('users.urls')),
     path('reviews/', include('reviews.urls')),
+    path('prayer/', include('prayer_times.urls')),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
