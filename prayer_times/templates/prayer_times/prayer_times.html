@@ -1,5 +1,4 @@
 {% extends 'places/base.html' %}
-{% load static %}
 
 {% block title %}Prayer Times - Halal Korea{% endblock %}
 
@@ -9,32 +8,32 @@
     <p class="mt-2 text-gray-600 dark:text-gray-400">Stay updated with the prayer times for your location.</p>
 
     <!-- Prayer Times Table -->
-    <div class="max-w-sm overflow-x-auto">
+    <div class="max-w-sm">
         <table class="w-full mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
             <tbody>
                 <tr>
                     <td class="py-2 px-4">Fajr</td>
-                    <td class="py-2 px-4" data-time="05:00">05:00</td>
+                    <td class="py-2 px-4" data-time="{{ data.timings.Fajr }}">{{ data.timings.Fajr}}</td>
                 </tr>
                 <tr>
                     <td class="py-2 px-4">Sunrise</td>
-                    <td class="py-2 px-4" data-time="05:00">05:00</td>
+                    <td class="py-2 px-4" data-time="{{ data.timings.Sunrise }}">{{ data.timings.Sunrise }}</td>
                 </tr>
                 <tr>
                     <td class="py-2 px-4">Dhuhr</td>
-                    <td class="py-2 px-4" data-time="12:30">12:30</td>
+                    <td class="py-2 px-4" data-time="{{ data.timings.Dhuhr }}">{{ data.timings.Dhuhr }}</td>
                 </tr>
                 <tr>
                     <td class="py-2 px-4">Asr</td>
-                    <td class="py-2 px-4" data-time="15:30">15:30</td>
+                    <td class="py-2 px-4" data-time="{{ data.timings.Asr }}">{{ data.timings.Asr }}</td>
                 </tr>
                 <tr>
                     <td class="py-2 px-4">Maghrib</td>
-                    <td class="py-2 px-4" data-time="18:30">18:30</td>
+                    <td class="py-2 px-4" data-time="{{ data.timings.Maghrib }}">{{ data.timings.Maghrib }}</td>
                 </tr>
                 <tr>
                     <td class="py-2 px-4">Isha</td>
-                    <td class="py-2 px-4" data-time="20:00">20:00</td>
+                    <td class="py-2 px-4" data-time="{{ data.timings.Isha }}">{{ data.timings.Isha }}</td>
                 </tr>
                 <tr class="bg-primary-400 dark:bg-green-600">
                     <td class="py-2 px-4" id="next-prayer">Next Prayer</td>
@@ -46,45 +45,59 @@
 </div>
 
 <script>
+    function parseTime(timeStr) {
+        const [hours, minutes] = timeStr.split(":").map(Number);
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+    }
+    
     function updateCountdown() {
         const now = new Date();
-        const prayerTimes = {
-            fajr: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 5, 0, 0), // Fajr time
-            sunrise: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 0, 0), // Sunrise time 
-            dhuhr: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 30, 0), // Dhuhr time
-            asr: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 30, 0), // Asr time
-            maghrib: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 30, 0), // Maghrib time
-            isha: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0), // Isha time
-            fajr_tomorrow: new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 5, 0, 0), // Tomorrow's Fajr time
-        };
-
-        let nextPrayer = null;
-        let nextPrayerName = '';
-
-        for (const [prayer, time] of Object.entries(prayerTimes)) {
-            if (time > now) {
-                nextPrayer = time;
-                nextPrayerName = prayer.charAt(0).toUpperCase() + prayer.slice(1);
-                break;
+        const prayerTimes = [];
+        const prayerNames = [];
+    
+        document.querySelectorAll("td[data-time]").forEach((td) => {
+            const time = parseTime(td.dataset.time);
+            if (time > now) {  // Only add future prayer times
+                prayerTimes.push(time);
+                prayerNames.push(td.previousElementSibling.textContent.trim()); 
             }
+        });
+    
+        // Add tomorrow's Fajr to handle day transition
+        const fajrTimeTomorrow = parseTime(document.querySelector('td[data-time]').dataset.time);
+        fajrTimeTomorrow.setDate(fajrTimeTomorrow.getDate() + 1);
+        prayerTimes.push(fajrTimeTomorrow);
+        prayerNames.push("Fajr (Tomorrow)");
+    
+        let nextPrayerIndex = prayerTimes.findIndex(time => time > now);
+        
+        if (nextPrayerIndex === -1) {
+            document.getElementById("countdown-display").textContent = "All prayer times have passed.";
+            return;
         }
-
-        const countdownElement = document.getElementById('countdown-display');
-        const nextPrayerElement = document.getElementById('next-prayer');
-        nextPrayerElement.textContent = `Next Prayer (${nextPrayerName})`;
-
-        if (nextPrayer) {
-            const timeDiff = nextPrayer - now;
-            const hours = String(Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+    
+        const nextPrayerTime = prayerTimes[nextPrayerIndex];
+        const nextPrayerName = prayerNames[nextPrayerIndex];
+    
+        document.getElementById("next-prayer").textContent = `${nextPrayerName}`;
+    
+        function updateTimer() {
+            const timeDiff = nextPrayerTime - new Date();
+            if (timeDiff <= 0) return updateCountdown(); // Recalculate if the time has passed
+    
+            const hours = String(Math.floor(timeDiff / (1000 * 60 * 60))).padStart(2, '0');
             const minutes = String(Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
             const seconds = String(Math.floor((timeDiff % (1000 * 60)) / 1000)).padStart(2, '0');
-            countdownElement.textContent = `${hours}:${minutes}:${seconds}`;
-        } else {
-            countdownElement.textContent = "All prayer times for today have passed.";
+            
+            document.getElementById("countdown-display").textContent = `${hours}:${minutes}:${seconds}`;
         }
+    
+        updateTimer();
+        setInterval(updateTimer, 1000);
     }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown(); // Initial call to set the countdown immediately
+    
+    document.addEventListener("DOMContentLoaded", updateCountdown);
+    
 </script>
 {% endblock %}
