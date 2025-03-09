@@ -155,27 +155,41 @@
         // Center on Seoul by default
         const seoul = { lat: 37.5665, lng: 126.9780 };
         const { Map } = await google.maps.importLibrary("maps")
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
 
         map = new Map(document.getElementById("map"), {
             zoom: 12,
             center: seoul,
+            mapId: 'DEMO_MAP_ID',
         });
 
         // Store markers
         const markers = {};
+        const markerIcons = {};
 
+        
         // Add markers for each place
         {% for place in places %}
-        markers[{{ place.id }}] = new google.maps.Marker({
+
+        markerIcons[{{ place.id }}] = document.createElement("img");
+        markerIcons[{{ place.id }}].src = ('{{ place.category }}' === 'mosque') ? '{% static "img/mosque-marker.png" %}' :
+        ('{{ place.category }}'=== 'restaurant') ? '{% static "img/mosque-marker-green.png" %}' :
+        ('{{ place.category }}'=== 'market') ? '{% static "img/mosque-marker.png" %}' :
+        '{% static "img/mosque-marker.png" %}';
+
+        markers[{{ place.id }}] = new AdvancedMarkerElement({
+            map,
             position: { lat: {{ place.latitude }}, lng: {{ place.longitude }} },
-            map: map,
             title: '{{ place.name }}',
+            content: markerIcons[{{ place.id }}],
+            
         });
 
         const infowindow{{ place.id }} = new google.maps.InfoWindow({
             content: `
                 <div class="text-center">
-                    <h3 class="font-semibold">{{ place.name }}</h3>
+                    <p class="font-semibold text-black text-md">{{ place.name }}</p>
                     <p class="text-sm text-gray-600">{{ place.category|title }}</p>
                     <a href="{% url 'places:place_detail' place.id %}" 
                        class="text-primary-600 hover:text-primary-700 text-sm">
@@ -185,7 +199,7 @@
             `
         });
 
-        markers[{{ place.id }}].addListener('click', () => {
+        markers[{{ place.id }}].addListener('gmp-click', () => {
             infowindow{{ place.id }}.open(map, markers[{{ place.id }}]);
         });
         {% endfor %}

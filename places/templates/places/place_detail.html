@@ -320,15 +320,18 @@
     async function initMap() {
         const location = { lat: {{ place.latitude }}, lng: {{ place.longitude }} };
         const { Map } = await google.maps.importLibrary("maps")
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
 
         map = new Map(document.getElementById("map"), {
             zoom: 15,
             center: location,
+            mapId: 'DEMO_MAP_ID',
         });
 
-        const marker = new google.maps.Marker({
+        const marker = new AdvancedMarkerElement({
+            map,
             position: location,
-            map: map,
             title: '{{ place.name }}'
         });
 
