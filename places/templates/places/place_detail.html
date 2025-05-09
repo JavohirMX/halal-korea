@@ -318,7 +318,7 @@
 
     // Initialize Google Map
     async function initMap() {
-        const location = { lat: {{ place.latitude }}, lng: {{ place.longitude }} };
+        const location = { lat: {{ place.location.y }}, lng: {{ place.location.x }} };
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 

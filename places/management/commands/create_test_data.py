@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from places.models import HalalPlace
 from reviews.models import Review
+from django.contrib.gis.geos import Point
 import random
 
 User = get_user_model()
@@ -31,13 +32,14 @@ class Command(BaseCommand):
         statuses = ['pending', 'approved', 'rejected']
         
         for i in range(20):
+            longitude = 126.9780 + random.uniform(-0.1, 0.1)
+            latitude = 37.5665 + random.uniform(-0.1, 0.1)
             place, created = HalalPlace.objects.get_or_create(
                 name=f'Test Place {i}',
                 defaults={
                     'description': f'This is test place {i}',
                     'category': random.choice(categories),
-                    'latitude': 37.5665 + random.uniform(-0.1, 0.1),
-                    'longitude': 126.9780 + random.uniform(-0.1, 0.1),
+                    'location': Point(longitude, latitude),
                     'address': f'Test Address {i}, Seoul',
                     'phone_number': f'010-1234-{i:04d}',
                     'website': f'http://example{i}.com',

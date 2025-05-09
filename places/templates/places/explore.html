@@ -74,8 +74,8 @@
         <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto">
             {% for place in places %}
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
-                 data-lat="{{ place.latitude }}"
-                 data-lng="{{ place.longitude }}"
+                 data-lat="{{ place.location.y }}"
+                 data-lng="{{ place.location.x }}"
                  onclick="window.location.href='{% url 'places:place_detail' place.id %}'">
                 {% if place.photo_urls %}
                 <img src="{{ place.photo_urls.0 }}" 
@@ -177,7 +177,7 @@
 
         markers[{{ place.id }}] = new AdvancedMarkerElement({
             map,
-            position: { lat: {{ place.latitude }}, lng: {{ place.longitude }} },
+            position: { lat: {{ place.location.y }}, lng: {{ place.location.x }} },
             title: '{{ place.name }}',
             content: markerIcons[{{ place.id }}],
             

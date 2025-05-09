@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import models
+from django.contrib.gis.db import models
 
 
 # Halal Place model
@@ -19,8 +19,7 @@ class HalalPlace(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    location = models.PointField()
     address = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     website = models.URLField(blank=True, null=True)
