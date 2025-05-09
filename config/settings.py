@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ci_#7=3i6ug3lg!&kw=c&+d-8ya3g(no$zrmewbq+9)==uju@b'
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -87,11 +88,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mydb',
-        'USER': 'jmx',
-        'PASSWORD': 'jmx8520!',
-        'HOST': 'localhost',
-        'PORT': '5432',  # default PostgreSQL port
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT', default='5432'),  # default PostgreSQL port
     }
 }
 
@@ -148,7 +149,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTH_USER_MODEL = 'users.User'
 
-GOOGLE_MAPS_API_KEY = 'AIzaSyBLh6P24tMbFdDy6vNw031kahmGuxLRXeg'
+GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
 
 LOGIN_URL = 'users:login'  # URL where users will be redirected when login is required
 LOGIN_REDIRECT_URL = 'places:home'  # URL where users will be redirected after successful login
