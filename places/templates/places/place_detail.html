@@ -420,6 +420,7 @@
             const isCurrentlyFavorited = heartIcon.classList.contains('text-red-600');
             heartIcon.classList.toggle('text-red-600', !isCurrentlyFavorited);
             heartIcon.classList.toggle('text-gray-400', isCurrentlyFavorited);
+            heartIcon.classList.toggle('dark:text-gray-600', isCurrentlyFavorited);
 
             try {
                 const response = await fetch(`/users/toggle-favorite/${placeId}/`, {
@@ -441,6 +442,7 @@
                 if ((data.status === 'added') !== !isCurrentlyFavorited) {
                     heartIcon.classList.toggle('text-red-600');
                     heartIcon.classList.toggle('text-gray-400');
+                    heartIcon.classList.toggle('dark:text-gray-600');
                 }
 
                 // Optional: Show success message
@@ -452,6 +454,7 @@
                 // Revert UI on error
                 heartIcon.classList.toggle('text-red-600');
                 heartIcon.classList.toggle('text-gray-400');
+                heartIcon.classList.toggle('dark:text-gray-600');
                 // Optional: Show error message to user
             }
         });
