@@ -76,7 +76,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
                  data-lat="{{ place.latitude }}"
                  data-lng="{{ place.longitude }}"
-                 onclick="highlightMarker({{ place.id }})">
+                 onclick="window.location.href='{% url 'places:place_detail' place.id %}'">
                 {% if place.photo_urls %}
                 <img src="{{ place.photo_urls.0 }}" 
                      alt="{{ place.name }}" 
@@ -125,14 +125,11 @@
                     {% endif %}
                     {% if place.kakao_map_link %}
                     <a href="{{ place.kakao_map_link }}" target="_blank" 
-                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+                       onclick="event.stopPropagation()">
                         Kakao Maps
                     </a>
                     {% endif %}
-                    <a href="{% url 'places:place_detail' place.id %}" 
-                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                        View Details
-                    </a>
                 </div>
             </div>
             {% empty %}
