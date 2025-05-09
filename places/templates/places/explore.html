@@ -11,12 +11,19 @@
         <p class="mt-2 text-gray-600 dark:text-gray-400">Discover halal restaurants, markets, and prayer spaces across South Korea</p>
     </div>
 
+    <!-- Update Location Button -->
+    <div class="mb-4 flex justify-end">
+        <button id="update-location-btn" type="button" class="inline-flex items-center px-4 py-2 border border-primary-500 rounded-lg text-base font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition">
+            <i class="fas fa-location-arrow mr-2"></i> Update Location
+        </button>
+    </div>
+
     <!-- Search and Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
             <!-- Search Bar -->
-            <div class="md:col-span-2">
-                <div class="relative">
+            <div class="md:col-span-2 flex items-center">
+                <div class="relative flex-grow">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
@@ -26,10 +33,50 @@
                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
                            placeholder="Search by name or location...">
                 </div>
+                <button type="button" id="filter-toggle" class="ml-2 p-2 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 md:hidden">
+                    <i class="fas fa-filter"></i>
+                </button>
             </div>
             
-            <!-- Category Filter -->
-            <div>
+            <!-- Mobile Filters Dropdown -->
+            <div id="mobile-filters" class="hidden md:hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-10">
+                <!-- Category Filter -->
+                <div class="mb-4">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-filter text-gray-400"></i>
+                        </div>
+                        <select name="category" 
+                                class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
+                            <option value="">All Categories</option>
+                            <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>Restaurants</option>
+                            <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>Markets</option>
+                            <option value="mosque" {% if request.GET.category == 'mosque' %}selected{% endif %}>Mosques</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Sorting Options -->
+                <div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-sort text-gray-400"></i>
+                        </div>
+                        <select name="sort" 
+                                class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
+                            <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>Sort by Distance</option>
+                            <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Sort by Rating</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Desktop Filters -->
+            <div class="hidden md:block md:col-span-1">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-filter text-gray-400"></i>
@@ -46,19 +93,15 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Rating Filter -->
-            <div>
+            <div class="hidden md:block md:col-span-1">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-star text-gray-400"></i>
+                        <i class="fas fa-sort text-gray-400"></i>
                     </div>
-                    <select name="rating" 
-                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
-                        <option value="">All Ratings</option>
-                        <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ Stars</option>
-                        <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3+ Stars</option>
-                        <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2+ Stars</option>
+                    <select name="sort" 
+                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>Sort by Distance</option>
+                        <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Sort by Rating</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <i class="fas fa-chevron-down text-gray-400"></i>
@@ -99,6 +142,16 @@
                 </div>
                 
                 <p class="mt-2 text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{{ place.description }}</p>
+                
+                {% if place.distance %}
+                <div class="mt-2 text-xs text-gray-500">
+                    {% if place.distance.m > 1000 %}
+                        {{ place.distance.km|floatformat:1 }} km away
+                    {% else %}
+                        {{ place.distance.m|floatformat:0 }} meters away
+                    {% endif %}
+                </div>
+                {% endif %}
                 
                 <div class="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,15 +204,34 @@
     async function initMap() {
         // Center on Seoul by default
         const seoul = { lat: 37.5665, lng: 126.9780 };
+        // Center on user location if available
+        {% if user_location %}
+        const userLat = {{ user_location.y }};
+        const userLng = {{ user_location.x }};
+        const center = { lat: userLat, lng: userLng };
+        {% else %}
+        const center = seoul;
+        {% endif %}
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
 
         map = new Map(document.getElementById("map"), {
             zoom: 12,
-            center: seoul,
+            center: center,
             mapId: 'DEMO_MAP_ID',
         });
+
+        // Add marker for user's current location if available
+        {% if user_location %}
+        const userMarker = new AdvancedMarkerElement({
+            map,
+            position: { lat: userLat, lng: userLng },
+            title: 'Your Location',
+            content: document.createElement('div'),
+        });
+        userMarker.content.innerHTML = '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>';
+        {% endif %}
 
         // Store markers
         const markers = {};
@@ -218,8 +290,20 @@
 
     // Add event listeners for filters
     document.querySelectorAll('select').forEach(element => {
-        element.addEventListener('change', function() {
-            this.closest('form').submit();
+        element.addEventListener('change', function(e) {
+            e.preventDefault();
+            const form = this.closest('form');
+            const formData = new FormData(form);
+            const searchParams = new URLSearchParams();
+            
+            // Only add non-empty values to prevent duplicate parameters
+            for (let [key, value] of formData.entries()) {
+                if (value) {
+                    searchParams.set(key, value);
+                }
+            }
+            
+            window.location.search = searchParams.toString();
         });
     });
 
@@ -228,8 +312,73 @@
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            this.closest('form').submit();
+            const form = this.closest('form');
+            const formData = new FormData(form);
+            const searchParams = new URLSearchParams();
+            
+            // Only add non-empty values to prevent duplicate parameters
+            for (let [key, value] of formData.entries()) {
+                if (value) {
+                    searchParams.set(key, value);
+                }
+            }
+            
+            window.location.search = searchParams.toString();
         }
     });
+
+    // Toggle mobile filters dropdown
+    document.getElementById('filter-toggle').addEventListener('click', function() {
+        document.getElementById('mobile-filters').classList.toggle('hidden');
+    });
+</script>
+
+<script>
+// If ?location=true, get user location and reload with lat/lng
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('location') === 'true' && !urlParams.get('lat')) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                urlParams.set('lat', position.coords.latitude);
+                urlParams.set('lng', position.coords.longitude);
+                urlParams.delete('location');
+                window.location.search = urlParams.toString();
+            }, function(error) {
+                alert('Could not get your location.');
+            });
+        } else {
+            alert('Geolocation is not supported by your browser.');
+        }
+    }
+});
+</script>
+
+<script>
+// Update Location Button AJAX
+document.getElementById('update-location-btn').onclick = function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            fetch("{% url 'places:set_location' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `lat=${position.coords.latitude}&lng=${position.coords.longitude}`
+            }).then(res => res.json()).then(data => {
+                if (data.status === 'ok') {
+                    window.location.reload();
+                } else {
+                    alert('Failed to update location.');
+                }
+            });
+        }, function() {
+            alert('Could not get your location.');
+        });
+    } else {
+        alert('Geolocation is not supported by your browser.');
+    }
+};
 </script>
 {% endblock %}

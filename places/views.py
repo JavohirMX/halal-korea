@@ -11,6 +11,10 @@ from django.core.files.base import ContentFile
 import uuid
 from django.db.models.functions import Round
 from django.conf import settings
+from django.contrib.gis.geos import Point
+from django.contrib.gis.db.models.functions import Distance
+from django.http import JsonResponse
+import time
 
 User = get_user_model()
 
@@ -29,43 +33,56 @@ def explore(request):
     # Get filter parameters
     category = request.GET.get('category')
     search_query = request.GET.get('q')
-    min_rating = request.GET.get('rating')
-    
+    sort = request.GET.get('sort', 'distance')
+    lat = request.GET.get('lat')
+    lng = request.GET.get('lng')
+    user_location = None
+    # Check session if no lat/lng in GET
+    session_loc = request.session.get('user_location')
+    if not (lat and lng) and session_loc:
+        # Check if not expired (1 hour = 3600 seconds)
+        if time.time() - session_loc['timestamp'] < 3600:
+            lat = session_loc['lat']
+            lng = session_loc['lng']
     # Start with all approved places
     places = HalalPlace.objects.filter(status='approved')
-    
     # Apply filters
     if category:
         places = places.filter(category=category)
-    
     if search_query:
         places = places.filter(
             Q(name__icontains=search_query) |
             Q(description__icontains=search_query) |
             Q(address__icontains=search_query)
         )
-    
     # Annotate with average rating
-    
     places = places.annotate(
         average_rating=Round(Avg('reviews__rating'), 1)
     )
-    
-    # Apply rating filter
-    if min_rating:
-        places = places.filter(average_rating__gte=float(min_rating))
-    
-    # Order by rating and name
-    places = places.order_by('-average_rating', 'name')
-    
+    # Location-based sorting
+    if lat and lng:
+        try:
+            user_location = Point(float(lng), float(lat), srid=4326)
+            places = places.annotate(distance=Distance('location', user_location))
+            if sort == 'distance':
+                places = places.order_by('distance')
+            else:
+                places = places.order_by('-average_rating', 'name')
+        except (ValueError, TypeError):
+            user_location = None
+            # fallback to default ordering
+            places = places.order_by('-average_rating', 'name')
+    else:
+        places = places.order_by('-average_rating', 'name')
     return render(request, 'places/explore.html', {
         'places': places,
         'current_filters': {
             'category': category,
             'search_query': search_query,
-            'min_rating': min_rating,
+            'sort': sort,
         },
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+        'user_location': user_location,
     })
 
 def place_detail(request, pk):
@@ -138,3 +155,16 @@ def about(request):
 
 def donate(request):
     return render(request, 'places/donate.html')
+
+def set_location(request):
+    if request.method == 'POST':
+        lat = request.POST.get('lat')
+        lng = request.POST.get('lng')
+        if lat and lng:
+            request.session['user_location'] = {
+                'lat': float(lat),
+                'lng': float(lng),
+                'timestamp': time.time()
+            }
+            return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error'}, status=400)
