@@ -278,24 +278,46 @@
                             placeholder="Enter website URL" 
                             class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                     </div>
-                    
                 </div>
+            </div>
 
-                <div>
-                    <label for="place-google-map" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Google Maps Link
-                    </label>
-                    <div class="relative mt-1">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-map-location-dot text-gray-400"></i>
+            <!-- Map Links -->
+            <div class="space-y-4">
+                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Additional Map Links</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Naver Maps -->
+                    <div>
+                        <label for="place-naver-map" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Naver Maps Link
+                        </label>
+                        <div class="relative mt-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-map-location-dot text-gray-400"></i>
+                            </div>
+                            <input type="url" 
+                               id="place-naver-map"
+                               name="naver_map_link"
+                               placeholder="Enter Naver Maps link" 
+                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                         </div>
-                        <input type="url" 
-                           id="place-google-map"
-                           name="google_map_link"
-                            placeholder="Enter Google Maps link" 
-                           class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                     </div>
-                    
+
+                    <!-- Kakao Maps -->
+                    <div>
+                        <label for="place-kakao-map" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Kakao Maps Link
+                        </label>
+                        <div class="relative mt-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-map-location-dot text-gray-400"></i>
+                            </div>
+                            <input type="url" 
+                               id="place-kakao-map"
+                               name="kakao_map_link"
+                               placeholder="Enter Kakao Maps link" 
+                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                        </div>
+                    </div>
                 </div>
             </div>
 
