@@ -43,20 +43,6 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-12">What We Offer</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Verified Listings -->
-                <div class="glass-card rounded-lg p-6">
-                    <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900/50 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Verified Listings</h3>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Every establishment listed on our platform is verified to ensure they meet halal standards.
-                    </p>
-                </div>
-
                 <!-- Community Reviews -->
                 <div class="glass-card rounded-lg p-6">
                     <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900/50 rounded-lg flex items-center justify-center mb-4">
@@ -84,6 +70,22 @@
                         Available in English, Korean, and Uzbek to serve our diverse community.
                     </p>
                 </div>
+
+                <!-- Find Nearby Places -->
+                <div class="glass-card rounded-lg p-6">
+                    <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900/50 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Find Nearby Places</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Discover halal restaurants, markets, and prayer spaces in your vicinity with our interactive map feature.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -97,7 +99,7 @@
                     <div class="text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2">
                         <span class="counter" data-target="{{ total_places }}">0</span>
                     </div>
-                    <p class="text-gray-600 dark:text-gray-400">Verified Places</p>
+                    <p class="text-gray-600 dark:text-gray-400">Community Places</p>
                 </div>
 
                 <!-- Total Reviews -->
@@ -114,6 +116,25 @@
                         <span class="counter" data-target="{{ total_users }}">0</span>
                     </div>
                     <p class="text-gray-600 dark:text-gray-400">Active Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Message -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="p-6 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-200 mb-2">Important Notice</h3>
+                    <p class="text-base text-yellow-700 dark:text-yellow-200">
+                        All places listed on our platform are community-contributed. While we make every effort to maintain accurate information, we strongly recommend verifying the halal status directly with each establishment before visiting. Your diligence helps maintain the integrity of our community.
+                    </p>
                 </div>
             </div>
         </div>
