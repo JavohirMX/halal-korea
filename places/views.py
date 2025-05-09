@@ -122,6 +122,12 @@ def submit_place(request):
             place.status = 'pending'
             place.submitted_by = request.user
             
+            # Handle location from latitude and longitude
+            latitude = form.cleaned_data.get('latitude')
+            longitude = form.cleaned_data.get('longitude')
+            if latitude is not None and longitude is not None:
+                place.location = Point(longitude, latitude)
+            
             # Handle multiple photos
             photos = request.FILES.getlist('photos')
             if photos:
