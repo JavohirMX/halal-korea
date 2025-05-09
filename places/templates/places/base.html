@@ -251,11 +251,40 @@
                     </button>
                     
                     <!-- Language Selector -->
-                    <select class="ml-4 mr-4 rounded-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm hidden md:block">
-                        <option value="EN">🇺🇸 English</option>
-                        <option value="KR">🇰🇷 한국어</option>
-                        <option value="UZ">🇺🇿 O'zbek</option>
-                    </select>
+                    <div class="ml-4 mr-4 relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
+                            <span class="flag">🇺🇸</span>
+                            <span class="hidden sm:inline">English</span>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        
+                        <!-- Dropdown menu -->
+                        <div x-show="open" 
+                             @click.away="open = false"
+                             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95">
+                            <div class="py-1">
+                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                    <span class="flag">🇺🇸</span>
+                                    <span>English</span>
+                                </button>
+                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                    <span class="flag">🇰🇷</span>
+                                    <span>한국어</span>
+                                </button>
+                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                    <span class="flag">🇺🇿</span>
+                                    <span>O'zbek</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Desktop Auth Menu -->
                     <div class="hidden md:flex md:items-center">
@@ -363,11 +392,42 @@
                     
                     <!-- Language Selector for Mobile -->
                     <div class="px-3 py-2">
-                        <select class="w-full rounded-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm">
-                            <option value="EN">🇺🇸 English</option>
-                            <option value="KR">🇰🇷 한국어</option>
-                            <option value="UZ">🇺🇿 O'zbek</option>
-                        </select>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" 
+                                    class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <div class="flex items-center space-x-2">
+                                    <span class="flag">🇺🇸</span>
+                                    <span>English</span>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            
+                            <!-- Dropdown menu -->
+                            <div x-show="open" 
+                                 @click.away="open = false"
+                                 class="mt-2 w-full rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95">
+                                <div class="py-1">
+                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <span class="flag">🇺🇸</span>
+                                        <span>English</span>
+                                    </button>
+                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <span class="flag">🇰🇷</span>
+                                        <span>한국어</span>
+                                    </button>
+                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <span class="flag">🇺🇿</span>
+                                        <span>O'zbek</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Mobile Auth Menu -->
