@@ -8,7 +8,7 @@
         const seoul = { lat: 37.5665, lng: 126.9780 };
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-
+        const { Geocoder } = await google.maps.importLibrary("geocoding");
 
         map = new Map(document.getElementById("map"), {
             zoom: 12,
@@ -17,6 +17,67 @@
         });
         
         let marker = null;
+        const geocoder = new Geocoder();
+
+        // Function to update address from coordinates
+        async function updateAddressFromCoordinates(lat, lng) {
+            try {
+                const response = await geocoder.geocode({
+                    location: { lat, lng }
+                });
+                
+                if (response.results[0]) {
+                    document.getElementById('place-address').value = response.results[0].formatted_address;
+                }
+            } catch (error) {
+                console.error('Geocoding error:', error);
+            }
+        }
+
+        // Function to update marker from address
+        async function updateMarkerFromAddress(address) {
+            try {
+                const response = await geocoder.geocode({
+                    address: address
+                });
+                
+                if (response.results[0]) {
+                    const location = response.results[0].geometry.location;
+                    const lat = location.lat();
+                    const lng = location.lng();
+                    
+                    // Update hidden inputs
+                    document.getElementById('id_latitude').value = lat;
+                    document.getElementById('id_longitude').value = lng;
+                    
+                    // Update or add marker
+                    if (marker) {
+                        marker.position = location;
+                    } else {
+                        marker = new AdvancedMarkerElement({
+                            map,
+                            position: location,
+                            draggable: true
+                        });
+
+                        // Update coordinates when marker is dragged
+                        marker.addListener('dragend', function() {
+                            const position = marker.getPosition();
+                            const lat = position.lat();
+                            const lng = position.lng();
+                            document.getElementById('id_latitude').value = lat;
+                            document.getElementById('id_longitude').value = lng;
+                            updateAddressFromCoordinates(lat, lng);
+                        });
+                    }
+                    
+                    // Center map on new location
+                    map.setCenter(location);
+                }
+            } catch (error) {
+                console.error('Geocoding error:', error);
+            }
+        }
 
         // Add click listener to map
         map.addListener('click', function(e) {
@@ -26,6 +87,9 @@
             // Update hidden inputs
             document.getElementById('id_latitude').value = lat;
             document.getElementById('id_longitude').value = lng;
+            
+            // Update address field
+            updateAddressFromCoordinates(lat, lng);
             
             // Update or add marker
             if (marker) {
@@ -40,12 +104,30 @@
                 // Update coordinates when marker is dragged
                 marker.addListener('dragend', function() {
                     const position = marker.getPosition();
-                    document.getElementById('id_latitude').value = position.lat();
-                    document.getElementById('id_longitude').value = position.lng();
+                    const lat = position.lat();
+                    const lng = position.lng();
+                    document.getElementById('id_latitude').value = lat;
+                    document.getElementById('id_longitude').value = lng;
+                    updateAddressFromCoordinates(lat, lng);
                 });
             }
         });
+
+        // Add address input listener
+        const addressInput = document.getElementById('place-address');
+        let addressTimeout;
         
+        addressInput.addEventListener('input', function() {
+            // Clear previous timeout
+            clearTimeout(addressTimeout);
+            
+            // Set new timeout to wait for user to stop typing
+            addressTimeout = setTimeout(() => {
+                if (this.value.trim()) {
+                    updateMarkerFromAddress(this.value);
+                }
+            }, 1000); // Wait 1 second after user stops typing
+        });
     }
 
     // Initialize map when the page loads
