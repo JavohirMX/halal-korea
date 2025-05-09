@@ -3,6 +3,7 @@ from .utils import get_prayer_times, get_prayer_times_ll
 from utils.location import get_client_ip, get_ip_location
 from django.http import JsonResponse
 import json
+import time
 
 # Create your views here.
 
@@ -11,6 +12,14 @@ def prayer_times(request):
     lat = request.GET.get('lat')
     lon = request.GET.get('lon')
     city = request.GET.get('city')
+    
+    # Check session for saved location
+    session_loc = request.session.get('user_location')
+    if not (lat and lon) and session_loc:
+        # Check if not expired (1 hour = 3600 seconds)
+        if time.time() - session_loc['timestamp'] < 3600:
+            lat = session_loc['lat']
+            lon = session_loc['lng']
     
     if lat and lon:
         # If coordinates are provided, use them directly
