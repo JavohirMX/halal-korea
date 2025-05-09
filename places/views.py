@@ -15,6 +15,7 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
 import time
+from utils.location import get_client_ip, get_ip_location
 
 User = get_user_model()
 
@@ -44,6 +45,21 @@ def explore(request):
         if time.time() - session_loc['timestamp'] < 3600:
             lat = session_loc['lat']
             lng = session_loc['lng']
+    
+    # If still no location, try IP-based geolocation
+    if not (lat and lng):
+        ip = get_client_ip(request)
+        ip_location = get_ip_location(ip)
+        if ip_location and not ip_location.get('error'):
+            lat = ip_location.get('lat')
+            lng = ip_location.get('lon')
+            # Store in session for future use
+            request.session['user_location'] = {
+                'lat': float(lat),
+                'lng': float(lng),
+                'timestamp': time.time()
+            }
+    
     # Start with all approved places
     places = HalalPlace.objects.filter(status='approved')
     # Apply filters
