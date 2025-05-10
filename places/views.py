@@ -20,12 +20,29 @@ from utils.location import get_client_ip, get_ip_location
 User = get_user_model()
 
 def home(request):
+    # Get user location from session or IP
+    user_location = None
+    session_loc = request.session.get('user_location')
+    if session_loc and time.time() - session_loc['timestamp'] < 3600:
+        user_location = Point(session_loc['lng'], session_loc['lat'], srid=4326)
+    else:
+        ip = get_client_ip(request)
+        ip_location = get_ip_location(ip)
+        if ip_location and not ip_location.get('error'):
+            user_location = Point(ip_location['lon'], ip_location['lat'], srid=4326)
+            request.session['user_location'] = {
+                'lat': float(ip_location['lat']),
+                'lng': float(ip_location['lon']),
+                'timestamp': time.time()
+            }
+
+    # Get nearest places
     featured_places = HalalPlace.objects.filter(
         status='approved'
     ).annotate(
-        average_rating=Round(Avg('reviews__rating'), 1)
-    ).order_by('-average_rating')[:6]
-    
+        average_rating=Round(Avg('reviews__rating'), 1),
+        distance=Distance('location', user_location) if user_location else None
+    ).order_by('distance' if user_location else '-average_rating')[:6]
     return render(request, 'places/home.html', {
         'featured_places': featured_places,
     })
