@@ -202,3 +202,12 @@ def set_location(request):
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+def handler404(request, exception):
+    try:
+        return render(request, 'places/404.html', status=404)
+    except Exception as e:
+        print(e)
+        # Fallback to a simple 404 response if template rendering fails
+        from django.http import HttpResponseNotFound
+        return HttpResponseNotFound('<h1>Page not found 404</h1>')

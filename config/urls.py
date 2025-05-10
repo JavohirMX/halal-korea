@@ -27,3 +27,5 @@ urlpatterns = [
     path('prayer/', include('prayer_times.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = 'places.views.handler404'
