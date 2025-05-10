@@ -116,6 +116,7 @@
                         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ place.name }}</h1>
                         <div class="mt-2">
                             <span class="px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
+                                <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% endif %} mr-1"></i>
                                 {{ place.category|title }}
                             </span>
                         </div>
