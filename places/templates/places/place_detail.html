@@ -6,6 +6,9 @@
 <!-- Swiper for image gallery -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<!-- Toastify for notifications -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 {% endblock %}
 
 {% block content %}
@@ -57,16 +60,24 @@
                             </span>
                         </div>
                     </div>
-                    <!-- Favorite button -->
-                    {% if user.is_authenticated %}
-                    <button id="favorite-button" 
-                            data-place-id="{{ place.id }}"
-                            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
-                        <i class="fas fa-heart text-2xl {% if place in user.favorite_places.all %}text-red-600{% else %}text-gray-400 dark:text-gray-600{% endif %}"></i>
-                    </button>
-                    {% endif %}
+                    <!-- Buttons container -->
+                    <div class="flex items-center space-x-2">
+                        {% if user.is_authenticated %}
+                        <button id="favorite-button" 
+                                data-place-id="{{ place.id }}"
+                                class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                            <i class="fas fa-heart text-2xl {% if place in user.favorite_places.all %}text-red-600{% else %}text-gray-400 dark:text-gray-600{% endif %}"></i>
+                        </button>
+                        {% endif %}
+                        <!-- Share button -->
+                        <button id="share-button"
+                                class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                            <i class="fas fa-share-alt text-2xl text-gray-400 dark:text-gray-600"></i>
+                        </button>
+                    </div>
                 </div>
 
+                {% if place.category != 'mosque' %}
                 <!-- Warning Message -->
                 <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                     <div class="flex">
@@ -82,6 +93,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
                 <!-- Rating and Reviews -->
                 <div class="mt-4">
@@ -150,6 +162,13 @@
                         Kakao Maps
                     </a>
                     {% endif %}
+                </div>
+            </div>
+
+            <!-- Map for mobile view -->
+            <div class="lg:hidden">
+                <div class="glass-card rounded-lg overflow-hidden">
+                    <div id="map-mobile" class="h-64 w-full dark:brightness-90"></div>
                 </div>
             </div>
 
@@ -228,7 +247,7 @@
                                         </label>
                                         <textarea name="comment" 
                                                   rows="4" 
-                                                  class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">{{ review.comment }}</textarea>
+                                                  class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none">{{ review.comment }}</textarea>
                                     </div>
                                     <div class="flex space-x-3">
                                         <button type="submit" 
@@ -270,7 +289,7 @@
                                 Your Review
                             </label>
                             <textarea name="content" rows="4" 
-                                      class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none"
                                       placeholder="Share your experience..."></textarea>
                         </div>
                         <button type="submit" 
@@ -313,10 +332,10 @@
             </div>
         </div>
 
-        <!-- Right Column: Map -->
-        <div class="lg:col-span-1">
+        <!-- Right Column: Map (desktop only) -->
+        <div class="hidden lg:block lg:col-span-1">
             <div class="glass-card rounded-lg overflow-hidden">
-                <div id="map" class="h-64 w-full dark:brightness-90"></div>
+                <div id="map-desktop" class="h-64 w-full dark:brightness-90"></div>
             </div>
         </div>
     </div>
@@ -338,20 +357,20 @@
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-
-        map = new Map(document.getElementById("map"), {
+        // Initialize desktop map
+        const desktopMap = new Map(document.getElementById("map-desktop"), {
             zoom: 15,
             center: location,
             mapId: 'DEMO_MAP_ID',
         });
 
-        const marker = new AdvancedMarkerElement({
-            map,
+        const desktopMarker = new AdvancedMarkerElement({
+            map: desktopMap,
             position: location,
             title: '{{ place.name }}'
         });
 
-        const infowindow = new google.maps.InfoWindow({
+        const desktopInfowindow = new google.maps.InfoWindow({
             content: `
                 <div class="text-center">
                     <h3 class="font-semibold">{{ place.name }}</h3>
@@ -360,8 +379,34 @@
             `
         });
 
-        marker.addListener('gmp-click', () => {
-            infowindow.open(map, marker);
+        desktopMarker.addListener('gmp-click', () => {
+            desktopInfowindow.open(desktopMap, desktopMarker);
+        });
+
+        // Initialize mobile map
+        const mobileMap = new Map(document.getElementById("map-mobile"), {
+            zoom: 15,
+            center: location,
+            mapId: 'DEMO_MAP_ID',
+        });
+
+        const mobileMarker = new AdvancedMarkerElement({
+            map: mobileMap,
+            position: location,
+            title: '{{ place.name }}'
+        });
+
+        const mobileInfowindow = new google.maps.InfoWindow({
+            content: `
+                <div class="text-center">
+                    <h3 class="font-semibold">{{ place.name }}</h3>
+                    <p class="text-sm text-gray-600">{{ place.address }}</p>
+                </div>
+            `
+        });
+
+        mobileMarker.addListener('gmp-click', () => {
+            mobileInfowindow.open(mobileMap, mobileMarker);
         });
     }
 
@@ -456,6 +501,47 @@
                 heartIcon.classList.toggle('text-gray-400');
                 heartIcon.classList.toggle('dark:text-gray-600');
                 // Optional: Show error message to user
+            }
+        });
+    }
+
+    // Share button functionality
+    const shareButton = document.getElementById('share-button');
+    if (shareButton) {
+        shareButton.addEventListener('click', async function() {
+            const shareData = {
+                title: '{{ place.name }}',
+                text: 'Check out {{ place.name }} on Halal Korea!',
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback for browsers that don't support Web Share API
+                    await navigator.clipboard.writeText(window.location.href);
+                    Toastify({
+                        text: "Link copied to clipboard!",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        },
+                    }).showToast();
+                }
+            } catch (error) {
+                console.error('Error sharing:', error);
+                Toastify({
+                    text: "Failed to share. Please try again.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    },
+                }).showToast();
             }
         });
     }
