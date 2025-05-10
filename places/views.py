@@ -14,35 +14,34 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
-import time
-from utils.location import get_client_ip, get_ip_location
+from utils.location_manager import get_user_location, update_user_location
+import json
 
 User = get_user_model()
 
 def home(request):
     # Get user location from session or IP
+    location = get_user_location(request)
     user_location = None
-    session_loc = request.session.get('user_location')
-    if session_loc and time.time() - session_loc['timestamp'] < 3600:
-        user_location = Point(session_loc['lng'], session_loc['lat'], srid=4326)
-    else:
-        ip = get_client_ip(request)
-        ip_location = get_ip_location(ip)
-        if ip_location and not ip_location.get('error'):
-            user_location = Point(ip_location['lon'], ip_location['lat'], srid=4326)
-            request.session['user_location'] = {
-                'lat': float(ip_location['lat']),
-                'lng': float(ip_location['lon']),
-                'timestamp': time.time()
-            }
+    
+    if 'lat' in location and 'lng' in location:
+        user_location = Point(location['lng'], location['lat'], srid=4326)
 
     # Get nearest places
     featured_places = HalalPlace.objects.filter(
         status='approved'
     ).annotate(
-        average_rating=Round(Avg('reviews__rating'), 1),
-        distance=Distance('location', user_location) if user_location else None
-    ).order_by('distance' if user_location else '-average_rating')[:6]
+        average_rating=Round(Avg('reviews__rating'), 1)
+    )
+
+    # Add distance annotation only if user_location exists
+    if user_location:
+        featured_places = featured_places.annotate(
+            distance=Distance('location', user_location)
+        ).order_by('distance')[:6]
+    else:
+        featured_places = featured_places.order_by('-average_rating')[:6]
+    
     return render(request, 'places/home.html', {
         'featured_places': featured_places,
     })
@@ -50,63 +49,45 @@ def home(request):
 def explore(request):
     # Get filter parameters
     category = request.GET.get('category')
-    search_query = request.GET.get('q')
+    search_query = request.GET.get('q', '')
     sort = request.GET.get('sort', 'distance')
-    lat = request.GET.get('lat')
-    lng = request.GET.get('lng')
+    
+    # Get user location
+    location = get_user_location(request)
     user_location = None
-    # Check session if no lat/lng in GET
-    session_loc = request.session.get('user_location')
-    if not (lat and lng) and session_loc:
-        # Check if not expired (1 hour = 3600 seconds)
-        if time.time() - session_loc['timestamp'] < 3600:
-            lat = session_loc['lat']
-            lng = session_loc['lng']
     
-    # If still no location, try IP-based geolocation
-    if not (lat and lng):
-        ip = get_client_ip(request)
-        ip_location = get_ip_location(ip)
-        if ip_location and not ip_location.get('error'):
-            lat = ip_location.get('lat')
-            lng = ip_location.get('lon')
-            # Store in session for future use
-            request.session['user_location'] = {
-                'lat': float(lat),
-                'lng': float(lng),
-                'timestamp': time.time()
-            }
-    
-    # Start with all approved places
+    if 'lat' in location and 'lng' in location:
+        user_location = Point(location['lng'], location['lat'], srid=4326)
+
+    # Base queryset
     places = HalalPlace.objects.filter(status='approved')
+    
     # Apply filters
     if category:
         places = places.filter(category=category)
+    
     if search_query:
         places = places.filter(
             Q(name__icontains=search_query) |
             Q(description__icontains=search_query) |
             Q(address__icontains=search_query)
         )
+    
     # Annotate with average rating
     places = places.annotate(
         average_rating=Round(Avg('reviews__rating'), 1)
     )
+    
     # Location-based sorting
-    if lat and lng:
-        try:
-            user_location = Point(float(lng), float(lat), srid=4326)
-            places = places.annotate(distance=Distance('location', user_location))
-            if sort == 'distance':
-                places = places.order_by('distance')
-            else:
-                places = places.order_by('-average_rating', 'name')
-        except (ValueError, TypeError):
-            user_location = None
-            # fallback to default ordering
+    if user_location:
+        places = places.annotate(distance=Distance('location', user_location))
+        if sort == 'rating':
             places = places.order_by('-average_rating', 'name')
+        else:
+            places = places.order_by('distance')
     else:
         places = places.order_by('-average_rating', 'name')
+        
     return render(request, 'places/explore.html', {
         'places': places,
         'current_filters': {
@@ -126,10 +107,12 @@ def place_detail(request, pk):
     user_has_reviewed = False
     if request.user.is_authenticated:
         user_has_reviewed = reviews.filter(user=request.user).exists()
+        
     # Annotate with average rating
     place = HalalPlace.objects.annotate(
         average_rating=Round(Avg('reviews__rating'), 1)
     ).get(pk=place.pk)
+    
     return render(request, 'places/place_detail.html', {
         'place': place,
         'reviews': reviews,
@@ -196,14 +179,26 @@ def donate(request):
     return render(request, 'places/donate.html')
 
 def set_location(request):
-    if request.method == 'POST':
-        lat = request.POST.get('lat')
-        lng = request.POST.get('lng')
-        if lat and lng:
-            request.session['user_location'] = {
-                'lat': float(lat),
-                'lng': float(lng),
-                'timestamp': time.time()
-            }
-            return JsonResponse({'status': 'ok'})
-    return JsonResponse({'status': 'error'}, status=400)
+    """API endpoint to set user location"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+        
+    try:
+        data = json.loads(request.body)
+        lat = data.get('latitude')
+        lng = data.get('longitude')
+        city = data.get('city')
+        
+        if not (lat and lng) and not city:
+            return JsonResponse({'error': 'Missing location data'}, status=400)
+            
+        # Update location in session
+        location = update_user_location(request, {
+            'lat': lat,
+            'lng': lng,
+            'city': city
+        })
+            
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

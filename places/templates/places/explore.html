@@ -334,27 +334,6 @@
 </script>
 
 <script>
-// If ?location=true, get user location and reload with lat/lng
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('location') === 'true' && !urlParams.get('lat')) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                urlParams.set('lat', position.coords.latitude);
-                urlParams.set('lng', position.coords.longitude);
-                urlParams.delete('location');
-                window.location.search = urlParams.toString();
-            }, function(error) {
-                alert('Could not get your location.');
-            });
-        } else {
-            alert('Geolocation is not supported by your browser.');
-        }
-    }
-});
-</script>
-
-<script>
 // Update Location Button AJAX
 document.getElementById('update-location-btn').onclick = function() {
     if (navigator.geolocation) {
@@ -362,19 +341,24 @@ document.getElementById('update-location-btn').onclick = function() {
             fetch("{% url 'places:set_location' %}", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                     'X-CSRFToken': '{{ csrf_token }}'
                 },
-                body: `lat=${position.coords.latitude}&lng=${position.coords.longitude}`
+                body: JSON.stringify({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                })
             }).then(res => res.json()).then(data => {
-                if (data.status === 'ok') {
+                if (data.success) {
                     window.location.reload();
                 } else {
-                    alert('Failed to update location.');
+                    alert('Failed to update location: ' + (data.error || 'Unknown error'));
                 }
+            }).catch(error => {
+                alert('Failed to update location: ' + error);
             });
-        }, function() {
-            alert('Could not get your location.');
+        }, function(error) {
+            alert('Could not get your location: ' + error.message);
         });
     } else {
         alert('Geolocation is not supported by your browser.');

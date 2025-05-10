@@ -32,10 +32,10 @@
                 </form>
                 <!-- Button to find nearest places -->
                 <div class="mt-4 text-center">
-                    <a href="{% url 'places:explore' %}?location=true" 
-                       class="inline-flex items-center px-6 py-3 border border-primary-500 rounded-lg text-base font-medium text-white gradient-bg-hover shadow-lg">
+                    <button id="find-nearest-btn"
+                            class="inline-flex items-center px-6 py-3 border border-primary-500 rounded-lg text-base font-medium text-white gradient-bg-hover shadow-lg">
                         <i class="fas fa-map-marker-alt mr-2"></i> Find Nearest Places
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -165,5 +165,38 @@
         </a>
     </div>
 </div>
+
+<script>
+// Find Nearest Places Button
+document.getElementById('find-nearest-btn').onclick = function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            fetch("{% url 'places:set_location' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                })
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    window.location.href = "{% url 'places:explore' %}";
+                } else {
+                    alert('Failed to update location: ' + (data.error || 'Unknown error'));
+                }
+            }).catch(error => {
+                alert('Failed to update location: ' + error);
+            });
+        }, function(error) {
+            alert('Could not get your location: ' + error.message);
+        });
+    } else {
+        alert('Geolocation is not supported by your browser.');
+    }
+};
+</script>
 {% endblock %}
 

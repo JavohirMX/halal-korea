@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .utils import get_prayer_times, get_prayer_times_ll
-from utils.location import get_client_ip, get_ip_location
+from utils.location_manager import get_user_location, update_user_location
 from django.http import JsonResponse
 import json
 import time
@@ -8,51 +8,36 @@ import time
 # Create your views here.
 
 def prayer_times(request):
-    # Get coordinates from query parameters
-    lat = request.GET.get('lat')
-    lon = request.GET.get('lon')
-    city = request.GET.get('city')
+    # Get prayer calculation settings from session
+    calculation_method = request.session.get('calculation_method', 3)  # Default to Muslim World League
+    asr_method = request.session.get('asr_method', 1)  # Default to Hanafi
     
-    # Check session for saved location
-    session_loc = request.session.get('user_location')
-    if not (lat and lon) and session_loc:
-        # Check if not expired (1 hour = 3600 seconds)
-        if time.time() - session_loc['timestamp'] < 3600:
-            lat = session_loc['lat']
-            lon = session_loc['lng']
+    # Get location from session or IP
+    location = get_user_location(request)
     
-    if lat and lon:
-        # If coordinates are provided, use them directly
-        data = get_prayer_times_ll(float(lat), float(lon))
-        location = {
+    # Get prayer times based on location type
+    if 'lat' in location and 'lng' in location:
+        data = get_prayer_times_ll(float(location['lat']), float(location['lng']), method=calculation_method, school=asr_method)
+        location_info = {
             "city": data.get("data", {}).get("meta", {}).get("timezone", "").split("/")[-1],
             "country": "South Korea",
-            "latitude": lat,
-            "longitude": lon
+            "latitude": location['lat'],
+            "longitude": location['lng']
         }
-    elif city:
-        # If city is provided, use it
-        location = {
-            "city": city,
+    else:
+        location_info = {
+            "city": location['city'],
             "country": "South Korea"
         }
-        data = get_prayer_times(location["city"], location["country"])
-    else:
-        # Otherwise, try to get location from IP
-        ip = get_client_ip(request)
-        location = get_ip_location(ip)
-        
-        # If IP location fails, default to Seoul
-        if not location or not location.get("city"):
-            location = {
-                "city": "Seoul",
-                "country": "South Korea"
-            }
-        data = get_prayer_times(location["city"], location["country"])
+        data = get_prayer_times(location_info["city"], location_info["country"], method=calculation_method, school=asr_method)
 
     context = {
         'data': data["data"],
-        'location': location,
+        'location': location_info,
+        'prayer_settings': {
+            'calculation_method': calculation_method,
+            'asr_method': asr_method
+        }
     }
     
     return render(request, 'prayer_times/prayer_times.html', context)
@@ -75,6 +60,13 @@ def get_location_from_coords(request):
             timezone = prayer_data["data"].get("meta", {}).get("timezone", "")
             city = timezone.split("/")[-1] if timezone else None
             
+            # Update location in session
+            location = update_user_location(request, {
+                'lat': lat,
+                'lng': lon,
+                'city': city
+            })
+            
             return JsonResponse({
                 'city': city,
                 'latitude': lat,
@@ -83,5 +75,43 @@ def get_location_from_coords(request):
         else:
             return JsonResponse({'error': 'Could not get prayer times for location'}, status=404)
             
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def update_prayer_settings(request):
+    """API endpoint to update prayer calculation settings"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+        
+    try:
+        data = json.loads(request.body)
+        calculation_method = data.get('calculation_method')
+        asr_method = data.get('asr_method')
+        
+        if calculation_method is not None:
+            request.session['calculation_method'] = int(calculation_method)
+        if asr_method is not None:
+            request.session['asr_method'] = int(asr_method)
+            
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def update_location(request):
+    """API endpoint to update location"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+        
+    try:
+        data = json.loads(request.body)
+        city = data.get('city')
+        
+        if not city:
+            return JsonResponse({'error': 'Missing city'}, status=400)
+            
+        # Update location in session
+        location = update_user_location(request, {'city': city})
+            
+        return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

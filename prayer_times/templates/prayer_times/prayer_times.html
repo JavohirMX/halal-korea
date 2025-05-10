@@ -8,9 +8,10 @@
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white text-center">Prayer Times</h1>
         <p class="mt-2 text-gray-600 dark:text-gray-400 text-center">Stay updated with the prayer times for your location.</p>
         
-        <!-- Location Selector -->
-        <div class="mt-4 max-w-md w-full mx-auto">
-            <div class="relative" x-data="{ open: false, search: '', cities: [
+        <!-- Location and Settings Container -->
+        <div class="mt-4 max-w-md w-full mx-auto flex items-center space-x-2">
+            <!-- Location Selector -->
+            <div class="relative flex-grow" x-data="{ open: false, search: '', cities: [
                 { name: 'Seoul', country: 'South Korea' },
                 { name: 'Busan', country: 'South Korea' },
                 { name: 'Incheon', country: 'South Korea' },
@@ -62,12 +63,79 @@
                     <!-- City List -->
                     <div class="py-1 max-h-60 overflow-y-auto">
                         <template x-for="city in cities.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))" :key="city.name">
-                            <a :href="'?city=' + city.name" 
+                            <a href="#" 
+                               @click.prevent="updateLocation(city.name)"
                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <i class="fas fa-city mr-2"></i>
                                 <span x-text="city.name"></span>
                             </a>
                         </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Button -->
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" 
+                        class="h-[38px] px-4 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 glass-card flex items-center justify-center">
+                    <i class="fas fa-gear text-lg"></i>
+                </button>
+
+                <!-- Settings Dropdown -->
+                <div x-show="open" 
+                     @click.away="open = false"
+                     class="absolute right-0 mt-2 w-72 rounded-md shadow-lg glass-card dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95">
+                    <div class="p-4">
+                        <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Prayer Calculation Settings</h3>
+                        
+                        <!-- Calculation Method -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Calculation Method</label>
+                            <select id="calculation-method" 
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
+                                    onchange="updateCalculationMethod(this.value)">
+                                <option value="0">Jafari / Shia Ithna-Ashari</option>
+                                <option value="1">University of Islamic Sciences, Karachi</option>
+                                <option value="2">Islamic Society of North America</option>
+                                <option value="3">Muslim World League</option>
+                                <option value="4">Umm Al-Qura University, Makkah</option>
+                                <option value="5">Egyptian General Authority of Survey</option>
+                                <option value="7">Institute of Geophysics, University of Tehran</option>
+                                <option value="8">Gulf Region</option>
+                                <option value="9">Kuwait</option>
+                                <option value="10">Qatar</option>
+                                <option value="11">Majlis Ugama Islam Singapura, Singapore</option>
+                                <option value="12">Union Organization islamic de France</option>
+                                <option value="13">Diyanet İşleri Başkanlığı, Turkey</option>
+                                <option value="14">Spiritual Administration of Muslims of Russia</option>
+                                <option value="15">Moonsighting Committee Worldwide</option>
+                                <option value="16">Dubai (experimental)</option>
+                                <option value="17">Jabatan Kemajuan Islam Malaysia (JAKIM)</option>
+                                <option value="18">Tunisia</option>
+                                <option value="19">Algeria</option>
+                                <option value="20">KEMENAG - Kementerian Agama Republik Indonesia</option>
+                                <option value="21">Morocco</option>
+                                <option value="22">Comunidade Islamica de Lisboa</option>
+                                <option value="23">Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan</option>
+                            </select>
+                        </div>
+
+                        <!-- Asr Calculation Method -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Asr Calculation</label>
+                            <select id="asr-method" 
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
+                                    onchange="updateAsrMethod(this.value)">
+                                <option value="0">Standard (Shafi)</option>
+                                <option value="1">Hanafi</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,7 +300,30 @@
     
     document.addEventListener("DOMContentLoaded", updateCountdown);
     
-    // Add this new function for getting current location
+    function updateLocation(city) {
+        fetch('/prayer/update-location/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                city: city
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                console.error('Failed to update location');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating location:', error);
+        });
+    }
+
     function getCurrentLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -252,8 +343,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.city) {
-                            // Use coordinates for more accurate prayer times
-                            window.location.href = `?lat=${data.latitude}&lon=${data.longitude}`;
+                            window.location.reload();
                         } else {
                             alert('Could not determine location. Please select a city manually.');
                         }
@@ -272,5 +362,66 @@
             alert('Geolocation is not supported by your browser. Please select a city manually.');
         }
     }
+
+    function updateCalculationMethod(method) {
+        fetch('/prayer/update-settings/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                calculation_method: method
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                console.error('Failed to update settings');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating settings:', error);
+        });
+    }
+
+    function updateAsrMethod(method) {
+        fetch('/prayer/update-settings/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                asr_method: method
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                console.error('Failed to update settings');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating settings:', error);
+        });
+    }
+
+    // Set initial values from session data
+    document.addEventListener('DOMContentLoaded', function() {
+        const calculationMethod = '{{ prayer_settings.calculation_method }}';
+        const asrMethod = '{{ prayer_settings.asr_method }}';
+        
+        if (calculationMethod) {
+            document.getElementById('calculation-method').value = calculationMethod;
+        }
+        if (asrMethod) {
+            document.getElementById('asr-method').value = asrMethod;
+        }
+    });
 </script>
 {% endblock %}
