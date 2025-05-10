@@ -143,21 +143,23 @@
 
         <!-- Date and Time Display -->
         <div class="mt-4 max-w-md w-full mx-auto">
-            <div class="grid grid-cols-2 gap-4 justify-center">
-                <div class="glass-card p-3 rounded-lg text-center">
-                    <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Gregorian Date</h3>
-                    <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ data.date.gregorian.month.en}} {{ data.date.gregorian.day}}, {{ data.date.gregorian.year }}</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ data.date.gregorian.weekday.en}}</p>
+            <div class="glass-card p-3 rounded-lg">
+                <div class="grid grid-cols-3 gap-4 justify-center">
+                    <div class="text-center">
+                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Gregorian Date</h3>
+                        <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ data.date.gregorian.month.en}} {{ data.date.gregorian.day}}, {{ data.date.gregorian.year }}</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">{{ data.date.gregorian.weekday.en}}</p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Current Time</h3>
+                        <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white" id="current-time"></p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Hijri Date</h3>
+                        <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ data.date.hijri.day }} {{ data.date.hijri.month.en }}, {{ data.date.hijri.year }}</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">{{ data.date.hijri.weekday.en }}</p>
+                    </div>
                 </div>
-                <div class="glass-card p-3 rounded-lg text-center">
-                    <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Hijri Date</h3>
-                    <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ data.date.hijri.day }} {{ data.date.hijri.month.en }}, {{ data.date.hijri.year }}</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ data.date.hijri.weekday.en }}</p>
-                </div>
-            </div>
-            <div class="mt-4 glass-card p-3 rounded-lg text-center">
-                <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Current Time</h3>
-                <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white" id="current-time"></p>
             </div>
         </div>
 
@@ -215,7 +217,7 @@
 <script>
     function updateCurrentTime() {
         const now = new Date();
-        const options = { hour: '2-digit', minute: '2-digit', hour12: false };
+        const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
         document.getElementById('current-time').textContent = now.toLocaleTimeString([], options);
     }
     setInterval(updateCurrentTime, 1000);
