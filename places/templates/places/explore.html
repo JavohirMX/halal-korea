@@ -12,9 +12,14 @@
     </div>
 
     <!-- Update Location Button -->
-    <div class="mb-4 flex justify-end">
+    <div class="mb-4 flex justify-between">
         <button id="update-location-btn" type="button" class="inline-flex items-center px-4 py-2 border border-primary-500 rounded-lg text-base font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition">
             <i class="fas fa-location-arrow mr-2"></i> Update My Location
+        </button>
+        <!-- View Map Button (Visible until lg breakpoint) -->
+        <button id="view-map-btn" type="button" 
+                class="lg:hidden inline-flex items-center px-4 py-2 border border-primary-500 rounded-lg text-base font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition">
+            <i class="fas fa-map-marked-alt mr-2"></i> View Map
         </button>
     </div>
 
@@ -355,6 +360,12 @@
     // Toggle mobile filters dropdown
     document.getElementById('filter-toggle').addEventListener('click', function() {
         document.getElementById('mobile-filters').classList.toggle('hidden');
+    });
+
+    // View Map Button functionality
+    document.getElementById('view-map-btn').addEventListener('click', function() {
+        const mapElement = document.getElementById('map');
+        mapElement.scrollIntoView({ behavior: 'smooth' });
     });
 </script>
 
