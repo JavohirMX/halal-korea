@@ -9,6 +9,49 @@
 <!-- Toastify for notifications -->
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<style>
+    .image-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 1000;
+    }
+    .modal-swiper {
+        width: 100%;
+        height: 100%;
+    }
+    .modal-swiper .swiper-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-swiper img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    .image-modal .close-button {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    .swiper-slide img {
+        cursor: pointer;
+    }
+    .modal-swiper .swiper-button-next,
+    .modal-swiper .swiper-button-prev {
+        color: #fff;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -38,7 +81,8 @@
                         <div class="swiper-slide">
                             <img src="{{ photo_url }}" 
                                  alt="{{ place.name }}" 
-                                 class="w-full h-96 object-cover">
+                                 class="w-full h-96 object-cover"
+                                 onclick="openImageModal({{ forloop.counter0 }})">
                         </div>
                         {% endfor %}
                     </div>
@@ -48,6 +92,22 @@
                 </div>
             </div>
             {% endif %}
+
+            <!-- Image Modal -->
+            <div id="imageModal" class="image-modal">
+                <span class="close-button" onclick="closeImageModal()">&times;</span>
+                <div class="modal-swiper">
+                    <div class="swiper-wrapper">
+                        {% for photo_url in place.photo_urls %}
+                        <div class="swiper-slide">
+                            <img src="{{ photo_url }}" alt="{{ place.name }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
 
             <!-- Place Details -->
             <div class="glass-card rounded-lg p-6">
@@ -623,5 +683,58 @@
             }).showToast();
         });
     }
+
+    // Image Modal functionality
+    const modal = document.getElementById('imageModal');
+    const closeButton = document.querySelector('.close-button');
+    let modalSwiper;
+
+    function initModalSwiper() {
+        modalSwiper = new Swiper('.modal-swiper', {
+            navigation: {
+                nextEl: '.modal-swiper .swiper-button-next',
+                prevEl: '.modal-swiper .swiper-button-prev',
+            },
+            keyboard: {
+                enabled: true,
+            },
+            grabCursor: true,
+            zoom: {
+                maxRatio: 2,
+            },
+        });
+    }
+
+    function openImageModal(index) {
+        modal.style.display = "block";
+        document.body.style.overflow = "hidden";
+        
+        // Initialize swiper if not already initialized
+        if (!modalSwiper) {
+            initModalSwiper();
+        }
+        
+        // Slide to the clicked image
+        modalSwiper.slideTo(index, 0);
+    }
+
+    function closeImageModal() {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
+    // Close modal when clicking outside the image
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeImageModal();
+        }
+    });
+
+    // Close modal when pressing Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === "Escape" && modal.style.display === "block") {
+            closeImageModal();
+        }
+    });
 </script>
 {% endblock %}
