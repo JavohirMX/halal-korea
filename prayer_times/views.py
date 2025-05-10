@@ -46,13 +46,13 @@ def get_location_from_coords(request):
     try:
         data = json.loads(request.body)
         lat = data.get('latitude')
-        lon = data.get('longitude')
+        lng = data.get('longitude')
         
-        if not lat or not lon:
+        if not lat or not lng:
             return JsonResponse({'error': 'Missing coordinates'}, status=400)
             
         # Get prayer times directly using coordinates
-        prayer_data = get_prayer_times_ll(float(lat), float(lon))
+        prayer_data = get_prayer_times_ll(float(lat), float(lng))
         
         if prayer_data and prayer_data.get("data"):
             # Extract city name from timezone
@@ -62,14 +62,14 @@ def get_location_from_coords(request):
             # Update location in session
             location = update_user_location(request, {  # noqa: F841
                 'lat': lat,
-                'lng': lon,
+                'lng': lng,
                 'city': city
             })
             
             return JsonResponse({
                 'city': city,
                 'latitude': lat,
-                'longitude': lon
+                'longitude': lng
             })
         else:
             return JsonResponse({'error': 'Could not get prayer times for location'}, status=404)
