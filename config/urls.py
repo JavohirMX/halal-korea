@@ -26,6 +26,6 @@ urlpatterns = [
     path('reviews/', include('reviews.urls')),
     path('prayer/', include('prayer_times.urls')),
     
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler404 = 'places.views.handler404'
