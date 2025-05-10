@@ -17,5 +17,11 @@ class UserProfileForm(forms.ModelForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email',]
+        fields = ['username', 'email', 'preferred_language']
+        
+    def clean_preferred_language(self):
+        language = self.cleaned_data.get('preferred_language')
+        if language not in dict(User.LANGUAGE_CHOICES):
+            raise forms.ValidationError('Invalid language choice')
+        return language
         
