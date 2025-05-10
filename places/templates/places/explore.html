@@ -292,6 +292,19 @@
     document.querySelectorAll('select').forEach(element => {
         element.addEventListener('change', function(e) {
             e.preventDefault();
+            // Get the name of the changed select element
+            const selectName = this.name;
+            // Get the new value
+            const newValue = this.value;
+            
+            // Update all other select elements with the same name
+            document.querySelectorAll(`select[name="${selectName}"]`).forEach(select => {
+                if (select !== this) {
+                    select.value = newValue;
+                }
+            });
+            
+            // Submit the form
             const form = this.closest('form');
             const formData = new FormData(form);
             const searchParams = new URLSearchParams();
@@ -308,23 +321,32 @@
     });
 
     // Search input handling
-    const searchInput = document.querySelector('input[name="q"]');
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const form = this.closest('form');
-            const formData = new FormData(form);
-            const searchParams = new URLSearchParams();
-            
-            // Only add non-empty values to prevent duplicate parameters
-            for (let [key, value] of formData.entries()) {
-                if (value) {
-                    searchParams.set(key, value);
+    const searchInputs = document.querySelectorAll('input[name="q"]');
+    searchInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Update all other search inputs
+                searchInputs.forEach(otherInput => {
+                    if (otherInput !== this) {
+                        otherInput.value = this.value;
+                    }
+                });
+                
+                const form = this.closest('form');
+                const formData = new FormData(form);
+                const searchParams = new URLSearchParams();
+                
+                // Only add non-empty values to prevent duplicate parameters
+                for (let [key, value] of formData.entries()) {
+                    if (value) {
+                        searchParams.set(key, value);
+                    }
                 }
+                
+                window.location.search = searchParams.toString();
             }
-            
-            window.location.search = searchParams.toString();
-        }
+        });
     });
 
     // Toggle mobile filters dropdown
