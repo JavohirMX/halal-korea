@@ -58,8 +58,7 @@ def explore(request):
     
     if 'lat' in location and 'lng' in location:
         user_location = Point(location['lng'], location['lat'], srid=4326)
-    print(user_location)
-    print(location)
+
     # Base queryset
     places = HalalPlace.objects.filter(status='approved')
     

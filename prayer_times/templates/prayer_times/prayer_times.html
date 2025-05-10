@@ -27,7 +27,7 @@
                         class="w-full flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 glass-card">
                     <div class="flex items-center space-x-2">
                         <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
-                        <span>{{ location.city }}, {{ location.country }}</span>
+                        <span id="location-display">{{ location.city }}, {{ location.country }}</span>
                     </div>
                     <i class="fas fa-chevron-down text-xs"></i>
                 </button>
@@ -141,70 +141,67 @@
             </div>
         </div>
 
-        <!-- Date and Time Display -->
-        <div class="mt-4 max-w-md w-full mx-auto">
-            <div class="glass-card p-3 rounded-lg">
-                <div class="grid grid-cols-3 gap-4 justify-center">
-                    <div class="text-center">
-                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Gregorian Date</h3>
-                        <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ data.date.gregorian.month.en}} {{ data.date.gregorian.day}}, {{ data.date.gregorian.year }}</p>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">{{ data.date.gregorian.weekday.en}}</p>
-                    </div>
-                    <div class="text-center">
-                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Current Time</h3>
-                        <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white" id="current-time"></p>
-                    </div>
-                    <div class="text-center">
-                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Hijri Date</h3>
-                        <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ data.date.hijri.day }} {{ data.date.hijri.month.en }}, {{ data.date.hijri.year }}</p>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">{{ data.date.hijri.weekday.en }}</p>
-                    </div>
-                </div>
+        <!-- Loading State -->
+        <div id="loading-state" class="mt-4 max-w-md w-full mx-auto text-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">Loading prayer times...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="mt-4 max-w-md w-full mx-auto text-center hidden">
+            <div class="text-red-600 dark:text-red-400">
+                <i class="fas fa-exclamation-circle text-2xl"></i>
+                <p class="mt-2">Failed to load prayer times</p>
+                <button onclick="loadPrayerTimes()" class="mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline">
+                    Try Again
+                </button>
             </div>
         </div>
 
-        <!-- Prayer Times Table -->
-        <div class="max-w-md w-full mx-auto">
-            <table class="w-full mt-6 glass-card rounded-lg overflow-hidden">
-                <thead>
-                    <tr class="bg-primary-50 dark:bg-primary-900/30">
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Prayer</th>
-                        <th class="py-3 px-4 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">Time</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                        <td class="py-3 px-4 text-gray-700 dark:text-gray-300">Fajr</td>
-                        <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="{{ data.timings.Fajr }}">{{ data.timings.Fajr}}</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                        <td class="py-3 px-4 text-gray-700 dark:text-gray-300">Sunrise</td>
-                        <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="{{ data.timings.Sunrise }}">{{ data.timings.Sunrise }}</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                        <td class="py-3 px-4 text-gray-700 dark:text-gray-300">Dhuhr</td>
-                        <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="{{ data.timings.Dhuhr }}">{{ data.timings.Dhuhr }}</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                        <td class="py-3 px-4 text-gray-700 dark:text-gray-300">Asr</td>
-                        <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="{{ data.timings.Asr }}">{{ data.timings.Asr }}</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                        <td class="py-3 px-4 text-gray-700 dark:text-gray-300">Maghrib</td>
-                        <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="{{ data.timings.Maghrib }}">{{ data.timings.Maghrib }}</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                        <td class="py-3 px-4 text-gray-700 dark:text-gray-300">Isha</td>
-                        <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="{{ data.timings.Isha }}">{{ data.timings.Isha }}</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="bg-primary-50 dark:bg-primary-900/30">
-                        <td class="py-3 px-4 font-medium text-primary-700 dark:text-primary-400" id="next-prayer">Next Prayer</td>
-                        <td class="py-3 px-4 text-right font-medium text-primary-700 dark:text-primary-400" id="countdown-display">Calculating...</td>
-                    </tr>
-                </tfoot>
-            </table>
+        <!-- Content Container -->
+        <div id="content-container" class="hidden">
+            <!-- Date and Time Display -->
+            <div class="mt-4 max-w-md w-full mx-auto">
+                <div class="glass-card p-3 rounded-lg">
+                    <div class="grid grid-cols-3 gap-4 justify-center">
+                        <div class="text-center">
+                            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Gregorian Date</h3>
+                            <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white" id="gregorian-date"></p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400" id="gregorian-weekday"></p>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Current Time</h3>
+                            <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white" id="current-time"></p>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Hijri Date</h3>
+                            <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white" id="hijri-date"></p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400" id="hijri-weekday"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prayer Times Table -->
+            <div class="max-w-md w-full mx-auto">
+                <table class="w-full mt-6 glass-card rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-primary-50 dark:bg-primary-900/30">
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Prayer</th>
+                            <th class="py-3 px-4 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="prayer-times-body">
+                        <!-- Prayer times will be inserted here -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-primary-50 dark:bg-primary-900/30">
+                            <td class="py-3 px-4 font-medium text-primary-700 dark:text-primary-400" id="next-prayer">Next Prayer</td>
+                            <td class="py-3 px-4 text-right font-medium text-primary-700 dark:text-primary-400" id="countdown-display">Calculating...</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
 
         <!-- Info about source -->
@@ -215,6 +212,22 @@
 </div>
 
 <script>
+    // Set initial values from session data
+    document.addEventListener('DOMContentLoaded', function() {
+        const calculationMethod = '{{ prayer_settings.calculation_method }}';
+        const asrMethod = '{{ prayer_settings.asr_method }}';
+        
+        if (calculationMethod) {
+            document.getElementById('calculation-method').value = calculationMethod;
+        }
+        if (asrMethod) {
+            document.getElementById('asr-method').value = asrMethod;
+        }
+        
+        // Load prayer times
+        loadPrayerTimes();
+    });
+
     function updateCurrentTime() {
         const now = new Date();
         const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
@@ -238,8 +251,8 @@
         document.querySelectorAll("td[data-time]").forEach((td, index) => {
             const time = parseTime(td.dataset.time);
             const row = td.closest('tr');
-                prayerTimes.push(time);
-                prayerNames.push(td.previousElementSibling.textContent.trim()); 
+            prayerTimes.push(time);
+            prayerNames.push(td.previousElementSibling.textContent.trim()); 
             prayerRows.push(row);
 
             // Reset any previous highlighting
@@ -299,8 +312,71 @@
         updateTimer();
         setInterval(updateTimer, 1000);
     }
-    
-    document.addEventListener("DOMContentLoaded", updateCountdown);
+
+    async function loadPrayerTimes() {
+        // Show loading state
+        document.getElementById('loading-state').classList.remove('hidden');
+        document.getElementById('error-state').classList.add('hidden');
+        document.getElementById('content-container').classList.add('hidden');
+        
+        try {
+            const response = await fetch('/prayer/get-prayer-times/');
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update location display
+                document.getElementById('location-display').textContent = 
+                    `${data.location.city}, ${data.location.country}`;
+                
+                // Update dates
+                const gregorian = data.data.date.gregorian;
+                document.getElementById('gregorian-date').textContent = 
+                    `${gregorian.month.en} ${gregorian.day}, ${gregorian.year}`;
+                document.getElementById('gregorian-weekday').textContent = 
+                    gregorian.weekday.en;
+                
+                const hijri = data.data.date.hijri;
+                document.getElementById('hijri-date').textContent = 
+                    `${hijri.day} ${hijri.month.en}, ${hijri.year}`;
+                document.getElementById('hijri-weekday').textContent = 
+                    hijri.weekday.en;
+                
+                // Update prayer times
+                const prayerTimesBody = document.getElementById('prayer-times-body');
+                prayerTimesBody.innerHTML = '';
+                
+                const prayers = [
+                    { name: 'Fajr', time: data.data.timings.Fajr },
+                    { name: 'Sunrise', time: data.data.timings.Sunrise },
+                    { name: 'Dhuhr', time: data.data.timings.Dhuhr },
+                    { name: 'Asr', time: data.data.timings.Asr },
+                    { name: 'Maghrib', time: data.data.timings.Maghrib },
+                    { name: 'Isha', time: data.data.timings.Isha }
+                ];
+                
+                prayers.forEach(prayer => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150';
+                    row.innerHTML = `
+                        <td class="py-3 px-4 text-gray-700 dark:text-gray-300">${prayer.name}</td>
+                        <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="${prayer.time}">${prayer.time}</td>
+                    `;
+                    prayerTimesBody.appendChild(row);
+                });
+                
+                // Show content and start countdown
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('content-container').classList.remove('hidden');
+                updateCountdown();
+            } else {
+                throw new Error(data.error || 'Failed to load prayer times');
+            }
+        } catch (error) {
+            console.error('Error loading prayer times:', error);
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+        }
+    }
     
     function updateLocation(city) {
         fetch('/prayer/update-location/', {
@@ -316,9 +392,9 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.reload();
+                loadPrayerTimes();
             } else {
-                console.error('Failed to update location');
+                console.error('Failed to update location:', data.error);
             }
         })
         .catch(error => {
@@ -330,7 +406,6 @@
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function(position) {
-                    // Send coordinates to our backend API
                     fetch('/prayer/get-location/', {
                         method: 'POST',
                         headers: {
@@ -344,8 +419,8 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.city) {
-                            window.location.reload();
+                        if (data.success) {
+                            loadPrayerTimes();
                         } else {
                             alert('Could not determine location. Please select a city manually.');
                         }
@@ -379,9 +454,9 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.reload();
+                loadPrayerTimes();
             } else {
-                console.error('Failed to update settings');
+                console.error('Failed to update settings:', data.error);
             }
         })
         .catch(error => {
@@ -403,27 +478,14 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.reload();
+                loadPrayerTimes();
             } else {
-                console.error('Failed to update settings');
+                console.error('Failed to update settings:', data.error);
             }
         })
         .catch(error => {
             console.error('Error updating settings:', error);
         });
     }
-
-    // Set initial values from session data
-    document.addEventListener('DOMContentLoaded', function() {
-        const calculationMethod = '{{ prayer_settings.calculation_method }}';
-        const asrMethod = '{{ prayer_settings.asr_method }}';
-        
-        if (calculationMethod) {
-            document.getElementById('calculation-method').value = calculationMethod;
-        }
-        if (asrMethod) {
-            document.getElementById('asr-method').value = asrMethod;
-        }
-    });
 </script>
 {% endblock %}

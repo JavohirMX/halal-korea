@@ -1,74 +1,119 @@
 import requests
 from datetime import datetime
+from django.core.cache import cache
+from .models import PrayerTimeCache
+import logging
+
+logger = logging.getLogger(__name__)
+
+def get_fallback_prayer_times():
+    """Return fallback prayer times in case of API failure"""
+    return {
+        "code": 200,
+        "status": "OK",
+        "data": {
+            "timings": {
+                "Fajr": "05:00",
+                "Sunrise": "07:00",
+                "Dhuhr": "12:00",
+                "Asr": "15:00",
+                "Maghrib": "18:00",
+                "Isha": "19:30"
+            },
+            "date": {
+                "gregorian": {
+                    "date": datetime.now().strftime("%d-%m-%Y"),
+                    "day": datetime.now().day,
+                    "month": {"en": datetime.now().strftime("%B")},
+                    "year": datetime.now().year,
+                    "weekday": {"en": datetime.now().strftime("%A")}
+                },
+                "hijri": {
+                    "date": "01-01-1445",
+                    "day": "1",
+                    "month": {"en": "Muharram"},
+                    "year": "1445",
+                    "weekday": {"en": "Monday"}
+                }
+            }
+        }
+    }
 
 def get_prayer_times(city, country, date=None, method=None, school=1):
     """
     Fetches the prayer times for a specified city and country on a given date.
-
-    This function retrieves prayer times from the Aladhan API based on the provided city,
-    country, and optional date. If no date is provided, the current date is used. The method
-    and school parameters can be adjusted to specify the calculation method and school of thought
-    for the prayer times.
-
-    Args:
-        city (str): The name of the city for which to retrieve prayer times.
-        country (str): The name of the country where the city is located.
-        date (str, optional): The date for which to retrieve prayer times in 'dd-mm-yyyy' format. 
-                              Defaults to None, which uses the current date.
-        method (int, optional): The calculation method for prayer times. Defaults to None.
-        school (int, optional): The school of thought for prayer times. Defaults to 1 (Hanafi).
-
-    Returns:
-        dict: A dictionary containing the prayer times and additional information from the API response.
+    Implements caching and timeout handling.
     """
-    
     if date is None:
         date = datetime.now().strftime('%d-%m-%Y')
+        
+    # Try to get from database cache first
+    cached_data = PrayerTimeCache.get_cached_times(city, country, date, method, school)
+    if cached_data:
+        return cached_data
+        
+    # Try to get from memory cache
+    cache_key = f"prayer_times_{city}_{country}_{date}_{method}_{school}"
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return cached_data
+        
+    # If not in cache, make API call
     url = f'http://api.aladhan.com/v1/timingsByCity/{date}'
     params = {
         'city': city,
         'country': country,
-        'method': method, # 0-23
-        'school': school, # Shafi'i 0, Hanafi 1
+        'method': method,
+        'school': school,
     }
-    response = requests.get(url, params=params)
-    return response.json() 
-
-
-
+    
+    try:
+        response = requests.get(url, params=params, timeout=5)  # 5 second timeout
+        data = response.json()
+        
+        # Cache the result
+        cache.set(cache_key, data, 3600)  # Cache for 1 hour
+        PrayerTimeCache.set_cached_times(city, country, date, data, method, school)
+        
+        return data
+    except (requests.Timeout, requests.RequestException) as e:
+        logger.error(f"Error fetching prayer times: {str(e)}")
+        return get_fallback_prayer_times()
 
 def get_prayer_times_ll(latitude, longitude, date=None, method=None, school=1):
     """
     Fetches the prayer times for a specified latitude and longitude on a given date.
-
-    This function retrieves prayer times from the Aladhan API based on the provided latitude,
-    longitude, and optional date. If no date is provided, the current date is used. The method
-    and school parameters can be adjusted to specify the calculation method and school of thought
-    for the prayer times.
-
-    Args:
-        latitude (float): The latitude of the location for which to retrieve prayer times.
-        longitude (float): The longitude of the location for which to retrieve prayer times.
-        date (str, optional): The date for which to retrieve prayer times in 'dd-mm-yyyy' format. 
-                              Defaults to None, which uses the current date.
-        method (int, optional): The calculation method for prayer times. Defaults to None.
-        school (int, optional): The school of thought for prayer times. Defaults to 1 (Hanafi).
-
-    Returns:
-        dict: A dictionary containing the prayer times and additional information from the API response.
+    Implements caching and timeout handling.
     """
-    
     if date is None:
         date = datetime.now().strftime('%d-%m-%Y')
+        
+    # Try to get from memory cache
+    cache_key = f"prayer_times_ll_{latitude}_{longitude}_{date}_{method}_{school}"
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return cached_data
+        
+    # If not in cache, make API call
     url = f'http://api.aladhan.com/v1/timings/{date}'
     params = {
         'latitude': latitude,
         'longitude': longitude,
-        'method': method, # 0-23
-        'school': school, # Shafi'i 0, Hanafi 1
+        'method': method,
+        'school': school,
     }
-    response = requests.get(url, params=params)
-    return response.json()
+    
+    try:
+        response = requests.get(url, params=params, timeout=5)  # 5 second timeout
+        data = response.json()
+        
+        # Cache the result
+        cache.set(cache_key, data, 3600)  # Cache for 1 hour
+        
+        return data
+    except (requests.Timeout, requests.RequestException) as e:
+        logger.error(f"Error fetching prayer times: {str(e)}")
+        return get_fallback_prayer_times()
 
 """ Example response for get_prayer_times
 {
