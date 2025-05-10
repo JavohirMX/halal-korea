@@ -193,7 +193,7 @@ def set_location(request):
             return JsonResponse({'error': 'Missing location data'}, status=400)
             
         # Update location in session
-        location = update_user_location(request, {
+        location = update_user_location(request, {  # noqa: F841
             'lat': lat,
             'lng': lng,
             'city': city

@@ -3,7 +3,6 @@ from .utils import get_prayer_times, get_prayer_times_ll
 from utils.location_manager import get_user_location, update_user_location
 from django.http import JsonResponse
 import json
-import time
 
 # Create your views here.
 
@@ -61,7 +60,7 @@ def get_location_from_coords(request):
             city = timezone.split("/")[-1] if timezone else None
             
             # Update location in session
-            location = update_user_location(request, {
+            location = update_user_location(request, {  # noqa: F841
                 'lat': lat,
                 'lng': lon,
                 'city': city
@@ -110,7 +109,7 @@ def update_location(request):
             return JsonResponse({'error': 'Missing city'}, status=400)
             
         # Update location in session
-        location = update_user_location(request, {'city': city})
+        location = update_user_location(request, {'city': city})  # noqa: F841
             
         return JsonResponse({'success': True})
     except Exception as e:
