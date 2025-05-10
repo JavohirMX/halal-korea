@@ -120,6 +120,11 @@
                     <div class="flex items-center text-gray-600 dark:text-gray-400">
                         <i class="fas fa-map-marker-alt w-5"></i>
                         <span class="ml-2">{{ place.address }}</span>
+                        <button onclick="copyAddress('{{ place.address }}')" 
+                                class="ml-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                                title="Copy address">
+                            <i class="fas fa-copy text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400"></i>
+                        </button>
                     </div>
                     {% if place.phone_number %}
                     <div class="flex items-center text-gray-600 dark:text-gray-400">
@@ -590,6 +595,32 @@
                 star.classList.remove('text-yellow-400');
                 star.classList.add('text-gray-300', 'dark:text-gray-600');
             }
+        });
+    }
+
+    // Copy address functionality
+    function copyAddress(address) {
+        navigator.clipboard.writeText(address).then(() => {
+            Toastify({
+                text: "Address copied to clipboard!",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                },
+            }).showToast();
+        }).catch(err => {
+            console.error('Failed to copy address:', err);
+            Toastify({
+                text: "Failed to copy address. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                },
+            }).showToast();
         });
     }
 </script>
