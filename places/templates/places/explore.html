@@ -1,6 +1,16 @@
 {% extends 'places/base.html' %}
 {% load static %}
 {% block extra_head %}
+<style>
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+    .loading-spinner.active {
+        display: block;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -25,7 +35,7 @@
 
     <!-- Search and Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+        <form id="filter-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
             <!-- Search Bar -->
             <div class="md:col-span-2 flex items-center">
                 <div class="relative flex-grow">
@@ -119,130 +129,17 @@
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Places List -->
-        <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto">
-            {% for place in places %}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
-                 data-lat="{{ place.location.y }}"
-                 data-lng="{{ place.location.x }}"
-                 onclick="window.location.href='{% url 'places:place_detail' place.id %}'">
-                {% if place.photo_urls %}
-                <img src="{{ place.photo_urls.0 }}" 
-                     alt="{{ place.name }}" 
-                     class="w-full h-48 object-cover rounded-lg mb-4">
-                {% endif %}
-                
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
-                        <p class="text-sm text-primary-600 dark:text-primary-400">
-                            <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% endif %} mr-1"></i>
-                            {{ place.category|title }}
-                        </p>
-                    </div>
-                    <div class="flex items-center bg-primary-50 dark:bg-primary-900/50 px-2 py-1 rounded">
-                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {{ place.average_rating|default:"New" }}
-                        </span>
-                    </div>
+        <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto" id="places-container">
+            <!-- Places will be loaded here dynamically -->
+            {% include 'places/partials/place_list.html' with places=places %}
+            
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loading-spinner">
+                <div class="flex justify-center items-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                 </div>
-                
-                <p class="mt-2 text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{{ place.description }}</p>
-                
-                {% if place.distance %}
-                <div class="mt-2 text-xs text-gray-500">
-                    {% if place.distance.m > 1000 %}
-                        {{ place.distance.km|floatformat:1 }} km away
-                    {% else %}
-                        {{ place.distance.m|floatformat:0 }} meters away
-                    {% endif %}
-                </div>
-                {% endif %}
-                
-                <div class="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    {{ place.address }}
-                </div>
-                
-                <div class="mt-4 flex space-x-2">
-                    {% if place.google_map_link %}
-                    <a href="{{ place.google_map_link }}" target="_blank" 
-                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                        Google Maps
-                    </a>
-                    {% endif %}
-                    {% if place.naver_map_link %}
-                    <a href="{{ place.naver_map_link }}" target="_blank" 
-                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                        Naver Maps
-                    </a>
-                    {% endif %}
-                    {% if place.kakao_map_link %}
-                    <a href="{{ place.kakao_map_link }}" target="_blank" 
-                       class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
-                       onclick="event.stopPropagation()">
-                        Kakao Maps
-                    </a>
-                    {% endif %}
-                </div>
+                <p class="mt-2 text-sm text-gray-500">Loading more places...</p>
             </div>
-            {% empty %}
-            <div class="text-center py-8 text-gray-500">
-                No places found matching your criteria
-            </div>
-            {% endfor %}
-
-            <!-- Pagination Controls -->
-            {% if places.paginator.num_pages > 1 %}
-            <div class="mt-6 flex justify-center">
-                <nav class="flex items-center space-x-2" aria-label="Pagination">
-                    <!-- Previous Page -->
-                    {% if places.has_previous %}
-                    <a href="?page={{ places.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
-                       class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="fas fa-chevron-left"></i>
-                    </a>
-                    {% else %}
-                    <span class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-400 dark:text-gray-600">
-                        <i class="fas fa-chevron-left"></i>
-                    </span>
-                    {% endif %}
-                    
-                    <!-- Page Numbers -->
-                    {% for i in places.paginator.page_range %}
-                        {% if places.number == i %}
-                        <span class="px-3 py-2 rounded-md bg-primary-500 text-white text-sm font-medium">
-                            {{ i }}
-                        </span>
-                        {% elif i > places.number|add:'-3' and i < places.number|add:'3' %}
-                        <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
-                           class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            {{ i }}
-                        </a>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    <!-- Next Page -->
-                    {% if places.has_next %}
-                    <a href="?page={{ places.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
-                       class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                    {% else %}
-                    <span class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-400 dark:text-gray-600">
-                        <i class="fas fa-chevron-right"></i>
-                    </span>
-                    {% endif %}
-                </nav>
-            </div>
-            {% endif %}
         </div>
 
         <!-- Map -->
@@ -253,6 +150,15 @@
 </div>
 
 <script>
+    // Global variables
+    let map;
+    let markers = {};
+    let markerIcons = {};
+    let currentPage = 1;
+    let isLoading = false;
+    let hasNextPage = {% if places.has_next %}true{% else %}false{% endif %};
+    let allPlaces = [];
+    
     // Initialize Google Map
     async function initMap() {
         // Center on Seoul by default
@@ -267,7 +173,6 @@
         {% endif %}
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-
 
         map = new Map(document.getElementById("map"), {
             zoom: 12,
@@ -286,36 +191,78 @@
         userMarker.content.innerHTML = '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>';
         {% endif %}
 
-        // Store markers
-        const markers = {};
-        const markerIcons = {};
-
+        // Load initial places on the map
+        loadInitialPlaces();
+    }
+    
+    // Load initial places for the map
+    function loadInitialPlaces() {
+        // Get current filter values
+        const searchParams = new URLSearchParams(window.location.search);
+        const category = searchParams.get('category') || '';
+        const query = searchParams.get('q') || '';
+        const sort = searchParams.get('sort') || 'distance';
+        
+        // Build request parameters
+        const requestParams = new URLSearchParams();
+        if (category) requestParams.set('category', category);
+        if (query) requestParams.set('q', query);
+        if (sort && sort !== 'distance') requestParams.set('sort', sort);
+        
+        // Fetch places data
+        fetch(`{% url 'places:places_json' %}?page=1&${requestParams.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                allPlaces = data.places;
+                hasNextPage = data.has_next;
+                currentPage = data.current_page;
         
         // Add markers for each place
-        {% for place in places %}
-
-        markerIcons[{{ place.id }}] = document.createElement("img");
-        markerIcons[{{ place.id }}].src = ('{{ place.category }}' === 'mosque') ? '{% static "images/marker-mosque.svg" %}' :
-        ('{{ place.category }}'=== 'restaurant') ? '{% static "images/marker-restaurant.svg" %}' :
-        ('{{ place.category }}'=== 'market') ? '{% static "images/marker-market.svg" %}' :
-        '{% static "images/marker-mosque.svg" %}';
-        markerIcons[{{ place.id }}].width = 32;  // Set width to 32 pixels
-        markerIcons[{{ place.id }}].height = 32; // Set height to 32 pixels
-
-        markers[{{ place.id }}] = new AdvancedMarkerElement({
-            map,
-            position: { lat: {{ place.location.y }}, lng: {{ place.location.x }} },
-            title: '{{ place.name }}',
-            content: markerIcons[{{ place.id }}],
-            
+                addPlacesToMap(data.places);
+            })
+            .catch(error => console.error('Error loading places:', error));
+    }
+    
+    // Add places to the map
+    function addPlacesToMap(places) {
+        // Clear existing markers
+        clearMapMarkers();
+        
+        places.forEach(place => {
+            addMarkerForPlace(place);
         });
-
-        const infowindow{{ place.id }} = new google.maps.InfoWindow({
+    }
+    
+    // Add a marker for a single place
+    function addMarkerForPlace(place) {
+        if (!map) return;
+        
+        const { AdvancedMarkerElement } = google.maps.importLibrary("marker");
+        
+        // Create marker icon
+        markerIcons[place.id] = document.createElement("img");
+        markerIcons[place.id].src = (place.category === 'mosque') ? '{% static "images/marker-mosque.svg" %}' :
+            (place.category === 'restaurant') ? '{% static "images/marker-restaurant.svg" %}' :
+            (place.category === 'market') ? '{% static "images/marker-market.svg" %}' :
+        '{% static "images/marker-mosque.svg" %}';
+        markerIcons[place.id].width = 32;
+        markerIcons[place.id].height = 32;
+        
+        // Create marker
+        markers[place.id] = new google.maps.marker.AdvancedMarkerElement({
+            map,
+            position: { lat: place.location.lat, lng: place.location.lng },
+            title: place.name,
+            content: markerIcons[place.id],
+        });
+        
+        // Create info window
+        const infowindow = new google.maps.InfoWindow({
             content: `
                 <div class="text-center">
-                    <p class="font-semibold text-black text-md">{{ place.name }}</p>
-                    <p class="text-sm text-gray-600">{{ place.category|title }}</p>
-                    <a href="{% url 'places:place_detail' place.id %}" 
+                    <p class="font-semibold text-black text-md">${place.name}</p>
+                    <p class="text-sm text-gray-600">${place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
+                    <a href="${place.detail_url}" 
                        class="text-primary-600 hover:text-primary-700 text-sm">
                         View Details
                     </a>
@@ -323,27 +270,225 @@
             `
         });
 
-        markers[{{ place.id }}].addListener('gmp-click', () => {
-            infowindow{{ place.id }}.open(map, markers[{{ place.id }}]);
+        // Add click listener
+        markers[place.id].addListener('gmp-click', () => {
+            infowindow.open(map, markers[place.id]);
         });
-        {% endfor %}
+    }
+    
+    // Clear all markers from the map
+    function clearMapMarkers() {
+        for (const id in markers) {
+            if (markers.hasOwnProperty(id)) {
+                markers[id].setMap(null);
+            }
+        }
+        markers = {};
+        markerIcons = {};
+    }
 
         // Highlight marker when clicking on list item
-        window.highlightMarker = function(placeId) {
+    function highlightMarker(placeId) {
             const marker = markers[placeId];
             if (marker) {
                 map.panTo(marker.getPosition());
                 google.maps.event.trigger(marker, 'click');
             }
-        };
+    }
+    
+    // Load more places with infinite scroll
+    function loadMorePlaces() {
+        if (isLoading || !hasNextPage) return;
+        
+        isLoading = true;
+        
+        // Safely access the loading spinner
+        const loadingSpinner = document.getElementById('loading-spinner');
+        if (loadingSpinner) {
+            loadingSpinner.classList.add('active');
+        }
+        
+        // Get current filter values
+        const searchParams = new URLSearchParams(window.location.search);
+        const category = searchParams.get('category') || '';
+        const query = searchParams.get('q') || '';
+        const sort = searchParams.get('sort') || 'distance';
+        const nextPage = currentPage + 1;
+        
+        // Build request parameters
+        const requestParams = new URLSearchParams();
+        requestParams.set('page', nextPage);
+        if (category) requestParams.set('category', category);
+        if (query) requestParams.set('q', query);
+        if (sort && sort !== 'distance') requestParams.set('sort', sort);
+        
+        // Fetch next page of places
+        fetch(`{% url 'places:explore' %}?${requestParams.toString()}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Append new places to the container
+            const placesContainer = document.getElementById('places-container');
+            
+            // Remove loading spinner before adding new content (to avoid duplicates)
+            const existingSpinner = document.getElementById('loading-spinner');
+            if (existingSpinner) {
+                existingSpinner.remove();
+            }
+            
+            // Add the new content
+            placesContainer.insertAdjacentHTML('beforeend', data.html);
+            
+            // Add loading spinner back
+            const loadingSpinner = document.createElement('div');
+            loadingSpinner.id = 'loading-spinner';
+            loadingSpinner.className = 'loading-spinner';
+            loadingSpinner.innerHTML = `
+               <div class="flex justify-center items-center">
+                   <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+               </div>
+               <p class="mt-2 text-sm text-gray-500">Loading more places...</p>
+            `;
+            placesContainer.appendChild(loadingSpinner);
+            
+            // Update state
+            hasNextPage = data.has_next;
+            currentPage = nextPage;
+            
+            // Fetch the JSON data to update map
+            return fetch(`{% url 'places:places_json' %}?${requestParams.toString()}`);
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Add new places to the map
+            allPlaces = [...allPlaces, ...data.places];
+            data.places.forEach(place => {
+                addMarkerForPlace(place);
+            });
+            
+            isLoading = false;
+            
+            // Safely hide the spinner
+            const loadingSpinner = document.getElementById('loading-spinner');
+            if (loadingSpinner) {
+                loadingSpinner.classList.remove('active');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading more places:', error);
+            isLoading = false;
+            
+            // Safely hide the spinner on error
+            const loadingSpinner = document.getElementById('loading-spinner');
+            if (loadingSpinner) {
+                loadingSpinner.classList.remove('active');
+            }
+        });
+    }
+    
+    // Handle scroll event for infinite loading
+    function handleScroll() {
+        const placesContainer = document.getElementById('places-container');
+        const scrollPosition = placesContainer.scrollTop + placesContainer.clientHeight;
+        const scrollHeight = placesContainer.scrollHeight;
+        
+        // Load more when user scrolls near the bottom
+        if (scrollHeight - scrollPosition < 300 && !isLoading && hasNextPage) {
+            loadMorePlaces();
+        }
+    }
+    
+    // Dynamic filtering
+    function applyFilters() {
+        // Get filter values
+        const form = document.getElementById('filter-form');
+        const formData = new FormData(form);
+        const searchParams = new URLSearchParams();
+        
+        // Only add non-empty values
+        for (let [key, value] of formData.entries()) {
+            if (value) {
+                // Skip adding sort=distance as it's the default
+                if (key === 'sort' && value === 'distance') {
+                    continue;
+                }
+                searchParams.set(key, value);
+            }
+        }
+        
+        // Reset state
+        currentPage = 1;
+        isLoading = true;
+        
+        // Show loading state
+        const placesContainer = document.getElementById('places-container');
+        placesContainer.innerHTML = `
+            <div class="flex justify-center items-center py-8">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+            </div>
+        `;
+        
+        // Fetch filtered places
+        fetch(`{% url 'places:explore' %}?${searchParams.toString()}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update places list
+            placesContainer.innerHTML = data.html;
+            
+            // Add loading spinner back to the container
+            const loadingSpinner = document.createElement('div');
+            loadingSpinner.id = 'loading-spinner';
+            loadingSpinner.className = 'loading-spinner';
+            loadingSpinner.innerHTML = `
+               <div class="flex justify-center items-center">
+                   <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+               </div>
+               <p class="mt-2 text-sm text-gray-500">Loading more places...</p>
+            `;
+            placesContainer.appendChild(loadingSpinner);
+            
+            // Update state
+            hasNextPage = data.has_next;
+            
+            // Update URL without reloading page
+            const url = new URL(window.location);
+            url.search = searchParams.toString();
+            window.history.pushState({}, '', url);
+            
+            // Update map
+            return fetch(`{% url 'places:places_json' %}?${searchParams.toString()}`);
+        })
+        .then(response => response.json())
+        .then(data => {
+            allPlaces = data.places;
+            addPlacesToMap(data.places);
+            isLoading = false;
+        })
+        .catch(error => {
+            console.error('Error applying filters:', error);
+            isLoading = false;
+        });
     }
 
     // Call initMap when the page loads
     document.addEventListener('DOMContentLoaded', function() {
         initMap();
-    });
-
-    // Add event listeners for filters
+        
+        // Set up infinite scroll
+        const placesContainer = document.getElementById('places-container');
+        placesContainer.addEventListener('scroll', handleScroll);
+        
+        // Set up filter change handlers
+        const filterForm = document.getElementById('filter-form');
+        
+        // Handle select changes
     document.querySelectorAll('select').forEach(element => {
         element.addEventListener('change', function(e) {
             e.preventDefault();
@@ -359,28 +504,38 @@
                 }
             });
             
-            // Submit the form
-            const form = this.closest('form');
-            const formData = new FormData(form);
-            const searchParams = new URLSearchParams();
-            
-            // Only add non-empty values to prevent duplicate parameters
-            for (let [key, value] of formData.entries()) {
-                if (value) {
-                    searchParams.set(key, value);
-                }
-            }
-            
-            window.location.search = searchParams.toString();
+                // Apply filters
+                applyFilters();
+            });
         });
-    });
-
-    // Search input handling
+        
+        // Handle search input
+        let searchTimeout;
     const searchInputs = document.querySelectorAll('input[name="q"]');
     searchInputs.forEach(input => {
+            input.addEventListener('input', function(e) {
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+                
+                // Set a timeout to avoid too many requests while typing
+                searchTimeout = setTimeout(() => {
+                    // Update all other search inputs
+                    searchInputs.forEach(otherInput => {
+                        if (otherInput !== this) {
+                            otherInput.value = this.value;
+                        }
+                    });
+                    
+                    // Apply filters
+                    applyFilters();
+                }, 500);
+            });
+            
         input.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
+                    clearTimeout(searchTimeout);
+                    
                 // Update all other search inputs
                 searchInputs.forEach(otherInput => {
                     if (otherInput !== this) {
@@ -388,19 +543,10 @@
                     }
                 });
                 
-                const form = this.closest('form');
-                const formData = new FormData(form);
-                const searchParams = new URLSearchParams();
-                
-                // Only add non-empty values to prevent duplicate parameters
-                for (let [key, value] of formData.entries()) {
-                    if (value) {
-                        searchParams.set(key, value);
-                    }
+                    // Apply filters
+                    applyFilters();
                 }
-                
-                window.location.search = searchParams.toString();
-            }
+            });
         });
     });
 

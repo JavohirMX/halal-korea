@@ -16,6 +16,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
 from utils.location_manager import get_user_location, update_user_location
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.template.loader import render_to_string
 import json
 
 User = get_user_model()
@@ -51,7 +52,7 @@ def explore(request):
     # Get filter parameters
     category = request.GET.get('category')
     search_query = request.GET.get('q', '')
-    sort = request.GET.get('sort', 'distance')
+    sort = request.GET.get('sort', 'distance')  # Default to distance sorting
     page = request.GET.get('page', 1)
     
     # Get user location
@@ -85,10 +86,13 @@ def explore(request):
         places = places.annotate(distance=Distance('location', user_location))
         if sort == 'rating':
             places = places.order_by('-average_rating', 'name')
-        else:
+        else:  # Default to distance sorting
             places = places.order_by('distance')
     else:
-        places = places.order_by('-average_rating', 'name')
+        if sort == 'rating':
+            places = places.order_by('-average_rating', 'name')
+        else:  # Default to rating if no location
+            places = places.order_by('-average_rating', 'name')
     
     # Pagination
     paginator = Paginator(places, 20)  # Show 20 places per page
@@ -101,6 +105,21 @@ def explore(request):
     except EmptyPage:
         # If page is out of range, deliver last page of results
         paginated_places = paginator.page(paginator.num_pages)
+    
+    # Check if this is an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        places_html = render_to_string('places/partials/place_list.html', {
+            'places': paginated_places,
+            'user_location': user_location,
+        })
+        
+        # Return JSON response with HTML and pagination info
+        return JsonResponse({
+            'html': places_html,
+            'has_next': paginated_places.has_next(),
+            'next_page': int(page) + 1 if paginated_places.has_next() else None,
+            'total_pages': paginator.num_pages,
+        })
         
     return render(request, 'places/explore.html', {
         'places': paginated_places,
@@ -111,6 +130,101 @@ def explore(request):
         },
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
         'user_location': user_location,
+    })
+
+def get_places_json(request):
+    """API endpoint to get places as JSON for map and dynamic loading"""
+    # Get filter parameters
+    category = request.GET.get('category')
+    search_query = request.GET.get('q', '')
+    sort = request.GET.get('sort', 'distance')  # Default to distance sorting
+    page = request.GET.get('page', 1)
+    
+    # Get user location
+    location = get_user_location(request)
+    user_location = None
+    
+    if 'lat' in location and 'lng' in location:
+        user_location = Point(location['lng'], location['lat'], srid=4326)
+
+    # Base queryset
+    places = HalalPlace.objects.filter(status='approved')
+    
+    # Apply filters
+    if category:
+        places = places.filter(category=category)
+    
+    if search_query:
+        places = places.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(address__icontains=search_query)
+        )
+    
+    # Annotate with average rating
+    places = places.annotate(
+        average_rating=Round(Avg('reviews__rating'), 1)
+    )
+    
+    # Location-based sorting
+    if user_location:
+        places = places.annotate(distance=Distance('location', user_location))
+        if sort == 'rating':
+            places = places.order_by('-average_rating', 'name')
+        else:  # Default to distance sorting
+            places = places.order_by('distance')
+    else:
+        if sort == 'rating':
+            places = places.order_by('-average_rating', 'name')
+        else:  # Default to rating if no location
+            places = places.order_by('-average_rating', 'name')
+    
+    # Pagination
+    paginator = Paginator(places, 20)
+    
+    try:
+        paginated_places = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_places = paginator.page(1)
+    except EmptyPage:
+        paginated_places = paginator.page(paginator.num_pages)
+    
+    # Prepare places data for JSON response
+    places_data = []
+    for place in paginated_places:
+        place_data = {
+            'id': place.id,
+            'name': place.name,
+            'category': place.category,
+            'address': place.address,
+            'description': place.description,
+            'average_rating': float(place.average_rating) if place.average_rating else None,
+            'photo_url': place.photo_urls[0] if place.photo_urls else None,
+            'location': {
+                'lat': place.location.y,
+                'lng': place.location.x
+            },
+            'detail_url': request.build_absolute_uri(f'/places/{place.id}/'),
+            'google_map_link': place.google_map_link,
+            'naver_map_link': place.naver_map_link,
+            'kakao_map_link': place.kakao_map_link,
+        }
+        
+        if hasattr(place, 'distance'):
+            place_data['distance'] = {
+                'm': float(place.distance.m),
+                'km': float(place.distance.km)
+            }
+            
+        places_data.append(place_data)
+    
+    # Return JSON response
+    return JsonResponse({
+        'places': places_data,
+        'has_next': paginated_places.has_next(),
+        'next_page': int(page) + 1 if paginated_places.has_next() else None,
+        'total_pages': paginator.num_pages,
+        'current_page': paginated_places.number,
     })
 
 def place_detail(request, pk):

@@ -14,7 +14,7 @@ class Command(BaseCommand):
         # Create test users
         self.stdout.write('Creating test users...')
         users = []
-        for i in range(5):
+        for i in range(6,15):
             user, created = User.objects.get_or_create(
                 username=f'testuser{i}',
                 email=f'testuser{i}@example.com',
@@ -29,11 +29,10 @@ class Command(BaseCommand):
         self.stdout.write('Creating test places...')
         places = []
         categories = ['restaurant', 'market', 'mosque']
-        statuses = ['pending', 'approved', 'rejected']
         
-        for i in range(20):
-            longitude = 126.9780 + random.uniform(-0.1, 0.1)
-            latitude = 37.5665 + random.uniform(-0.1, 0.1)
+        for i in range(20,60):
+            longitude = 126.9780 + random.uniform(-0.3, 0.3)
+            latitude = 37.5665 + random.uniform(-0.3, 0.3)
             place, created = HalalPlace.objects.get_or_create(
                 name=f'Test Place {i}',
                 defaults={
@@ -43,7 +42,7 @@ class Command(BaseCommand):
                     'address': f'Test Address {i}, Seoul',
                     'phone_number': f'010-1234-{i:04d}',
                     'website': f'http://example{i}.com',
-                    'status': random.choice(statuses),
+                    'status': 'approved',
                     'submitted_by': random.choice(users)
                 }
             )
