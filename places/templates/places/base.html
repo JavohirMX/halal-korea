@@ -1,30 +1,50 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg-gray-50 dark:bg-gray-900">
 <head>
+    <!-- Meta Tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Find halal food and services across South Korea. Join our community and discover verified halal places.">
+    <meta name="theme-color" content="#22c55e">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="{% block og_title %}Halal Korea{% endblock %}">
+    <meta property="og:description" content="Find halal food and services across South Korea">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <title>{% block title %}Halal Korea{% endblock %}</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-    <!-- Add Tailwind CSS -->
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/logo-square.svg' %}">
+
+    <!-- External CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Add Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Add Google Maps -->
+
+    <!-- Google Maps -->
     <script>
         (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
-          key: "{{ google_maps_api_key }}",
-          v: "beta",
+            key: "{{ google_maps_api_key }}",
+            v: "beta",
         });
-      </script>
-    <!-- Add Alpine.js -->
+    </script>
+
+    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Ubuntu', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
                     colors: {
                         primary: {
                             50: '#f0fdf4',
@@ -56,13 +76,17 @@
             }
         }
     </script>
+
+    <!-- Custom Styles -->
     <style>
+        /* Form Focus Styles */
         input:focus, textarea:focus, select:focus {
             outline: none !important;
             border-color: #22c55e !important;
             box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
         }
         
+        /* Glass Effects */
         .glass-effect {
             background: linear-gradient(135deg, 
                 rgba(255, 255, 255, 0.8), 
@@ -85,12 +109,11 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
-        /* Smooth scrolling */
+        /* Scrollbar Styles */
         html {
             scroll-behavior: smooth;
         }
 
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -118,6 +141,7 @@
             to { opacity: 1; }
         }
 
+        /* Gradient Styles */
         .gradient-border {
             border-image: linear-gradient(to right, #22c55e, #10b981) 1;
         }
@@ -142,6 +166,7 @@
             background-position: 100% 0;
         }
 
+        /* Card Styles */
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(8px);
@@ -155,7 +180,7 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* Dark mode overrides */
+        /* Dark Mode Styles */
         .dark {
             color-scheme: dark;
         }
@@ -178,7 +203,7 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* Dark scrollbar */
+        /* Dark Mode Scrollbar */
         .dark ::-webkit-scrollbar-track {
             background: #1f2937;
         }
@@ -191,7 +216,7 @@
             background: #16a34a;
         }
 
-        /* Theme toggle animation */
+        /* Theme Toggle Animation */
         .theme-toggle-icon {
             transition: transform 0.5s ease;
         }
@@ -200,8 +225,21 @@
             transform: rotate(360deg);
         }
     </style>
+
     {% block extra_head %}{% endblock %}
+
+    <!-- Prevent Dark Mode Flash -->
+    <script>
+        (function() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 </head>
+
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     <!-- Navigation -->
     <nav class="fixed w-full z-50 glass-effect dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800" x-data="{ isOpen: false }">
@@ -210,14 +248,16 @@
                 <!-- Left side -->
                 <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="{% url 'places:home' %}" class="text-xl font-bold">
+                        <a href="{% url 'places:home' %}" class="text-xl font-bold flex items-center">
+                            <img src="{% static 'images/logo-marker.svg' %}" alt="Halal Korea Logo" class="h-8 w-auto mr-2">
                             <span class="bg-gradient-to-r from-primary-500 via-primary-400 to-teal-400 bg-clip-text text-transparent">
                                 Halal Korea
                             </span>
                         </a>
                     </div>
+
                     <!-- Desktop Menu -->
-                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                    <div class="hidden lg:ml-6 lg:flex lg:space-x-8">
                         <a href="{% url 'places:explore' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-search mr-2"></i>Explore
@@ -251,28 +291,57 @@
                     </button>
                     
                     <!-- Language Selector -->
-                    <select class="ml-4 mr-4 rounded-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm hidden md:block">
-                        <option value="EN">🇺🇸 English</option>
-                        <option value="KR">🇰🇷 한국어</option>
-                        <option value="UZ">🇺🇿 O'zbek</option>
-                    </select>
+                    <div class="ml-4 mr-4 relative" x-data="{ open: false }">
+                        <button @click="open = !open" 
+                                class="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
+                            <span class="flag">🇺🇸</span>
+                            <span class="hidden lg:inline">English</span>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        
+                        <!-- Language Dropdown -->
+                        <div x-show="open" 
+                             @click.away="open = false"
+                             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95">
+                            <div class="py-1">
+                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                    <span class="flag">🇺🇸</span>
+                                    <span>English</span>
+                                </button>
+                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                    <span class="flag">🇰🇷</span>
+                                    <span>한국어</span>
+                                </button>
+                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                    <span class="flag">🇺🇿</span>
+                                    <span>O'zbek</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Desktop Auth Menu -->
-                    <div class="hidden md:flex md:items-center">
+                    <div class="hidden lg:flex lg:items-center">
                         {% if user.is_authenticated %}
                             <div class="ml-3 relative" x-data="{ open: false }">
                                 <button @click="open = !open" 
                                         class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900">
                                     {% if user.profile.avatar %}
-                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="h-8 w-8 rounded-full">
+                                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="h-8 w-8 rounded-full">
                                     {% else %}
-                                    <div class="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center">
-                                        <i class="fas fa-user text-primary-600 dark:text-primary-400"></i>
-                                    </div>
+                                        <div class="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center">
+                                            <i class="fas fa-user text-primary-600 dark:text-primary-400"></i>
+                                        </div>
                                     {% endif %}
                                 </button>
                                 
-                                <!-- Dropdown menu -->
+                                <!-- User Dropdown -->
                                 <div x-show="open" 
                                      @click.away="open = false"
                                      class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
@@ -314,7 +383,7 @@
                     </div>
 
                     <!-- Mobile menu button -->
-                    <div class="flex items-center md:hidden ml-4">
+                    <div class="flex items-center lg:hidden ml-4">
                         <button @click="isOpen = !isOpen" 
                                 class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
                             <svg class="h-6 w-6" x-bind:class="{'hidden': isOpen, 'block': !isOpen }" 
@@ -332,7 +401,7 @@
 
             <!-- Mobile menu -->
             <div x-show="isOpen" 
-                 class="md:hidden glass-effect dark:bg-gray-900/95 rounded-lg mb-4"
+                 class="lg:hidden glass-effect dark:bg-gray-900/95 rounded-lg mb-4"
                  x-transition:enter="transition ease-out duration-100 transform"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
@@ -363,11 +432,42 @@
                     
                     <!-- Language Selector for Mobile -->
                     <div class="px-3 py-2">
-                        <select class="w-full rounded-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 text-sm">
-                            <option value="EN">🇺🇸 English</option>
-                            <option value="KR">🇰🇷 한국어</option>
-                            <option value="UZ">🇺🇿 O'zbek</option>
-                        </select>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" 
+                                    class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <div class="flex items-center space-x-2">
+                                    <span class="flag">🇺🇸</span>
+                                    <span>English</span>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            
+                            <!-- Mobile Language Dropdown -->
+                            <div x-show="open" 
+                                 @click.away="open = false"
+                                 class="mt-2 w-full rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95">
+                                <div class="py-1">
+                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <span class="flag">🇺🇸</span>
+                                        <span>English</span>
+                                    </button>
+                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <span class="flag">🇰🇷</span>
+                                        <span>한국어</span>
+                                    </button>
+                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <span class="flag">🇺🇿</span>
+                                        <span>O'zbek</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Mobile Auth Menu -->
@@ -401,10 +501,10 @@
         </div>
     </nav>
 
-    <!-- Add a spacer for the fixed navbar -->
+    <!-- Navbar Spacer -->
     <div class="h-16"></div>
 
-    <!-- Add Messages/Notifications -->
+    <!-- Messages/Notifications -->
     {% if messages %}
     <div class="messages-container fixed top-4 right-4 z-50 space-y-2">
         {% for message in messages %}
@@ -459,7 +559,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- About Section -->
                 <div class="col-span-1 md:col-span-2">
-                    <a href="{% url 'places:home' %}" class="text-xl font-bold">
+                    <a href="{% url 'places:home' %}" class="text-xl font-bold flex items-center">
+                        <img src="{% static 'images/logo-marker.svg' %}" alt="Halal Korea Logo" class="h-8 w-auto mr-2">
                         <span class="bg-gradient-to-r from-primary-500 via-primary-400 to-teal-400 bg-clip-text text-transparent">
                             Halal Korea
                         </span>
@@ -477,9 +578,8 @@
                         <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                             <i class="fab fa-instagram text-xl"></i>
                         </a>
+                    </div>
                 </div>
-                </div>
-                
 
                 <!-- Quick Links -->
                 <div>
@@ -549,7 +649,7 @@
         </div>
     </footer>
 
-    <!-- Add this script before the closing body tag -->
+    <!-- Scripts -->
     <script>
         // Handle message dismissal
         document.addEventListener('DOMContentLoaded', function() {
@@ -575,29 +675,17 @@
                 });
             });
         });
-    </script>
 
-    <!-- Add theme toggle script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check for saved theme preference, otherwise use system preference
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-
-            // Theme toggle function
-            window.toggleTheme = function() {
-                const isDark = document.documentElement.classList.toggle('dark');
-                localStorage.theme = isDark ? 'dark' : 'light';
-                
-                // Animate icon
-                const icon = document.querySelector('.theme-toggle-icon');
-                icon.classList.add('rotate');
-                setTimeout(() => icon.classList.remove('rotate'), 500);
-            }
-        });
+        // Theme toggle function
+        window.toggleTheme = function() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+            
+            // Animate icon
+            const icon = document.querySelector('.theme-toggle-icon');
+            icon.classList.add('rotate');
+            setTimeout(() => icon.classList.remove('rotate'), 500);
+        }
     </script>
 </body>
 </html>

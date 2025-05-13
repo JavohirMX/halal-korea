@@ -6,6 +6,52 @@
 <!-- Swiper for image gallery -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<!-- Toastify for notifications -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<style>
+    .image-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 1000;
+    }
+    .modal-swiper {
+        width: 100%;
+        height: 100%;
+    }
+    .modal-swiper .swiper-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-swiper img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    .image-modal .close-button {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    .swiper-slide img {
+        cursor: pointer;
+    }
+    .modal-swiper .swiper-button-next,
+    .modal-swiper .swiper-button-prev {
+        color: #fff;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -35,7 +81,8 @@
                         <div class="swiper-slide">
                             <img src="{{ photo_url }}" 
                                  alt="{{ place.name }}" 
-                                 class="w-full h-96 object-cover">
+                                 class="w-full h-96 object-cover"
+                                 onclick="openImageModal({{ forloop.counter0 }})">
                         </div>
                         {% endfor %}
                     </div>
@@ -46,6 +93,22 @@
             </div>
             {% endif %}
 
+            <!-- Image Modal -->
+            <div id="imageModal" class="image-modal">
+                <span class="close-button" onclick="closeImageModal()">&times;</span>
+                <div class="modal-swiper">
+                    <div class="swiper-wrapper">
+                        {% for photo_url in place.photo_urls %}
+                        <div class="swiper-slide">
+                            <img src="{{ photo_url }}" alt="{{ place.name }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
+
             <!-- Place Details -->
             <div class="glass-card rounded-lg p-6">
                 <div class="flex justify-between items-start">
@@ -53,19 +116,45 @@
                         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ place.name }}</h1>
                         <div class="mt-2">
                             <span class="px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
+                                <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% endif %} mr-1"></i>
                                 {{ place.category|title }}
                             </span>
                         </div>
                     </div>
-                    <!-- Favorite button -->
-                    {% if user.is_authenticated %}
-                    <button id="favorite-button" 
-                            data-place-id="{{ place.id }}"
-                            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
-                        <i class="fas fa-heart text-2xl {% if place in user.favorite_places.all %}text-red-600{% else %}text-gray-400 dark:text-gray-600{% endif %}"></i>
-                    </button>
-                    {% endif %}
+                    <!-- Buttons container -->
+                    <div class="flex items-center space-x-2">
+                        {% if user.is_authenticated %}
+                        <button id="favorite-button" 
+                                data-place-id="{{ place.id }}"
+                                class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                            <i class="fas fa-heart text-2xl {% if place in user.favorite_places.all %}text-red-600{% else %}text-gray-400 dark:text-gray-600{% endif %}"></i>
+                        </button>
+                        {% endif %}
+                        <!-- Share button -->
+                        <button id="share-button"
+                                class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                            <i class="fas fa-share-alt text-2xl text-gray-400 dark:text-gray-600"></i>
+                        </button>
+                    </div>
                 </div>
+
+                {% if place.category != 'mosque' %}
+                <!-- Warning Message -->
+                <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                                <strong>Important Notice:</strong> This place has been added by our community. While we strive to maintain accurate information, we recommend verifying the halal status directly with the establishment before visiting.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
 
                 <!-- Rating and Reviews -->
                 <div class="mt-4">
@@ -92,6 +181,11 @@
                     <div class="flex items-center text-gray-600 dark:text-gray-400">
                         <i class="fas fa-map-marker-alt w-5"></i>
                         <span class="ml-2">{{ place.address }}</span>
+                        <button onclick="copyAddress('{{ place.address }}')" 
+                                class="ml-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                                title="Copy address">
+                            <i class="fas fa-copy text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400"></i>
+                        </button>
                     </div>
                     {% if place.phone_number %}
                     <div class="flex items-center text-gray-600 dark:text-gray-400">
@@ -134,6 +228,13 @@
                         Kakao Maps
                     </a>
                     {% endif %}
+                </div>
+            </div>
+
+            <!-- Map for mobile view -->
+            <div class="lg:hidden">
+                <div class="glass-card rounded-lg overflow-hidden">
+                    <div id="map-mobile" class="h-64 w-full dark:brightness-90"></div>
                 </div>
             </div>
 
@@ -212,7 +313,7 @@
                                         </label>
                                         <textarea name="comment" 
                                                   rows="4" 
-                                                  class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">{{ review.comment }}</textarea>
+                                                  class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none">{{ review.comment }}</textarea>
                                     </div>
                                     <div class="flex space-x-3">
                                         <button type="submit" 
@@ -253,8 +354,8 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Your Review
                             </label>
-                            <textarea name="content" rows="4" 
-                                      class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                            <textarea name="comment" rows="4" 
+                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none"
                                       placeholder="Share your experience..."></textarea>
                         </div>
                         <button type="submit" 
@@ -297,10 +398,10 @@
             </div>
         </div>
 
-        <!-- Right Column: Map -->
-        <div class="lg:col-span-1">
+        <!-- Right Column: Map (desktop only) -->
+        <div class="hidden lg:block lg:col-span-1">
             <div class="glass-card rounded-lg overflow-hidden">
-                <div id="map" class="h-64 w-full dark:brightness-90"></div>
+                <div id="map-desktop" class="h-64 w-full dark:brightness-90"></div>
             </div>
         </div>
     </div>
@@ -318,24 +419,24 @@
 
     // Initialize Google Map
     async function initMap() {
-        const location = { lat: {{ place.latitude }}, lng: {{ place.longitude }} };
+        const location = { lat: {{ place.location.y }}, lng: {{ place.location.x }} };
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-
-        map = new Map(document.getElementById("map"), {
+        // Initialize desktop map
+        const desktopMap = new Map(document.getElementById("map-desktop"), {
             zoom: 15,
             center: location,
             mapId: 'DEMO_MAP_ID',
         });
 
-        const marker = new AdvancedMarkerElement({
-            map,
+        const desktopMarker = new AdvancedMarkerElement({
+            map: desktopMap,
             position: location,
             title: '{{ place.name }}'
         });
 
-        const infowindow = new google.maps.InfoWindow({
+        const desktopInfowindow = new google.maps.InfoWindow({
             content: `
                 <div class="text-center">
                     <h3 class="font-semibold">{{ place.name }}</h3>
@@ -344,8 +445,34 @@
             `
         });
 
-        marker.addListener('click', () => {
-            infowindow.open(map, marker);
+        desktopMarker.addListener('gmp-click', () => {
+            desktopInfowindow.open(desktopMap, desktopMarker);
+        });
+
+        // Initialize mobile map
+        const mobileMap = new Map(document.getElementById("map-mobile"), {
+            zoom: 15,
+            center: location,
+            mapId: 'DEMO_MAP_ID',
+        });
+
+        const mobileMarker = new AdvancedMarkerElement({
+            map: mobileMap,
+            position: location,
+            title: '{{ place.name }}'
+        });
+
+        const mobileInfowindow = new google.maps.InfoWindow({
+            content: `
+                <div class="text-center">
+                    <h3 class="font-semibold">{{ place.name }}</h3>
+                    <p class="text-sm text-gray-600">{{ place.address }}</p>
+                </div>
+            `
+        });
+
+        mobileMarker.addListener('gmp-click', () => {
+            mobileInfowindow.open(mobileMap, mobileMarker);
         });
     }
 
@@ -404,6 +531,7 @@
             const isCurrentlyFavorited = heartIcon.classList.contains('text-red-600');
             heartIcon.classList.toggle('text-red-600', !isCurrentlyFavorited);
             heartIcon.classList.toggle('text-gray-400', isCurrentlyFavorited);
+            heartIcon.classList.toggle('dark:text-gray-600', isCurrentlyFavorited);
 
             try {
                 const response = await fetch(`/users/toggle-favorite/${placeId}/`, {
@@ -425,6 +553,7 @@
                 if ((data.status === 'added') !== !isCurrentlyFavorited) {
                     heartIcon.classList.toggle('text-red-600');
                     heartIcon.classList.toggle('text-gray-400');
+                    heartIcon.classList.toggle('dark:text-gray-600');
                 }
 
                 // Optional: Show success message
@@ -436,7 +565,49 @@
                 // Revert UI on error
                 heartIcon.classList.toggle('text-red-600');
                 heartIcon.classList.toggle('text-gray-400');
+                heartIcon.classList.toggle('dark:text-gray-600');
                 // Optional: Show error message to user
+            }
+        });
+    }
+
+    // Share button functionality
+    const shareButton = document.getElementById('share-button');
+    if (shareButton) {
+        shareButton.addEventListener('click', async function() {
+            const shareData = {
+                title: '{{ place.name }}',
+                text: 'Check out {{ place.name }} on Halal Korea!',
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback for browsers that don't support Web Share API
+                    await navigator.clipboard.writeText(window.location.href);
+                    Toastify({
+                        text: "Link copied to clipboard!",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        },
+                    }).showToast();
+                }
+            } catch (error) {
+                console.error('Error sharing:', error);
+                Toastify({
+                    text: "Failed to share. Please try again.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    },
+                }).showToast();
             }
         });
     }
@@ -487,5 +658,84 @@
             }
         });
     }
+
+    // Copy address functionality
+    function copyAddress(address) {
+        navigator.clipboard.writeText(address).then(() => {
+            Toastify({
+                text: "Address copied to clipboard!",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                },
+            }).showToast();
+        }).catch(err => {
+            console.error('Failed to copy address:', err);
+            Toastify({
+                text: "Failed to copy address. Please try again.",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                },
+            }).showToast();
+        });
+    }
+
+    // Image Modal functionality
+    const modal = document.getElementById('imageModal');
+    const closeButton = document.querySelector('.close-button');
+    let modalSwiper;
+
+    function initModalSwiper() {
+        modalSwiper = new Swiper('.modal-swiper', {
+            navigation: {
+                nextEl: '.modal-swiper .swiper-button-next',
+                prevEl: '.modal-swiper .swiper-button-prev',
+            },
+            keyboard: {
+                enabled: true,
+            },
+            grabCursor: true,
+            zoom: {
+                maxRatio: 2,
+            },
+        });
+    }
+
+    function openImageModal(index) {
+        modal.style.display = "block";
+        document.body.style.overflow = "hidden";
+        
+        // Initialize swiper if not already initialized
+        if (!modalSwiper) {
+            initModalSwiper();
+        }
+        
+        // Slide to the clicked image
+        modalSwiper.slideTo(index, 0);
+    }
+
+    function closeImageModal() {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
+    // Close modal when clicking outside the image
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeImageModal();
+        }
+    });
+
+    // Close modal when pressing Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === "Escape" && modal.style.display === "block") {
+            closeImageModal();
+        }
+    });
 </script>
 {% endblock %}

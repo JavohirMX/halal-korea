@@ -8,7 +8,7 @@
         const seoul = { lat: 37.5665, lng: 126.9780 };
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-
+        const { Geocoder } = await google.maps.importLibrary("geocoding");
 
         map = new Map(document.getElementById("map"), {
             zoom: 12,
@@ -17,6 +17,67 @@
         });
         
         let marker = null;
+        const geocoder = new Geocoder();
+
+        // Function to update address from coordinates
+        async function updateAddressFromCoordinates(lat, lng) {
+            try {
+                const response = await geocoder.geocode({
+                    location: { lat, lng }
+                });
+                
+                if (response.results[0]) {
+                    document.getElementById('place-address').value = response.results[0].formatted_address;
+                }
+            } catch (error) {
+                console.error('Geocoding error:', error);
+            }
+        }
+
+        // Function to update marker from address
+        async function updateMarkerFromAddress(address) {
+            try {
+                const response = await geocoder.geocode({
+                    address: address
+                });
+                
+                if (response.results[0]) {
+                    const location = response.results[0].geometry.location;
+                    const lat = location.lat();
+                    const lng = location.lng();
+                    
+                    // Update hidden inputs
+                    document.getElementById('id_latitude').value = lat;
+                    document.getElementById('id_longitude').value = lng;
+                    
+                    // Update or add marker
+                    if (marker) {
+                        marker.position = location;
+                    } else {
+                        marker = new AdvancedMarkerElement({
+                            map,
+                            position: location,
+                            draggable: true
+                        });
+
+                        // Update coordinates when marker is dragged
+                        marker.addListener('dragend', function() {
+                            const position = marker.getPosition();
+                            const lat = position.lat();
+                            const lng = position.lng();
+                            document.getElementById('id_latitude').value = lat;
+                            document.getElementById('id_longitude').value = lng;
+                            updateAddressFromCoordinates(lat, lng);
+                        });
+                    }
+                    
+                    // Center map on new location
+                    map.setCenter(location);
+                }
+            } catch (error) {
+                console.error('Geocoding error:', error);
+            }
+        }
 
         // Add click listener to map
         map.addListener('click', function(e) {
@@ -27,9 +88,12 @@
             document.getElementById('id_latitude').value = lat;
             document.getElementById('id_longitude').value = lng;
             
+            // Update address field
+            updateAddressFromCoordinates(lat, lng);
+            
             // Update or add marker
             if (marker) {
-                marker.setPosition(e.latLng);
+                marker.position = e.latLng;
             } else {
                 marker = new AdvancedMarkerElement({
                     map,
@@ -40,12 +104,30 @@
                 // Update coordinates when marker is dragged
                 marker.addListener('dragend', function() {
                     const position = marker.getPosition();
-                    document.getElementById('id_latitude').value = position.lat();
-                    document.getElementById('id_longitude').value = position.lng();
+                    const lat = position.lat();
+                    const lng = position.lng();
+                    document.getElementById('id_latitude').value = lat;
+                    document.getElementById('id_longitude').value = lng;
+                    updateAddressFromCoordinates(lat, lng);
                 });
             }
         });
+
+        // Add address input listener
+        const addressInput = document.getElementById('place-address');
+        let addressTimeout;
         
+        addressInput.addEventListener('input', function() {
+            // Clear previous timeout
+            clearTimeout(addressTimeout);
+            
+            // Set new timeout to wait for user to stop typing
+            addressTimeout = setTimeout(() => {
+                if (this.value.trim()) {
+                    updateMarkerFromAddress(this.value);
+                }
+            }, 1000); // Wait 1 second after user stops typing
+        });
     }
 
     // Initialize map when the page loads
@@ -71,7 +153,7 @@
             <!-- Basic Information -->
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label for="place-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Place Name <span class="text-red-500">*</span>
                     </label>
                     <div class="relative mt-1">
@@ -79,6 +161,7 @@
                             <i class="fas fa-store text-gray-400"></i>
                         </div>
                         <input type="text" 
+                               id="place-name"
                                name="name" 
                                required 
                                placeholder="Enter place name"
@@ -87,14 +170,15 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label for="place-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Category <span class="text-red-500">*</span>
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fas fa-tag text-gray-400"></i>
                         </div>
-                        <select name="category" 
+                        <select id="place-category"
+                                name="category" 
                                 required 
                                 class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
                             <option value="">Select a category</option>
@@ -108,11 +192,12 @@
 
             <!-- Description -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="place-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Description <span class="text-red-500">*</span>
                 </label>
                 <div class="relative mt-1">
-                    <textarea name="description" 
+                    <textarea id="place-description"
+                              name="description" 
                               rows="4" 
                               required 
                               placeholder="Describe the place..."
@@ -141,7 +226,7 @@
             <!-- Address and Contact -->
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label for="place-address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Address
                     </label>
                     <div class="relative mt-1">
@@ -149,6 +234,7 @@
                             <i class="fas fa-location-dot text-gray-400"></i>
                         </div>
                         <input type="text" 
+                           id="place-address"
                            name="address" 
                            required 
                            placeholder="Enter address"
@@ -159,7 +245,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label for="place-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Phone Number
                     </label>
                     <div class="relative mt-1">
@@ -167,6 +253,7 @@
                             <i class="fas fa-phone text-gray-400"></i>
                         </div>
                         <input type="tel" 
+                            id="place-phone"
                             name="phone_number" 
                             placeholder="Enter phone number"
                             class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
@@ -178,7 +265,7 @@
             <!-- Website and Map Links -->
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label for="place-website" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Website
                     </label>
                     <div class="relative mt-1">
@@ -186,33 +273,57 @@
                             <i class="fas fa-globe text-gray-400"></i>
                         </div>
                         <input type="url" 
+                            id="place-website"
                             name="website"
                             placeholder="Enter website URL" 
                             class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                     </div>
-                    
                 </div>
+            </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Google Maps Link
-                    </label>
-                    <div class="relative mt-1">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-map-location-dot text-gray-400"></i>
+            <!-- Map Links -->
+            <div class="space-y-4">
+                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Additional Map Links</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Naver Maps -->
+                    <div>
+                        <label for="place-naver-map" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Naver Maps Link
+                        </label>
+                        <div class="relative mt-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-map-location-dot text-gray-400"></i>
+                            </div>
+                            <input type="url" 
+                               id="place-naver-map"
+                               name="naver_map_link"
+                               placeholder="Enter Naver Maps link" 
+                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                         </div>
-                        <input type="url" 
-                           name="google_map_link"
-                            placeholder="Enter Google Maps link" 
-                           class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                     </div>
-                    
+
+                    <!-- Kakao Maps -->
+                    <div>
+                        <label for="place-kakao-map" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Kakao Maps Link
+                        </label>
+                        <div class="relative mt-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-map-location-dot text-gray-400"></i>
+                            </div>
+                            <input type="url" 
+                               id="place-kakao-map"
+                               name="kakao_map_link"
+                               placeholder="Enter Kakao Maps link" 
+                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Photos -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label for="photo-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Photos
                 </label>
                 <div id="drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-primary-500 dark:hover:border-primary-400 transition-colors duration-200">

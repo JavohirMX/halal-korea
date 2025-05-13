@@ -10,4 +10,6 @@ urlpatterns = [
     path('submit/', views.submit_place, name='submit_place'),
     path('about/', views.about, name='about'),
     path('donate/', views.donate, name='donate'),
+    path('set-location/', views.set_location, name='set_location'),
+    path('api/places/', views.get_places_json, name='places_json'),
 ]

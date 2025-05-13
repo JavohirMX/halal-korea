@@ -36,7 +36,7 @@ def get_ip_location(ip):
                 "region": data.get("regionName"),
                 "city": data.get("city"),
                 "lat": data.get("lat"),
-                "lon": data.get("lon"),
+                "lng": data.get("lon"),
                 "isp": data.get("isp"),
             }
             

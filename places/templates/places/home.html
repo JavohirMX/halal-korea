@@ -32,10 +32,10 @@
                 </form>
                 <!-- Button to find nearest places -->
                 <div class="mt-4 text-center">
-                    <a href="{% url 'places:explore' %}?location=true" 
-                       class="inline-flex items-center px-6 py-3 border border-primary-500 rounded-lg text-base font-medium text-white gradient-bg-hover shadow-lg">
+                    <button id="find-nearest-btn"
+                            class="inline-flex items-center px-6 py-3 border border-primary-500 rounded-lg text-base font-medium text-white gradient-bg-hover shadow-lg">
                         <i class="fas fa-map-marker-alt mr-2"></i> Find Nearest Places
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -86,6 +86,20 @@
                 </div>
             </div>
         </a>
+
+        <!-- Explore All -->
+        <a href="{% url 'places:explore' %}" 
+           class="glass-card rounded-lg p-6 transition-all duration-200 col-span-full sm:col-span-2 lg:col-span-3">
+            <div class="flex items-center justify-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-compass w-8 h-8 text-primary-600 dark:text-primary-400 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Explore All</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Discover all halal places in Korea</p>
+                </div>
+            </div>
+        </a>
     </div>
 </div>
 
@@ -97,38 +111,37 @@
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for place in featured_places %}
-            <div class="glass-card rounded-lg overflow-hidden transition-all duration-200">
-                {% if place.photo_urls %}
-                <img src="{{ place.photo_urls.0 }}" 
-                     alt="{{ place.name }}" 
-                     class="w-full h-48 object-cover">
-                {% endif %}
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                        {{ place.name }}
-                    </h3>
-                    <p class="text-sm text-primary-600 dark:text-primary-400">
-                        {{ place.category|title }}
-                    </p>
-                    <div class="mt-2 flex items-center">
-                        <div class="flex items-center">
-                            {% for i in "12345" %}
-                            <svg class="w-4 h-4 {% if forloop.counter <= place.average_rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" 
-                                 fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                            </svg>
-                            {% endfor %}
+            <a href="{% url 'places:place_detail' place.id %}" class="block">
+                <div class="glass-card rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg">
+                    {% if place.photo_urls %}
+                    <img src="{{ place.photo_urls.0 }}" 
+                         alt="{{ place.name }}" 
+                         class="w-full h-48 object-cover">
+                    {% endif %}
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            {{ place.name }}
+                        </h3>
+                        <p class="text-sm text-primary-600 dark:text-primary-400">
+                            <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% endif %} mr-1"></i>
+                            {{ place.category|title }}
+                        </p>
+                        <div class="mt-2 flex items-center">
+                            <div class="flex items-center">
+                                {% for i in "12345" %}
+                                <svg class="w-4 h-4 {% if forloop.counter <= place.average_rating %}text-yellow-400{% else %}text-gray-300 dark:text-gray-600{% endif %}" 
+                                     fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                {% endfor %}
+                            </div>
+                            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                                ({{ place.reviews.count }} reviews)
+                            </span>
                         </div>
-                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                            ({{ place.reviews.count }} reviews)
-                        </span>
                     </div>
-                    <a href="{% url 'places:place_detail' place.id %}" 
-                       class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm">
-                        View Details →
-                    </a>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
     </div>
@@ -165,5 +178,38 @@
         </a>
     </div>
 </div>
+
+<script>
+// Find Nearest Places Button
+document.getElementById('find-nearest-btn').onclick = function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            fetch("{% url 'places:set_location' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                })
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    window.location.href = "{% url 'places:explore' %}";
+                } else {
+                    alert('Failed to update location: ' + (data.error || 'Unknown error'));
+                }
+            }).catch(error => {
+                alert('Failed to update location: ' + error);
+            });
+        }, function(error) {
+            alert('Could not get your location: ' + error.message);
+        });
+    } else {
+        alert('Geolocation is not supported by your browser.');
+    }
+};
+</script>
 {% endblock %}
 
