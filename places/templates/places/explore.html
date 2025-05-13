@@ -250,10 +250,12 @@
         {% for place in places %}
 
         markerIcons[{{ place.id }}] = document.createElement("img");
-        markerIcons[{{ place.id }}].src = ('{{ place.category }}' === 'mosque') ? '{% static "img/mosque-marker.png" %}' :
-        ('{{ place.category }}'=== 'restaurant') ? '{% static "img/mosque-marker-green.png" %}' :
-        ('{{ place.category }}'=== 'market') ? '{% static "img/mosque-marker.png" %}' :
-        '{% static "img/mosque-marker.png" %}';
+        markerIcons[{{ place.id }}].src = ('{{ place.category }}' === 'mosque') ? '{% static "images/marker-mosque.svg" %}' :
+        ('{{ place.category }}'=== 'restaurant') ? '{% static "images/marker-restaurant.svg" %}' :
+        ('{{ place.category }}'=== 'market') ? '{% static "images/marker-market.svg" %}' :
+        '{% static "images/marker-mosque.svg" %}';
+        markerIcons[{{ place.id }}].width = 32;  // Set width to 32 pixels
+        markerIcons[{{ place.id }}].height = 32; // Set height to 32 pixels
 
         markers[{{ place.id }}] = new AdvancedMarkerElement({
             map,
