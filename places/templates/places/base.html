@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/logo-square-220-268.svg' %}">
 
     <!-- External CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -248,7 +248,8 @@
                 <!-- Left side -->
                 <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="{% url 'places:home' %}" class="text-xl font-bold">
+                        <a href="{% url 'places:home' %}" class="text-xl font-bold flex items-center">
+                            <img src="{% static 'images/logo-marker-220-304.svg' %}" alt="Halal Korea Logo" class="h-8 w-auto mr-2">
                             <span class="bg-gradient-to-r from-primary-500 via-primary-400 to-teal-400 bg-clip-text text-transparent">
                                 Halal Korea
                             </span>
@@ -558,7 +559,8 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- About Section -->
                 <div class="col-span-1 md:col-span-2">
-                    <a href="{% url 'places:home' %}" class="text-xl font-bold">
+                    <a href="{% url 'places:home' %}" class="text-xl font-bold flex items-center">
+                        <img src="{% static 'images/logo-marker-220-304.svg' %}" alt="Halal Korea Logo" class="h-8 w-auto mr-2">
                         <span class="bg-gradient-to-r from-primary-500 via-primary-400 to-teal-400 bg-clip-text text-transparent">
                             Halal Korea
                         </span>
