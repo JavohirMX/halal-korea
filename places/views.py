@@ -15,6 +15,7 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
 from utils.location_manager import get_user_location, update_user_location
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json
 
 User = get_user_model()
@@ -51,6 +52,7 @@ def explore(request):
     category = request.GET.get('category')
     search_query = request.GET.get('q', '')
     sort = request.GET.get('sort', 'distance')
+    page = request.GET.get('page', 1)
     
     # Get user location
     location = get_user_location(request)
@@ -87,9 +89,21 @@ def explore(request):
             places = places.order_by('distance')
     else:
         places = places.order_by('-average_rating', 'name')
+    
+    # Pagination
+    paginator = Paginator(places, 20)  # Show 20 places per page
+    
+    try:
+        paginated_places = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page
+        paginated_places = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results
+        paginated_places = paginator.page(paginator.num_pages)
         
     return render(request, 'places/explore.html', {
-        'places': places,
+        'places': paginated_places,
         'current_filters': {
             'category': category,
             'search_query': search_query,
