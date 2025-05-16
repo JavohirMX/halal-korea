@@ -185,6 +185,7 @@
                             <option value="restaurant">Restaurant</option>
                             <option value="market">Market</option>
                             <option value="mosque">Mosque</option>
+                            <option value="prayer_room">Prayer Room</option>
                         </select>
                     </div>
                 </div>
@@ -366,6 +367,15 @@
     const dropZone = document.getElementById('drop-zone');
     const preview = document.getElementById('photo-preview');
     let currentFiles = []; // Keep track of current files
+
+    // Add a help text below category to explain the difference between mosque and prayer room
+    const categorySelect = document.getElementById('place-category');
+    const categoryParent = categorySelect.closest('div').parentElement;
+    
+    const helpText = document.createElement('p');
+    helpText.className = 'text-xs text-gray-500 mt-1';
+    helpText.innerHTML = 'Note: <strong>Mosque</strong> is for dedicated Islamic centers, while <strong>Prayer Room</strong> is for designated prayer spaces in other locations.';
+    categoryParent.appendChild(helpText);
 
     // Handle file selection through input
     photoInput.addEventListener('change', function(e) {

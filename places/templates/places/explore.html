@@ -66,7 +66,7 @@
                             <option value="">All Categories</option>
                             <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>Restaurants</option>
                             <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>Markets</option>
-                            <option value="mosque" {% if request.GET.category == 'mosque' %}selected{% endif %}>Mosques</option>
+                            <option value="mosque" {% if request.GET.category == 'mosque' or request.GET.category == 'prayer_room' %}selected{% endif %}>Mosques & Prayer Rooms</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                             <i class="fas fa-chevron-down text-gray-400"></i>
@@ -101,7 +101,7 @@
                         <option value="">All Categories</option>
                         <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>Restaurants</option>
                         <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>Markets</option>
-                        <option value="mosque" {% if request.GET.category == 'mosque' %}selected{% endif %}>Mosques</option>
+                        <option value="mosque" {% if request.GET.category == 'mosque' or request.GET.category == 'prayer_room' %}selected{% endif %}>Mosques & Prayer Rooms</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <i class="fas fa-chevron-down text-gray-400"></i>
@@ -241,10 +241,10 @@
         
         // Create marker icon
         markerIcons[place.id] = document.createElement("img");
-        markerIcons[place.id].src = (place.category === 'mosque') ? '{% static "images/marker-mosque.svg" %}' :
+        markerIcons[place.id].src = (place.category === 'mosque' || place.category === 'prayer_room') ? '{% static "images/marker-mosque.svg" %}' :
             (place.category === 'restaurant') ? '{% static "images/marker-restaurant.svg" %}' :
             (place.category === 'market') ? '{% static "images/marker-market.svg" %}' :
-        '{% static "images/marker-mosque.svg" %}';
+            '{% static "images/marker-default.svg" %}';
         markerIcons[place.id].width = 32;
         markerIcons[place.id].height = 32;
         
@@ -261,7 +261,7 @@
             content: `
                 <div class="text-center">
                     <p class="font-semibold text-black text-md">${place.name}</p>
-                    <p class="text-sm text-gray-600">${place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
+                    <p class="text-sm text-gray-600">${place.category === 'prayer_room' ? 'Prayer Space' : place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
                     <a href="/place/${place.id}/" 
                        class="text-primary-600 hover:text-primary-700 text-sm">
                         View Details

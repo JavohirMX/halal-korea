@@ -14,8 +14,8 @@
         <div>
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
             <p class="text-sm text-primary-600 dark:text-primary-400">
-                <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% endif %} mr-1"></i>
-                {{ place.category|title }}
+                <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1"></i>
+                {% if place.category == 'prayer_room' %}Prayer Space{% else %}{{ place.category|title }}{% endif %}
             </p>
         </div>
         <div class="flex items-center bg-primary-50 dark:bg-primary-900/50 px-2 py-1 rounded">

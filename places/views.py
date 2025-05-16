@@ -67,7 +67,11 @@ def explore(request):
     
     # Apply filters
     if category:
-        places = places.filter(category=category)
+        # Treat mosque and prayer_room as the same category for filtering
+        if category == 'mosque' or category == 'prayer_room':
+            places = places.filter(Q(category='mosque') | Q(category='prayer_room'))
+        else:
+            places = places.filter(category=category)
     
     if search_query:
         places = places.filter(
@@ -152,7 +156,11 @@ def get_places_json(request):
     
     # Apply filters
     if category:
-        places = places.filter(category=category)
+        # Treat mosque and prayer_room as the same category for filtering
+        if category == 'mosque' or category == 'prayer_room':
+            places = places.filter(Q(category='mosque') | Q(category='prayer_room'))
+        else:
+            places = places.filter(category=category)
     
     if search_query:
         places = places.filter(

@@ -150,3 +150,4 @@ class HalalPlaceFormTest(TestCase):
         self.assertIn(('restaurant', 'Restaurant'), form.fields['category'].choices)
         self.assertIn(('market', 'Market'), form.fields['category'].choices)
         self.assertIn(('mosque', 'Mosque'), form.fields['category'].choices)
+        self.assertIn(('prayer_room', 'Prayer Room'), form.fields['category'].choices)

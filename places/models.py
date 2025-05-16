@@ -8,6 +8,7 @@ class HalalPlace(models.Model):
         ('restaurant', 'Restaurant'),
         ('market', 'Market'),
         ('mosque', 'Mosque'),
+        ('prayer_room', 'Prayer Room'),
     ]
     STATUS_CHOICES = [
         ('pending', 'Pending'),
