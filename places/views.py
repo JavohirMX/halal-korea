@@ -118,12 +118,14 @@ def explore(request):
         })
         
         # Return JSON response with HTML and pagination info
-        return JsonResponse({
+        response = JsonResponse({
             'html': places_html,
             'has_next': paginated_places.has_next(),
             'next_page': int(page) + 1 if paginated_places.has_next() else None,
             'total_pages': paginator.num_pages,
         })
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return response
         
     return render(request, 'places/explore.html', {
         'places': paginated_places,
@@ -227,13 +229,15 @@ def get_places_json(request):
         places_data.append(place_data)
     
     # Return JSON response
-    return JsonResponse({
+    response = JsonResponse({
         'places': places_data,
         'has_next': paginated_places.has_next(),
         'next_page': int(page) + 1 if paginated_places.has_next() else None,
         'total_pages': paginator.num_pages,
         'current_page': paginated_places.number,
     })
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return response
 
 def place_detail(request, pk):
     place = get_object_or_404(HalalPlace, pk=pk, status='approved')
