@@ -241,9 +241,10 @@
         
         // Create marker icon
         markerIcons[place.id] = document.createElement("img");
-        markerIcons[place.id].src = (place.category === 'mosque' || place.category === 'prayer_room') ? '{% static "images/marker-mosque.svg" %}' :
-            (place.category === 'restaurant') ? '{% static "images/marker-restaurant.svg" %}' :
-            (place.category === 'market') ? '{% static "images/marker-market.svg" %}' :
+        markerIcons[place.id].src = place.category === 'mosque' ? '{% static "images/marker-mosque.svg" %}' :
+            place.category === 'prayer_room' ? '{% static "images/marker-prayer-room.svg" %}' :
+            place.category === 'restaurant' ? '{% static "images/marker-restaurant.svg" %}' :
+            place.category === 'market' ? '{% static "images/marker-market.svg" %}' :
             '{% static "images/marker-default.svg" %}';
         markerIcons[place.id].width = 32;
         markerIcons[place.id].height = 32;
