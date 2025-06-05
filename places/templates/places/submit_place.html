@@ -1,6 +1,7 @@
 {% extends 'places/base.html' %}
+{% load i18n %}
 
-{% block title %}Submit a Place - Halal Korea{% endblock %}
+{% block title %}{% translate "Submit a Place" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block extra_head %}
 <script>
@@ -32,7 +33,7 @@
                     document.getElementById('place-address').value = response.results[0].formatted_address;
                 }
             } catch (error) {
-                console.error('Geocoding error:', error);
+                console.error('{% translate "Geocoding error:" %}', error);
             }
         }
 
@@ -77,7 +78,7 @@
                     map.setCenter(location);
                 }
             } catch (error) {
-                console.error('Geocoding error:', error);
+                console.error('{% translate "Geocoding error:" %}', error);
             }
         }
 
@@ -143,8 +144,8 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Submit a New Place</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">Help others find halal places by submitting a new location</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Submit a New Place" %}</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Help others find halal places by submitting a new location" %}</p>
     </div>
 
     <!-- Form Container -->
@@ -156,7 +157,7 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="place-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Place Name <span class="text-red-500">*</span>
+                        {% translate "Place Name" %} <span class="text-red-500">*</span>
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -166,14 +167,14 @@
                                id="place-name"
                                name="name" 
                                required 
-                               placeholder="Enter place name"
+                               placeholder="{% translate 'Enter place name' %}"
                                class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
                     </div>
                 </div>
 
                 <div>
                     <label for="place-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Category <span class="text-red-500">*</span>
+                        {% translate "Category" %} <span class="text-red-500">*</span>
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -183,11 +184,11 @@
                                 name="category" 
                                 required 
                                 class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
-                            <option value="">Select a category</option>
-                            <option value="restaurant">Restaurant</option>
-                            <option value="market">Market</option>
-                            <option value="mosque">Mosque</option>
-                            <option value="prayer_room">Prayer Room</option>
+                            <option value="">{% translate "Select a category" %}</option>
+                            <option value="restaurant">{% translate "Restaurant" %}</option>
+                            <option value="market">{% translate "Market" %}</option>
+                            <option value="mosque">{% translate "Mosque" %}</option>
+                            <option value="prayer_room">{% translate "Prayer Room" %}</option>
                         </select>
                     </div>
                 </div>
@@ -196,14 +197,14 @@
             <!-- Description -->
             <div>
                 <label for="place-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Description <span class="text-red-500">*</span>
+                    {% translate "Description" %} <span class="text-red-500">*</span>
                 </label>
                 <div class="relative mt-1">
                     <textarea id="place-description"
                               name="description" 
                               rows="4" 
                               required 
-                              placeholder="Describe the place..."
+                              placeholder="{% translate 'Describe the place...' %}"
                               class="block w-full p-3 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"></textarea>
                     <div class="absolute bottom-2 right-2 text-xs text-gray-400">
                         <span id="char-count">0</span>/500
@@ -214,13 +215,13 @@
             <!-- Location -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Location
+                    {% translate "Location" %}
                 </label>
                 <div class="h-64 rounded-lg overflow-hidden mb-2">
                     <div id="map" class="w-full h-full dark:brightness-90"></div>
                 </div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Click on the map to set the location
+                    {% translate "Click on the map to set the location" %}
                 </p>
                 <input type="hidden" name="latitude" id="id_latitude" required>
                 <input type="hidden" name="longitude" id="id_longitude" required>
@@ -230,7 +231,7 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="place-address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Address
+                        {% translate "Address" %}
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -240,7 +241,7 @@
                            id="place-address"
                            name="address" 
                            required 
-                           placeholder="Enter address"
+                           placeholder="{% translate 'Enter address' %}"
                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                            
                     </div>
@@ -249,7 +250,7 @@
 
                 <div>
                     <label for="place-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Phone Number
+                        {% translate "Phone Number" %}
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -258,7 +259,7 @@
                         <input type="tel" 
                             id="place-phone"
                             name="phone_number" 
-                            placeholder="Enter phone number"
+                            placeholder="{% translate 'Enter phone number' %}"
                             class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                     </div>
                     
@@ -269,7 +270,7 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="place-website" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Website
+                        {% translate "Website" %}
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -278,7 +279,7 @@
                         <input type="url" 
                             id="place-website"
                             name="website"
-                            placeholder="Enter website URL" 
+                            placeholder="{% translate 'Enter website URL' %}" 
                             class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                     </div>
                 </div>
@@ -286,12 +287,12 @@
 
             <!-- Map Links -->
             <div class="space-y-4">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Additional Map Links</h3>
+                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Additional Map Links" %}</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Naver Maps -->
                     <div>
                         <label for="place-naver-map" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Naver Maps Link
+                            {% translate "Naver Maps Link" %}
                         </label>
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -300,7 +301,7 @@
                             <input type="url" 
                                id="place-naver-map"
                                name="naver_map_link"
-                               placeholder="Enter Naver Maps link" 
+                               placeholder="{% translate 'Enter Naver Maps link' %}" 
                                class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                         </div>
                     </div>
@@ -308,7 +309,7 @@
                     <!-- Kakao Maps -->
                     <div>
                         <label for="place-kakao-map" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Kakao Maps Link
+                            {% translate "Kakao Maps Link" %}
                         </label>
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -317,7 +318,7 @@
                             <input type="url" 
                                id="place-kakao-map"
                                name="kakao_map_link"
-                               placeholder="Enter Kakao Maps link" 
+                               placeholder="{% translate 'Enter Kakao Maps link' %}" 
                                class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
                         </div>
                     </div>
@@ -327,14 +328,14 @@
             <!-- Photos -->
             <div>
                 <label for="photo-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Photos
+                    {% translate "Photos" %}
                 </label>
                 <div id="drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-primary-500 dark:hover:border-primary-400 transition-colors duration-200">
                     <div class="space-y-1 text-center">
                         <i class="fas fa-image text-gray-400 dark:text-gray-600 text-3xl mb-3"></i>
                         <div class="flex text-sm text-gray-600 dark:text-gray-400">
                             <label for="photo-input" class="relative cursor-pointer rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 focus-within:outline-none">
-                                <span>Upload photos</span>
+                                <span>{% translate "Upload photos" %}</span>
                                 <input id="photo-input" 
                                        name="photos" 
                                        type="file" 
@@ -342,10 +343,10 @@
                                        accept="image/*" 
                                        class="sr-only">
                             </label>
-                            <p class="pl-1">or drag and drop</p>
+                            <p class="pl-1">{% translate "or drag and drop" %}</p>
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400">
-                            PNG, JPG, GIF up to 10MB each
+                            {% translate "PNG, JPG, GIF up to 10MB each" %}
                         </p>
                     </div>
                 </div>
@@ -356,7 +357,7 @@
             <div class="flex justify-end">
                 <button type="submit" 
                         class="gradient-bg-hover text-white font-medium py-2 px-4 rounded-md transition-all duration-200">
-                    Submit Place
+                    {% translate "Submit Place" %}
                 </button>
             </div>
         </form>
@@ -376,7 +377,7 @@
     
     const helpText = document.createElement('p');
     helpText.className = 'text-xs text-gray-500 mt-1';
-    helpText.innerHTML = 'Note: <strong>Mosque</strong> is for dedicated Islamic centers, while <strong>Prayer Room</strong> is for designated prayer spaces in other locations.';
+    helpText.innerHTML = "{% blocktranslate %}Note: <strong>Mosque</strong> is for dedicated Islamic centers, while <strong>Prayer Room</strong> is for designated prayer spaces in other locations.{% endblocktranslate %}";
     categoryParent.appendChild(helpText);
 
     // Handle file selection through input
@@ -459,7 +460,7 @@
             div.innerHTML = `
                 <div class="h-full">
                     <img src="${e.target.result}" 
-                         alt="Preview" 
+                         alt="{% translate 'Preview' %}" 
                          class="w-full h-full object-cover rounded-lg">
                     <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
                         <button type="button" 
@@ -510,7 +511,7 @@
         
         if (!lat || !lng) {
             e.preventDefault();
-            alert('Please select a location on the map');
+            alert('{% translate "Please select a location on the map" %}');
         }
     });
 

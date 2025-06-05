@@ -1,10 +1,11 @@
 {% extends 'users/auth_base.html' %}
+{% load i18n %}
 
-{% block title %}Log in - Halal Korea{% endblock %}
+{% block title %}{% translate "Log in" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block content %}
 <div class="max-w-md w-full mx-auto px-4 sm:px-6 mt-8 sm:mt-12">
-    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Welcome Back</h2>
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{% translate "Welcome Back" %}</h2>
 
     {% if messages %}
     <div class="mb-4">
@@ -20,7 +21,7 @@
         {% csrf_token %}
         <div>
             <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Username <span class="text-red-500">*</span>
+                {% translate "Username" %} <span class="text-red-500">*</span>
             </label>
             <div class="relative mt-1">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -31,7 +32,7 @@
                        id="username" 
                        required 
                        autocomplete="username"
-                       placeholder="Enter your username"
+                       placeholder="{% translate 'Enter your username' %}"
                        class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
             </div>
             {% if form.username.errors %}
@@ -41,7 +42,7 @@
 
         <div>
             <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password <span class="text-red-500">*</span>
+                {% translate "Password" %} <span class="text-red-500">*</span>
             </label>
             <div class="relative mt-1">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -52,7 +53,7 @@
                        id="password" 
                        required 
                        autocomplete="current-password"
-                       placeholder="Enter your password"
+                       placeholder="{% translate 'Enter your password' %}"
                        class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
                 <button type="button" 
                         onclick="togglePassword('password')"
@@ -69,13 +70,13 @@
             <div class="flex items-center">
                 <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
                 <label for="remember_me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                    Remember me
+                    {% translate "Remember me" %}
                 </label>
             </div>
 
             <div class="text-sm">
                 <a href="#" class="font-medium text-primary-600 hover:text-primary-500">
-                    Forgot your password?
+                    {% translate "Forgot your password?" %}
                 </a>
             </div>
         </div>
@@ -83,7 +84,7 @@
         <div>
             <button type="submit" 
                     class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                Log in
+                {% translate "Log in" %}
             </button>
         </div>
     </form>
@@ -95,7 +96,7 @@
             </div>
             <div class="relative flex justify-center text-sm">
                 <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                    Don't have an account?
+                    {% translate "Don't have an account?" %}
                 </span>
             </div>
         </div>
@@ -103,7 +104,7 @@
         <div class="mt-6">
             <a href="{% url 'users:register' %}" 
                class="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                Sign up
+                {% translate "Sign up" %}
             </a>
         </div>
     </div>

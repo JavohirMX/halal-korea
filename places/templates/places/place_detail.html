@@ -1,8 +1,9 @@
 {% extends 'places/base.html' %}
 {% load static %}
 {% load place_extras %}
+{% load i18n %}
 
-{% block title %}{{ place.name }} - Halal Korea{% endblock %}
+{% block title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block extra_head %}
 <!-- Swiper for image gallery -->
@@ -60,11 +61,11 @@
 {% csrf_token %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
-    <nav class="flex mb-4" aria-label="Breadcrumb">
+    <nav class="flex mb-4" aria-label="{% translate 'Breadcrumb' %}">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li><a href="{% url 'places:home' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Home</a></li>
+            <li><a href="{% url 'places:home' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">{% translate "Home" %}</a></li>
             <li><span class="text-gray-400 dark:text-gray-600 mx-2">/</span></li>
-            <li><a href="{% url 'places:explore' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Explore</a></li>
+            <li><a href="{% url 'places:explore' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">{% translate "Explore" %}</a></li>
             <li><span class="text-gray-400 dark:text-gray-600 mx-2">/</span></li>
             <li class="text-gray-700 dark:text-gray-300">{{ place.name }}</li>
         </ol>
@@ -151,7 +152,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                                <strong>Important Notice:</strong> This place has been added by our community. While we strive to maintain accurate information, we recommend verifying the halal status directly with the establishment before visiting.
+                                <strong>{% translate "Important Notice:" %}</strong> {% blocktranslate %}This place has been added by our community. While we strive to maintain accurate information, we recommend verifying the halal status directly with the establishment before visiting.{% endblocktranslate %}
                             </p>
                         </div>
                     </div>
@@ -170,7 +171,7 @@
                             {% endfor %}
                         </div>
                         <span class="ml-2 text-gray-600 dark:text-gray-400">
-                            {{ place.average_rating|default:"No ratings yet" }} ({{ place.reviews.count }} reviews)
+                            {{ place.average_rating|default:_("No ratings yet") }} ({{ place.reviews.count }} {% translate "reviews" %})
                         </span>
                     </div>
                 </div>
@@ -185,7 +186,7 @@
                         <span class="ml-2">{{ place.address }}</span>
                         <button onclick="copyAddress('{{ place.address }}')" 
                                 class="ml-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-                                title="Copy address">
+                                title="{% translate 'Copy address' %}">
                             <i class="fas fa-copy text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400"></i>
                         </button>
                     </div>
@@ -201,7 +202,7 @@
                     <div class="flex items-center text-gray-600 dark:text-gray-400">
                         <i class="fas fa-globe w-5"></i>
                         <a href="{{ place.website }}" target="_blank" class="ml-2 hover:text-primary-600 dark:hover:text-primary-400">
-                            Visit Website
+                            {% translate "Visit Website" %}
                         </a>
                     </div>
                     {% endif %}
@@ -242,7 +243,7 @@
 
             <!-- Reviews Section -->
             <div class="glass-card rounded-lg p-6">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Reviews</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">{% translate "Reviews" %}</h3>
                 
                 {% if user.is_authenticated %}
                     {% for review in place.reviews.all %}
@@ -250,7 +251,7 @@
                             <!-- User's existing review with edit/delete options -->
                             <div class="mb-6 border-b border-gray-200 dark:border-gray-700 pb-6">
                                 <div class="flex justify-between items-start mb-4">
-                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">Your Review</h4>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Your Review" %}</h4>
                                     <div class="flex space-x-2">
                                         <button onclick="toggleEditForm()" 
                                                 class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
@@ -259,7 +260,7 @@
                                         <form action="{% url 'reviews:delete_review' review.id %}" 
                                               method="POST" 
                                               class="inline"
-                                              onsubmit="return confirm('Are you sure you want to delete your review?');">
+                                              onsubmit="return confirm('{% translate 'Are you sure you want to delete your review?' %}');">
                                             {% csrf_token %}
                                             <button type="submit" 
                                                     class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
@@ -290,7 +291,7 @@
                                     {% csrf_token %}
                                     <div class="mb-4">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Rating
+                                            {% translate "Rating" %}
                                         </label>
                                         <div class="flex items-center space-x-1">
                                             {% for i in "12345" %}
@@ -311,7 +312,7 @@
                                     </div>
                                     <div class="mb-4">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Your Review
+                                            {% translate "Your Review" %}
                                         </label>
                                         <textarea name="comment" 
                                                   rows="4" 
@@ -320,12 +321,12 @@
                                     <div class="flex space-x-3">
                                         <button type="submit" 
                                                 class="gradient-bg-hover text-white font-medium py-2 px-4 rounded-md transition-all duration-200">
-                                            Update Review
+                                            {% translate "Update Review" %}
                                         </button>
                                         <button type="button" 
                                                 onclick="toggleEditForm()" 
                                                 class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800">
-                                            Cancel
+                                            {% translate "Cancel" %}
                                         </button>
                                     </div>
                                 </form>
@@ -339,7 +340,7 @@
                         {% csrf_token %}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Your Rating
+                                {% translate "Your Rating" %}
                             </label>
                             <div class="flex items-center space-x-1">
                                 {% for i in "12345" %}
@@ -354,15 +355,15 @@
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Your Review
+                                {% translate "Your Review" %}
                             </label>
                             <textarea name="comment" rows="4" 
                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none"
-                                      placeholder="Share your experience..."></textarea>
+                                      placeholder="{% translate 'Share your experience...' %}"></textarea>
                         </div>
                         <button type="submit" 
                                 class="w-full gradient-bg-hover text-white font-medium py-2 px-4 rounded-md transition-all duration-200">
-                            Submit Review
+                            {% translate "Submit Review" %}
                         </button>
                     </form>
                     {% endif %}
@@ -394,7 +395,7 @@
                         <p class="mt-2 text-gray-600 dark:text-gray-400">{{ review.comment }}</p>
                     </div>
                     {% empty %}
-                    <p class="text-gray-500 dark:text-gray-400 text-center">No reviews yet. Be the first to review!</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-center">{% translate "No reviews yet. Be the first to review!" %}</p>
                     {% endfor %}
                 </div>
             </div>
@@ -546,7 +547,7 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('{% translate "Network response was not ok" %}');
                 }
 
                 const data = await response.json();
@@ -559,16 +560,34 @@
                 }
 
                 // Optional: Show success message
-                const message = data.status === 'added' ? 'Added to favorites' : 'Removed from favorites';
+                const message = data.status === 'added' ? '{% translate "Added to favorites" %}' : '{% translate "Removed from favorites" %}';
                 // You could add a toast notification here if desired
+                Toastify({
+                    text: message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: data.status === 'added' ? "linear-gradient(to right, #00b09b, #96c93d)" : "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    },
+                }).showToast();
 
             } catch (error) {
-                console.error('Error toggling favorite:', error);
+                console.error('{% translate "Error toggling favorite:" %}', error);
                 // Revert UI on error
                 heartIcon.classList.toggle('text-red-600');
                 heartIcon.classList.toggle('text-gray-400');
                 heartIcon.classList.toggle('dark:text-gray-600');
                 // Optional: Show error message to user
+                Toastify({
+                    text: "{% translate 'Could not update favorite status. Please try again.' %}",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    },
+                }).showToast();
             }
         });
     }
@@ -579,7 +598,7 @@
         shareButton.addEventListener('click', async function() {
             const shareData = {
                 title: '{{ place.name }}',
-                text: 'Check out {{ place.name }} on Halal Korea!',
+                text: "{% blocktranslate with place_name=place.name site_name=STATIC_INFO.site_name %}Check out {{ place_name }} on {{ site_name }}!{% endblocktranslate %}",
                 url: window.location.href
             };
 
@@ -590,7 +609,7 @@
                     // Fallback for browsers that don't support Web Share API
                     await navigator.clipboard.writeText(window.location.href);
                     Toastify({
-                        text: "Link copied to clipboard!",
+                        text: "{% translate 'Link copied to clipboard!' %}",
                         duration: 3000,
                         gravity: "top",
                         position: "right",
@@ -600,16 +619,16 @@
                     }).showToast();
                 }
             } catch (error) {
-                console.error('Error sharing:', error);
+                console.error('{% translate "Error sharing:" %}', error);
                 Toastify({
-                    text: "Failed to share. Please try again.",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    style: {
-                        background: "linear-gradient(to right, #ff5f6d, #ffc371)",
-                    },
-                }).showToast();
+                    text: "{% translate 'Failed to share. Please try again.' %}",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                        },
+                    }).showToast();
             }
         });
     }
@@ -665,7 +684,7 @@
     function copyAddress(address) {
         navigator.clipboard.writeText(address).then(() => {
             Toastify({
-                text: "Address copied to clipboard!",
+                text: "{% translate 'Address copied to clipboard!' %}",
                 duration: 3000,
                 gravity: "top",
                 position: "right",
@@ -674,9 +693,9 @@
                 },
             }).showToast();
         }).catch(err => {
-            console.error('Failed to copy address:', err);
+            console.error('{% translate "Failed to copy address:" %}', err);
             Toastify({
-                text: "Failed to copy address. Please try again.",
+                text: "{% translate 'Failed to copy address. Please try again.' %}",
                 duration: 3000,
                 gravity: "top",
                 position: "right",

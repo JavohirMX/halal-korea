@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 
 <!DOCTYPE html>
 <html lang="en" class="bg-gray-50 dark:bg-gray-900">
@@ -269,23 +270,23 @@
                     <div class="hidden lg:ml-4 xl:ml-6 lg:flex lg:space-x-4 xl:space-x-8">
                         <a href="{% url 'places:explore' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
-                            <i class="fas fa-search mr-2"></i>Explore
+                            <i class="fas fa-search mr-2"></i>{% translate "Explore" %}
                         </a>
                         <a href="{% url 'places:submit_place' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
-                            <i class="fas fa-plus-circle mr-2"></i>Submit Place
+                            <i class="fas fa-plus-circle mr-2"></i>{% translate "Submit Place" %}
                         </a>
                         <a href="{% url 'places:about' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
-                            <i class="fas fa-info-circle mr-2"></i>About
+                            <i class="fas fa-info-circle mr-2"></i>{% translate "About" %}
                         </a>
                         <a href="{% url 'places:donate' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
-                            <i class="fas fa-heart mr-2"></i>Donate
+                            <i class="fas fa-heart mr-2"></i>{% translate "Donate" %}
                         </a>
                         <a href="{% url 'prayer_times:prayer_times' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
-                            <i class="fas fa-clock mr-2"></i>Prayer Times
+                            <i class="fas fa-clock mr-2"></i>{% translate "Prayer Times" %}
                         </a>
                     </div>
                 </div>
@@ -301,17 +302,25 @@
                     
                     <!-- Language Selector -->
                     <div class="relative hidden sm:block" x-data="{ open: false }">
+                        {% get_current_language as CURRENT_LANGUAGE_CODE %}
+                        {% get_available_languages as LANGUAGES %}
+                        {% get_language_info_list for LANGUAGES as languages_info %}
+                        {% get_language_info for CURRENT_LANGUAGE_CODE as current_lang_info %}
+
                         <button @click="open = !open" 
                                 class="flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
-                            <span class="flag">🇺🇸</span>
-                            <span class="hidden lg:inline">English</span>
+                            {% if current_lang_info.code == 'en' %}<span class="flag">🇺🇸</span>
+                            {% elif current_lang_info.code == 'ko' %}<span class="flag">🇰🇷</span>
+                            {% elif current_lang_info.code == 'uz' %}<span class="flag">🇺🇿</span>
+                            {% else %}<span class="flag">🌐</span>{% endif %}
+                            <span class="hidden lg:inline">{{ current_lang_info.name }}</span>
                             <i class="fas fa-chevron-down text-xs ml-1"></i>
                         </button>
                         
                         <!-- Language Dropdown -->
                         <div x-show="open" 
                              @click.away="open = false"
-                             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
+                             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20"
                              x-transition:enter="transition ease-out duration-100"
                              x-transition:enter-start="transform opacity-0 scale-95"
                              x-transition:enter-end="transform opacity-100 scale-100"
@@ -319,18 +328,22 @@
                              x-transition:leave-start="transform opacity-100 scale-100"
                              x-transition:leave-end="transform opacity-0 scale-95">
                             <div class="py-1">
-                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
-                                    <span class="flag">🇺🇸</span>
-                                    <span>English</span>
-                                </button>
-                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
-                                    <span class="flag">🇰🇷</span>
-                                    <span>한국어</span>
-                                </button>
-                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
-                                    <span class="flag">🇺🇿</span>
-                                    <span>O'zbek</span>
-                                </button>
+                                {% for lang in languages_info %}
+                                    {% if lang.code != CURRENT_LANGUAGE_CODE %}
+                                        <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{{ request.path }}">
+                                            <input type="hidden" name="language" value="{{ lang.code }}">
+                                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                                {% if lang.code == 'en' %}<span class="flag">🇺🇸</span>
+                                                {% elif lang.code == 'ko' %}<span class="flag">🇰🇷</span>
+                                                {% elif lang.code == 'uz' %}<span class="flag">🇺🇿</span>
+                                                {% else %}<span class="flag">🌐</span>{% endif %}
+                                                <span>{{ lang.name }}</span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -357,17 +370,17 @@
                                     <div class="py-1">
                                         <a href="{% url 'users:profile' %}" 
                                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                            <i class="fas fa-user mr-2"></i>Profile
+                                            <i class="fas fa-user mr-2"></i>{% translate "Profile" %}
                                         </a>
                                         <a href="{% url 'users:edit_profile' %}" 
                                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                            <i class="fas fa-cog mr-2"></i>Settings
+                                            <i class="fas fa-cog mr-2"></i>{% translate "Settings" %}
                                         </a>
                                         <form method="POST" action="{% url 'users:logout' %}">
                                             {% csrf_token %}
                                             <button type="submit" 
                                                     class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                <i class="fas fa-sign-out-alt mr-2"></i>Log out
+                                                <i class="fas fa-sign-out-alt mr-2"></i>{% translate "Log out" %}
                                             </button>
                                         </form>
                                     </div>
@@ -377,11 +390,11 @@
                             <div class="flex items-center space-x-2 xl:space-x-4">
                                 <a href="{% url 'users:login' %}" 
                                    class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-2 text-sm font-medium">
-                                    Log in
+                                    {% translate "Log in" %}
                                 </a>
                                 <a href="{% url 'users:register' %}" 
                                    class="gradient-bg-hover text-white px-3 xl:px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap">
-                                    Sign up
+                                    {% translate "Sign up" %}
                                 </a>
                             </div>
                         {% endif %}
@@ -416,33 +429,41 @@
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="{% url 'places:explore' %}" 
                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <i class="fas fa-search mr-2"></i>Explore
+                        <i class="fas fa-search mr-2"></i>{% translate "Explore" %}
                     </a>
                     <a href="{% url 'places:submit_place' %}" 
                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <i class="fas fa-plus-circle mr-2"></i>Submit Place
+                        <i class="fas fa-plus-circle mr-2"></i>{% translate "Submit Place" %}
                     </a>
                     <a href="{% url 'places:about' %}" 
                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <i class="fas fa-info-circle mr-2"></i>About
+                        <i class="fas fa-info-circle mr-2"></i>{% translate "About" %}
                     </a>
                     <a href="{% url 'places:donate' %}" 
                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <i class="fas fa-heart mr-2"></i>Donate
+                        <i class="fas fa-heart mr-2"></i>{% translate "Donate" %}
                     </a>
                     <a href="{% url 'prayer_times:prayer_times' %}" 
                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <i class="fas fa-clock mr-2"></i>Prayer Times
+                        <i class="fas fa-clock mr-2"></i>{% translate "Prayer Times" %}
                     </a>
                     
                     <!-- Language Selector for Mobile -->
                     <div class="px-3 py-2">
                         <div class="relative" x-data="{ open: false }">
+                            {% get_current_language as CURRENT_LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages_info %}
+                            {% get_language_info for CURRENT_LANGUAGE_CODE as current_lang_info %}
+
                             <button @click="open = !open" 
                                     class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
                                 <div class="flex items-center space-x-2">
-                                    <span class="flag">🇺🇸</span>
-                                    <span>English</span>
+                                    {% if current_lang_info.code == 'en' %}<span class="flag">🇺🇸</span>
+                                    {% elif current_lang_info.code == 'ko' %}<span class="flag">🇰🇷</span>
+                                    {% elif current_lang_info.code == 'uz' %}<span class="flag">🇺🇿</span>
+                                    {% else %}<span class="flag">🌐</span>{% endif %}
+                                    <span>{{ current_lang_info.name }}</span>
                                 </div>
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </button>
@@ -450,7 +471,7 @@
                             <!-- Mobile Language Dropdown -->
                             <div x-show="open" 
                                  @click.away="open = false"
-                                 class="mt-2 w-full rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
+                                 class="mt-2 w-full rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20"
                                  x-transition:enter="transition ease-out duration-100"
                                  x-transition:enter-start="transform opacity-0 scale-95"
                                  x-transition:enter-end="transform opacity-100 scale-100"
@@ -458,18 +479,22 @@
                                  x-transition:leave-start="transform opacity-100 scale-100"
                                  x-transition:leave-end="transform opacity-0 scale-95">
                                 <div class="py-1">
-                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
-                                        <span class="flag">🇺🇸</span>
-                                        <span>English</span>
-                                    </button>
-                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
-                                        <span class="flag">🇰🇷</span>
-                                        <span>한국어</span>
-                                    </button>
-                                    <button class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
-                                        <span class="flag">🇺🇿</span>
-                                        <span>O'zbek</span>
-                                    </button>
+                                    {% for lang in languages_info %}
+                                        {% if lang.code != CURRENT_LANGUAGE_CODE %}
+                                            <form action="{% url 'set_language' %}" method="post" class="w-full">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next" value="{{ request.path }}">
+                                                <input type="hidden" name="language" value="{{ lang.code }}">
+                                                <button type="submit" class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                                    {% if lang.code == 'en' %}<span class="flag">🇺🇸</span>
+                                                    {% elif lang.code == 'ko' %}<span class="flag">🇰🇷</span>
+                                                    {% elif lang.code == 'uz' %}<span class="flag">🇺🇿</span>
+                                                    {% else %}<span class="flag">🌐</span>{% endif %}
+                                                    <span>{{ lang.name }}</span>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
@@ -477,27 +502,30 @@
 
                     <!-- Mobile Auth Menu -->
                     {% if user.is_authenticated %}
-                        <div class="border-t border-gray-200 pt-4">
-                            <div class="px-3 py-2 text-sm font-medium text-gray-500">
-                                Signed in as <span class="font-bold text-gray-700">{{ user.username }}</span>
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <div class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                                {% blocktranslate with username=user.username %}Signed in as <span class="font-bold text-gray-700 dark:text-white">{{ username }}</span>{% endblocktranslate %}
                             </div>
-                            <a href="{% url 'users:profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-primary-50">
-                                <i class="fas fa-user mr-2"></i>Profile
+                            <a href="{% url 'users:profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <i class="fas fa-user mr-2"></i>{% translate "Profile" %}
                             </a>
-                            <a href="{% url 'users:edit_profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 hover:bg-primary-50">
-                                <i class="fas fa-cog mr-2"></i>Settings
+                            <a href="{% url 'users:edit_profile' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <i class="fas fa-cog mr-2"></i>{% translate "Settings" %}
                             </a>
-                            <a href="{% url 'users:logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-primary-50">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                            </a>
+                            <form method="POST" action="{% url 'users:logout' %}" class="block w-full">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-800">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>{% translate "Logout" %}
+                                </button>
+                            </form>
                         </div>
                     {% else %}
-                        <div class="border-t border-gray-200 pt-4">
-                            <a href="{% url 'users:login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 hover:bg-primary-50">
-                                Log in
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <a href="{% url 'users:login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-gray-800">
+                                {% translate "Log in" %}
                             </a>
-                            <a href="{% url 'users:register' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 hover:bg-primary-50">
-                                Sign up
+                            <a href="{% url 'users:register' %}" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-gray-800">
+                                {% translate "Sign up" %}
                             </a>
                         </div>
                     {% endif %}
@@ -588,21 +616,21 @@
 
                 <!-- Quick Links -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">Quick Links</h3>
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Quick Links" %}</h3>
                     <ul class="space-y-3">
                         <li>
                             <a href="{% url 'places:explore' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
-                                Explore Places
+                                {% translate "Explore Places" %}
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'places:submit_place' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
-                                Submit a Place
+                                {% translate "Submit a Place" %}
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'places:about' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
-                                About Us
+                                {% translate "About Us" %}
                             </a>
                         </li>
                     </ul>
@@ -610,7 +638,7 @@
 
                 <!-- Contact Info -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">Contact</h3>
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Contact" %}</h3>
                     <ul class="space-y-3">
                         <li class="flex items-start text-gray-600 dark:text-gray-400">
                             <i class="fas fa-envelope w-5 mt-1"></i>
@@ -640,13 +668,13 @@
                     </p>
                     <div class="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
                         <a href="{{ STATIC_INFO.footer_links.privacy_policy }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
-                            Privacy Policy
+                            {% translate "Privacy Policy" %}
                         </a>
                         <a href="{{ STATIC_INFO.footer_links.terms_of_service }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
-                            Terms of Service
+                            {% translate "Terms of Service" %}
                         </a>
                         <a href="{{ STATIC_INFO.footer_links.cookie_policy }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
-                            Cookie Policy
+                            {% translate "Cookie Policy" %}
                         </a>
                     </div>
                 </div>

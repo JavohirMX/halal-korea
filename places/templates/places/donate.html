@@ -1,6 +1,7 @@
 {% extends 'places/base.html' %}
+{% load i18n %}
 
-{% block title %}Donate - Halal Korea{% endblock %}
+{% block title %}{% translate "Donate" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -8,11 +9,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
         <div class="text-center">
             <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-                Support Halal Korea
+                {% translate "Support Halal Korea" %}
             </h1>
             <p class="mt-4 max-w-2xl mx-auto text-xl text-primary-100">
-                Help us maintain and improve our platform to better serve the Muslim community in Korea.
-                Your support makes a difference!
+                {% blocktranslate %}Help us maintain and improve our platform to better serve the Muslim community in Korea.
+                Your support makes a difference!{% endblocktranslate %}
             </p>
         </div>
     </div>
@@ -27,12 +28,12 @@
                 <div class="h-16 w-16 mx-auto mb-6 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                     <i class="fas fa-gift text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
-                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">One-time Donation</h3>
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "One-time Donation" %}</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
-                    Make a single contribution to support our mission
+                    {% translate "Make a single contribution to support our mission" %}
                 </p>
                 <button class="gradient-bg-hover text-white px-8 py-3 rounded-lg font-medium w-full text-lg transition-all duration-300 hover:scale-105">
-                    Donate Now
+                    {% translate "Donate Now" %}
                 </button>
             </div>
         </div>
@@ -43,12 +44,12 @@
                 <div class="h-16 w-16 mx-auto mb-6 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                     <i class="fas fa-heart text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
-                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">Monthly Support</h3>
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Monthly Support" %}</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
-                    Become a regular supporter with monthly donations
+                    {% translate "Become a regular supporter with monthly donations" %}
                 </p>
                 <button class="gradient-bg-hover text-white px-8 py-3 rounded-lg font-medium w-full text-lg transition-all duration-300 hover:scale-105">
-                    Subscribe Monthly
+                    {% translate "Subscribe Monthly" %}
                 </button>
             </div>
         </div>
@@ -59,12 +60,12 @@
                 <div class="h-16 w-16 mx-auto mb-6 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                     <i class="fas fa-building text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
-                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">Corporate Sponsorship</h3>
+                <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Corporate Sponsorship" %}</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
-                    Partner with us as a corporate sponsor
+                    {% translate "Partner with us as a corporate sponsor" %}
                 </p>
                 <button class="gradient-bg-hover text-white px-8 py-3 rounded-lg font-medium w-full text-lg transition-all duration-300 hover:scale-105">
-                    Contact Us
+                    {% translate "Contact Us" %}
                 </button>
             </div>
         </div>
@@ -72,62 +73,64 @@
 
     <!-- Why Donate Section -->
     <div class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Why Donate?</h2>
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">{% translate "Why Donate?" %}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div class="glass-card rounded-lg p-6 transition-all duration-300 hover:shadow-lg">
                 <div class="flex items-center mb-4">
                     <div class="h-12 w-12 rounded-lg bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-4">
                         <i class="fas fa-server text-primary-600 dark:text-primary-400 text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Server Costs</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Server Costs" %}</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-400">Help us maintain reliable and fast server infrastructure</p>
+                <p class="text-gray-600 dark:text-gray-400">{% translate "Help us maintain reliable and fast server infrastructure" %}</p>
             </div>
             <div class="glass-card rounded-lg p-6 transition-all duration-300 hover:shadow-lg">
                 <div class="flex items-center mb-4">
                     <div class="h-12 w-12 rounded-lg bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-4">
                         <i class="fas fa-code text-primary-600 dark:text-primary-400 text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Development</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Development" %}</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-400">Support ongoing development of new features</p>
+                <p class="text-gray-600 dark:text-gray-400">{% translate "Support ongoing development of new features" %}</p>
             </div>
             <div class="glass-card rounded-lg p-6 transition-all duration-300 hover:shadow-lg">
                 <div class="flex items-center mb-4">
                     <div class="h-12 w-12 rounded-lg bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-4">
                         <i class="fas fa-users text-primary-600 dark:text-primary-400 text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Community Growth</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Community Growth" %}</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-400">Help us reach and serve more Muslims in Korea</p>
+                <p class="text-gray-600 dark:text-gray-400">{% translate "Help us reach and serve more Muslims in Korea" %}</p>
             </div>
             <div class="glass-card rounded-lg p-6 transition-all duration-300 hover:shadow-lg">
                 <div class="flex items-center mb-4">
                     <div class="h-12 w-12 rounded-lg bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-4">
                         <i class="fas fa-chart-line text-primary-600 dark:text-primary-400 text-xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Sustainability</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{% translate "Sustainability" %}</h3>
                 </div>
-                <p class="text-gray-600 dark:text-gray-400">Ensure long-term sustainability of the platform</p>
+                <p class="text-gray-600 dark:text-gray-400">{% translate "Ensure long-term sustainability of the platform" %}</p>
             </div>
         </div>
     </div>
 
     <!-- FAQ Section -->
     <div>
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Frequently Asked Questions</h2>
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">{% translate "Frequently Asked Questions" %}</h2>
         <div class="max-w-3xl mx-auto space-y-6">
             <div class="glass-card rounded-lg p-6 transition-all duration-300 hover:shadow-lg">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">How is my donation used?</h3>
-                <p class="text-gray-600 dark:text-gray-400">Your donations directly support server costs, development, and community outreach efforts.</p>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "How is my donation used?" %}</h3>
+                <p class="text-gray-600 dark:text-gray-400">{% translate "Your donations directly support server costs, development, and community outreach efforts." %}</p>
             </div>
             <div class="glass-card rounded-lg p-6 transition-all duration-300 hover:shadow-lg">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Why does Halal Korea need donations?</h3>
-                <p class="text-gray-600 dark:text-gray-400">As a non-profit community platform, we don't run ads or have other revenue streams. Your donations help us maintain and improve our services, ensuring Muslims in Korea have access to reliable halal information and resources.</p>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Why does Halal Korea need donations?" %}</h3>
+                <p class="text-gray-600 dark:text-gray-400">{% blocktranslate %}As a non-profit community platform, we don't run ads or have other revenue streams. Your donations help us maintain and improve our services, ensuring Muslims in Korea have access to reliable halal information and resources.{% endblocktranslate %}</p>
             </div>
             <div class="glass-card rounded-lg p-6 transition-all duration-300 hover:shadow-lg">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Can I donate from outside Korea?</h3>
-                <p class="text-gray-600 dark:text-gray-400">Yes! We accept international donations through various payment methods.</p>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Can I donate from outside Korea?" %}</h3>
+                <p class=                           {# Display current language flag - you might need a mapping or static files for flags based on lang.code #}
+                {# For example, if current_lang_info.code == 'en', show US flag, etc. #}
+                {# This part is kept as per your design, you may need to adjust flag logic #}"text-gray-600 dark:text-gray-400">{% translate "Yes! We accept international donations through various payment methods." %}</p>
             </div>
         </div>
     </div>

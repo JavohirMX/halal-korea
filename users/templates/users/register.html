@@ -1,10 +1,11 @@
 {% extends 'users/auth_base.html' %}
+{% load i18n %}
 
-{% block title %}Sign up - Halal Korea{% endblock %}
+{% block title %}{% translate "Sign up" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block content %}
 <div class="max-w-md w-full mx-auto px-4 sm:px-6 mt-8 sm:mt-12">
-    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Create an Account</h2>
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{% translate "Create an Account" %}</h2>
 
     {% if messages %}
     <div class="mb-4">
@@ -22,7 +23,7 @@
         <!-- Username -->
         <div>
             <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Username <span class="text-red-500">*</span>
+                {% translate "Username" %} <span class="text-red-500">*</span>
             </label>
             <div class="relative mt-1">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -33,7 +34,7 @@
                        id="username" 
                        required 
                        autocomplete="username"
-                       placeholder="Enter your username"
+                       placeholder="{% translate 'Enter your username' %}"
                        class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
             </div>
             {% if form.username.errors %}
@@ -44,7 +45,7 @@
         <!-- Email -->
         <div>
             <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email <span class="text-red-500">*</span>
+                {% translate "Email" %} <span class="text-red-500">*</span>
             </label>
             <div class="relative mt-1">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -55,7 +56,7 @@
                        id="email" 
                        required 
                        autocomplete="email"
-                       placeholder="Enter your email"
+                       placeholder="{% translate 'Enter your email' %}"
                        class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
             </div>
             {% if form.email.errors %}
@@ -66,7 +67,7 @@
         <!-- Password -->
         <div>
             <label for="password1" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password <span class="text-red-500">*</span>
+                {% translate "Password" %} <span class="text-red-500">*</span>
             </label>
             <div class="relative mt-1">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -77,7 +78,7 @@
                        id="password1" 
                        required 
                        autocomplete="new-password"
-                       placeholder="Create a password"
+                       placeholder="{% translate 'Create a password' %}"
                        class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
                 <button type="button" 
                         onclick="togglePassword('password1')"
@@ -86,7 +87,7 @@
                 </button>
             </div>
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Password must be at least 8 characters and contain letters and numbers
+                {% translate "Password must be at least 8 characters and contain letters and numbers" %}
             </p>
             {% if form.password1.errors %}
             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password1.errors.0 }}</p>
@@ -96,7 +97,7 @@
         <!-- Confirm Password -->
         <div>
             <label for="password2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Confirm Password
+                {% translate "Confirm Password" %}
             </label>
             <input type="password" 
                    name="password2" 
@@ -111,7 +112,7 @@
         <div>
             <button type="submit" 
                     class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                Sign up
+                {% translate "Sign up" %}
             </button>
         </div>
     </form>
@@ -123,7 +124,7 @@
             </div>
             <div class="relative flex justify-center text-sm">
                 <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                    Already have an account?
+                    {% translate "Already have an account?" %}
                 </span>
             </div>
         </div>
@@ -131,7 +132,7 @@
         <div class="mt-6">
             <a href="{% url 'users:login' %}" 
                class="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                Log in
+                {% translate "Log in" %}
             </a>
         </div>
     </div>

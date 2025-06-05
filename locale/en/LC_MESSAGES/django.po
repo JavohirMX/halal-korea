@@ -1,0 +1,1146 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-19 03:25+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: places/templates/places/404.html:5
+msgid "404 - Page Not Found"
+msgstr ""
+
+#: places/templates/places/404.html:12
+msgid "Page Not Found"
+msgstr ""
+
+#: places/templates/places/404.html:14
+msgid "Oops! The page you're looking for doesn't exist or has been moved."
+msgstr ""
+
+#: places/templates/places/404.html:23
+msgid "Return Home"
+msgstr ""
+
+#: places/templates/places/about.html:5 places/templates/places/about.html:14
+#: places/templates/places/base.html:281 places/templates/places/base.html:440
+msgid "About"
+msgstr ""
+
+#: places/templates/places/about.html:33 places/templates/places/about.html:43
+msgid "Our Mission"
+msgstr ""
+
+#: places/templates/places/about.html:35
+msgid ""
+"Halal Korea aims to make life easier for Muslims living in and visiting "
+"South Korea by providing a comprehensive platform to find halal food, "
+"markets, and prayer spaces."
+msgstr ""
+
+#: places/templates/places/about.html:38
+msgid ""
+"We understand the challenges of finding halal options in a new country, and "
+"we're here to bridge that gap by connecting our community with verified "
+"halal establishments across Korea."
+msgstr ""
+
+#: places/templates/places/about.html:53
+msgid "What We Offer"
+msgstr ""
+
+#: places/templates/places/about.html:63 places/templates/places/about.html:120
+msgid "Community Reviews"
+msgstr ""
+
+#: places/templates/places/about.html:65
+msgid ""
+"Real experiences shared by our community members help others make informed "
+"decisions."
+msgstr ""
+
+#: places/templates/places/about.html:77
+msgid "Multi-Language Support"
+msgstr ""
+
+#: places/templates/places/about.html:79
+msgid "Available in English, Korean, and Uzbek to serve our diverse community."
+msgstr ""
+
+#: places/templates/places/about.html:93
+msgid "Find Nearby Places"
+msgstr ""
+
+#: places/templates/places/about.html:95
+msgid ""
+"Discover halal restaurants, markets, and prayer spaces in your vicinity with "
+"our interactive map feature."
+msgstr ""
+
+#: places/templates/places/about.html:105
+msgid "Our Growing Community"
+msgstr ""
+
+#: places/templates/places/about.html:112
+msgid "Community Added Places"
+msgstr ""
+
+#: places/templates/places/about.html:128
+msgid "Active Users"
+msgstr ""
+
+#: places/templates/places/about.html:144
+msgid "Important Notice"
+msgstr ""
+
+#: places/templates/places/about.html:146
+msgid ""
+"All places listed on our platform are community-contributed. While we make "
+"every effort to maintain accurate information, we strongly recommend "
+"verifying the halal status directly with each establishment before visiting. "
+"Your diligence helps maintain the integrity of our community."
+msgstr ""
+
+#: places/templates/places/about.html:156
+msgid "Get in Touch"
+msgstr ""
+
+#: places/templates/places/about.html:158
+msgid "Have questions or suggestions? We'd love to hear from you."
+msgstr ""
+
+#: places/templates/places/base.html:273 places/templates/places/base.html:432
+#: places/templates/places/place_detail.html:68
+msgid "Explore"
+msgstr ""
+
+#: places/templates/places/base.html:277 places/templates/places/base.html:436
+#: places/templates/places/submit_place.html:360
+msgid "Submit Place"
+msgstr ""
+
+#: places/templates/places/base.html:285 places/templates/places/base.html:444
+#: places/templates/places/donate.html:4
+msgid "Donate"
+msgstr ""
+
+#: places/templates/places/base.html:289 places/templates/places/base.html:448
+#: prayer_times/templates/prayer_times/error.html:4
+#: prayer_times/templates/prayer_times/prayer_times.html:4
+#: prayer_times/templates/prayer_times/prayer_times.html:9
+msgid "Prayer Times"
+msgstr ""
+
+#: places/templates/places/base.html:373 places/templates/places/base.html:510
+msgid "Profile"
+msgstr ""
+
+#: places/templates/places/base.html:377 places/templates/places/base.html:513
+msgid "Settings"
+msgstr ""
+
+#: places/templates/places/base.html:383
+msgid "Log out"
+msgstr ""
+
+#: places/templates/places/base.html:393 places/templates/places/base.html:525
+#: users/templates/users/login.html:4 users/templates/users/login.html:87
+#: users/templates/users/register.html:135
+msgid "Log in"
+msgstr ""
+
+#: places/templates/places/base.html:397 places/templates/places/base.html:528
+#: users/templates/users/login.html:107 users/templates/users/register.html:4
+#: users/templates/users/register.html:115
+msgid "Sign up"
+msgstr ""
+
+#: places/templates/places/base.html:507
+#, python-format
+msgid ""
+"Signed in as <span class=\"font-bold text-gray-700 dark:text-"
+"white\">%(username)s</span>"
+msgstr ""
+
+#: places/templates/places/base.html:518
+msgid "Logout"
+msgstr ""
+
+#: places/templates/places/base.html:619
+msgid "Quick Links"
+msgstr ""
+
+#: places/templates/places/base.html:623 users/templates/users/profile.html:96
+#: users/templates/users/profile.html:137
+msgid "Explore Places"
+msgstr ""
+
+#: places/templates/places/base.html:628 places/templates/places/home.html:178
+#: places/templates/places/submit_place.html:4
+#: users/templates/users/profile.html:176
+msgid "Submit a Place"
+msgstr ""
+
+#: places/templates/places/base.html:633
+msgid "About Us"
+msgstr ""
+
+#: places/templates/places/base.html:641
+msgid "Contact"
+msgstr ""
+
+#: places/templates/places/base.html:671
+msgid "Privacy Policy"
+msgstr ""
+
+#: places/templates/places/base.html:674
+msgid "Terms of Service"
+msgstr ""
+
+#: places/templates/places/base.html:677
+msgid "Cookie Policy"
+msgstr ""
+
+#: places/templates/places/donate.html:12
+msgid "Support Halal Korea"
+msgstr ""
+
+#: places/templates/places/donate.html:15
+msgid ""
+"Help us maintain and improve our platform to better serve the Muslim "
+"community in Korea.\n"
+"                Your support makes a difference!"
+msgstr ""
+
+#: places/templates/places/donate.html:31
+msgid "One-time Donation"
+msgstr ""
+
+#: places/templates/places/donate.html:33
+msgid "Make a single contribution to support our mission"
+msgstr ""
+
+#: places/templates/places/donate.html:36
+msgid "Donate Now"
+msgstr ""
+
+#: places/templates/places/donate.html:47
+msgid "Monthly Support"
+msgstr ""
+
+#: places/templates/places/donate.html:49
+msgid "Become a regular supporter with monthly donations"
+msgstr ""
+
+#: places/templates/places/donate.html:52
+msgid "Subscribe Monthly"
+msgstr ""
+
+#: places/templates/places/donate.html:63
+msgid "Corporate Sponsorship"
+msgstr ""
+
+#: places/templates/places/donate.html:65
+msgid "Partner with us as a corporate sponsor"
+msgstr ""
+
+#: places/templates/places/donate.html:68
+msgid "Contact Us"
+msgstr ""
+
+#: places/templates/places/donate.html:76
+msgid "Why Donate?"
+msgstr ""
+
+#: places/templates/places/donate.html:83
+msgid "Server Costs"
+msgstr ""
+
+#: places/templates/places/donate.html:85
+msgid "Help us maintain reliable and fast server infrastructure"
+msgstr ""
+
+#: places/templates/places/donate.html:92
+msgid "Development"
+msgstr ""
+
+#: places/templates/places/donate.html:94
+msgid "Support ongoing development of new features"
+msgstr ""
+
+#: places/templates/places/donate.html:101
+msgid "Community Growth"
+msgstr ""
+
+#: places/templates/places/donate.html:103
+msgid "Help us reach and serve more Muslims in Korea"
+msgstr ""
+
+#: places/templates/places/donate.html:110
+msgid "Sustainability"
+msgstr ""
+
+#: places/templates/places/donate.html:112
+msgid "Ensure long-term sustainability of the platform"
+msgstr ""
+
+#: places/templates/places/donate.html:119
+msgid "Frequently Asked Questions"
+msgstr ""
+
+#: places/templates/places/donate.html:122
+msgid "How is my donation used?"
+msgstr ""
+
+#: places/templates/places/donate.html:123
+msgid ""
+"Your donations directly support server costs, development, and community "
+"outreach efforts."
+msgstr ""
+
+#: places/templates/places/donate.html:126
+msgid "Why does Halal Korea need donations?"
+msgstr ""
+
+#: places/templates/places/donate.html:127
+msgid ""
+"As a non-profit community platform, we don't run ads or have other revenue "
+"streams. Your donations help us maintain and improve our services, ensuring "
+"Muslims in Korea have access to reliable halal information and resources."
+msgstr ""
+
+#: places/templates/places/donate.html:130
+msgid "Can I donate from outside Korea?"
+msgstr ""
+
+#: places/templates/places/donate.html:133
+msgid "Yes! We accept international donations through various payment methods."
+msgstr ""
+
+#: places/templates/places/explore.html:18
+#: places/templates/places/explore.html:24
+msgid "Explore Halal Places"
+msgstr ""
+
+#: places/templates/places/explore.html:25
+msgid ""
+"Discover halal restaurants, markets, and prayer spaces across South Korea"
+msgstr ""
+
+#: places/templates/places/explore.html:31
+msgid "Update My Location"
+msgstr ""
+
+#: places/templates/places/explore.html:36
+msgid "View Map"
+msgstr ""
+
+#: places/templates/places/explore.html:53
+msgid "Search by name or location..."
+msgstr ""
+
+#: places/templates/places/explore.html:70
+#: places/templates/places/explore.html:105
+msgid "All Categories"
+msgstr ""
+
+#: places/templates/places/explore.html:71
+#: places/templates/places/explore.html:106
+#: places/templates/places/home.html:57
+msgid "Restaurants"
+msgstr ""
+
+#: places/templates/places/explore.html:72
+#: places/templates/places/explore.html:107
+#: places/templates/places/home.html:71
+msgid "Markets"
+msgstr ""
+
+#: places/templates/places/explore.html:73
+#: places/templates/places/explore.html:108
+#: places/templates/places/home.html:85
+msgid "Mosques & Prayer Rooms"
+msgstr ""
+
+#: places/templates/places/explore.html:88
+#: places/templates/places/explore.html:122
+msgid "Sort by Distance"
+msgstr ""
+
+#: places/templates/places/explore.html:89
+#: places/templates/places/explore.html:123
+msgid "Sort by Rating"
+msgstr ""
+
+#: places/templates/places/explore.html:145
+#: places/templates/places/explore.html:360
+#: places/templates/places/explore.html:460
+msgid "Loading more places..."
+msgstr ""
+
+#: places/templates/places/explore.html:175
+msgid "Your Location"
+msgstr ""
+
+#: places/templates/places/explore.html:229
+msgid "Error loading places:"
+msgstr ""
+
+#: places/templates/places/explore.html:271
+msgid "Prayer Space"
+msgstr ""
+
+#: places/templates/places/explore.html:274
+#: users/templates/users/profile.html:84 users/templates/users/profile.html:163
+msgid "View Details"
+msgstr ""
+
+#: places/templates/places/explore.html:388
+msgid "Error loading more places:"
+msgstr ""
+
+#: places/templates/places/explore.html:482
+msgid "Error applying filters:"
+msgstr ""
+
+#: places/templates/places/explore.html:591
+#: places/templates/places/explore.html:594
+#: places/templates/places/home.html:202 places/templates/places/home.html:205
+msgid "Failed to update location: "
+msgstr ""
+
+#: places/templates/places/explore.html:591
+#: places/templates/places/home.html:202
+msgid "Unknown error"
+msgstr ""
+
+#: places/templates/places/explore.html:597
+#: places/templates/places/home.html:208
+msgid "Could not get your location: "
+msgstr ""
+
+#: places/templates/places/explore.html:600
+#: places/templates/places/home.html:211
+msgid "Geolocation is not supported by your browser."
+msgstr ""
+
+#: places/templates/places/home.html:17
+msgid "Find Halal Places in Korea"
+msgstr ""
+
+#: places/templates/places/home.html:20
+msgid ""
+"Discover halal restaurants, markets, and prayer spaces across South Korea."
+msgstr ""
+
+#: places/templates/places/home.html:29
+msgid "Search places..."
+msgstr ""
+
+#: places/templates/places/home.html:31
+msgid "Search"
+msgstr ""
+
+#: places/templates/places/home.html:38
+msgid "Find Nearest Places"
+msgstr ""
+
+#: places/templates/places/home.html:58
+msgid "Find halal restaurants near you"
+msgstr ""
+
+#: places/templates/places/home.html:72
+msgid "Discover halal grocery stores"
+msgstr ""
+
+#: places/templates/places/home.html:86
+msgid "Find nearby prayer spaces"
+msgstr ""
+
+#: places/templates/places/home.html:99
+msgid "Explore All"
+msgstr ""
+
+#: places/templates/places/home.html:100
+msgid "Discover all halal places in Korea"
+msgstr ""
+
+#: places/templates/places/home.html:111
+msgid "Featured Places"
+msgstr ""
+
+#: places/templates/places/home.html:140
+#, python-format
+msgid "(%(review_count)s review)"
+msgid_plural "(%(review_count)s reviews)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: places/templates/places/home.html:155
+msgid "Stay Updated with Prayer Times"
+msgstr ""
+
+#: places/templates/places/home.html:158
+msgid "Check the latest prayer times for your location."
+msgstr ""
+
+#: places/templates/places/home.html:162
+msgid "View Prayer Times"
+msgstr ""
+
+#: places/templates/places/home.html:171
+msgid "Know a Halal Spot? Share It!"
+msgstr ""
+
+#: places/templates/places/home.html:174
+msgid "Help us grow our community by submitting halal places you know!"
+msgstr ""
+
+#: places/templates/places/place_detail.html:64
+msgid "Breadcrumb"
+msgstr ""
+
+#: places/templates/places/place_detail.html:66
+msgid "Home"
+msgstr ""
+
+#: places/templates/places/place_detail.html:155
+msgid "Important Notice:"
+msgstr ""
+
+#: places/templates/places/place_detail.html:155
+msgid ""
+"This place has been added by our community. While we strive to maintain "
+"accurate information, we recommend verifying the halal status directly with "
+"the establishment before visiting."
+msgstr ""
+
+#: places/templates/places/place_detail.html:174
+msgid "No ratings yet"
+msgstr ""
+
+#: places/templates/places/place_detail.html:174
+msgid "reviews"
+msgstr ""
+
+#: places/templates/places/place_detail.html:189
+msgid "Copy address"
+msgstr ""
+
+#: places/templates/places/place_detail.html:205
+msgid "Visit Website"
+msgstr ""
+
+#: places/templates/places/place_detail.html:246
+msgid "Reviews"
+msgstr ""
+
+#: places/templates/places/place_detail.html:254
+#: places/templates/places/place_detail.html:315
+#: places/templates/places/place_detail.html:358
+msgid "Your Review"
+msgstr ""
+
+#: places/templates/places/place_detail.html:263
+msgid "Are you sure you want to delete your review?"
+msgstr ""
+
+#: places/templates/places/place_detail.html:294
+msgid "Rating"
+msgstr ""
+
+#: places/templates/places/place_detail.html:324
+msgid "Update Review"
+msgstr ""
+
+#: places/templates/places/place_detail.html:329
+#: users/templates/users/edit_profile.html:89
+msgid "Cancel"
+msgstr ""
+
+#: places/templates/places/place_detail.html:343
+msgid "Your Rating"
+msgstr ""
+
+#: places/templates/places/place_detail.html:362
+msgid "Share your experience..."
+msgstr ""
+
+#: places/templates/places/place_detail.html:366
+msgid "Submit Review"
+msgstr ""
+
+#: places/templates/places/place_detail.html:398
+msgid "No reviews yet. Be the first to review!"
+msgstr ""
+
+#: places/templates/places/place_detail.html:550
+msgid "Network response was not ok"
+msgstr ""
+
+#: places/templates/places/place_detail.html:563
+msgid "Added to favorites"
+msgstr ""
+
+#: places/templates/places/place_detail.html:563
+msgid "Removed from favorites"
+msgstr ""
+
+#: places/templates/places/place_detail.html:576
+msgid "Error toggling favorite:"
+msgstr ""
+
+#: places/templates/places/place_detail.html:583
+msgid "Could not update favorite status. Please try again."
+msgstr ""
+
+#: places/templates/places/place_detail.html:601
+#, python-format
+msgid "Check out %(place_name)s on %(site_name)s!"
+msgstr ""
+
+#: places/templates/places/place_detail.html:612
+msgid "Link copied to clipboard!"
+msgstr ""
+
+#: places/templates/places/place_detail.html:622
+msgid "Error sharing:"
+msgstr ""
+
+#: places/templates/places/place_detail.html:624
+msgid "Failed to share. Please try again."
+msgstr ""
+
+#: places/templates/places/place_detail.html:687
+msgid "Address copied to clipboard!"
+msgstr ""
+
+#: places/templates/places/place_detail.html:696
+msgid "Failed to copy address:"
+msgstr ""
+
+#: places/templates/places/place_detail.html:698
+msgid "Failed to copy address. Please try again."
+msgstr ""
+
+#: places/templates/places/submit_place.html:36
+#: places/templates/places/submit_place.html:81
+msgid "Geocoding error:"
+msgstr ""
+
+#: places/templates/places/submit_place.html:147
+msgid "Submit a New Place"
+msgstr ""
+
+#: places/templates/places/submit_place.html:148
+msgid "Help others find halal places by submitting a new location"
+msgstr ""
+
+#: places/templates/places/submit_place.html:160
+msgid "Place Name"
+msgstr ""
+
+#: places/templates/places/submit_place.html:170
+msgid "Enter place name"
+msgstr ""
+
+#: places/templates/places/submit_place.html:177
+msgid "Category"
+msgstr ""
+
+#: places/templates/places/submit_place.html:187
+msgid "Select a category"
+msgstr ""
+
+#: places/templates/places/submit_place.html:188
+msgid "Restaurant"
+msgstr ""
+
+#: places/templates/places/submit_place.html:189
+msgid "Market"
+msgstr ""
+
+#: places/templates/places/submit_place.html:190
+msgid "Mosque"
+msgstr ""
+
+#: places/templates/places/submit_place.html:191
+msgid "Prayer Room"
+msgstr ""
+
+#: places/templates/places/submit_place.html:200
+msgid "Description"
+msgstr ""
+
+#: places/templates/places/submit_place.html:207
+msgid "Describe the place..."
+msgstr ""
+
+#: places/templates/places/submit_place.html:218
+msgid "Location"
+msgstr ""
+
+#: places/templates/places/submit_place.html:224
+msgid "Click on the map to set the location"
+msgstr ""
+
+#: places/templates/places/submit_place.html:234
+msgid "Address"
+msgstr ""
+
+#: places/templates/places/submit_place.html:244
+msgid "Enter address"
+msgstr ""
+
+#: places/templates/places/submit_place.html:253
+msgid "Phone Number"
+msgstr ""
+
+#: places/templates/places/submit_place.html:262
+msgid "Enter phone number"
+msgstr ""
+
+#: places/templates/places/submit_place.html:273
+msgid "Website"
+msgstr ""
+
+#: places/templates/places/submit_place.html:282
+msgid "Enter website URL"
+msgstr ""
+
+#: places/templates/places/submit_place.html:290
+msgid "Additional Map Links"
+msgstr ""
+
+#: places/templates/places/submit_place.html:295
+msgid "Naver Maps Link"
+msgstr ""
+
+#: places/templates/places/submit_place.html:304
+msgid "Enter Naver Maps link"
+msgstr ""
+
+#: places/templates/places/submit_place.html:312
+msgid "Kakao Maps Link"
+msgstr ""
+
+#: places/templates/places/submit_place.html:321
+msgid "Enter Kakao Maps link"
+msgstr ""
+
+#: places/templates/places/submit_place.html:331
+msgid "Photos"
+msgstr ""
+
+#: places/templates/places/submit_place.html:338
+msgid "Upload photos"
+msgstr ""
+
+#: places/templates/places/submit_place.html:346
+msgid "or drag and drop"
+msgstr ""
+
+#: places/templates/places/submit_place.html:349
+msgid "PNG, JPG, GIF up to 10MB each"
+msgstr ""
+
+#: places/templates/places/submit_place.html:380
+msgid ""
+"Note: <strong>Mosque</strong> is for dedicated Islamic centers, while "
+"<strong>Prayer Room</strong> is for designated prayer spaces in other "
+"locations."
+msgstr ""
+
+#: places/templates/places/submit_place.html:463
+msgid "Preview"
+msgstr ""
+
+#: places/templates/places/submit_place.html:514
+msgid "Please select a location on the map"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/error.html:4
+msgid "Error"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/error.html:11
+msgid "Error Loading Prayer Times"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/error.html:22
+#: prayer_times/templates/prayer_times/prayer_times.html:157
+msgid "Try Again"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:10
+msgid "Stay updated with the prayer times for your location."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:51
+msgid "Search city..."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:61
+msgid "Use Current Location"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:96
+msgid "Prayer Calculation Settings"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:100
+msgid "Calculation Method"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:104
+msgid "Jafari / Shia Ithna-Ashari"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:105
+msgid "University of Islamic Sciences, Karachi"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:106
+msgid "Islamic Society of North America"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:107
+msgid "Muslim World League"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:108
+msgid "Umm Al-Qura University, Makkah"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:109
+msgid "Egyptian General Authority of Survey"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:110
+msgid "Institute of Geophysics, University of Tehran"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:111
+msgid "Gulf Region"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:112
+msgid "Kuwait"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:113
+msgid "Qatar"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:114
+msgid "Majlis Ugama Islam Singapura, Singapore"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:115
+msgid "Union Organization islamic de France"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:116
+msgid "Diyanet İşleri Başkanlığı, Turkey"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:117
+msgid "Spiritual Administration of Muslims of Russia"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:118
+msgid "Moonsighting Committee Worldwide"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:119
+msgid "Dubai (experimental)"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:120
+msgid "Jabatan Kemajuan Islam Malaysia (JAKIM)"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:121
+msgid "Tunisia"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:122
+msgid "Algeria"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:123
+msgid "KEMENAG - Kementerian Agama Republik Indonesia"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:124
+msgid "Morocco"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:125
+msgid "Comunidade Islamica de Lisboa"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:126
+msgid "Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:132
+msgid "Asr Calculation"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:136
+msgid "Standard (Shafi)"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:137
+msgid "Hanafi"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:148
+msgid "Loading prayer times..."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:155
+#: prayer_times/templates/prayer_times/prayer_times.html:373
+msgid "Failed to load prayer times"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:169
+msgid "Gregorian Date"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:174
+msgid "Current Time"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:178
+msgid "Hijri Date"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:191
+msgid "Prayer"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:192
+msgid "Time"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:200
+msgid "Next Prayer"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:201
+msgid "Calculating..."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:210
+msgid ""
+"Prayer times are provided by <a href=\"https://aladhan.com/\" "
+"target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 "
+"dark:hover:text-primary-400\">aladhan.com</a>"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:269
+msgid "Fajr (Tomorrow)"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:293
+msgid "All prayer times have passed."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:350
+msgid "Fajr"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:351
+msgid "Sunrise"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:352
+msgid "Dhuhr"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:353
+msgid "Asr"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:354
+msgid "Maghrib"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:355
+msgid "Isha"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:376
+msgid "Error loading prayer times:"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:398
+msgid "Failed to update location:"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:402
+msgid "Error updating location:"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:426
+msgid "Could not determine location. Please select a city manually."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:430
+#: prayer_times/templates/prayer_times/prayer_times.html:435
+msgid "Error getting location:"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:431
+#: prayer_times/templates/prayer_times/prayer_times.html:436
+msgid "Error getting your location. Please select a city manually."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:440
+msgid ""
+"Geolocation is not supported by your browser. Please select a city manually."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:460
+#: prayer_times/templates/prayer_times/prayer_times.html:484
+msgid "Failed to update settings:"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:464
+#: prayer_times/templates/prayer_times/prayer_times.html:488
+msgid "Error updating settings:"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:5
+#: users/templates/users/edit_profile.html:12
+#: users/templates/users/profile.html:30
+msgid "Edit Profile"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:13
+msgid "Update your profile information"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:24
+#: users/templates/users/login.html:24 users/templates/users/register.html:26
+msgid "Username"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:40
+#: users/templates/users/register.html:48
+msgid "Email"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:56
+msgid "Current Password"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:71
+msgid "New Password"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:78
+msgid "Leave blank to keep current password"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:93
+msgid "Save Changes"
+msgstr ""
+
+#: users/templates/users/login.html:8
+msgid "Welcome Back"
+msgstr ""
+
+#: users/templates/users/login.html:35 users/templates/users/register.html:37
+msgid "Enter your username"
+msgstr ""
+
+#: users/templates/users/login.html:45 users/templates/users/register.html:70
+msgid "Password"
+msgstr ""
+
+#: users/templates/users/login.html:56
+msgid "Enter your password"
+msgstr ""
+
+#: users/templates/users/login.html:73
+msgid "Remember me"
+msgstr ""
+
+#: users/templates/users/login.html:79
+msgid "Forgot your password?"
+msgstr ""
+
+#: users/templates/users/login.html:99
+msgid "Don't have an account?"
+msgstr ""
+
+#: users/templates/users/profile.html:5
+msgid "My Profile"
+msgstr ""
+
+#: users/templates/users/profile.html:42
+msgid "Favorite Places"
+msgstr ""
+
+#: users/templates/users/profile.html:46
+msgid "My Reviews"
+msgstr ""
+
+#: users/templates/users/profile.html:50
+msgid "Submitted Places"
+msgstr ""
+
+#: users/templates/users/profile.html:93
+msgid "You haven't favorited any places yet."
+msgstr ""
+
+#: users/templates/users/profile.html:134
+msgid "You haven't written any reviews yet."
+msgstr ""
+
+#: users/templates/users/profile.html:158
+msgid "Status:"
+msgstr ""
+
+#: users/templates/users/profile.html:173
+msgid "You haven't submitted any places yet."
+msgstr ""
+
+#: users/templates/users/register.html:8
+msgid "Create an Account"
+msgstr ""
+
+#: users/templates/users/register.html:59
+msgid "Enter your email"
+msgstr ""
+
+#: users/templates/users/register.html:81
+msgid "Create a password"
+msgstr ""
+
+#: users/templates/users/register.html:90
+msgid "Password must be at least 8 characters and contain letters and numbers"
+msgstr ""
+
+#: users/templates/users/register.html:100
+msgid "Confirm Password"
+msgstr ""
+
+#: users/templates/users/register.html:127
+msgid "Already have an account?"
+msgstr ""

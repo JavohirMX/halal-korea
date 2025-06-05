@@ -1,7 +1,8 @@
 {% extends 'places/base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}My Profile - Halal Korea{% endblock %}
+{% block title %}{% translate "My Profile" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -26,7 +27,7 @@
                     <a href="{% url 'users:edit_profile' %}" 
                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
                         <i class="fas fa-edit mr-2"></i>
-                        Edit Profile
+                        {% translate "Edit Profile" %}
                     </a>
                 </div>
             </div>
@@ -38,15 +39,15 @@
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
             <button class="tab-button border-primary-500 text-primary-600 dark:text-primary-400 border-b-2 py-4 px-1 text-sm font-medium active" 
                     data-tab="favorites">
-                Favorite Places
+                {% translate "Favorite Places" %}
             </button>
             <button class="tab-button text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 border-b-2 border-transparent py-4 px-1 text-sm font-medium" 
                     data-tab="reviews">
-                My Reviews
+                {% translate "My Reviews" %}
             </button>
             <button class="tab-button text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 border-b-2 border-transparent py-4 px-1 text-sm font-medium" 
                     data-tab="submitted">
-                Submitted Places
+                {% translate "Submitted Places" %}
             </button>
         </nav>
     </div>
@@ -80,7 +81,7 @@
                     </div>
                     <a href="{% url 'places:place_detail' place.id %}" 
                        class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                        View Details →
+                        {% translate "View Details" %} →
                     </a>
                 </div>
             </div>
@@ -89,10 +90,10 @@
         {% else %}
         <div class="text-center py-12">
             <i class="fas fa-heart text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
-            <p class="text-gray-600 dark:text-gray-400">You haven't favorited any places yet.</p>
+            <p class="text-gray-600 dark:text-gray-400">{% translate "You haven't favorited any places yet." %}</p>
             <a href="{% url 'places:explore' %}" 
                class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                Explore Places →
+                {% translate "Explore Places" %} →
             </a>
         </div>
         {% endif %}
@@ -130,10 +131,10 @@
         {% else %}
         <div class="text-center py-12">
             <i class="fas fa-comment text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
-            <p class="text-gray-600 dark:text-gray-400">You haven't written any reviews yet.</p>
+            <p class="text-gray-600 dark:text-gray-400">{% translate "You haven't written any reviews yet." %}</p>
             <a href="{% url 'places:explore' %}" 
                class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                Explore Places →
+                {% translate "Explore Places" %} →
             </a>
         </div>
         {% endif %}
@@ -154,12 +155,12 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
                     <p class="text-sm text-primary-600 dark:text-primary-400">{{ place.category|title }}</p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Status: <span class="capitalize">{{ place.status }}</span>
+                        {% translate "Status:" %} <span class="capitalize">{{ place.status }}</span>
                     </p>
                     <div class="mt-2">
                         <a href="{% url 'places:place_detail' place.id %}" 
                            class="inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                            View Details →
+                            {% translate "View Details" %} →
                         </a>
                     </div>
                 </div>
@@ -169,10 +170,10 @@
         {% else %}
         <div class="text-center py-12">
             <i class="fas fa-map-marker-alt text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
-            <p class="text-gray-600 dark:text-gray-400">You haven't submitted any places yet.</p>
+            <p class="text-gray-600 dark:text-gray-400">{% translate "You haven't submitted any places yet." %}</p>
             <a href="{% url 'places:submit_place' %}" 
                class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                Submit a Place →
+                {% translate "Submit a Place" %} →
             </a>
         </div>
         {% endif %}

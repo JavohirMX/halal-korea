@@ -1,13 +1,14 @@
 {% extends 'places/base.html' %}
+{% load i18n %}
 
-{% block title %}Error - Prayer Times{% endblock %}
+{% block title %}{% translate "Error" %} - {% translate "Prayer Times" %}{% endblock %}
 
 {% block content %}
 <div class="flex flex-col items-center justify-center min-h-[70vh] py-8">
     <div class="w-full max-w-md px-4 sm:px-6 lg:px-8 text-center">
         <div class="text-red-600 dark:text-red-400">
             <i class="fas fa-exclamation-circle text-5xl"></i>
-            <h1 class="mt-4 text-2xl font-bold text-gray-900 dark:text-white">Error Loading Prayer Times</h1>
+            <h1 class="mt-4 text-2xl font-bold text-gray-900 dark:text-white">{% translate "Error Loading Prayer Times" %}</h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">{{ error }}</p>
             {% if details %}
             <p class="mt-2 text-sm text-gray-500 dark:text-gray-500">{{ details }}</p>
@@ -18,7 +19,7 @@
             <a href="{% url 'prayer_times:prayer_times' %}" 
                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                 <i class="fas fa-redo mr-2"></i>
-                Try Again
+                {% translate "Try Again" %}
             </a>
         </div>
     </div>

@@ -1,5 +1,7 @@
 {% extends 'places/base.html' %}
 {% load static %}
+{% load i18n %}
+
 {% block extra_head %}
 <style>
     .loading-spinner {
@@ -13,25 +15,25 @@
 </style>
 {% endblock %}
 
-{% block title %}Explore Halal Places - Halal Korea{% endblock %}
+{% block title %}{% translate "Explore Halal Places" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Explore Halal Places</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">Discover halal restaurants, markets, and prayer spaces across South Korea</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Explore Halal Places" %}</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Discover halal restaurants, markets, and prayer spaces across South Korea" %}</p>
     </div>
 
     <!-- Update Location Button -->
     <div class="mb-4 flex justify-between">
         <button id="update-location-btn" type="button" class="inline-flex items-center px-4 py-2 border border-primary-500 rounded-lg text-base font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition">
-            <i class="fas fa-location-arrow mr-2"></i> Update My Location
+            <i class="fas fa-location-arrow mr-2"></i> {% translate "Update My Location" %}
         </button>
         <!-- View Map Button (Visible until lg breakpoint) -->
         <button id="view-map-btn" type="button" 
                 class="lg:hidden inline-flex items-center px-4 py-2 border border-primary-500 rounded-lg text-base font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition">
-            <i class="fas fa-map-marked-alt mr-2"></i> View Map
+            <i class="fas fa-map-marked-alt mr-2"></i> {% translate "View Map" %}
         </button>
     </div>
 
@@ -48,7 +50,7 @@
                            name="q"
                            value="{{ request.GET.q }}"
                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
-                           placeholder="Search by name or location...">
+                           placeholder="{% translate 'Search by name or location...' %}">
                 </div>
                 <button type="button" id="filter-toggle" class="ml-2 p-2 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 md:hidden">
                     <i class="fas fa-filter"></i>
@@ -65,10 +67,10 @@
                         </div>
                         <select name="category" 
                                 class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
-                            <option value="">All Categories</option>
-                            <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>Restaurants</option>
-                            <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>Markets</option>
-                            <option value="mosque" {% if request.GET.category == 'mosque' or request.GET.category == 'prayer_room' %}selected{% endif %}>Mosques & Prayer Rooms</option>
+                            <option value="">{% translate "All Categories" %}</option>
+                            <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>{% translate "Restaurants" %}</option>
+                            <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>{% translate "Markets" %}</option>
+                            <option value="mosque" {% if request.GET.category == 'mosque' or request.GET.category == 'prayer_room' %}selected{% endif %}>{% translate "Mosques & Prayer Rooms" %}</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                             <i class="fas fa-chevron-down text-gray-400"></i>
@@ -83,8 +85,8 @@
                         </div>
                         <select name="sort" 
                                 class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
-                            <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>Sort by Distance</option>
-                            <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Sort by Rating</option>
+                            <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
+                            <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                             <i class="fas fa-chevron-down text-gray-400"></i>
@@ -100,10 +102,10 @@
                     </div>
                     <select name="category" 
                             class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
-                        <option value="">All Categories</option>
-                        <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>Restaurants</option>
-                        <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>Markets</option>
-                        <option value="mosque" {% if request.GET.category == 'mosque' or request.GET.category == 'prayer_room' %}selected{% endif %}>Mosques & Prayer Rooms</option>
+                        <option value="">{% translate "All Categories" %}</option>
+                        <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>{% translate "Restaurants" %}</option>
+                        <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>{% translate "Markets" %}</option>
+                        <option value="mosque" {% if request.GET.category == 'mosque' or request.GET.category == 'prayer_room' %}selected{% endif %}>{% translate "Mosques & Prayer Rooms" %}</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <i class="fas fa-chevron-down text-gray-400"></i>
@@ -117,8 +119,8 @@
                     </div>
                     <select name="sort" 
                             class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
-                        <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>Sort by Distance</option>
-                        <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Sort by Rating</option>
+                        <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
+                        <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <i class="fas fa-chevron-down text-gray-400"></i>
@@ -140,7 +142,7 @@
                 <div class="flex justify-center items-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                 </div>
-                <p class="mt-2 text-sm text-gray-500">Loading more places...</p>
+                <p class="mt-2 text-sm text-gray-500">{% translate "Loading more places..." %}</p>
             </div>
         </div>
 
@@ -167,11 +169,13 @@
         const seoul = { lat: 37.5665, lng: 126.9780 };
         // Center on user location if available
         {% if user_location %}
-        const userLat = {{ user_location.y }};
-        const userLng = {{ user_location.x }};
+        const userLat = {{ user_location.y|stringformat:".6f" }};
+        const userLng = {{ user_location.x|stringformat:".6f" }};
         const center = { lat: userLat, lng: userLng };
+        const userLocationTitle = "{% translate 'Your Location' %}";
         {% else %}
         const center = seoul;
+        const userLocationTitle = ""; // No user location
         {% endif %}
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
@@ -187,7 +191,7 @@
         const userMarker = new AdvancedMarkerElement({
             map,
             position: { lat: userLat, lng: userLng },
-            title: 'Your Location',
+            title: userLocationTitle,
             content: document.createElement('div'),
         });
         userMarker.content.innerHTML = '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>';
@@ -222,7 +226,7 @@
         // Add markers for each place
                 addPlacesToMap(data.places);
             })
-            .catch(error => console.error('Error loading places:', error));
+            .catch(error => console.error('{% translate "Error loading places:" %}', error));
     }
     
     // Add places to the map
@@ -264,10 +268,10 @@
             content: `
                 <div class="text-center">
                     <p class="font-semibold text-black text-md">${place.name}</p>
-                    <p class="text-sm text-gray-600">${place.category === 'prayer_room' ? 'Prayer Space' : place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
+                    <p class="text-sm text-gray-600">${place.category === 'prayer_room' ? '{% translate "Prayer Space" %}' : place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
                     <a href="/place/${place.id}/" 
                        class="text-primary-600 hover:text-primary-700 text-sm">
-                        View Details
+                        {% translate "View Details" %}
                     </a>
                 </div>
             `
@@ -353,7 +357,7 @@
                <div class="flex justify-center items-center">
                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                </div>
-               <p class="mt-2 text-sm text-gray-500">Loading more places...</p>
+               <p class="mt-2 text-sm text-gray-500">{% translate "Loading more places..." %}</p>
             `;
             placesContainer.appendChild(loadingSpinner);
             
@@ -381,7 +385,7 @@
             }
         })
         .catch(error => {
-            console.error('Error loading more places:', error);
+            console.error('{% translate "Error loading more places:" %}', error);
             isLoading = false;
             
             // Safely hide the spinner on error
@@ -453,7 +457,7 @@
                <div class="flex justify-center items-center">
                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                </div>
-               <p class="mt-2 text-sm text-gray-500">Loading more places...</p>
+               <p class="mt-2 text-sm text-gray-500">{% translate "Loading more places..." %}</p>
             `;
             placesContainer.appendChild(loadingSpinner);
             
@@ -475,7 +479,7 @@
             isLoading = false;
         })
         .catch(error => {
-            console.error('Error applying filters:', error);
+            console.error('{% translate "Error applying filters:" %}', error);
             isLoading = false;
         });
     }
@@ -584,16 +588,16 @@ document.getElementById('update-location-btn').onclick = function() {
                 if (data.success) {
                     window.location.reload();
                 } else {
-                    alert('Failed to update location: ' + (data.error || 'Unknown error'));
+                    alert('{% translate "Failed to update location: " %}' + (data.error || '{% translate "Unknown error" %}'));
                 }
             }).catch(error => {
-                alert('Failed to update location: ' + error);
+                alert('{% translate "Failed to update location: " %}' + error);
             });
         }, function(error) {
-            alert('Could not get your location: ' + error.message);
+            alert('{% translate "Could not get your location: " %}' + error.message);
         });
     } else {
-        alert('Geolocation is not supported by your browser.');
+        alert('{% translate "Geolocation is not supported by your browser." %}');
     }
 };
 </script>
