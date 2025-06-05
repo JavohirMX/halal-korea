@@ -1,8 +1,8 @@
 # static_info.py
 INFO = {
     # Contact information
-    "email": "contact@halalkorea.com",
-    "phone": "+82 10-1234-5678",
+    "email": "contact@halal-korea.com",
+    "phone": "None",
     "address": "Seoul, South Korea",
     
     # Company information
