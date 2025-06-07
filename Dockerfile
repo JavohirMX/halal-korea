@@ -32,10 +32,10 @@ COPY . .
 RUN mkdir -p media/places/photos
 
 # Collect static files
-RUN python manage.py collectstatic --noinput --clear
+# RUN python manage.py collectstatic --noinput --clear
 
 # Compile translations
-RUN python manage.py compilemessages
+# RUN python manage.py compilemessages
 
 # Expose port
 EXPOSE 8000
