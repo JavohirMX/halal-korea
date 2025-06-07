@@ -1,5 +1,4 @@
 name: Deploy to Droplet
-
 on:
   push:
     branches: [main]
@@ -7,25 +6,37 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan -H ${{ secrets.DOCKER_HOST }} >> ~/.ssh/known_hosts
-
-    - name: Deploy via SSH
-      run: |
-        ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no root@${{ secrets.DOCKER_HOST }} << 'EOF'
+      uses: actions/checkout@v4
+      
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.DOCKER_HOST }}
+        username: root
+        key: ${{ secrets.DEPLOY_KEY }}
+        port: 22
+        script: |
           cd /home/jmx/halal-korea
           git pull origin main
           docker-compose down
           docker-compose up -d --build
-          docker-compose exec web python manage.py migrate
-          docker-compose exec web python manage.py collectstatic --noinput
-        EOF
+          
+          # Wait for containers to be ready
+          sleep 10
+          
+          # Check if web container is running
+          if docker-compose ps web | grep -q "Up"; then
+            echo "Running migrations..."
+            docker-compose exec -T web python manage.py migrate
+            
+            echo "Collecting static files..."
+            docker-compose exec -T web python manage.py collectstatic --noinput
+            
+            echo "Deployment completed successfully!"
+          else
+            echo "Web container failed to start"
+            docker-compose logs web
+            exit 1
+          fi
