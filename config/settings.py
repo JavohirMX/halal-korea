@@ -28,6 +28,11 @@ DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS").split()
 
+# CSRF Settings for production
+# Add your production domain(s) to CSRF_TRUSTED_ORIGINS environment variable
+# Example: CSRF_TRUSTED_ORIGINS="https://halal-korea.com https://www.halal-korea.com"
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split()
+
 
 # Application definition
 

@@ -9,6 +9,11 @@
 {% endblock %}
 
 {% block content %}
+<!-- Hidden CSRF Token Form -->
+<form id="csrf-form" style="display: none;">
+    {% csrf_token %}
+</form>
+
 <!-- Hero Section -->
 <div class="relative bg-gradient-to-br from-green-400 to-green-600 overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
@@ -185,11 +190,14 @@
 document.getElementById('find-nearest-btn').onclick = function() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
+            // Get CSRF token from the hidden form
+            const csrfToken = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
+            
             fetch("{% url 'places:set_location' %}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify({
                     latitude: position.coords.latitude,
