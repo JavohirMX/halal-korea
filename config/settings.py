@@ -26,7 +26,7 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config("ALLOWED_HOSTS").split()
 
 
 # Application definition
@@ -99,6 +99,9 @@ DATABASES = {
         'PORT': config('DB_PORT', default='5432'),  # default PostgreSQL port
     }
 }
+# DATABASES = {
+#     'default': dj_database_url.config(default=config("DATABASE_URL"))
+# }
 
 
 
@@ -148,7 +151,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "static/",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -159,7 +162,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'media/'
 
 AUTH_USER_MODEL = 'users.User'
 
