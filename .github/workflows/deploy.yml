@@ -1,0 +1,31 @@
+name: Deploy to Droplet
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan -H ${{ secrets.DOCKER_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy via SSH
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.DOCKER_HOST }} << 'EOF'
+          cd /home/jmx/halal-korea
+          git pull origin main
+          docker-compose down
+          docker-compose up -d --build
+          docker-compose exec web python manage.py migrate
+          docker-compose exec web python manage.py collectstatic --noinput
+        EOF
