@@ -6,6 +6,9 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_http_methods
 from .models import Review
 from places.models import HalalPlace
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 @require_http_methods(["POST"])
@@ -13,8 +16,11 @@ def add_review(request, place_id):
     """Add a new review for a place."""
     place = get_object_or_404(HalalPlace, id=place_id, status='approved')
     
+    logger.info(f"Review submission attempt by user {request.user.username} for place {place.name}")
+    
     # Check if user has already reviewed this place
     if Review.objects.filter(user=request.user, place=place).exists():
+        logger.warning(f"Duplicate review attempt by user {request.user.username} for place {place.name}")
         messages.error(request, 'You have already reviewed this place.')
         return redirect('places:place_detail', pk=place_id)
     
@@ -25,6 +31,7 @@ def add_review(request, place_id):
         
         # Validate rating
         if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+            logger.warning(f"Invalid rating {rating} submitted by user {request.user.username} for place {place.name}")
             raise ValidationError('Please provide a valid rating between 1 and 5.')
         
         # Create review
@@ -35,6 +42,7 @@ def add_review(request, place_id):
             comment=comment
         )
         
+        logger.info(f"Review created successfully by user {request.user.username} for place {place.name} with rating {rating}")
         messages.success(request, 'Your review has been added successfully!')
         
         # Return JSON response for AJAX requests
@@ -51,13 +59,15 @@ def add_review(request, place_id):
             })
             
     except ValidationError as e:
+        logger.warning(f"Validation error in review submission: {str(e)}")
         messages.error(request, str(e))
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'status': 'error',
                 'message': str(e)
             }, status=400)
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error adding review by user {request.user.username} for place {place.name}: {str(e)}", exc_info=True)
         messages.error(request, 'An error occurred while submitting your review.')
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({

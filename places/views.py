@@ -18,35 +18,51 @@ from utils.location_manager import get_user_location, update_user_location
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 import json
+import logging
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 def home(request):
-    # Get user location from session or IP
-    location = get_user_location(request)
-    user_location = None
-    
-    if 'lat' in location and 'lng' in location:
-        user_location = Point(location['lng'], location['lat'], srid=4326)
+    """Main home page view showing featured places"""
+    try:
+        logger.info(f"Home page accessed by user: {request.user.username if request.user.is_authenticated else 'anonymous'}")
+        
+        # Get user location from session or IP
+        location = get_user_location(request)
+        user_location = None
+        
+        if 'lat' in location and 'lng' in location:
+            user_location = Point(location['lng'], location['lat'], srid=4326)
+            logger.debug(f"User location determined: lat={location['lat']}, lng={location['lng']}")
 
-    # Get nearest places
-    featured_places = HalalPlace.objects.filter(
-        status='approved'
-    ).annotate(
-        average_rating=Round(Avg('reviews__rating'), 1)
-    )
+        # Get nearest places
+        featured_places = HalalPlace.objects.filter(
+            status='approved'
+        ).annotate(
+            average_rating=Round(Avg('reviews__rating'), 1)
+        )
 
-    # Add distance annotation only if user_location exists
-    if user_location:
-        featured_places = featured_places.annotate(
-            distance=Distance('location', user_location)
-        ).order_by('distance')[:6]
-    else:
-        featured_places = featured_places.order_by('-average_rating')[:6]
-    
-    return render(request, 'places/home.html', {
-        'featured_places': featured_places,
-    })
+        # Add distance annotation only if user_location exists
+        if user_location:
+            featured_places = featured_places.annotate(
+                distance=Distance('location', user_location)
+            ).order_by('distance')[:6]
+            logger.debug(f"Featured places ordered by distance from user location")
+        else:
+            featured_places = featured_places.order_by('-average_rating')[:6]
+            logger.debug(f"Featured places ordered by rating (no user location)")
+        
+        logger.info(f"Home page rendered with {featured_places.count()} featured places")
+        return render(request, 'places/home.html', {
+            'featured_places': featured_places,
+        })
+    except Exception as e:
+        logger.error(f"Error in home view: {str(e)}", exc_info=True)
+        return render(request, 'places/error.html', {
+            'error': 'Unable to load home page',
+            'details': str(e)
+        })
 
 def explore(request):
     # Get filter parameters
@@ -271,41 +287,58 @@ def upload_photo(photo):
 
 @login_required
 def submit_place(request):
-    if request.method == 'POST':
-        form = HalalPlaceForm(request.POST, request.FILES)
-        if form.is_valid():
-            place = form.save(commit=False)
-            place.status = 'pending'
-            place.submitted_by = request.user
-            
-            # Handle location from latitude and longitude
-            latitude = form.cleaned_data.get('latitude')
-            longitude = form.cleaned_data.get('longitude')
-            if latitude is not None and longitude is not None:
-                place.location = Point(longitude, latitude)
-            
-            # Handle multiple photos
-            photos = request.FILES.getlist('photos')
-            if photos:
-                photo_urls = []
-                for photo in photos:
-                    # Update the photo URL to include MEDIA_URL
-                    photo_url = upload_photo(photo)
-                    if not photo_url.startswith(('http://', 'https://')):
-                        photo_url = settings.MEDIA_URL + photo_url
-                    photo_urls.append(photo_url)
-                place.photo_urls = photo_urls
-            
-            place.save()
-            messages.success(request, 'Place submitted successfully! It will be reviewed by our team.')
-            return redirect('places:explore')
-    else:
-        form = HalalPlaceForm()
-    
-    return render(request, 'places/submit_place.html', {
-        'form': form,
-        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
-    })
+    """Handle place submission by authenticated users"""
+    try:
+        if request.method == 'POST':
+            logger.info(f"Place submission attempt by user: {request.user.username}")
+            form = HalalPlaceForm(request.POST, request.FILES)
+            if form.is_valid():
+                place = form.save(commit=False)
+                place.status = 'pending'
+                place.submitted_by = request.user
+                
+                # Handle location from latitude and longitude
+                latitude = form.cleaned_data.get('latitude')
+                longitude = form.cleaned_data.get('longitude')
+                if latitude is not None and longitude is not None:
+                    place.location = Point(longitude, latitude)
+                    logger.debug(f"Place location set: lat={latitude}, lng={longitude}")
+                
+                # Handle multiple photos
+                photos = request.FILES.getlist('photos')
+                if photos:
+                    logger.debug(f"Processing {len(photos)} photos for place submission")
+                    photo_urls = []
+                    for photo in photos:
+                        try:
+                            # Update the photo URL to include MEDIA_URL
+                            photo_url = upload_photo(photo)
+                            if not photo_url.startswith(('http://', 'https://')):
+                                photo_url = settings.MEDIA_URL + photo_url
+                            photo_urls.append(photo_url)
+                        except Exception as e:
+                            logger.error(f"Error uploading photo: {str(e)}")
+                            messages.error(request, f'Error uploading photo: {photo.name}')
+                    place.photo_urls = photo_urls
+                
+                place.save()
+                logger.info(f"Place '{place.name}' submitted successfully by user {request.user.username}")
+                messages.success(request, 'Place submitted successfully! It will be reviewed by our team.')
+                return redirect('places:explore')
+            else:
+                logger.warning(f"Invalid place submission form by user {request.user.username}: {form.errors}")
+                messages.error(request, 'Please correct the errors below.')
+        else:
+            form = HalalPlaceForm()
+        
+        return render(request, 'places/submit_place.html', {
+            'form': form,
+            'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+        })
+    except Exception as e:
+        logger.error(f"Error in submit_place view: {str(e)}", exc_info=True)
+        messages.error(request, 'An error occurred while submitting the place. Please try again.')
+        return redirect('places:home')
 
 def about(request):
     stats = {
