@@ -258,6 +258,7 @@ LOGGING = {
 # Override logging level based on DEBUG setting
 if DEBUG:
     LOGGING['handlers']['console']['level'] = 'DEBUG'
+    LOGGING['handlers']['file']['level'] = 'DEBUG'  # Enable DEBUG logs in files
     LOGGING['loggers']['django']['level'] = 'DEBUG'
     for logger_name in ['places', 'reviews', 'users', 'prayer_times', 'utils']:
         LOGGING['loggers'][logger_name]['level'] = 'DEBUG'
