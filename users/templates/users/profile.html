@@ -66,6 +66,7 @@
                 <div class="p-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
                     <p class="text-sm text-primary-600 dark:text-primary-400">{{ place.category|title }}</p>
+                    {% if place.reviews.count > 0 %}
                     <div class="mt-2 flex items-center">
                         <div class="flex items-center">
                             {% for i in "12345" %}
@@ -79,6 +80,7 @@
                             ({{ place.reviews.count }})
                         </span>
                     </div>
+                    {% endif %}
                     <a href="{% url 'places:place_detail' place.id %}" 
                        class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                         {% translate "View Details" %} →
