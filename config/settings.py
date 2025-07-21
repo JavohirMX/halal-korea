@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-import os
 from pathlib import Path
 from decouple import config
 
@@ -257,11 +256,11 @@ LOGGING = {
 
 # Override logging level based on DEBUG setting
 if DEBUG:
-    LOGGING['handlers']['console']['level'] = 'DEBUG'
-    LOGGING['handlers']['file']['level'] = 'DEBUG'  # Enable DEBUG logs in files
-    LOGGING['loggers']['django']['level'] = 'DEBUG'
+    LOGGING['handlers']['console']['level'] = 'INFO'
+    LOGGING['handlers']['file']['level'] = 'INFO'  # Enable DEBUG logs in files
+    LOGGING['loggers']['django']['level'] = 'INFO'
     for logger_name in ['places', 'reviews', 'users', 'prayer_times', 'utils']:
-        LOGGING['loggers'][logger_name]['level'] = 'DEBUG'
+        LOGGING['loggers'][logger_name]['level'] = 'INFO'
 else:
     # In production, log WARNING and above to console
     LOGGING['handlers']['console']['level'] = 'WARNING'
