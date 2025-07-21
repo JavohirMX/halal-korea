@@ -311,6 +311,435 @@ Examples:
 - **Remote**: Telegram channel (permanent storage)
 - **Logs**: `project_root/logs/backup.log`
 
+## Backup Restoration
+
+### Quick Restoration Guide
+
+The backup restoration process allows you to recover your database from any saved backup file. All backups are compressed PostgreSQL dump files that can be restored using standard PostgreSQL tools.
+
+### Prerequisites for Restoration
+
+Before starting restoration:
+
+1. **PostgreSQL access**: Ensure you have database admin privileges
+2. **Backup file**: Download backup from Telegram or use local copy
+3. **Target database**: Decide whether to restore to existing or new database
+4. **Application downtime**: Plan for temporary service interruption
+
+### Restoration Methods
+
+#### Method 1: Full Database Restoration (Recommended)
+
+Complete database replacement - **destroys existing data**:
+
+```bash
+# 1. Stop your Django application
+sudo systemctl stop your-django-app  # or kill process
+
+# 2. Download backup from Telegram (if needed)
+# Save the .sql.gz file to your backups/ directory
+
+# 3. Extract the backup file
+gunzip backups/backup_20240115_020000.sql.gz
+
+# 4. Drop existing database (CAUTION: This deletes all data!)
+dropdb -h localhost -U your_db_user halal_korea_db
+
+# 5. Create fresh database
+createdb -h localhost -U your_db_user halal_korea_db
+
+# 6. Restore from backup
+psql -h localhost -U your_db_user -d halal_korea_db < backups/backup_20240115_020000.sql
+
+# 7. Restart your Django application
+sudo systemctl start your-django-app
+```
+
+#### Method 2: Test Database Restoration
+
+Restore to a separate test database for verification:
+
+```bash
+# 1. Extract backup file
+gunzip -c backups/backup_20240115_020000.sql.gz > backups/backup_20240115_020000.sql
+
+# 2. Create test database
+createdb -h localhost -U your_db_user halal_korea_test
+
+# 3. Restore to test database
+psql -h localhost -U your_db_user -d halal_korea_test < backups/backup_20240115_020000.sql
+
+# 4. Verify restoration
+psql -h localhost -U your_db_user -d halal_korea_test -c "\dt"  # List tables
+psql -h localhost -U your_db_user -d halal_korea_test -c "SELECT COUNT(*) FROM places_halalplace;"
+```
+
+#### Method 3: Selective Data Restoration
+
+Restore specific tables or data:
+
+```bash
+# 1. Extract backup and create temporary database
+gunzip -c backups/backup_20240115_020000.sql.gz > backups/backup_20240115_020000.sql
+createdb -h localhost -U your_db_user temp_restore_db
+psql -h localhost -U your_db_user -d temp_restore_db < backups/backup_20240115_020000.sql
+
+# 2. Export specific table data
+pg_dump -h localhost -U your_db_user -d temp_restore_db \
+        --table=places_halalplace --data-only > specific_table.sql
+
+# 3. Restore specific data to main database
+psql -h localhost -U your_db_user -d halal_korea_db < specific_table.sql
+
+# 4. Clean up temporary database
+dropdb -h localhost -U your_db_user temp_restore_db
+```
+
+### Point-in-Time Recovery Scenarios
+
+#### Scenario 1: Data Corruption Recovery
+
+When you discover data corruption:
+
+```bash
+# 1. Identify the last known good backup
+ls -la backups/ | head -10
+
+# 2. Check backup contents before restoration
+gunzip -c backups/backup_20240115_020000.sql.gz | head -50
+
+# 3. Create backup of current state (even if corrupted)
+python manage.py backup_database --force
+
+# 4. Restore from good backup (follow Method 1)
+```
+
+#### Scenario 2: Accidental Data Deletion
+
+When important data has been accidentally deleted:
+
+```bash
+# 1. Immediately stop write operations to prevent further changes
+# 2. Identify backup containing the deleted data
+# 3. Use Method 3 (Selective Restoration) to recover specific data
+# 4. Verify data integrity after restoration
+```
+
+#### Scenario 3: Migration Rollback
+
+When a Django migration causes issues:
+
+```bash
+# 1. Find pre-migration backup
+ls -la backups/ | grep "$(date -d 'yesterday' +%Y%m%d)"
+
+# 2. Restore database to pre-migration state
+# 3. Fix migration issues
+# 4. Re-run migrations after fixes
+```
+
+### Restoration Verification
+
+#### Post-Restoration Checks
+
+After any restoration, verify data integrity:
+
+```python
+# Django shell verification commands
+python manage.py shell
+
+# Check record counts
+from places.models import HalalPlace
+from users.models import CustomUser
+from reviews.models import Review
+
+print(f"Places: {HalalPlace.objects.count()}")
+print(f"Users: {CustomUser.objects.count()}")
+print(f"Reviews: {Review.objects.count()}")
+
+# Check recent data
+recent_places = HalalPlace.objects.order_by('-created_at')[:5]
+for place in recent_places:
+    print(f"{place.name} - {place.created_at}")
+```
+
+#### Application Testing
+
+```bash
+# 1. Run Django tests
+python manage.py test
+
+# 2. Check database migrations
+python manage.py showmigrations
+
+# 3. Verify admin interface
+python manage.py createsuperuser  # if needed
+
+# 4. Test critical functionality
+# - User authentication
+# - Place creation/editing
+# - Review submission
+# - Search functionality
+```
+
+### Emergency Recovery Procedures
+
+#### Complete System Failure Recovery
+
+When your entire system needs restoration:
+
+```bash
+# 1. Set up fresh server/environment
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Configure environment variables
+cp .env.example .env
+# Edit .env with your settings
+
+# 4. Download latest backup from Telegram
+# 5. Create database and restore
+createdb -h localhost -U postgres halal_korea_db
+gunzip -c backup_latest.sql.gz | psql -h localhost -U postgres -d halal_korea_db
+
+# 6. Run Django setup
+python manage.py migrate --run-syncdb
+python manage.py collectstatic --noinput
+
+# 7. Start application
+python manage.py runserver
+```
+
+#### Automated Recovery Script
+
+Create a recovery script for common scenarios:
+
+```bash
+#!/bin/bash
+# recovery.sh - Automated database recovery script
+
+set -e  # Exit on any error
+
+BACKUP_FILE="$1"
+DB_NAME="${DB_NAME:-halal_korea_db}"
+DB_USER="${DB_USER:-postgres}"
+DB_HOST="${DB_HOST:-localhost}"
+
+if [ -z "$BACKUP_FILE" ]; then
+    echo "Usage: $0 <backup_file.sql.gz>"
+    echo "Available backups:"
+    ls -la backups/backup_*.sql.gz
+    exit 1
+fi
+
+echo "🚨 WARNING: This will replace all data in $DB_NAME"
+read -p "Continue? (y/N): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 1
+fi
+
+echo "📋 Starting recovery process..."
+
+# 1. Create backup of current state
+echo "📦 Creating emergency backup of current state..."
+pg_dump -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" | gzip > "emergency_backup_$(date +%Y%m%d_%H%M%S).sql.gz"
+
+# 2. Stop Django application (adjust as needed)
+echo "🛑 Stopping Django application..."
+sudo systemctl stop halal-korea || echo "Could not stop service (may not be running)"
+
+# 3. Drop and recreate database
+echo "🗑️ Dropping existing database..."
+dropdb -h "$DB_HOST" -U "$DB_USER" "$DB_NAME"
+
+echo "🔨 Creating fresh database..."
+createdb -h "$DB_HOST" -U "$DB_USER" "$DB_NAME"
+
+# 4. Restore from backup
+echo "📥 Restoring from backup: $BACKUP_FILE"
+if [[ "$BACKUP_FILE" == *.gz ]]; then
+    gunzip -c "$BACKUP_FILE" | psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME"
+else
+    psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" < "$BACKUP_FILE"
+fi
+
+# 5. Run Django migrations if needed
+echo "🔄 Running Django migrations..."
+python manage.py migrate --run-syncdb
+
+# 6. Restart application
+echo "🚀 Starting Django application..."
+sudo systemctl start halal-korea || echo "Could not start service automatically"
+
+echo "✅ Recovery completed successfully!"
+echo "📊 Verifying restoration..."
+
+# Basic verification
+python manage.py shell -c "
+from places.models import HalalPlace
+from users.models import CustomUser
+print(f'✅ Places: {HalalPlace.objects.count()}')
+print(f'✅ Users: {CustomUser.objects.count()}')
+print('✅ Database restoration verified')
+"
+```
+
+Make the script executable:
+```bash
+chmod +x recovery.sh
+
+# Usage examples
+./recovery.sh backups/backup_20240115_020000.sql.gz
+./recovery.sh emergency_backup_20240116_143000.sql.gz
+```
+
+### Best Practices for Restoration
+
+#### Before Restoration
+
+1. **Create emergency backup** of current state
+2. **Stop all write operations** to prevent data conflicts
+3. **Document the reason** for restoration in logs
+4. **Notify stakeholders** about potential downtime
+5. **Test restoration process** in staging environment first
+
+#### During Restoration
+
+1. **Monitor the process** for errors or timeouts
+2. **Keep detailed logs** of all commands executed
+3. **Verify each step** before proceeding to next
+4. **Have rollback plan** ready in case of issues
+
+#### After Restoration
+
+1. **Verify data integrity** through application testing
+2. **Check all critical functionality** works correctly
+3. **Monitor application logs** for unusual errors
+4. **Update team** on completion status
+5. **Document lessons learned** for future reference
+
+### Common Restoration Issues
+
+#### Issue 1: Permission Denied
+```
+ERROR: permission denied for database "halal_korea_db"
+```
+**Solution**: Ensure database user has CREATEDB privileges:
+```sql
+ALTER USER your_db_user CREATEDB;
+```
+
+#### Issue 2: Database Still in Use
+```
+ERROR: database "halal_korea_db" is being accessed by other users
+```
+**Solution**: Terminate active connections:
+```sql
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'halal_korea_db';
+```
+
+#### Issue 3: Disk Space Issues
+```
+ERROR: could not write to file: No space left on device
+```
+**Solution**: 
+- Check disk space: `df -h`
+- Clean up old backups: `rm -f backups/backup_old_*.sql.gz`
+- Use streaming restoration for large backups
+
+#### Issue 4: Character Encoding Problems
+```
+ERROR: invalid byte sequence for encoding "UTF8"
+```
+**Solution**: Specify encoding during restoration:
+```bash
+psql -h localhost -U user -d database --set client_encoding=UTF8 < backup.sql
+```
+
+### Automation and Monitoring
+
+#### Restoration Health Checks
+
+Create automated checks to verify restoration success:
+
+```python
+# restoration_health_check.py
+import os
+import sys
+import django
+from datetime import datetime, timedelta
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
+
+from places.models import HalalPlace
+from users.models import CustomUser
+from reviews.models import Review
+
+def check_restoration_health():
+    """Verify database health after restoration"""
+    
+    checks = []
+    
+    # Check record counts
+    place_count = HalalPlace.objects.count()
+    user_count = CustomUser.objects.count()
+    review_count = Review.objects.count()
+    
+    checks.append(f"✅ Places: {place_count}")
+    checks.append(f"✅ Users: {user_count}")  
+    checks.append(f"✅ Reviews: {review_count}")
+    
+    # Check for recent data (should exist if backup is recent)
+    recent_threshold = datetime.now() - timedelta(days=7)
+    recent_places = HalalPlace.objects.filter(created_at__gte=recent_threshold).count()
+    checks.append(f"✅ Recent places (7 days): {recent_places}")
+    
+    # Check database relationships
+    try:
+        # Test a complex query
+        places_with_reviews = HalalPlace.objects.filter(review__isnull=False).distinct().count()
+        checks.append(f"✅ Places with reviews: {places_with_reviews}")
+    except Exception as e:
+        checks.append(f"❌ Relationship check failed: {e}")
+    
+    # Check critical functionality
+    try:
+        # Test user authentication setup
+        superusers = CustomUser.objects.filter(is_superuser=True).count()
+        checks.append(f"✅ Superusers: {superusers}")
+    except Exception as e:
+        checks.append(f"❌ User check failed: {e}")
+    
+    print("🔍 Database Health Check Results:")
+    for check in checks:
+        print(f"  {check}")
+    
+    # Overall health score
+    passed = len([c for c in checks if c.startswith("✅")])
+    total = len(checks)
+    print(f"\n📊 Health Score: {passed}/{total} checks passed")
+    
+    if passed == total:
+        print("🎉 Database restoration verified successfully!")
+        return True
+    else:
+        print("⚠️  Some checks failed - investigate issues")
+        return False
+
+if __name__ == "__main__":
+    success = check_restoration_health()
+    sys.exit(0 if success else 1)
+```
+
+Run after restoration:
+```bash
+python restoration_health_check.py
+```
+
+This comprehensive restoration guide ensures you can confidently recover your Halal Korea database from any backup, whether dealing with routine maintenance, emergency recovery, or testing scenarios.
+
 ## Monitoring and Maintenance
 
 ### Log Monitoring
