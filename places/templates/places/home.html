@@ -36,13 +36,22 @@
                          {% translate "Search" %} 
                     </button>
                 </form>
-                <!-- Button to find nearest places -->
-                <div class="mt-4 text-center">
-                    <button id="find-nearest-btn"
-                            class="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 border border-primary-500 rounded-lg text-sm sm:text-base font-medium text-white gradient-bg-hover shadow-lg">
-                        <i class="fas fa-map-marker-alt mr-2"></i> {% translate "Find Nearest Places" %}
-                    </button>
-                </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="mt-8 flex items-center justify-center">
+                <div class="border-t border-white/30 flex-1 max-w-20"></div>
+                <span class="px-4 text-white/70 text-sm font-medium">{% translate "or" %}</span>
+                <div class="border-t border-white/30 flex-1 max-w-20"></div>
+            </div>
+            
+            <!-- Location Button -->
+            <div class="mt-6 text-center">
+                <button id="find-nearest-btn"
+                        class="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold btn-location-creative shadow-xl">
+                    <i class="fas fa-map-marker-alt mr-3 text-lg"></i> 
+                    {% translate "Find Nearest Places" %}
+                </button>
             </div>
         </div>
     </div>
