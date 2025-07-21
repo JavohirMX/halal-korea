@@ -14,7 +14,7 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
-from utils.location_manager import get_user_location, update_user_location
+from utils.location_manager import get_user_location_context, update_user_location
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 import json
@@ -24,38 +24,43 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 def home(request):
-    """Main home page view showing featured places"""
+    """Main home page view showing featured places with international user support"""
     try:
         logger.info(f"Home page accessed by user: {request.user.username if request.user.is_authenticated else 'anonymous'}")
         
-        # Get user location from session or IP
-        location = get_user_location(request)
+        # Get user location context (includes international user detection)
+        location_context = get_user_location_context(request)
+        location = location_context['location']
+        is_in_korea = location_context['is_in_korea']
         user_location = None
         
-        if 'lat' in location and 'lng' in location:
+        if 'lat' in location and 'lng' in location and not location.get('is_fallback'):
             user_location = Point(location['lng'], location['lat'], srid=4326)
             logger.debug(f"User location determined: lat={location['lat']}, lng={location['lng']}")
 
-        # Get nearest places
+        # Get featured places with different logic for Korea vs international users
         featured_places = HalalPlace.objects.filter(
             status='approved'
         ).annotate(
             average_rating=Round(Avg('reviews__rating'), 1)
         )
 
-        # Add distance annotation only if user_location exists
-        if user_location:
+        # Different sorting logic based on user location
+        if is_in_korea and user_location:
+            # For Korea users: distance-based recommendations
             featured_places = featured_places.annotate(
                 distance=Distance('location', user_location)
             ).order_by('distance')[:6]
-            logger.debug(f"Featured places ordered by distance from user location")
+            logger.debug("Featured places ordered by distance for Korea user")
         else:
-            featured_places = featured_places.order_by('-average_rating')[:6]
-            logger.debug(f"Featured places ordered by rating (no user location)")
+            # For international users: popular/highly-rated places
+            featured_places = featured_places.order_by('-average_rating', '-created_at')[:6]
+            logger.debug("Featured places ordered by rating for international user")
         
         logger.info(f"Home page rendered with {featured_places.count()} featured places")
         return render(request, 'places/home.html', {
             'featured_places': featured_places,
+            'location_context': location_context,
         })
     except Exception as e:
         logger.error(f"Error in home view: {str(e)}", exc_info=True)
@@ -68,14 +73,17 @@ def explore(request):
     # Get filter parameters
     category = request.GET.get('category')
     search_query = request.GET.get('q', '')
+    city_filter = request.GET.get('city', '')  # New city filter
     sort = request.GET.get('sort', 'distance')  # Default to distance sorting
     page = request.GET.get('page', 1)
     
-    # Get user location
-    location = get_user_location(request)
+    # Get user location context
+    location_context = get_user_location_context(request)
+    location = location_context['location']
+    is_in_korea = location_context['is_in_korea']
     user_location = None
     
-    if 'lat' in location and 'lng' in location:
+    if 'lat' in location and 'lng' in location and not location.get('is_fallback'):
         user_location = Point(location['lng'], location['lat'], srid=4326)
 
     # Base queryset
@@ -89,6 +97,10 @@ def explore(request):
         else:
             places = places.filter(category=category)
     
+    # City filtering (for trip planning)
+    if city_filter:
+        places = places.filter(address__icontains=city_filter)
+    
     if search_query:
         places = places.filter(
             Q(name__icontains=search_query) |
@@ -101,17 +113,21 @@ def explore(request):
         average_rating=Round(Avg('reviews__rating'), 1)
     )
     
-    # Location-based sorting
-    if user_location:
+    # Enhanced sorting logic for international users
+    if is_in_korea and user_location:
+        # Korea users get distance-based sorting
         places = places.annotate(distance=Distance('location', user_location))
         if sort == 'rating':
             places = places.order_by('-average_rating', 'name')
-        else:  # Default to distance sorting
+        else:  # Default to distance sorting for Korea users
             places = places.order_by('distance')
     else:
-        if sort == 'rating':
-            places = places.order_by('-average_rating', 'name')
-        else:  # Default to rating if no location
+        # International users get rating-based sorting by default
+        if sort == 'distance' and user_location:
+            # Still allow distance sorting if they have location
+            places = places.annotate(distance=Distance('location', user_location))
+            places = places.order_by('distance')
+        else:  # Default to rating for international users
             places = places.order_by('-average_rating', 'name')
     
     # Pagination
@@ -131,6 +147,7 @@ def explore(request):
         places_html = render_to_string('places/partials/place_list.html', {
             'places': paginated_places,
             'user_location': user_location,
+            'location_context': location_context,
         })
         
         # Return JSON response with HTML and pagination info
@@ -148,10 +165,12 @@ def explore(request):
         'current_filters': {
             'category': category,
             'search_query': search_query,
+            'city': city_filter,  # Include city filter in current filters
             'sort': sort,
         },
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
         'user_location': user_location,
+        'location_context': location_context,
     })
 
 def get_places_json(request):
@@ -163,10 +182,10 @@ def get_places_json(request):
     page = request.GET.get('page', 1)
     
     # Get user location
-    location = get_user_location(request)
+    location = get_user_location_context(request)['location']
     user_location = None
     
-    if 'lat' in location and 'lng' in location:
+    if 'lat' in location and 'lng' in location and not location.get('is_fallback'):
         user_location = Point(location['lng'], location['lat'], srid=4326)
 
     # Base queryset
@@ -269,11 +288,15 @@ def place_detail(request, pk):
         average_rating=Round(Avg('reviews__rating'), 1)
     ).get(pk=place.pk)
     
+    # Get user location context for proper map link styling
+    location_context = get_user_location_context(request)
+    
     return render(request, 'places/place_detail.html', {
         'place': place,
         'reviews': reviews,
         'user_has_reviewed': user_has_reviewed,
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+        'location_context': location_context,
     })
 
 def upload_photo(photo):
@@ -361,16 +384,23 @@ def set_location(request):
         lat = data.get('latitude')
         lng = data.get('longitude')
         city = data.get('city')
+        country = data.get('country')
         
         if not (lat and lng) and not city:
             return JsonResponse({'error': 'Missing location data'}, status=400)
             
+        # Prepare location data
+        location_data = {}
+        if lat and lng:
+            location_data['lat'] = lat
+            location_data['lng'] = lng
+        if city:
+            location_data['city'] = city
+        if country:
+            location_data['country'] = country
+            
         # Update location in session
-        location = update_user_location(request, {  # noqa: F841
-            'lat': lat,
-            'lng': lng,
-            'city': city
-        })
+        location = update_user_location(request, location_data)  # noqa: F841
             
         return JsonResponse({'success': True})
     except Exception as e:

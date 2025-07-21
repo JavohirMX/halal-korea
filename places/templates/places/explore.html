@@ -26,19 +26,71 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Explore Halal Places" %}</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Discover halal restaurants, markets, and prayer spaces across South Korea" %}</p>
+        {% if location_context.is_in_korea %}
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Explore Halal Places" %}</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Discover halal restaurants, markets, and prayer spaces near you" %}</p>
+        {% else %}
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Halal Places in Korea" %}</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Plan your halal journey across South Korea - browse by city and region" %}</p>
+            <!-- Trip Planning Info -->
+            <div class="mt-4 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700 dark:text-blue-300">
+                            {% translate "Planning a trip to Korea? Browse places by city to create your perfect halal itinerary." %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
-    <!-- Update Location Button -->
-    <div class="mb-4 flex justify-between">
-        <button id="update-location-btn" type="button" class="inline-flex items-center px-4 py-2 border border-primary-500 rounded-lg text-base font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition">
-            <i class="fas fa-location-arrow mr-2"></i> {% translate "Update My Location" %}
-        </button>
+    <!-- Location/Action Buttons -->
+    <div class="mb-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            {% if location_context.is_in_korea %}
+                <button id="update-location-btn" type="button"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
+                >
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </span>
+                    <span>{% translate "Update My Location" %}</span>
+                </button>
+            {% else %}
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                        <i class="fas fa-globe-americas mr-1"></i>
+                        {% translate "Browsing from:" %} {{ location_context.location.city|default:"International" }}
+                    </span>
+                    <button id="update-location-btn" type="button" class="text-primary-600 hover:text-primary-800 text-sm">
+                        {% translate "Change" %}
+                    </button>
+                </div>
+            {% endif %}
+            
+            <!-- Seoul Default Button (Development/Testing) - Only for international users -->
+            {% if not location_context.is_in_korea %}
+            <button id="set-seoul-btn" type="button" 
+                    class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    title="{% translate 'Set location to Seoul' %}">
+                <i class="fas fa-map-pin mr-1 text-xs"></i>
+                Seoul
+            </button>
+            {% endif %}
+        </div>
+        
         <!-- View Map Button (Visible until lg breakpoint) -->
-        <button id="view-map-btn" type="button" 
-                class="lg:hidden inline-flex items-center px-4 py-2 border border-primary-500 rounded-lg text-base font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition">
-            <i class="fas fa-map-marked-alt mr-2"></i> {% translate "View Map" %}
+        <button id="view-map-btn" type="button"
+            class="lg:hidden inline-flex items-center gap-2 px-5 py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
+        >
+            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
+                <i class="fas fa-map-marked-alt"></i>
+            </span>
+            <span>{% translate "View Map" %}</span>
         </button>
     </div>
 
@@ -82,6 +134,35 @@
                         </div>
                     </div>
                 </div>
+                <!-- City Filter (for trip planning) -->
+                {% if not location_context.is_in_korea %}
+                <div class="mb-4">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-map-marker-alt text-gray-400"></i>
+                        </div>
+                        <select name="city" 
+                                class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
+                            <option value="">{% translate "All Cities" %}</option>
+                            <option value="Seoul" {% if request.GET.city == 'Seoul' %}selected{% endif %}>Seoul</option>
+                            <option value="Busan" {% if request.GET.city == 'Busan' %}selected{% endif %}>Busan</option>
+                            <option value="Incheon" {% if request.GET.city == 'Incheon' %}selected{% endif %}>Incheon</option>
+                            <option value="Ansan" {% if request.GET.city == 'Ansan' %}selected{% endif %}>Ansan</option>
+                            <option value="Seongnam" {% if request.GET.city == 'Seongnam' %}selected{% endif %}>Seongnam</option>
+                            <option value="Bucheon" {% if request.GET.city == 'Bucheon' %}selected{% endif %}>Bucheon</option>
+                            <option value="Yangsan" {% if request.GET.city == 'Yangsan' %}selected{% endif %}>Yangsan</option>
+                            <option value="Gyeongju" {% if request.GET.city == 'Gyeongju' %}selected{% endif %}>Gyeongju</option>
+                            <option value="Cheonan" {% if request.GET.city == 'Cheonan' %}selected{% endif %}>Cheonan</option>
+                            <option value="Cheongju" {% if request.GET.city == 'Cheongju' %}selected{% endif %}>Cheongju</option>
+                            <option value="Anyang" {% if request.GET.city == 'Anyang' %}selected{% endif %}>Anyang</option>
+                            <option value="Gimpo" {% if request.GET.city == 'Gimpo' %}selected{% endif %}>Gimpo</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
                 <!-- Sorting Options -->
                 <div>
                     <div class="relative">
@@ -90,8 +171,13 @@
                         </div>
                         <select name="sort" 
                                 class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
-                            <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
-                            <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
+                            {% if location_context.is_in_korea %}
+                                <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
+                                <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
+                            {% else %}
+                                <option value="rating" {% if request.GET.sort == 'rating' or not request.GET.sort %}selected{% endif %}>{% translate "Most Popular" %}</option>
+                                <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "By Location" %}</option>
+                            {% endif %}
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                             <i class="fas fa-chevron-down text-gray-400"></i>
@@ -124,8 +210,13 @@
                     </div>
                     <select name="sort" 
                             class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
-                        <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
-                        <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
+                        {% if location_context.is_in_korea %}
+                            <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
+                            <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
+                        {% else %}
+                            <option value="rating" {% if request.GET.sort == 'rating' or not request.GET.sort %}selected{% endif %}>{% translate "Most Popular" %}</option>
+                            <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "By Location" %}</option>
+                        {% endif %}
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <i class="fas fa-chevron-down text-gray-400"></i>
@@ -575,6 +666,41 @@
 </script>
 
 <script>
+// Seoul Default Button AJAX (only for international users)
+{% if not location_context.is_in_korea %}
+document.getElementById('set-seoul-btn').onclick = function() {
+    // Get CSRF token from the hidden form
+    const csrfToken = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
+    
+    // Seoul coordinates
+    const seoulLat = 37.5665;
+    const seoulLng = 126.9780;
+    
+    fetch("{% url 'places:set_location' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            latitude: seoulLat,
+            longitude: seoulLng,
+            city: 'Seoul',
+            country: 'South Korea'
+        })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('{% translate "Failed to set location to Seoul" %}');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('{% translate "Error setting location to Seoul" %}');
+    });
+};
+{% endif %}
+
 // Update Location Button AJAX
 document.getElementById('update-location-btn').onclick = function() {
     if (navigator.geolocation) {

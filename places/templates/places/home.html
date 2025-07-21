@@ -18,12 +18,28 @@
 <div class="relative bg-gradient-to-br from-green-400 to-green-600 overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
         <div class="text-center">
-            <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
-                {% translate "Find Halal Places in Korea" %}
-            </h1>
-            <p class="mt-3 max-w-md mx-auto text-base text-primary-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                {% translate "Discover halal restaurants, markets, and prayer spaces across South Korea." %}
-            </p>
+            {% if location_context.is_in_korea %}
+                <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                    {% translate "Find Halal Places in Korea" %}
+                </h1>
+                <p class="mt-3 max-w-md mx-auto text-base text-primary-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                    {% translate "Discover halal restaurants, markets, and prayer spaces near you." %}
+                </p>
+            {% else %}
+                <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                    {% translate "Planning Your Halal Journey to Korea?" %}
+                </h1>
+                <p class="mt-3 max-w-md mx-auto text-base text-primary-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                    {% translate "Discover verified halal restaurants, markets, and prayer spaces across South Korea for your trip." %}
+                </p>
+                <!-- Trip Planning Banner -->
+                <div class="mt-6 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 max-w-2xl mx-auto">
+                    <p class="text-white text-sm sm:text-base">
+                        <i class="fas fa-plane mr-2"></i>
+                        {% translate "Planning a trip to Korea? We'll help you find the best halal options!" %}
+                    </p>
+                </div>
+            {% endif %}
             
             <!-- Search Bar -->
             <div class="mt-10 max-w-xl mx-auto px-4 sm:px-6">
@@ -31,7 +47,7 @@
                     <input type="text" 
                            name="q"
                            class="flex-1 min-w-0 rounded-l-lg px-3 sm:px-4 py-2 sm:py-3 border-0 focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 text-sm sm:text-base" 
-                           placeholder="{% translate 'Search places...' %}">
+                           placeholder="{% if location_context.is_in_korea %}{% translate 'Search places...' %}{% else %}{% translate 'Search places in Korea...' %}{% endif %}">
                     <button type="submit" class="shrink-0 inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 border border-transparent text-sm sm:text-base font-medium rounded-r-lg text-white gradient-bg-hover">
                          {% translate "Search" %} 
                     </button>
@@ -45,14 +61,24 @@
                 <div class="border-t border-white/30 flex-1 max-w-20"></div>
             </div>
             
-            <!-- Location Button -->
-            <div class="mt-6 text-center">
-                <button id="find-nearest-btn"
-                        class="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold btn-location-creative shadow-xl">
-                    <i class="fas fa-map-marker-alt mr-3 text-lg"></i> 
-                    {% translate "Find Nearest Places" %}
-                </button>
-            </div>
+            <!-- Location/Browse Button -->
+            {% if location_context.is_in_korea %}
+                <div class="mt-6 text-center">
+                    <button id="find-nearest-btn"
+                    class="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold btn-location-creative shadow-xl">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        {% translate "Find Places Near Me" %}
+                    </button>
+                </div>
+            {% else %}
+                <div class="mt-6 text-center">
+                    <a href="{% url 'places:explore' %}" 
+                    class="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold btn-location-creative shadow-xl">
+                        <i class="fas fa-compass mr-2"></i>
+                        {% translate "Browse All Places" %}
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -69,7 +95,13 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Restaurants" %}</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% translate "Find halal restaurants near you" %}</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {% if location_context.is_in_korea %}
+                            {% translate "Find halal restaurants near you" %}
+                        {% else %}
+                            {% translate "Find halal restaurants in Korea" %}
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </a>
@@ -83,7 +115,13 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Markets" %}</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% translate "Discover halal grocery stores" %}</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {% if location_context.is_in_korea %}
+                            {% translate "Discover halal grocery stores" %}
+                        {% else %}
+                            {% translate "Find halal markets for your trip" %}
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </a>
@@ -97,7 +135,13 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Mosques & Prayer Rooms" %}</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% translate "Find nearby prayer spaces" %}</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {% if location_context.is_in_korea %}
+                            {% translate "Find nearby prayer spaces" %}
+                        {% else %}
+                            {% translate "Prayer spaces for your journey" %}
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </a>
@@ -122,7 +166,11 @@
 <div class="bg-gray-50 dark:bg-gray-900 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">
-            {% translate "Featured Places" %}
+            {% if location_context.is_in_korea %}
+                {% translate "Featured Places" %}
+            {% else %}
+                {% translate "Popular Places to Visit" %}
+            {% endif %}
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for place in featured_places %}

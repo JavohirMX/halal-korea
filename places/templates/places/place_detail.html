@@ -215,27 +215,51 @@
                 </div>
 
                 <!-- Map Links -->
-                <div class="mt-6 flex flex-wrap gap-4">
+                <div class="mt-6 flex flex-wrap gap-3">
                     {% if place.google_map_link %}
                     <a href="{{ place.google_map_link }}" target="_blank" 
-                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                       class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors border border-blue-200 dark:border-blue-700"
+                       title="{% translate 'Open in Google Maps' %}">
                         <i class="fab fa-google mr-2"></i>
                         Google Maps
                     </a>
                     {% endif %}
-                    {% if place.naver_map_link %}
-                    <a href="{{ place.naver_map_link }}" target="_blank" 
-                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <i class="fab fa-naver mr-2"></i>
-                        Naver Maps
-                    </a>
-                    {% endif %}
-                    {% if place.kakao_map_link %}
-                    <a href="{{ place.kakao_map_link }}" target="_blank" 
-                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <i class="fab fa-kakao mr-2"></i>
-                        Kakao Maps
-                    </a>
+                    {% if location_context.is_in_korea %}
+                        {% if place.naver_map_link %}
+                        <a href="{{ place.naver_map_link }}" target="_blank" 
+                           class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800/50 transition-colors border border-green-200 dark:border-green-700">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            Naver Maps
+                        </a>
+                        {% endif %}
+                        {% if place.kakao_map_link %}
+                        <a href="{{ place.kakao_map_link }}" target="_blank" 
+                           class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800/50 transition-colors border border-yellow-200 dark:border-yellow-700">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            Kakao Maps
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        <!-- For international users, show Korean map options with explanation -->
+                        {% if place.naver_map_link or place.kakao_map_link %}
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{% translate "Korean maps:" %}</span>
+                            {% if place.naver_map_link %}
+                            <a href="{{ place.naver_map_link }}" target="_blank" 
+                               class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-200 dark:border-gray-600"
+                               title="{% translate 'Korean navigation app' %}">
+                                Naver
+                            </a>
+                            {% endif %}
+                            {% if place.kakao_map_link %}
+                            <a href="{{ place.kakao_map_link }}" target="_blank" 
+                               class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-200 dark:border-gray-600"
+                               title="{% translate 'Korean navigation app' %}">
+                                Kakao
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

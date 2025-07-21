@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .utils import get_prayer_times, get_prayer_times_ll, get_fallback_prayer_times
-from utils.location_manager import get_user_location, update_user_location
+from utils.location_manager import get_user_location_context, get_default_korea_location, update_user_location
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import json
@@ -17,12 +17,12 @@ def prayer_times(request):
         calculation_method = request.session.get('calculation_method', 3)
         asr_method = request.session.get('asr_method', 1)
         
-        # Get location from session or IP
-        location = get_user_location(request)
+        # Get location context (includes is_in_korea detection)
+        location_context = get_user_location_context(request)
         
         # Initial context with loading state
         context = {
-            'location': location,
+            'location_context': location_context,
             'prayer_settings': {
                 'calculation_method': calculation_method,
                 'asr_method': asr_method
@@ -40,42 +40,107 @@ def prayer_times(request):
 
 @require_http_methods(["GET"])
 def get_prayer_times_data(request):
-    """API endpoint to get prayer times data"""
+    """API endpoint to get prayer times data - now supports international users"""
     try:
         calculation_method = request.session.get('calculation_method', 3)
         asr_method = request.session.get('asr_method', 1)
-        location = get_user_location(request)
+        location_context = get_user_location_context(request)
+        location = location_context['location']
+        is_in_korea = location_context['is_in_korea']
         
-        if 'lat' in location and 'lng' in location:
-            data = get_prayer_times_ll(
+        # Primary prayer times - user's actual location
+        primary_data = None
+        primary_location_info = None
+        
+        if 'lat' in location and 'lng' in location and not location.get('is_fallback'):
+            # Use coordinates for accurate prayer times
+            primary_data = get_prayer_times_ll(
                 float(location['lat']), 
                 float(location['lng']), 
                 method=calculation_method, 
                 school=asr_method
             )
-            location_info = {
-                "city": data.get("data", {}).get("meta", {}).get("timezone", "").split("/")[-1],
-                "country": "South Korea",
+            primary_location_info = {
+                "city": location.get('city', 'Your Location'),
+                "country": location.get('country', 'Unknown'),
                 "latitude": location['lat'],
                 "longitude": location['lng']
             }
-        else:
-            location_info = {
-                "city": location['city'],
-                "country": "South Korea"
-            }
-            data = get_prayer_times(
-                location_info["city"], 
-                location_info["country"], 
+        elif location.get('city') and location.get('city') != 'Unknown':
+            # Use city-based lookup
+            primary_data = get_prayer_times(
+                location['city'], 
+                location.get('country', 'Unknown'), 
                 method=calculation_method, 
                 school=asr_method
             )
-            
-        return JsonResponse({
+            primary_location_info = {
+                "city": location['city'],
+                "country": location.get('country', 'Unknown')
+            }
+        
+        # For international users, also provide Korea prayer times
+        korea_data = None
+        korea_location_info = None
+        
+        if not is_in_korea and primary_data:
+            try:
+                korea_location = get_default_korea_location()
+                korea_data = get_prayer_times_ll(
+                    korea_location['lat'],
+                    korea_location['lng'],
+                    method=calculation_method,
+                    school=asr_method
+                )
+                korea_location_info = {
+                    "city": korea_location['city'],
+                    "country": korea_location['country'],
+                    "latitude": korea_location['lat'],
+                    "longitude": korea_location['lng']
+                }
+            except Exception as e:
+                logger.warning(f"Failed to get Korea prayer times for international user: {str(e)}")
+        
+        # If we couldn't get user's location prayer times, fall back
+        if not primary_data:
+            if is_in_korea:
+                # User is in Korea but we couldn't get specific location
+                korea_location = get_default_korea_location()
+                primary_data = get_prayer_times_ll(
+                    korea_location['lat'],
+                    korea_location['lng'],
+                    method=calculation_method,
+                    school=asr_method
+                )
+                primary_location_info = {
+                    "city": korea_location['city'],
+                    "country": korea_location['country']
+                }
+            else:
+                # International user with no location data
+                primary_data = get_fallback_prayer_times()
+                primary_location_info = {
+                    "city": "Unknown Location",
+                    "country": "Unknown"
+                }
+        
+        response_data = {
             'success': True,
-            'data': data["data"],
-            'location': location_info
-        })
+            'data': primary_data["data"],
+            'location': primary_location_info,
+            'is_in_korea': is_in_korea,
+            'user_type': location_context['user_type']
+        }
+        
+        # Add Korea reference data for international users
+        if not is_in_korea and korea_data:
+            response_data['korea_reference'] = {
+                'data': korea_data["data"],
+                'location': korea_location_info
+            }
+            
+        return JsonResponse(response_data)
+        
     except Exception as e:
         logger.error(f"Error in get_prayer_times_data: {str(e)}")
         return JsonResponse({
