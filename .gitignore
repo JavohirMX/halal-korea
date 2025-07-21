@@ -86,4 +86,8 @@ npm-debug.log
 
 # Project specific
 media/places/photos/*
-!media/places/photos/.gitkeep 
+
+
+# Database backups
+backups/
+logs/backup.log 
