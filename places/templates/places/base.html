@@ -287,26 +287,45 @@
                     </div>
 
                     <!-- Desktop Menu -->
-                    <div class="hidden lg:ml-4 xl:ml-6 lg:flex lg:space-x-4 xl:space-x-8">
+                    <div class="hidden xl:ml-6 xl:flex xl:space-x-8">
                         <a href="{% url 'places:explore' %}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-search mr-2"></i>{% translate "Explore" %}
                         </a>
                         <a href="{% url 'places:submit_place' %}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-plus-circle mr-2"></i>{% translate "Submit Place" %}
                         </a>
                         <a href="{% url 'places:about' %}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-info-circle mr-2"></i>{% translate "About" %}
                         </a>
                         <a href="{% url 'places:donate' %}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-heart mr-2"></i>{% translate "Donate" %}
                         </a>
                         <a href="{% url 'prayer_times:prayer_times' %}" 
-                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 xl:px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-clock mr-2"></i>{% translate "Prayer Times" %}
+                        </a>
+                    </div>
+                    
+                    <!-- Compact Desktop Menu for lg screens -->
+                    <div class="hidden lg:ml-3 lg:flex lg:space-x-2 xl:hidden">
+                        <a href="{% url 'places:explore' %}" 
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200"
+                           title="{% translate 'Explore' %}">
+                            <i class="fas fa-search"></i>
+                        </a>
+                        <a href="{% url 'places:submit_place' %}" 
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200"
+                           title="{% translate 'Submit Place' %}">
+                            <i class="fas fa-plus-circle"></i>
+                        </a>
+                        <a href="{% url 'prayer_times:prayer_times' %}" 
+                           class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200"
+                           title="{% translate 'Prayer Times' %}">
+                            <i class="fas fa-clock"></i>
                         </a>
                     </div>
                 </div>
@@ -328,13 +347,13 @@
                         {% get_language_info for CURRENT_LANGUAGE_CODE as current_lang_info %}
 
                         <button @click="open = !open" 
-                                class="flex items-center space-x-2 px-2 xl:px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
+                                class="flex items-center space-x-1 lg:space-x-2 px-2 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
                             {% if current_lang_info.code == 'en' %}<span class="flag">🇺🇸</span>
                             {% elif current_lang_info.code == 'ko' %}<span class="flag">🇰🇷</span>
                             {% elif current_lang_info.code == 'uz' %}<span class="flag">🇺🇿</span>
                             {% else %}<span class="flag">🌐</span>{% endif %}
-                            <span class="hidden lg:inline">{{ current_lang_info.name }}</span>
-                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                            <span class="hidden xl:inline">{{ current_lang_info.name }}</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
                         </button>
                         
                         <!-- Language Dropdown -->
@@ -407,13 +426,13 @@
                                 </div>
                             </div>
                         {% else %}
-                            <div class="flex items-center space-x-2 xl:space-x-4">
+                            <div class="flex items-center space-x-3">
                                 <a href="{% url 'users:login' %}" 
-                                   class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-2 text-sm font-medium">
+                                   class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 text-sm font-medium">
                                     {% translate "Log in" %}
                                 </a>
                                 <a href="{% url 'users:register' %}" 
-                                   class="gradient-bg-hover text-white px-3 xl:px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap">
+                                   class="gradient-bg-hover text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap">
                                     {% translate "Sign up" %}
                                 </a>
                             </div>
@@ -421,7 +440,7 @@
                     </div>
 
                     <!-- Mobile menu button -->
-                    <div class="flex items-center lg:hidden ml-4">
+                    <div class="flex items-center xl:hidden ml-2 lg:ml-4">
                         <button @click="isOpen = !isOpen" 
                                 class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
                             <svg class="h-6 w-6" x-bind:class="{'hidden': isOpen, 'block': !isOpen }" 
@@ -439,7 +458,7 @@
 
             <!-- Mobile menu -->
             <div x-show="isOpen" 
-                 class="lg:hidden glass-effect dark:bg-gray-900/95 rounded-lg mb-4"
+                 class="xl:hidden glass-effect dark:bg-gray-900/95 rounded-lg mb-4"
                  x-transition:enter="transition ease-out duration-100 transform"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
