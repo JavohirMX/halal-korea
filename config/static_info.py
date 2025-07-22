@@ -26,8 +26,8 @@ INFO = {
     
     # Footer and legal links
     "footer_links": {
-        "privacy_policy": "#",
-        "terms_of_service": "#",
-        "cookie_policy": "#"
+        "privacy_policy": "/legal/#privacy-policy",
+        "terms_of_service": "/legal/#terms-of-service",
+        "cookie_policy": "/legal/#cookie-policy"
     },
 }

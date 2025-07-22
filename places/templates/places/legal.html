@@ -1,0 +1,321 @@
+{% extends 'places/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "Legal" %} - {{ STATIC_INFO.site_name }}{% endblock %}
+
+{% block content %}
+<div>
+    <!-- Hero Section -->
+    <div class="relative bg-gradient-to-br from-green-400 to-green-600 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
+                    {% translate "Legal Information" %}
+                </h1>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-primary-100">
+                    {% translate "Privacy Policy, Terms of Service, and Cookie Policy" %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-16 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex justify-center space-x-8 py-4">
+                <a href="#privacy-policy" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-200 flex items-center">
+                    <i class="fas fa-shield-alt mr-2"></i>{% translate "Privacy Policy" %}
+                </a>
+                <a href="#terms-of-service" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-200 flex items-center">
+                    <i class="fas fa-file-contract mr-2"></i>{% translate "Terms of Service" %}
+                </a>
+                <a href="#cookie-policy" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-200 flex items-center">
+                    <i class="fas fa-cookie-bite mr-2"></i>{% translate "Cookie Policy" %}
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Content Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        
+        <!-- Privacy Policy Section -->
+        <section id="privacy-policy" class="mb-16">
+            <div class="glass-card rounded-lg p-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <i class="fas fa-shield-alt text-primary-600 mr-4"></i>
+                    {% translate "Privacy Policy" %}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{% translate "Last updated: January 2024" %}</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Information We Collect" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% blocktranslate %}When you use {{ STATIC_INFO.site_name }}, we may collect the following types of information:{% endblocktranslate %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Personal information you provide when creating an account (name, email address)" %}</li>
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Location data when you use our location-based services" %}</li>
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Information you provide when submitting places or reviews" %}</li>
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Usage data and analytics to improve our service" %}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "How We Use Your Information" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% translate "We use the information we collect to:" %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Provide and maintain our services" %}</li>
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Show you relevant halal places near your location" %}</li>
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Enable you to submit and review places" %}</li>
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Communicate with you about our services" %}</li>
+                            <li class="flex items-start"><i class="fas fa-check text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Improve our platform and user experience" %}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Information Sharing" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% blocktranslate %}We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except:{% endblocktranslate %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-exclamation-triangle text-amber-500 mr-2 mt-1 text-sm"></i>{% translate "When required by law or to comply with legal processes" %}</li>
+                            <li class="flex items-start"><i class="fas fa-exclamation-triangle text-amber-500 mr-2 mt-1 text-sm"></i>{% translate "To protect our rights, property, or safety" %}</li>
+                            <li class="flex items-start"><i class="fas fa-exclamation-triangle text-amber-500 mr-2 mt-1 text-sm"></i>{% translate "With trusted service providers who assist in operating our website" %}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Data Security" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">{% translate "We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction." %}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Your Rights" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% translate "You have the right to:" %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-user-shield text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Access and update your personal information" %}</li>
+                            <li class="flex items-start"><i class="fas fa-user-shield text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Delete your account and associated data" %}</li>
+                            <li class="flex items-start"><i class="fas fa-user-shield text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Opt out of non-essential communications" %}</li>
+                            <li class="flex items-start"><i class="fas fa-user-shield text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Request a copy of your data" %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms of Service Section -->
+        <section id="terms-of-service" class="mb-16">
+            <div class="glass-card rounded-lg p-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <i class="fas fa-file-contract text-primary-600 mr-4"></i>
+                    {% translate "Terms of Service" %}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{% translate "Last updated: January 2024" %}</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Acceptance of Terms" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">{% blocktranslate %}By accessing and using {{ STATIC_INFO.site_name }}, you accept and agree to be bound by the terms and provision of this agreement.{% endblocktranslate %}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Use License" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% translate "Permission is granted to temporarily use our service for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:" %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-times text-red-500 mr-2 mt-1 text-sm"></i>{% translate "Modify or copy the materials" %}</li>
+                            <li class="flex items-start"><i class="fas fa-times text-red-500 mr-2 mt-1 text-sm"></i>{% translate "Use the materials for any commercial purpose" %}</li>
+                            <li class="flex items-start"><i class="fas fa-times text-red-500 mr-2 mt-1 text-sm"></i>{% translate "Attempt to decompile or reverse engineer any software" %}</li>
+                            <li class="flex items-start"><i class="fas fa-times text-red-500 mr-2 mt-1 text-sm"></i>{% translate "Remove any copyright or other proprietary notations" %}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "User Content" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% translate "When you submit content (places, reviews, photos), you:" %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-handshake text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Grant us a non-exclusive license to use, display, and distribute your content" %}</li>
+                            <li class="flex items-start"><i class="fas fa-handshake text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Confirm that you have the right to submit such content" %}</li>
+                            <li class="flex items-start"><i class="fas fa-handshake text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Agree not to submit false, misleading, or harmful content" %}</li>
+                            <li class="flex items-start"><i class="fas fa-handshake text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Understand that we may moderate and remove content at our discretion" %}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Prohibited Uses" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% translate "You may not use our service:" %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-ban text-red-500 mr-2 mt-1 text-sm"></i>{% translate "For any unlawful purpose or to solicit others to unlawful acts" %}</li>
+                            <li class="flex items-start"><i class="fas fa-ban text-red-500 mr-2 mt-1 text-sm"></i>{% translate "To violate any international, federal, provincial, or state regulations or laws" %}</li>
+                            <li class="flex items-start"><i class="fas fa-ban text-red-500 mr-2 mt-1 text-sm"></i>{% translate "To transmit or procure the sending of any advertising or promotional material" %}</li>
+                            <li class="flex items-start"><i class="fas fa-ban text-red-500 mr-2 mt-1 text-sm"></i>{% translate "To impersonate or attempt to impersonate another user" %}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Disclaimer" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">{% blocktranslate %}The information on {{ STATIC_INFO.site_name }} is provided on an 'as is' basis. We make no representations or warranties of any kind regarding the halal status of establishments listed on our platform. Users are strongly advised to verify halal certification independently.{% endblocktranslate %}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Limitations" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">{% blocktranslate %}{{ STATIC_INFO.site_name }} or its suppliers will not be held liable for any damages that will arise with the use or inability to use the materials on our website.{% endblocktranslate %}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cookie Policy Section -->
+        <section id="cookie-policy" class="mb-16">
+            <div class="glass-card rounded-lg p-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <i class="fas fa-cookie-bite text-primary-600 mr-4"></i>
+                    {% translate "Cookie Policy" %}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{% translate "Last updated: January 2024" %}</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "What Are Cookies" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">{% translate "Cookies are small text files that are placed on your computer or mobile device when you visit our website. They help us provide you with a better experience by remembering your preferences and understanding how you use our site." %}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "How We Use Cookies" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% blocktranslate %}{{ STATIC_INFO.site_name }} uses cookies for several purposes:{% endblocktranslate %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-cog text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Essential cookies: Required for the website to function properly" %}</li>
+                            <li class="flex items-start"><i class="fas fa-user-cog text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Preference cookies: Remember your settings and language preferences" %}</li>
+                            <li class="flex items-start"><i class="fas fa-chart-line text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Analytics cookies: Help us understand how visitors interact with our website" %}</li>
+                            <li class="flex items-start"><i class="fas fa-magic text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Functionality cookies: Enable enhanced features and personalization" %}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Types of Cookies We Use" %}</h3>
+                        <ul class="space-y-3 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start">
+                                <i class="fas fa-clock text-blue-500 mr-3 mt-1 text-sm"></i>
+                                <div>
+                                    <strong class="text-gray-900 dark:text-white">{% translate "Session Cookies" %}:</strong>
+                                    {% translate "Temporary cookies that expire when you close your browser" %}
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-save text-blue-500 mr-3 mt-1 text-sm"></i>
+                                <div>
+                                    <strong class="text-gray-900 dark:text-white">{% translate "Persistent Cookies" %}:</strong>
+                                    {% translate "Remain on your device until they expire or you delete them" %}
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-home text-blue-500 mr-3 mt-1 text-sm"></i>
+                                <div>
+                                    <strong class="text-gray-900 dark:text-white">{% translate "First-party Cookies" %}:</strong>
+                                    {% translate "Set directly by our website" %}
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-external-link-alt text-blue-500 mr-3 mt-1 text-sm"></i>
+                                <div>
+                                    <strong class="text-gray-900 dark:text-white">{% translate "Third-party Cookies" %}:</strong>
+                                    {% translate "Set by external services like Google Analytics" %}
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Third-Party Services" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% translate "We use the following third-party services that may set cookies:" %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fab fa-google text-blue-500 mr-2 mt-1 text-sm"></i><strong>Google Analytics:</strong> {% translate "To analyze website traffic and user behavior" %}</li>
+                            <li class="flex items-start"><i class="fas fa-map-marked-alt text-blue-500 mr-2 mt-1 text-sm"></i><strong>Google Maps:</strong> {% translate "To provide location-based services and mapping functionality" %}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Managing Cookies" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">{% translate "You can control and manage cookies in several ways:" %}</p>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-400">
+                            <li class="flex items-start"><i class="fas fa-browser text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Browser settings: Most browsers allow you to refuse or delete cookies" %}</li>
+                            <li class="flex items-start"><i class="fas fa-tools text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Opt-out tools: Use tools provided by advertising networks" %}</li>
+                            <li class="flex items-start"><i class="fas fa-mobile-alt text-primary-600 dark:text-primary-400 mr-2 mt-1 text-sm"></i>{% translate "Mobile settings: Adjust settings on your mobile device" %}</li>
+                        </ul>
+                        
+                        <div class="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mt-6">
+                            <p class="text-yellow-800 dark:text-yellow-200">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                {% translate "Please note that disabling certain cookies may affect the functionality of our website and your user experience." %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">{% translate "Updates to This Policy" %}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">{% translate "We may update this Cookie Policy from time to time. We will notify you of any changes by posting the new policy on this page with an updated revision date." %}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="text-center">
+            <div class="glass-card rounded-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                    {% translate "Questions About Our Legal Policies?" %}
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    {% translate "If you have any questions about our Privacy Policy, Terms of Service, or Cookie Policy, please don't hesitate to contact us." %}
+                </p>
+                <a href="mailto:{{ STATIC_INFO.email }}" 
+                   class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white gradient-bg-hover transition-all duration-200 hover:scale-105">
+                    <i class="fas fa-envelope mr-2"></i>
+                    {% translate "Contact Us" %}
+                </a>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const offsetTop = target.offsetTop - 120; // Account for sticky nav
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Highlight active section in navigation
+    window.addEventListener('scroll', function() {
+        const sections = ['privacy-policy', 'terms-of-service', 'cookie-policy'];
+        const navLinks = document.querySelectorAll('nav a[href^="#"]');
+        
+        let current = '';
+        sections.forEach(section => {
+            const element = document.getElementById(section);
+            if (element && element.offsetTop <= window.scrollY + 150) {
+                current = section;
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('text-primary-600', 'dark:text-primary-400');
+            link.classList.add('text-gray-600', 'dark:text-gray-400');
+            
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.remove('text-gray-600', 'dark:text-gray-400');
+                link.classList.add('text-primary-600', 'dark:text-primary-400');
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

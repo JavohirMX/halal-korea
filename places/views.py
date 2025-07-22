@@ -374,6 +374,10 @@ def about(request):
 def donate(request):
     return render(request, 'places/donate.html')
 
+def legal(request):
+    """Combined legal page with Privacy Policy, Terms of Service, and Cookie Policy"""
+    return render(request, 'places/legal.html')
+
 def set_location(request):
     """API endpoint to set user location"""
     if request.method != 'POST':
