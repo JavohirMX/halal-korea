@@ -19,6 +19,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 import json
 import logging
+from utils.telegram_notifications import send_new_place_notification
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -346,6 +347,31 @@ def submit_place(request):
                 
                 place.save()
                 logger.info(f"Place '{place.name}' submitted successfully by user {request.user.username}")
+                
+                # Send Telegram notification about the new submission
+                try:
+                    notification_data = {
+                        'place_id': place.id,
+                        'name': place.name,
+                        'category': place.category,
+                        'address': place.address,
+                        'description': place.description,
+                        'submitted_by_username': request.user.username,
+                        'website': place.website or '',
+                        'phone_number': place.phone_number or '',
+                        'photos_count': len(place.photo_urls) if place.photo_urls else 0,
+                    }
+                    
+                    notification_sent = send_new_place_notification(notification_data)
+                    if notification_sent:
+                        logger.info(f"Telegram notification sent for place submission: {place.name}")
+                    else:
+                        logger.debug(f"Telegram notification not sent for place submission: {place.name}")
+                        
+                except Exception as e:
+                    # Don't fail the submission if notification fails
+                    logger.error(f"Error sending Telegram notification for place '{place.name}': {str(e)}")
+                
                 messages.success(request, 'Place submitted successfully! It will be reviewed by our team.')
                 return redirect('places:explore')
             else:

@@ -36,6 +36,16 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS").split()
 # Example: CSRF_TRUSTED_ORIGINS="https://halal-korea.com https://www.halal-korea.com"
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split()
 
+# Telegram Bot Notifications
+# Set TELEGRAM_NOTIFICATIONS_ENABLED=True in your .env file to enable notifications
+# Get bot token from @BotFather on Telegram and chat ID from your target channel/group
+TELEGRAM_NOTIFICATIONS_ENABLED = config('TELEGRAM_NOTIFICATIONS_ENABLED', default=False, cast=bool)
+TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
+TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
+
+# Site URL for admin links in notifications
+SITE_URL = config('SITE_URL', default='http://localhost:8000')
+
 
 # Application definition
 
