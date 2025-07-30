@@ -133,7 +133,7 @@ class TelegramNotifier:
             return False
 
 
-# Convenience function for easy import
+# Convenience functions for easy import
 def send_new_place_notification(place_data: Dict[str, Any]) -> bool:
     """
     Convenience function to send a new place submission notification
@@ -145,4 +145,19 @@ def send_new_place_notification(place_data: Dict[str, Any]) -> bool:
         bool: True if notification was sent successfully, False otherwise
     """
     notifier = TelegramNotifier()
-    return notifier.notify_new_place_submission(place_data) 
+    return notifier.notify_new_place_submission(place_data)
+
+
+def send_telegram_notification(message: str, parse_mode: str = 'HTML') -> bool:
+    """
+    Convenience function to send a plain text message via Telegram
+    
+    Args:
+        message (str): The message to send
+        parse_mode (str): Parse mode for message formatting (HTML or Markdown)
+        
+    Returns:
+        bool: True if notification was sent successfully, False otherwise
+    """
+    notifier = TelegramNotifier()
+    return notifier.send_message(message, parse_mode) 
