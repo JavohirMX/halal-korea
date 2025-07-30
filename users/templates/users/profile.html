@@ -45,10 +45,10 @@
                     data-tab="reviews">
                 {% translate "My Reviews" %}
             </button>
-            <button class="tab-button text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 border-b-2 border-transparent py-4 px-1 text-sm font-medium" 
-                    data-tab="submitted">
-                {% translate "Submitted Places" %}
-            </button>
+            <a href="{% url 'places:my_contributions' %}" 
+               class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 border-b-2 border-transparent py-4 px-1 text-sm font-medium inline-flex items-center">
+                <i class="fas fa-hands-helping mr-2"></i>{% translate "My Contributions" %}
+            </a>
         </nav>
     </div>
 
@@ -142,44 +142,7 @@
         {% endif %}
     </div>
 
-    <!-- Submitted Places Tab -->
-    <div id="submitted-tab" class="tab-content hidden">
-        {% if submitted_places %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for place in submitted_places %}
-            <div class="glass-card rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                {% if place.photo_urls %}
-                <img src="{{ place.photo_urls.0 }}" 
-                     alt="{{ place.name }}" 
-                     class="w-full h-48 object-cover">
-                {% endif %}
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
-                    <p class="text-sm text-primary-600 dark:text-primary-400">{{ place.category|title }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {% translate "Status:" %} <span class="capitalize">{{ place.status }}</span>
-                    </p>
-                    <div class="mt-2">
-                        <a href="{% url 'places:place_detail' place.id %}" 
-                           class="inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                            {% translate "View Details" %} →
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-12">
-            <i class="fas fa-map-marker-alt text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
-            <p class="text-gray-600 dark:text-gray-400">{% translate "You haven't submitted any places yet." %}</p>
-            <a href="{% url 'places:submit_place' %}" 
-               class="mt-4 inline-block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
-                {% translate "Submit a Place" %} →
-            </a>
-        </div>
-        {% endif %}
-    </div>
+
 </div>
 
 <script>

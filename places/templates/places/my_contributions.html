@@ -1,0 +1,713 @@
+{% extends 'places/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "My Contributions" %} - {{ STATIC_INFO.site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Hide scrollbar for mobile tabs */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Smooth scrolling for tabs */
+.scrollbar-hide {
+    scroll-behavior: smooth;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+    <!-- Header -->
+    <div class="mb-6 sm:mb-8">
+        <div class="flex items-center space-x-2 sm:space-x-4 mb-3 sm:mb-4">
+            <a href="{% url 'users:profile' %}" 
+               class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm sm:text-base">
+                <i class="fas fa-arrow-left mr-1 sm:mr-2"></i>
+                <span class="hidden sm:inline">{% translate "Back to Profile" %}</span>
+                <span class="sm:hidden">{% translate "Back" %}</span>
+            </a>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{% translate "My Contributions" %}</h1>
+        <p class="mt-2 text-base sm:text-lg text-gray-600 dark:text-gray-400">
+            {% translate "Your submitted places and edit suggestions that help build our community" %}
+        </p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <!-- Places Statistics -->
+        <div class="glass-card rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-map-marker-alt text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.total_submitted }}</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">{% translate "total" %}</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Places Submitted" %}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{% translate "Places you've added to our community" %}</p>
+            </div>
+            {% if stats.total_submitted > 0 %}
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-green-600 dark:text-green-400">
+                        <i class="fas fa-check-circle mr-1"></i>{% translate "Approved" %}
+                    </span>
+                    <span class="font-medium">{{ stats.approved_places }}/{{ stats.total_submitted }}</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-500" 
+                         style="width: {% widthratio stats.approved_places stats.total_submitted 100 %}%"></div>
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                    {% widthratio stats.approved_places stats.total_submitted 100 %}% {% translate "approval rate" %}
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-2">
+                <p class="text-sm text-gray-500 dark:text-gray-400">{% translate "No places submitted yet" %}</p>
+                <a href="{% url 'places:submit_place' %}" 
+                   class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                    {% translate "Submit your first place" %} →
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Field Edits Statistics -->
+        <div class="glass-card rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-edit text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.total_field_suggestions }}</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">{% translate "total" %}</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Field Edits" %}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{% translate "Improvements to place information" %}</p>
+            </div>
+            {% if stats.total_field_suggestions > 0 %}
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-green-600 dark:text-green-400">
+                        <i class="fas fa-check-circle mr-1"></i>{% translate "Approved" %}
+                    </span>
+                    <span class="font-medium">{{ stats.approved_field_suggestions }}/{{ stats.total_field_suggestions }}</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500" 
+                         style="width: {% widthratio stats.approved_field_suggestions stats.total_field_suggestions 100 %}%"></div>
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                    {% widthratio stats.approved_field_suggestions stats.total_field_suggestions 100 %}% {% translate "approval rate" %}
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-2">
+                <p class="text-sm text-gray-500 dark:text-gray-400">{% translate "No field edits yet" %}</p>
+                <a href="{% url 'places:explore' %}" 
+                   class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                    {% translate "Find places to improve" %} →
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Images Statistics -->
+        <div class="glass-card rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-images text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.total_image_suggestions }}</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">{% translate "total" %}</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Images Uploaded" %}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{% translate "Photos you've shared with the community" %}</p>
+            </div>
+            {% if stats.total_image_suggestions > 0 %}
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-green-600 dark:text-green-400">
+                        <i class="fas fa-check-circle mr-1"></i>{% translate "Approved" %}
+                    </span>
+                    <span class="font-medium">{{ stats.approved_image_suggestions }}/{{ stats.total_image_suggestions }}</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-500" 
+                         style="width: {% widthratio stats.approved_image_suggestions stats.total_image_suggestions 100 %}%"></div>
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                    {% widthratio stats.approved_image_suggestions stats.total_image_suggestions 100 %}% {% translate "approval rate" %}
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-2">
+                <p class="text-sm text-gray-500 dark:text-gray-400">{% translate "No images uploaded yet" %}</p>
+                <a href="{% url 'places:explore' %}" 
+                   class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                    {% translate "Add photos to places" %} →
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Overall Contribution Summary -->
+    {% if stats.total_submitted > 0 or stats.total_field_suggestions > 0 or stats.total_image_suggestions > 0 %}
+    <div class="glass-card rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 border border-primary-200 dark:border-primary-800">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="p-3 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+                    <i class="fas fa-hands-helping text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Community Impact" %}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{% translate "Your total contributions to the community" %}</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                    {% widthratio stats.approved_places|add:stats.approved_field_suggestions|add:stats.approved_image_suggestions 1 1 %}
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">{% translate "approved contributions" %}</div>
+            </div>
+        </div>
+        
+        <div class="mt-4 grid grid-cols-3 gap-4 text-center">
+            <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                <div class="text-lg font-bold text-primary-600 dark:text-primary-400">{{ stats.approved_places }}</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400">{% translate "Places" %}</div>
+            </div>
+            <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                <div class="text-lg font-bold text-blue-600 dark:text-blue-400">{{ stats.approved_field_suggestions }}</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400">{% translate "Edits" %}</div>
+            </div>
+            <div class="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+                <div class="text-lg font-bold text-purple-600 dark:text-purple-400">{{ stats.approved_image_suggestions }}</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400">{% translate "Images" %}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Navigation Tabs -->
+    <div class="mb-8">
+        <!-- Mobile Navigation (Horizontal Scroll) -->
+        <div class="sm:hidden mb-4">
+            <div class="border-b border-gray-200 dark:border-gray-700">
+                <nav class="-mb-px flex space-x-1 overflow-x-auto scrollbar-hide pb-2">
+                    <a href="#submitted-places" 
+                       class="tab-link active border-primary-500 text-primary-600 dark:text-primary-400 flex-shrink-0 py-2 px-3 border-b-2 font-medium text-xs rounded-t-lg bg-primary-50 dark:bg-primary-900/20">
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-sm"></i>
+                            <span class="ml-1">{% translate "Places" %}</span>
+                            {% if submitted_places.paginator.count > 0 %}
+                            <span class="bg-primary-100 dark:bg-primary-800 text-primary-800 dark:text-primary-200 ml-1 py-0.5 px-1.5 rounded-full text-xs font-semibold">{{ submitted_places.paginator.count }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <a href="#field-suggestions" 
+                       class="tab-link border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 flex-shrink-0 py-2 px-3 border-b-2 font-medium text-xs rounded-t-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-edit text-sm"></i>
+                            <span class="ml-1">{% translate "Edits" %}</span>
+                            {% if field_suggestions.paginator.count > 0 %}
+                            <span class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 ml-1 py-0.5 px-1.5 rounded-full text-xs font-semibold">{{ field_suggestions.paginator.count }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <a href="#image-suggestions" 
+                       class="tab-link border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 flex-shrink-0 py-2 px-3 border-b-2 font-medium text-xs rounded-t-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-images text-sm"></i>
+                            <span class="ml-1">{% translate "Images" %}</span>
+                            {% if image_suggestions.paginator.count > 0 %}
+                            <span class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 ml-1 py-0.5 px-1.5 rounded-full text-xs font-semibold">{{ image_suggestions.paginator.count }}</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden sm:block">
+            <div class="border-b border-gray-200 dark:border-gray-700">
+                <nav class="-mb-px flex space-x-8">
+                    <a href="#submitted-places" 
+                       class="tab-link active border-primary-500 text-primary-600 dark:text-primary-400 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-map-marker-alt mr-2"></i>{% translate "Submitted Places" %}
+                        {% if submitted_places.paginator.count > 0 %}
+                        <span class="bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 ml-2 py-0.5 px-2 rounded-full text-xs">{{ submitted_places.paginator.count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="#field-suggestions" 
+                       class="tab-link border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-edit mr-2"></i>{% translate "Field Edits" %}
+                        {% if field_suggestions.paginator.count > 0 %}
+                        <span class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 ml-2 py-0.5 px-2 rounded-full text-xs">{{ field_suggestions.paginator.count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="#image-suggestions" 
+                       class="tab-link border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                        <i class="fas fa-images mr-2"></i>{% translate "Image Uploads" %}
+                        {% if image_suggestions.paginator.count > 0 %}
+                        <span class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 ml-2 py-0.5 px-2 rounded-full text-xs">{{ image_suggestions.paginator.count }}</span>
+                        {% endif %}
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submitted Places Tab -->
+    <div id="submitted-places" class="tab-content">
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                <i class="fas fa-map-marker-alt mr-2"></i>{% translate "Places You've Submitted" %}
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {% translate "Places you've added to help grow our community" %}
+            </p>
+        </div>
+
+        {% if submitted_places %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for place in submitted_places %}
+            <div class="glass-card rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                {% if place.photo_urls %}
+                <img src="{{ place.photo_urls.0 }}" 
+                     alt="{{ place.name }}" 
+                     class="w-full h-48 object-cover">
+                {% else %}
+                <div class="w-full h-48 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex items-center justify-center">
+                    <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} text-4xl text-primary-400 dark:text-primary-500"></i>
+                </div>
+                {% endif %}
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
+                        <span class="px-2 py-1 text-xs font-medium rounded-full
+                            {% if place.status == 'pending' %}bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200
+                            {% elif place.status == 'approved' %}bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200
+                            {% elif place.status == 'rejected' %}bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200
+                            {% else %}bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200{% endif %}">
+                            {% if place.status == 'pending' %}<i class="fas fa-clock mr-1"></i>
+                            {% elif place.status == 'approved' %}<i class="fas fa-check mr-1"></i>
+                            {% elif place.status == 'rejected' %}<i class="fas fa-times mr-1"></i>
+                            {% else %}<i class="fas fa-archive mr-1"></i>{% endif %}
+                            {{ place.get_status_display }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-primary-600 dark:text-primary-400 mb-2">
+                        <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1"></i>
+                        {{ place.get_category_display }}
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{{ place.address }}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ place.created_at|date:"M d, Y" }}</span>
+                        {% comment %} <a href="{% url 'places:place_detail' place.pk %}" 
+                           class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                            {% translate "View Details" %} →
+                        </a> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination for Submitted Places -->
+        {% if submitted_places.has_other_pages %}
+        <div class="mt-8 flex justify-center">
+            <nav class="flex items-center space-x-2">
+                {% if submitted_places.has_previous %}
+                    <a href="?places_page={{ submitted_places.previous_page_number }}#submitted-places" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {% translate "Previous" %}
+                    </a>
+                {% endif %}
+                
+                <span class="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+                    {% blocktranslate with current=submitted_places.number total=submitted_places.paginator.num_pages %}Page {{ current }} of {{ total }}{% endblocktranslate %}
+                </span>
+                
+                {% if submitted_places.has_next %}
+                    <a href="?places_page={{ submitted_places.next_page_number }}#submitted-places" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {% translate "Next" %}
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-map-marker-alt text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{% translate "No places submitted yet" %}</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                {% translate "You haven't submitted any places yet. Help grow our community by adding places you know!" %}
+            </p>
+            <a href="{% url 'places:submit_place' %}" 
+               class="inline-flex items-center px-4 py-2 gradient-bg-hover text-white rounded-md text-sm font-medium">
+                <i class="fas fa-plus-circle mr-2"></i>{% translate "Submit a Place" %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Field Suggestions Tab -->
+    <div id="field-suggestions" class="tab-content hidden">
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                <i class="fas fa-edit mr-2"></i>{% translate "Field Edit Suggestions" %}
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {% translate "Your suggestions for updating place information" %}
+            </p>
+        </div>
+
+        {% if field_suggestions %}
+        <div class="space-y-3">
+            {% for suggestion in field_suggestions %}
+            <div class="glass-card rounded-xl overflow-hidden hover:shadow-lg transition-all duration-200 group">
+                <!-- Header Section -->
+                <div class="p-4 pb-3 border-b border-gray-100 dark:border-gray-700/50">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <!-- Field Icon -->
+                            <div class="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                                <i class="fas 
+                                    {% if suggestion.field_name == 'name' %}fa-signature
+                                    {% elif suggestion.field_name == 'description' %}fa-align-left
+                                    {% elif suggestion.field_name == 'category' %}fa-tag
+                                    {% elif suggestion.field_name == 'address' %}fa-map-marker-alt
+                                    {% elif suggestion.field_name == 'phone_number' %}fa-phone
+                                    {% elif suggestion.field_name == 'website' %}fa-globe
+                                    {% elif 'map' in suggestion.field_name %}fa-map
+                                    {% else %}fa-edit
+                                    {% endif %} text-blue-600 dark:text-blue-400 text-sm"></i>
+                            </div>
+                            
+                            <!-- Place Name & Field -->
+                            <div>
+                                <h3 class="font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                    <a href="{% url 'places:place_detail' suggestion.place.pk %}" class="hover:underline">
+                                        {{ suggestion.place.name }}
+                                    </a>
+                                </h3>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">
+                                        {{ suggestion.get_field_name_display }}
+                                    </span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ suggestion.created_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 text-xs font-medium rounded-full
+                                {% if suggestion.status == 'pending' %}bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200
+                                {% elif suggestion.status == 'approved' %}bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200
+                                {% else %}bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200{% endif %}">
+                                {% if suggestion.status == 'pending' %}
+                                    <i class="fas fa-clock mr-1"></i>{% translate "Pending" %}
+                                {% elif suggestion.status == 'approved' %}
+                                    <i class="fas fa-check mr-1"></i>{% translate "Approved" %}
+                                {% else %}
+                                    <i class="fas fa-times mr-1"></i>{% translate "Rejected" %}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Section -->
+                <div class="p-4">
+                    <!-- Before/After Comparison -->
+                    <div class="space-y-3">
+                        <!-- Current Value -->
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 w-12 text-right">
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{% translate "From" %}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border-l-4 border-gray-300 dark:border-gray-600">
+                                    <div class="text-sm text-gray-700 dark:text-gray-300 break-words">
+                                        {% if suggestion.current_value %}
+                                            {{ suggestion.current_value }}
+                                        {% else %}
+                                            <span class="italic text-gray-500 dark:text-gray-400">{% translate "No current value" %}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Arrow Indicator -->
+                        <div class="flex justify-center">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30">
+                                <i class="fas fa-arrow-down text-primary-600 dark:text-primary-400 text-sm"></i>
+                            </div>
+                        </div>
+
+                        <!-- Suggested Value -->
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 w-12 text-right">
+                                <span class="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wide">{% translate "To" %}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border-l-4 border-green-400 dark:border-green-500">
+                                    <div class="text-sm text-gray-900 dark:text-white font-medium break-words">
+                                        {{ suggestion.suggested_value }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reason -->
+                    {% if suggestion.reason %}
+                    <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-comment-dots text-gray-400 mt-0.5 text-sm"></i>
+                            <div>
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{% translate "Reason" %}</span>
+                                <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">{{ suggestion.reason }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Admin Notes -->
+                    {% if suggestion.admin_notes %}
+                    <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-user-shield text-blue-600 dark:text-blue-400 mt-0.5 text-sm"></i>
+                            <div>
+                                <span class="text-xs font-medium text-blue-700 dark:text-blue-300 uppercase tracking-wide">{% translate "Admin Notes" %}</span>
+                                <p class="text-sm text-blue-800 dark:text-blue-200 mt-1">{{ suggestion.admin_notes }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Review Info -->
+                    {% if suggestion.reviewed_at %}
+                    <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+                        <div class="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-clock"></i>
+                            <span>{% translate "Reviewed on" %} {{ suggestion.reviewed_at|date:"M d, Y" }}</span>
+                            {% if suggestion.reviewed_by %}
+                                <span>{% translate "by" %} {{ suggestion.reviewed_by.username }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination for Field Suggestions -->
+        {% if field_suggestions.has_other_pages %}
+        <div class="mt-8 flex justify-center">
+            <nav class="flex items-center space-x-2">
+                {% if field_suggestions.has_previous %}
+                    <a href="?field_page={{ field_suggestions.previous_page_number }}#field-suggestions" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {% translate "Previous" %}
+                    </a>
+                {% endif %}
+                
+                <span class="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+                    {% blocktranslate with current=field_suggestions.number total=field_suggestions.paginator.num_pages %}Page {{ current }} of {{ total }}{% endblocktranslate %}
+                </span>
+                
+                {% if field_suggestions.has_next %}
+                    <a href="?field_page={{ field_suggestions.next_page_number }}#field-suggestions" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {% translate "Next" %}
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-edit text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{% translate "No field suggestions yet" %}</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                {% translate "You haven't suggested any field edits yet. Visit a place page and click 'Suggest Edit' to get started!" %}
+            </p>
+            <a href="{% url 'places:explore' %}" 
+               class="inline-flex items-center px-4 py-2 gradient-bg-hover text-white rounded-md text-sm font-medium">
+                <i class="fas fa-search mr-2"></i>{% translate "Explore Places" %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Image Suggestions Tab -->
+    <div id="image-suggestions" class="tab-content hidden">
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                <i class="fas fa-images mr-2"></i>{% translate "Image Upload Suggestions" %}
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {% translate "Your uploaded images for places" %}
+            </p>
+        </div>
+
+        {% if image_suggestions %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for suggestion in image_suggestions %}
+            <div class="glass-card rounded-lg overflow-hidden">
+                <div class="aspect-w-16 aspect-h-9">
+                    <img src="{{ suggestion.image.url }}" 
+                         alt="{% translate 'Suggested image for' %} {{ suggestion.place.name }}"
+                         class="w-full h-48 object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-medium text-gray-900 dark:text-white">
+                            <a href="{% url 'places:place_detail' suggestion.place.pk %}" 
+                               class="hover:text-primary-600 dark:hover:text-primary-400">
+                                {{ suggestion.place.name }}
+                            </a>
+                        </h3>
+                        <span class="px-2 py-1 text-xs font-medium rounded-full
+                            {% if suggestion.status == 'pending' %}bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200
+                            {% elif suggestion.status == 'approved' %}bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200
+                            {% else %}bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-200{% endif %}">
+                            {% if suggestion.status == 'pending' %}<i class="fas fa-clock mr-1"></i>
+                            {% elif suggestion.status == 'approved' %}<i class="fas fa-check mr-1"></i>
+                            {% else %}<i class="fas fa-times mr-1"></i>{% endif %}
+                            {{ suggestion.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    {% if suggestion.caption %}
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ suggestion.caption }}</p>
+                    {% endif %}
+                    
+                    <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+                        <span>{{ suggestion.created_at|date:"M d, Y" }}</span>
+                        {% if suggestion.reviewed_at %}
+                        <span>{% translate "Reviewed:" %} {{ suggestion.reviewed_at|date:"M d" }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if suggestion.admin_notes %}
+                    <div class="mt-3 bg-blue-50 dark:bg-blue-900/20 rounded p-2">
+                        <p class="text-xs font-medium text-blue-800 dark:text-blue-200 mb-1">{% translate "Admin Notes:" %}</p>
+                        <p class="text-xs text-blue-700 dark:text-blue-300">{{ suggestion.admin_notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination for Image Suggestions -->
+        {% if image_suggestions.has_other_pages %}
+        <div class="mt-8 flex justify-center">
+            <nav class="flex items-center space-x-2">
+                {% if image_suggestions.has_previous %}
+                    <a href="?image_page={{ image_suggestions.previous_page_number }}#image-suggestions" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {% translate "Previous" %}
+                    </a>
+                {% endif %}
+                
+                <span class="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+                    {% blocktranslate with current=image_suggestions.number total=image_suggestions.paginator.num_pages %}Page {{ current }} of {{ total }}{% endblocktranslate %}
+                </span>
+                
+                {% if image_suggestions.has_next %}
+                    <a href="?image_page={{ image_suggestions.next_page_number }}#image-suggestions" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {% translate "Next" %}
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-images text-4xl text-gray-400 dark:text-gray-600 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{% translate "No image suggestions yet" %}</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">
+                {% translate "You haven't uploaded any images yet. Visit a place page and click 'Suggest Edit' to upload photos!" %}
+            </p>
+            <a href="{% url 'places:explore' %}" 
+               class="inline-flex items-center px-4 py-2 gradient-bg-hover text-white rounded-md text-sm font-medium">
+                <i class="fas fa-search mr-2"></i>{% translate "Explore Places" %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching functionality
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all tabs
+            tabLinks.forEach(tab => {
+                tab.classList.remove('active', 'border-primary-500', 'text-primary-600');
+                tab.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            // Add active class to clicked tab
+            this.classList.add('active', 'border-primary-500', 'text-primary-600');
+            this.classList.remove('border-transparent', 'text-gray-500');
+            
+            // Hide all tab contents
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show corresponding tab content
+            const targetId = this.getAttribute('href').substring(1);
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
+        });
+    });
+    
+    // Handle URL hash to show correct tab
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+        const targetTab = document.querySelector(`a[href="#${hash}"]`);
+        if (targetTab) {
+            targetTab.click();
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,924 @@
+{% extends 'places/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "Suggest Edit" %} - {{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.edit-field {
+    transition: all 0.3s ease;
+}
+.edit-field.editing {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #0ea5e9;
+    border-radius: 12px;
+    padding: 16px;
+}
+.edit-field.editing.dark {
+    background: linear-gradient(135deg, #082f49 0%, #0c4a6e 100%);
+    border-color: #0284c7;
+}
+.current-value {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+}
+.dark .current-value {
+    background: #1e293b;
+    border-color: #475569;
+}
+.suggested-value {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 2px solid #10b981;
+    border-radius: 8px;
+    padding: 12px;
+}
+.dark .suggested-value {
+    background: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
+    border-color: #059669;
+}
+.edit-button {
+    transition: all 0.2s ease;
+}
+.edit-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+.section-card {
+    transition: all 0.3s ease;
+}
+.section-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+.progress-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    transition: width 0.3s ease;
+    z-index: 50;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="progress-indicator" id="progress-bar"></div>
+
+<div class="max-w-6xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+    <!-- Header -->
+    <div class="mb-6 sm:mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <a href="{% url 'places:place_detail' place.pk %}" 
+               class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm sm:text-base">
+                <i class="fas fa-arrow-left mr-1 sm:mr-2"></i>
+                <span class="hidden sm:inline">{% translate "Back to place" %}</span>
+                <span class="sm:hidden">{% translate "Back" %}</span>
+            </a>
+            <div class="text-right">
+                <div class="text-xs text-gray-500 dark:text-gray-400">{% translate "Editing" %}</div>
+                <div class="font-medium text-gray-900 dark:text-white">{{ place.name|truncatechars:30 }}</div>
+            </div>
+        </div>
+        <div class="text-center">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                <i class="fas fa-edit mr-2 text-primary-600 dark:text-primary-400"></i>
+                {% translate "Suggest Improvements" %}
+            </h1>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                {% translate "Help our community by suggesting better information or adding photos" %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl">
+            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="edit-count">0</div>
+            <div class="text-xs text-blue-600 dark:text-blue-400">{% translate "Edits" %}</div>
+        </div>
+        <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl">
+            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400" id="image-count">0</div>
+            <div class="text-xs text-purple-600 dark:text-purple-400">{% translate "Images" %}</div>
+        </div>
+        <div class="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl">
+            <div class="text-2xl font-bold text-green-600 dark:text-green-400">3</div>
+            <div class="text-xs text-green-600 dark:text-green-400">{% translate "Min Impact" %}</div>
+        </div>
+        <div class="text-center p-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl">
+            <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">⭐</div>
+            <div class="text-xs text-amber-600 dark:text-amber-400">{% translate "Quality" %}</div>
+        </div>
+    </div>
+
+    <!-- Suggestion Form -->
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Field Edit Suggestions -->
+        <div class="section-card glass-card rounded-xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    <i class="fas fa-edit mr-2 text-blue-600 dark:text-blue-400"></i>
+                    {% translate "Edit Information" %}
+                </h2>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {% translate "Click to edit any field" %}
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Name Field -->
+                <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600" 
+                     data-field="name">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-signature text-gray-400"></i>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Name" %}</label>
+                        </div>
+                        <button type="button" class="edit-button text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50"
+                                onclick="toggleEdit('name')">
+                            <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                        </button>
+                    </div>
+                    <div class="current-value">
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
+                        <div class="font-medium text-gray-900 dark:text-white">{{ place.name }}</div>
+                    </div>
+                    <div class="suggested-input hidden mt-3">
+                        <div class="text-sm text-green-700 dark:text-green-300 mb-2">
+                            <i class="fas fa-arrow-right mr-1"></i>{% translate "Your suggestion:" %}
+                        </div>
+                        {{ form.name }}
+                        <div class="hidden">{{ form.suggest_name }}</div>
+                    </div>
+                </div>
+
+                <!-- Category Field -->
+                <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600" 
+                     data-field="category">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-tag text-gray-400"></i>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Category" %}</label>
+                        </div>
+                        <button type="button" class="edit-button text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50"
+                                onclick="toggleEdit('category')">
+                            <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                        </button>
+                    </div>
+                    <div class="current-value">
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
+                        <div class="font-medium text-gray-900 dark:text-white">
+                            <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-2"></i>
+                            {{ place.get_category_display }}
+                        </div>
+                    </div>
+                    <div class="suggested-input hidden mt-3">
+                        <div class="text-sm text-green-700 dark:text-green-300 mb-2">
+                            <i class="fas fa-arrow-right mr-1"></i>{% translate "Your suggestion:" %}
+                        </div>
+                        {{ form.category }}
+                        <div class="hidden">{{ form.suggest_category }}</div>
+                    </div>
+                </div>
+
+                <!-- Description Field -->
+                <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600" 
+                     data-field="description">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-align-left text-gray-400"></i>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Description" %}</label>
+                        </div>
+                        <button type="button" class="edit-button text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50"
+                                onclick="toggleEdit('description')">
+                            <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                        </button>
+                    </div>
+                    <div class="current-value">
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
+                        <div class="text-gray-900 dark:text-white">
+                            {% if place.description %}
+                                {{ place.description|truncatechars:150 }}
+                            {% else %}
+                                <span class="italic text-gray-500">{% translate "No description available" %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="suggested-input hidden mt-3">
+                        <div class="text-sm text-green-700 dark:text-green-300 mb-2">
+                            <i class="fas fa-arrow-right mr-1"></i>{% translate "Your suggestion:" %}
+                        </div>
+                        {{ form.description }}
+                        <div class="hidden">{{ form.suggest_description }}</div>
+                    </div>
+                </div>
+
+                <!-- Address Field -->
+                <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600" 
+                     data-field="address">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-map-marker-alt text-gray-400"></i>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Address" %}</label>
+                        </div>
+                        <button type="button" class="edit-button text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50"
+                                onclick="toggleEdit('address')">
+                            <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                        </button>
+                    </div>
+                    <div class="current-value">
+                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
+                        <div class="text-gray-900 dark:text-white">{{ place.address|default:"Not specified" }}</div>
+                    </div>
+                    <div class="suggested-input hidden mt-3">
+                        <div class="text-sm text-green-700 dark:text-green-300 mb-2">
+                            <i class="fas fa-arrow-right mr-1"></i>{% translate "Your suggestion:" %}
+                        </div>
+                        {{ form.address }}
+                        <div class="hidden">{{ form.suggest_address }}</div>
+                    </div>
+                </div>
+
+                <!-- Contact Information Collapsible -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <button type="button" class="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg"
+                            onclick="toggleSection('contact-section')">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-phone text-gray-400"></i>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Contact Information" %}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">{% translate "(Optional)" %}</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 transform transition-transform" id="contact-chevron"></i>
+                    </button>
+                    
+                    <div class="hidden border-t border-gray-200 dark:border-gray-700 p-4 space-y-4" id="contact-section">
+                        <!-- Phone Number -->
+                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="phone_number">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Phone Number" %}</label>
+                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
+                                        onclick="toggleEdit('phone_number')">
+                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                                </button>
+                            </div>
+                            <div class="current-value">
+                                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
+                                <div class="text-sm text-gray-900 dark:text-white">{{ place.phone_number|default:"Not specified" }}</div>
+                            </div>
+                            <div class="suggested-input hidden mt-2">
+                                {{ form.phone_number }}
+                                <div class="hidden">{{ form.suggest_phone_number }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Website -->
+                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="website">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Website" %}</label>
+                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
+                                        onclick="toggleEdit('website')">
+                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                                </button>
+                            </div>
+                            <div class="current-value">
+                                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
+                                <div class="text-sm text-gray-900 dark:text-white">
+                                    {% if place.website %}
+                                        <a href="{{ place.website }}" target="_blank" class="text-blue-600 hover:underline">{{ place.website|truncatechars:40 }}</a>
+                                    {% else %}
+                                        {% translate "Not specified" %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="suggested-input hidden mt-2">
+                                {{ form.website }}
+                                <div class="hidden">{{ form.suggest_website }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Links Collapsible -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <button type="button" class="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg"
+                            onclick="toggleSection('maps-section')">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-map text-gray-400"></i>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Map Links" %}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">{% translate "(Optional)" %}</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 transform transition-transform" id="maps-chevron"></i>
+                    </button>
+                    
+                    <div class="hidden border-t border-gray-200 dark:border-gray-700 p-4 space-y-3" id="maps-section">
+                        <!-- Google Maps -->
+                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="google_map_link">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <i class="fab fa-google mr-1"></i>{% translate "Google Maps" %}
+                                </label>
+                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
+                                        onclick="toggleEdit('google_map_link')">
+                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                                </button>
+                            </div>
+                            <div class="current-value">
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ place.google_map_link|default:"Not specified" }}</div>
+                            </div>
+                            <div class="suggested-input hidden mt-2">
+                                {{ form.google_map_link }}
+                                <div class="hidden">{{ form.suggest_google_map_link }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Kakao Maps -->
+                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="kakao_map_link">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {% translate "Kakao Maps" %}
+                                </label>
+                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
+                                        onclick="toggleEdit('kakao_map_link')">
+                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                                </button>
+                            </div>
+                            <div class="current-value">
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ place.kakao_map_link|default:"Not specified" }}</div>
+                            </div>
+                            <div class="suggested-input hidden mt-2">
+                                {{ form.kakao_map_link }}
+                                <div class="hidden">{{ form.suggest_kakao_map_link }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Naver Maps -->
+                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="naver_map_link">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {% translate "Naver Maps" %}
+                                </label>
+                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
+                                        onclick="toggleEdit('naver_map_link')">
+                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
+                                </button>
+                            </div>
+                            <div class="current-value">
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ place.naver_map_link|default:"Not specified" }}</div>
+                            </div>
+                            <div class="suggested-input hidden mt-2">
+                                {{ form.naver_map_link }}
+                                <div class="hidden">{{ form.suggest_naver_map_link }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Upload Section -->
+        <div class="section-card glass-card rounded-xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    <i class="fas fa-images mr-2 text-purple-600 dark:text-purple-400"></i>
+                    {% translate "Add Photos" %}
+                </h2>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {% translate "Drag & drop or click to upload" %}
+                </div>
+            </div>
+
+            <div class="relative">
+                <!-- Current Images Display -->
+                {% if place.photo_urls %}
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        <i class="fas fa-eye mr-1"></i>{% translate "Current Photos" %}
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {% for photo_url in place.photo_urls|slice:":8" %}
+                        <div class="relative group aspect-square">
+                            <img src="{{ photo_url }}" alt="{{ place.name }}" 
+                                 class="w-full h-full object-cover rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                <button type="button" onclick="viewImage('{{ photo_url }}')" 
+                                        class="text-white hover:text-blue-300">
+                                    <i class="fas fa-expand-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if place.photo_urls|length > 8 %}
+                        <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                            <div class="text-center text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-ellipsis-h text-xl mb-1"></i>
+                                <div class="text-xs">+{{ place.photo_urls|length|add:"-8" }} more</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Upload Area -->
+                <div class="upload-zone border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-purple-400 dark:hover:border-purple-500 transition-colors"
+                     ondrop="dropHandler(event)" ondragover="dragOverHandler(event)" ondragenter="dragEnterHandler(event)" ondragleave="dragLeaveHandler(event)">
+                    <div class="space-y-4">
+                        <div class="mx-auto w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-purple-600 dark:text-purple-400 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Upload Images" %}</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                {% translate "Drag and drop your images here, or" %}
+                                <label for="images" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 cursor-pointer font-medium">
+                                    {% translate "browse files" %}
+                                </label>
+                            </p>
+                        </div>
+                        <input type="file" id="images" name="images" multiple accept="image/*" 
+                               class="hidden" onchange="handleFileSelect(event)">
+                        <div class="flex justify-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                            <span><i class="fas fa-check mr-1"></i>JPG, PNG, GIF, WebP</span>
+                            <span><i class="fas fa-weight mr-1"></i>Max 5MB each</span>
+                            <span><i class="fas fa-layer-group mr-1"></i>Multiple files</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Images Preview -->
+                <div id="image-preview" class="hidden mt-6">
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                        <i class="fas fa-plus mr-1"></i>{% translate "Images to Upload" %}
+                    </h3>
+                    <div id="preview-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reason Section (Combined for all changes) -->
+        <div class="section-card glass-card rounded-xl p-6">
+            <div class="flex items-center mb-6">
+                <div class="p-3 rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white mr-4">
+                    <i class="fas fa-comment-dots text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        {% translate "Why These Changes?" %}
+                    </h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        {% translate "Help reviewers understand your suggestions" %}
+                    </p>
+                </div>
+                <span class="ml-auto px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-full">
+                    {% translate "Required" %}
+                </span>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-lightbulb text-amber-500 mt-1 mr-3"></i>
+                        <div class="text-sm text-amber-800 dark:text-amber-200">
+                            <p class="font-medium mb-1">{% translate "Tips for a good explanation:" %}</p>
+                            <ul class="list-disc list-inside space-y-1 text-xs">
+                                <li>{% translate "Mention what's incorrect or missing" %}</li>
+                                <li>{% translate "Provide source if possible (website, local knowledge, etc.)" %}</li>
+                                <li>{% translate "Be specific about why the change improves accuracy" %}</li>
+                                <li>{% translate "One explanation covers all your changes and images" %}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="{{ form.reason.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% translate "Explain your changes" %} <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        {{ form.reason }}
+                        <div class="absolute bottom-3 right-3 text-xs text-gray-400 pointer-events-none">
+                            <span id="char-count">0</span>/500
+                        </div>
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        {% translate "This explanation will apply to all your field changes and image uploads." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden fields for location -->
+        {{ form.latitude }}
+        {{ form.longitude }}
+
+        <!-- Form Errors -->
+        {% if form.non_field_errors %}
+        <div class="animate-shake bg-red-50 dark:bg-red-900/30 border-l-4 border-red-400 dark:border-red-600 rounded-r-lg p-4 shadow-md">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200 mb-2">
+                        <i class="fas fa-times-circle mr-1"></i>{% translate "Please fix these issues:" %}
+                    </h3>
+                    <div class="text-sm text-red-700 dark:text-red-300">
+                        {{ form.non_field_errors }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Summary & Submit Section -->
+        <div class="sticky bottom-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-3 sm:p-6 -mx-2 sm:-mx-4 lg:-mx-8">
+            <div class="max-w-6xl mx-auto">
+                <!-- Progress Summary - Compact on Mobile -->
+                <div class="mb-3 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg sm:rounded-xl border border-blue-200 dark:border-blue-800">
+                    <!-- Mobile Compact View -->
+                    <div class="block sm:hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-list-check text-blue-600 dark:text-blue-400"></i>
+                                <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                    <span id="summary-count-mobile" class="text-blue-600 dark:text-blue-400">0</span> {% translate "changes" %}
+                                </span>
+                            </div>
+                            <button type="button" onclick="toggleMobileSummary()" class="text-blue-600 dark:text-blue-400 text-sm">
+                                <i class="fas fa-chevron-down transform transition-transform" id="mobile-summary-chevron"></i>
+                            </button>
+                        </div>
+                        <div id="mobile-summary-content" class="hidden mt-2 text-xs text-gray-600 dark:text-gray-400">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                                {% translate "Select fields to edit or upload images to create suggestions." %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Full View -->
+                    <div class="hidden sm:block">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-medium text-gray-900 dark:text-white">
+                                <i class="fas fa-list-check mr-2"></i>{% translate "Suggestion Summary" %}
+                            </h3>
+                            <div class="text-sm">
+                                <span id="summary-count" class="text-blue-600 dark:text-blue-400 font-medium">0</span>
+                                <span class="text-gray-500 dark:text-gray-400">{% translate "changes" %}</span>
+                            </div>
+                        </div>
+                        <div id="summary-content" class="text-sm text-gray-600 dark:text-gray-400">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                {% translate "Select fields to edit or upload images to create suggestions." %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                    <!-- Mobile: Hide moderation message, Desktop: Show -->
+                    <div class="hidden sm:flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt mr-2 text-green-500"></i>
+                            {% translate "Your suggestions will be reviewed by moderators" %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2 sm:space-x-3 w-full sm:w-auto">
+                        <a href="{% url 'places:place_detail' place.pk %}" 
+                           class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 text-center">
+                            <i class="fas fa-times mr-1 sm:mr-2"></i>{% translate "Cancel" %}
+                        </a>
+                        <button type="submit" id="submit-button"
+                                class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg sm:rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                            <i class="fas fa-paper-plane mr-1 sm:mr-2"></i>
+                            <span id="submit-text">{% translate "Submit" %}<span class="hidden sm:inline"> {% translate "Suggestions" %}</span></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // State management
+    let activeEdits = new Set();
+    let selectedImages = [];
+    let isDarkMode = document.documentElement.classList.contains('dark');
+    
+    // Initialize counters
+    updateCounters();
+    updateProgressBar();
+    updateSummary();
+    
+    // Character counter for reason field
+    const reasonField = document.getElementById('{{ form.reason.id_for_label }}');
+    const charCount = document.getElementById('char-count');
+    
+    if (reasonField && charCount) {
+        reasonField.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            // Change color based on character count
+            if (count > 450) {
+                charCount.className = 'text-red-500 font-medium';
+            } else if (count > 300) {
+                charCount.className = 'text-amber-500';
+            } else {
+                charCount.className = 'text-gray-400';
+            }
+        });
+        
+        // Initial count
+        charCount.textContent = reasonField.value.length;
+    }
+    
+    // Toggle edit functionality
+    window.toggleEdit = function(fieldName) {
+        const editField = document.querySelector(`[data-field="${fieldName}"]`);
+        const suggestedInput = editField.querySelector('.suggested-input');
+        const checkbox = document.getElementById(`id_suggest_${fieldName}`);
+        const editButton = editField.querySelector('.edit-button');
+        
+        if (activeEdits.has(fieldName)) {
+            // Stop editing
+            activeEdits.delete(fieldName);
+            suggestedInput.classList.add('hidden');
+            editField.classList.remove('editing');
+            checkbox.checked = false;
+            editButton.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}';
+            editButton.className = editButton.className.replace('bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300', 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300');
+        } else {
+            // Start editing
+            activeEdits.add(fieldName);
+            suggestedInput.classList.remove('hidden');
+            editField.classList.add('editing');
+            if (isDarkMode) editField.classList.add('dark');
+            checkbox.checked = true;
+            editButton.innerHTML = '<i class="fas fa-times mr-1"></i>{% translate "Cancel" %}';
+            editButton.className = editButton.className.replace('bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300', 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300');
+            
+            // Focus on input field
+            const input = suggestedInput.querySelector('input, select, textarea');
+            if (input) {
+                setTimeout(() => input.focus(), 100);
+            }
+        }
+        
+        updateCounters();
+        updateProgressBar();
+        updateSummary();
+    };
+    
+    // Toggle collapsible sections
+    window.toggleSection = function(sectionId) {
+        const section = document.getElementById(sectionId);
+        const chevron = document.getElementById(sectionId.replace('-section', '-chevron'));
+        
+        if (section.classList.contains('hidden')) {
+            section.classList.remove('hidden');
+            chevron.classList.add('rotate-180');
+        } else {
+            section.classList.add('hidden');
+            chevron.classList.remove('rotate-180');
+        }
+    };
+    
+    // Image upload handling
+    window.handleFileSelect = function(event) {
+        const files = Array.from(event.target.files);
+        addSelectedImages(files);
+    };
+    
+    // Drag and drop handlers
+    window.dragOverHandler = function(event) {
+        event.preventDefault();
+        event.currentTarget.classList.add('border-purple-500', 'bg-purple-50', 'dark:bg-purple-900/20');
+    };
+    
+    window.dragEnterHandler = function(event) {
+        event.preventDefault();
+    };
+    
+    window.dragLeaveHandler = function(event) {
+        event.preventDefault();
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+            event.currentTarget.classList.remove('border-purple-500', 'bg-purple-50', 'dark:bg-purple-900/20');
+        }
+    };
+    
+    window.dropHandler = function(event) {
+        event.preventDefault();
+        event.currentTarget.classList.remove('border-purple-500', 'bg-purple-50', 'dark:bg-purple-900/20');
+        
+        const files = Array.from(event.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+        if (files.length > 0) {
+            addSelectedImages(files);
+        }
+    };
+    
+    // Image preview functionality
+    window.viewImage = function(imageUrl) {
+        // Simple modal or new tab view
+        window.open(imageUrl, '_blank');
+    };
+    
+    function addSelectedImages(files) {
+        const validFiles = files.filter(file => {
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
+                return false;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert(`File "${file.name}" is not a valid image.`);
+                return false;
+            }
+            
+            return true;
+        });
+        
+        selectedImages = selectedImages.concat(validFiles);
+        
+        // Use a DataTransfer object to update the file input
+        const dataTransfer = new DataTransfer();
+        selectedImages.forEach(file => dataTransfer.items.add(file));
+        
+        const fileInput = document.getElementById('images');
+        fileInput.files = dataTransfer.files;
+        
+        updateImagePreview();
+        updateCounters();
+        updateProgressBar();
+        updateSummary();
+    }
+    
+    function updateImagePreview() {
+        const preview = document.getElementById('image-preview');
+        const grid = document.getElementById('preview-grid');
+        
+        if (selectedImages.length === 0) {
+            preview.classList.add('hidden');
+            return;
+        }
+        
+        preview.classList.remove('hidden');
+        grid.innerHTML = '';
+        
+        selectedImages.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative group aspect-square';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview" 
+                         class="w-full h-full object-cover rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                        <button type="button" onclick="removeImage(${index})" 
+                                class="text-white hover:text-red-300 bg-red-600 rounded-full p-2">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="absolute bottom-2 left-2 right-2">
+                        <div class="bg-black bg-opacity-75 text-white text-xs p-1 rounded truncate">
+                            ${file.name}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    window.removeImage = function(index) {
+        selectedImages.splice(index, 1);
+        
+        // Use a DataTransfer object to update the file input
+        const dataTransfer = new DataTransfer();
+        selectedImages.forEach(file => dataTransfer.items.add(file));
+        
+        const fileInput = document.getElementById('images');
+        fileInput.files = dataTransfer.files;
+
+        updateImagePreview();
+        updateCounters();
+        updateProgressBar();
+        updateSummary();
+    };
+    
+    function updateCounters() {
+        document.getElementById('edit-count').textContent = activeEdits.size;
+        document.getElementById('image-count').textContent = selectedImages.length;
+    }
+    
+    // Toggle mobile summary
+    window.toggleMobileSummary = function() {
+        const content = document.getElementById('mobile-summary-content');
+        const chevron = document.getElementById('mobile-summary-chevron');
+        
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            chevron.classList.add('rotate-180');
+        } else {
+            content.classList.add('hidden');
+            chevron.classList.remove('rotate-180');
+        }
+    };
+    
+    function updateProgressBar() {
+        const totalChanges = activeEdits.size + selectedImages.length;
+        const progress = Math.min(totalChanges * 25, 100); // 25% per change, max 100%
+        
+        const progressBar = document.getElementById('progress-bar');
+        progressBar.style.width = progress + '%';
+    }
+    
+    function updateSummary() {
+        const totalChanges = activeEdits.size + selectedImages.length;
+        const summaryCount = document.getElementById('summary-count');
+        const summaryCountMobile = document.getElementById('summary-count-mobile');
+        const summaryContent = document.getElementById('summary-content');
+        const mobileSummaryContent = document.getElementById('mobile-summary-content');
+        const submitButton = document.getElementById('submit-button');
+        
+        // Update both desktop and mobile counters
+        if (summaryCount) summaryCount.textContent = totalChanges;
+        if (summaryCountMobile) summaryCountMobile.textContent = totalChanges;
+        
+        if (totalChanges === 0) {
+            const infoContent = `
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                    {% translate "Select fields to edit or upload images to create suggestions." %}
+                </div>
+            `;
+            const mobileInfoContent = `
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                    {% translate "Select fields to edit or upload images to create suggestions." %}
+                </div>
+            `;
+            
+            if (summaryContent) summaryContent.innerHTML = infoContent;
+            if (mobileSummaryContent) mobileSummaryContent.innerHTML = mobileInfoContent;
+            
+            submitButton.disabled = true;
+            submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            let summary = [];
+            if (activeEdits.size > 0) {
+                summary.push(`${activeEdits.size} field edit${activeEdits.size > 1 ? 's' : ''}`);
+            }
+            if (selectedImages.length > 0) {
+                summary.push(`${selectedImages.length} image${selectedImages.length > 1 ? 's' : ''}`);
+            }
+            
+            const readyContent = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2 text-green-500"></i>
+                    <span class="font-medium">Ready to submit:</span>
+                    <span class="ml-1">${summary.join(' + ')}</span>
+                </div>
+            `;
+            const mobileReadyContent = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-1 text-green-500"></i>
+                    <span class="font-medium">Ready:</span>
+                    <span class="ml-1">${summary.join(' + ')}</span>
+                </div>
+            `;
+            
+            if (summaryContent) summaryContent.innerHTML = readyContent;
+            if (mobileSummaryContent) mobileSummaryContent.innerHTML = mobileReadyContent;
+            
+            submitButton.disabled = false;
+            submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+    
+    // Form submission handling
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const submitButton = document.getElementById('submit-button');
+        const submitText = document.getElementById('submit-text');
+        
+        // Update submit button state
+        submitButton.disabled = true;
+        submitText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>{% translate "Submitting..." %}';
+    });
+});
+</script>
+{% endblock %}
