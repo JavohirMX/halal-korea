@@ -1,8 +1,9 @@
 {% load i18n %}
+{% load l10n %}
 {% for place in places %}
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer place-item"
-     data-lat="{{ place.location.y }}"
-     data-lng="{{ place.location.x }}"
+     data-lat="{{ place.location.y|unlocalize }}"
+     data-lng="{{ place.location.x|unlocalize }}"
      data-id="{{ place.id }}"
      onclick="window.location.href='{% url 'places:place_detail' place.id %}'">
     {% if place.photo_urls %}

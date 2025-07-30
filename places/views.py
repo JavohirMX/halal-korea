@@ -247,8 +247,8 @@ def get_places_json(request):
             'average_rating': float(place.average_rating) if place.average_rating else None,
             'photo_url': place.photo_urls[0] if place.photo_urls else None,
             'location': {
-                'lat': place.location.y,
-                'lng': place.location.x
+                'lat': float(place.location.y),
+                'lng': float(place.location.x)
             },
             'detail_url': request.build_absolute_uri(f'/places/{place.id}/'),
             'google_map_link': place.google_map_link,

@@ -302,8 +302,8 @@ LANGUAGE_CODE = 'en'
 
 LANGUAGES = [
     ('en', 'English'),
-    ('ko', 'Korean'),
-    ('uz', 'Uzbek'),
+    ('ko', '한국어'),
+    ('uz', "O'zbek"),
 ]
 
 LOCALE_PATHS = [

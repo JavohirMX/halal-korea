@@ -1,6 +1,7 @@
 {% extends 'places/base.html' %}
 {% load static %}
 {% load i18n %}
+{% load l10n %}
 
 {% block extra_head %}
 <style>
@@ -265,8 +266,8 @@
         const seoul = { lat: 37.5665, lng: 126.9780 };
         // Center on user location if available
         {% if user_location %}
-        const userLat = {{ user_location.y|stringformat:".6f" }};
-        const userLng = {{ user_location.x|stringformat:".6f" }};
+        const userLat = {{ user_location.y|unlocalize|stringformat:".6f" }};
+        const userLng = {{ user_location.x|unlocalize|stringformat:".6f" }};
         const center = { lat: userLat, lng: userLng };
         const userLocationTitle = "{% translate 'Your Location' %}";
         {% else %}

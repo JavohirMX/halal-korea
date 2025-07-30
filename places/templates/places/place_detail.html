@@ -2,6 +2,7 @@
 {% load static %}
 {% load place_extras %}
 {% load i18n %}
+{% load l10n %}
 
 {% block title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
 
@@ -460,7 +461,7 @@
 
     // Initialize Google Map
     async function initMap() {
-        const location = { lat: {{ place.location.y }}, lng: {{ place.location.x }} };
+        const location = { lat: {{ place.location.y|unlocalize }}, lng: {{ place.location.x|unlocalize }} };
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
