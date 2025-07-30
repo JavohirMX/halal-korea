@@ -23,11 +23,15 @@ wheels/
 # Django
 *.log
 logs/
+logs/*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
-static/
+media/*
+media/places/photos/*
+assets/
+assets/*
 staticfiles/
 
 # Virtual Environment
@@ -36,6 +40,9 @@ staticfiles/
 env/
 venv/
 ENV/
+# VSCode Python venv
+.vscode/.mypy_cache/
+.vscode/.pytest_cache/
 
 # IDE - VSCode
 .vscode/
@@ -68,6 +75,8 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+test-results/
+junit-*.xml
 
 # Translations
 *.mo
@@ -76,18 +85,31 @@ coverage.xml
 # Node
 node_modules/
 npm-debug.log
+yarn-error.log
 
 # Environment variables
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 
 # Project specific
-media/places/photos/*
-
-
-# Database backups
 backups/
-logs/backup.log 
+logs/backup.log
+
+# Misc
+*.swp
+*.swo
+*.bak
+*.tmp
+# macOS
+.AppleDouble
+.LSOverride
+
+# Database dumps
+*.dump
+*.sql
+*.sqlite3
+
+# Ignore secret config files
+secrets.json
+config/secrets.json
