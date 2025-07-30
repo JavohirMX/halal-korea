@@ -1,0 +1,416 @@
+/* Enhanced Admin Styles for HalalPlace */
+
+/* List view enhancements */
+.admin-list-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-list-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    padding: 12px 8px;
+    border: none;
+}
+
+.admin-list-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.admin-list-table tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Status badges enhancement */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-approved { background: #d1fae5; color: #065f46; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+.status-archived { background: #f3f4f6; color: #374151; }
+
+/* Category icons enhancement */
+.category-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+/* Image count enhancement */
+.image-count-display {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.image-count-number {
+    font-size: 18px;
+    font-weight: bold;
+    color: #059669;
+}
+
+.image-count-label {
+    font-size: 10px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Location display enhancement */
+.location-display {
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.location-coords {
+    font-family: monospace;
+    color: #374151;
+    font-weight: bold;
+}
+
+.location-address {
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+/* Suggestion count enhancement */
+.suggestion-count {
+    text-align: center;
+    font-size: 12px;
+}
+
+.suggestion-pending {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.suggestion-approved {
+    color: #059669;
+}
+
+/* Form enhancements */
+.field-image_preview_grid img {
+    border-radius: 6px;
+    transition: transform 0.2s ease;
+}
+
+.field-image_preview_grid img:hover {
+    transform: scale(1.05);
+}
+
+/* Image management field */
+.field-image_management {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.image-manager-btn {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.image-manager-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Action buttons enhancement */
+.admin-actions select {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.admin-actions .button {
+    background: #667eea;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.admin-actions .button:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+/* Filter sidebar enhancement */
+.changelist-filter {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.changelist-filter h2 {
+    background: #667eea;
+    color: white;
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.changelist-filter h3 {
+    background: #f1f5f9;
+    margin: 0;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.changelist-filter li {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.changelist-filter li:last-child {
+    border-bottom: none;
+}
+
+.changelist-filter a {
+    display: block;
+    padding: 8px 16px;
+    color: #4a5568;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.changelist-filter a:hover {
+    background: #e2e8f0;
+    color: #2d3748;
+}
+
+.changelist-filter a.selected {
+    background: #667eea;
+    color: white;
+    font-weight: 500;
+}
+
+/* Pagination enhancement */
+.paginator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.paginator a, .paginator .this-page {
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.paginator a {
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #4a5568;
+}
+
+.paginator a:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.paginator .this-page {
+    background: #667eea;
+    color: white;
+    border: 1px solid #667eea;
+}
+
+/* Search bar enhancement */
+.changelist-search {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.changelist-search input[type="text"] {
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    width: 300px;
+    transition: border-color 0.3s ease;
+}
+
+.changelist-search input[type="text"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.changelist-search input[type="submit"] {
+    background: #667eea;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+}
+
+.changelist-search input[type="submit"]:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+    .admin-list-table {
+        font-size: 12px;
+    }
+    
+    .admin-list-table th,
+    .admin-list-table td {
+        padding: 8px 4px;
+    }
+    
+    .location-display,
+    .suggestion-count {
+        font-size: 10px;
+    }
+    
+    .changelist-search input[type="text"] {
+        width: 200px;
+    }
+}
+
+/* Custom fieldset styling */
+.fieldset {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.fieldset h2 {
+    background: #f8fafc;
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.fieldset .form-row {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.fieldset .form-row:last-child {
+    border-bottom: none;
+}
+
+/* Map preview styling */
+.field-location_map iframe {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Enhanced buttons */
+.btn-enhanced {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary-enhanced {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary-enhanced:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary-enhanced {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-secondary-enhanced:hover {
+    background: #e2e8f0;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
