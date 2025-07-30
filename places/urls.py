@@ -13,4 +13,7 @@ urlpatterns = [
     path('legal/', views.legal, name='legal'),
     path('set-location/', views.set_location, name='set_location'),
     path('api/places/', views.get_places_json, name='places_json'),
+    # Suggestion URLs
+    path('place/<int:pk>/suggest-edit/', views.suggest_place_edit, name='suggest_place_edit'),
+    path('my-contributions/', views.my_contributions, name='my_contributions'),
 ]

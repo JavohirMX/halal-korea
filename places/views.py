@@ -3,9 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg, Q
 from django.contrib.auth import get_user_model
-from .models import HalalPlace
+from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 from reviews.models import Review
-from .forms import HalalPlaceForm
+from .forms import HalalPlaceForm, PlaceSuggestionForm, PlaceImageSuggestionForm
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import uuid
@@ -435,6 +435,203 @@ def set_location(request):
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def suggest_place_edit(request, pk):
+    """Display form for suggesting edits to a place"""
+    place = get_object_or_404(HalalPlace, pk=pk, status='approved')
+    
+    if request.method == 'POST':
+        form = PlaceSuggestionForm(place=place, data=request.POST, files=request.FILES)
+        if form.is_valid():
+            return _process_place_suggestions(request, form, place)
+    else:
+        form = PlaceSuggestionForm(place=place)
+    
+    context = {
+        'place': place,
+        'form': form,
+        'page_title': f'Suggest edits for {place.name}'
+    }
+    return render(request, 'places/suggest_edit.html', context)
+
+
+def _process_place_suggestions(request, form, place):
+    """Process the suggestion form and create suggestion objects"""
+    try:
+        # Get field suggestions
+        field_suggestions = form.get_field_suggestions()
+        
+        # Create field edit suggestions
+        created_suggestions = []
+        for suggestion_data in field_suggestions:
+            suggestion = PlaceEditSuggestion.objects.create(
+                place=place,
+                suggested_by=request.user,
+                field_name=suggestion_data['field_name'],
+                current_value=suggestion_data['current_value'],
+                suggested_value=suggestion_data['suggested_value'],
+                reason=suggestion_data['reason']
+            )
+            created_suggestions.append(suggestion)
+        
+        # Handle multiple image uploads
+        # Django handles multiple files when the HTML input has multiple attribute
+        images = request.FILES.getlist('images')  # Get all uploaded images
+        created_image_suggestions = []
+        
+        for image in images:
+            # Validate image
+            if image and _is_valid_image(image):
+                image_suggestion = PlaceImageSuggestion.objects.create(
+                    place=place,
+                    suggested_by=request.user,
+                    image=image,
+                    caption=form.cleaned_data.get('reason', '')  # Use reason as default caption
+                )
+                created_image_suggestions.append(image_suggestion)
+        
+        # Send notification if any suggestions were created
+        if created_suggestions or created_image_suggestions:
+            _send_suggestion_notification(place, request.user, created_suggestions, created_image_suggestions)
+        
+        # Success message
+        total_suggestions = len(created_suggestions) + len(created_image_suggestions)
+        if total_suggestions > 0:
+            messages.success(
+                request, 
+                f'Thank you! Your {total_suggestions} suggestion(s) have been submitted for review.'
+            )
+        else:
+            messages.info(request, 'No valid suggestions were submitted.')
+        
+        return redirect('places:place_detail', pk=place.pk)
+        
+    except Exception as e:
+        logger.error(f"Error processing place suggestions: {e}")
+        messages.error(request, 'There was an error processing your suggestions. Please try again.')
+        return redirect('places:suggest_place_edit', pk=place.pk)
+
+
+def _is_valid_image(image):
+    """Validate uploaded image file"""
+    try:
+        # Check file size (max 5MB)
+        if image.size > 5 * 1024 * 1024:
+            return False
+        
+        # Check file type
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        if image.content_type not in allowed_types:
+            return False
+        
+        return True
+    except Exception:
+        return False
+
+
+def _send_suggestion_notification(place, user, field_suggestions, image_suggestions):
+    """Send Telegram notification for new suggestions"""
+    try:
+        # Prepare notification message
+        total_suggestions = len(field_suggestions) + len(image_suggestions)
+        
+        message = (
+            "<b>🔔 New Place Edit Suggestions</b>\n\n"
+            f"<b>Place:</b> {place.name}\n"
+            f"<b>Submitted by:</b> {user.username}\n"
+            f"<b>Total suggestions:</b> {total_suggestions}\n\n"
+        )
+        
+        if field_suggestions:
+            message += f"<b>Field edits:</b> {len(field_suggestions)}\n"
+            for suggestion in field_suggestions[:3]:  # Show first 3
+                message += f" • {suggestion.get_field_name_display()}\n"
+            if len(field_suggestions) > 3:
+                message += f" • ... and {len(field_suggestions) - 3} more\n"
+        
+        if image_suggestions:
+            message += f"<b>Images:</b> {len(image_suggestions)}\n"
+        
+        message += "\nPlease review in <a href='https://halal-korea.com/admin/places/'>admin panel</a>."
+        
+        # Send notification (reuse existing notification system)
+        from utils.telegram_notifications import send_telegram_notification
+        send_telegram_notification(message)
+        
+    except Exception as e:
+        logger.error(f"Error sending suggestion notification: {e}")
+
+
+@login_required
+def my_contributions(request):
+    """View user's contributions including submitted places and suggestions"""
+    # Get user's submitted places
+    submitted_places = HalalPlace.objects.filter(
+        submitted_by=request.user
+    ).order_by('-created_at')
+    
+    # Get user's field suggestions
+    field_suggestions = PlaceEditSuggestion.objects.filter(
+        suggested_by=request.user
+    ).select_related('place').order_by('-created_at')
+    
+    # Get user's image suggestions
+    image_suggestions = PlaceImageSuggestion.objects.filter(
+        suggested_by=request.user
+    ).select_related('place').order_by('-created_at')
+    
+    # Pagination for submitted places
+    places_paginator = Paginator(submitted_places, 9)  # 9 for nice grid layout
+    places_page = request.GET.get('places_page', 1)
+    try:
+        submitted_places_page = places_paginator.page(places_page)
+    except (PageNotAnInteger, EmptyPage):
+        submitted_places_page = places_paginator.page(1)
+    
+    # Pagination for field suggestions
+    field_paginator = Paginator(field_suggestions, 10)
+    field_page = request.GET.get('field_page', 1)
+    try:
+        field_suggestions_page = field_paginator.page(field_page)
+    except (PageNotAnInteger, EmptyPage):
+        field_suggestions_page = field_paginator.page(1)
+    
+    # Pagination for image suggestions
+    image_paginator = Paginator(image_suggestions, 12)  # 12 for nice grid layout
+    image_page = request.GET.get('image_page', 1)
+    try:
+        image_suggestions_page = image_paginator.page(image_page)
+    except (PageNotAnInteger, EmptyPage):
+        image_suggestions_page = image_paginator.page(1)
+    
+    # Get summary statistics
+    total_submitted = submitted_places.count()
+    total_field_suggestions = field_suggestions.count()
+    total_image_suggestions = image_suggestions.count()
+    
+    # Count approved suggestions
+    approved_field_suggestions = field_suggestions.filter(status='approved').count()
+    approved_image_suggestions = image_suggestions.filter(status='approved').count()
+    approved_places = submitted_places.filter(status='approved').count()
+    
+    context = {
+        'submitted_places': submitted_places_page,
+        'field_suggestions': field_suggestions_page,
+        'image_suggestions': image_suggestions_page,
+        'page_title': 'My Contributions',
+        # Summary stats
+        'stats': {
+            'total_submitted': total_submitted,
+            'total_field_suggestions': total_field_suggestions,
+            'total_image_suggestions': total_image_suggestions,
+            'approved_field_suggestions': approved_field_suggestions,
+            'approved_image_suggestions': approved_image_suggestions,
+            'approved_places': approved_places,
+        }
+    }
+    return render(request, 'places/my_contributions.html', context)
 
 def handler404(request, exception):
     try:
