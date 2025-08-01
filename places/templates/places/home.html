@@ -243,7 +243,7 @@
         </a>
     </div>
 </div>
-
+{% if location_context.is_in_korea %}
 <script>
 // Find Nearest Places Button
 document.getElementById('find-nearest-btn').onclick = function() {
@@ -279,5 +279,7 @@ document.getElementById('find-nearest-btn').onclick = function() {
     }
 };
 </script>
+{% endif %}
+
 {% endblock %}
 

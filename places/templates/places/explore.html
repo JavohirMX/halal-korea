@@ -51,23 +51,26 @@
 
     <!-- Location/Action Buttons -->
     <div class="mb-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 sm:space-x-3">
             {% if location_context.is_in_korea %}
                 <button id="update-location-btn" type="button"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
+                    class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-sm sm:text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
                 >
-                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
-                        <i class="fas fa-map-marker-alt"></i>
+                    <span class="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
+                        <i class="fas fa-map-marker-alt text-xs sm:text-sm"></i>
                     </span>
-                    <span>{% translate "Update My Location" %}</span>
+                    <span class="hidden sm:inline">{% translate "Update My Location" %}</span>
+                    <span class="sm:hidden">{% translate "Location" %}</span>
                 </button>
             {% else %}
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         <i class="fas fa-globe-americas mr-1"></i>
-                        {% translate "Browsing from:" %} {{ location_context.location.city|default:"International" }}
+                        <span class="hidden sm:inline">{% translate "Browsing from:" %}</span>
+                        <span class="sm:hidden">{% translate "From:" %}</span>
+                        {{ location_context.location.city|default:"International" }}
                     </span>
-                    <button id="update-location-btn" type="button" class="text-primary-600 hover:text-primary-800 text-sm">
+                    <button id="update-location-btn" type="button" class="text-primary-600 hover:text-primary-800 text-xs sm:text-sm">
                         {% translate "Change" %}
                     </button>
                 </div>
@@ -76,22 +79,24 @@
             <!-- Seoul Default Button (Development/Testing) - Only for international users -->
             {% if not location_context.is_in_korea %}
             <button id="set-seoul-btn" type="button" 
-                    class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    class="inline-flex items-center px-1.5 sm:px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                     title="{% translate 'Set location to Seoul' %}">
                 <i class="fas fa-map-pin mr-1 text-xs"></i>
-                Seoul
+                <span class="hidden sm:inline">Seoul</span>
+                <span class="sm:hidden">S</span>
             </button>
             {% endif %}
         </div>
         
         <!-- View Map Button (Visible until lg breakpoint) -->
         <button id="view-map-btn" type="button"
-            class="lg:hidden inline-flex items-center gap-2 px-5 py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
+            class="lg:hidden inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-sm sm:text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
         >
-            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
-                <i class="fas fa-map-marked-alt"></i>
+            <span class="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
+                <i class="fas fa-map-marked-alt text-xs sm:text-sm"></i>
             </span>
-            <span>{% translate "View Map" %}</span>
+            <span class="hidden sm:inline">{% translate "View Map" %}</span>
+            <span class="sm:hidden">{% translate "Map" %}</span>
         </button>
     </div>
 
@@ -266,8 +271,8 @@
         const seoul = { lat: 37.5665, lng: 126.9780 };
         // Center on user location if available
         {% if user_location %}
-        const userLat = {{ user_location.y|unlocalize|stringformat:".6f" }};
-        const userLng = {{ user_location.x|unlocalize|stringformat:".6f" }};
+        const userLat = {{ user_location.y|unlocalize }};
+        const userLng = {{ user_location.x|unlocalize }};
         const center = { lat: userLat, lng: userLng };
         const userLocationTitle = "{% translate 'Your Location' %}";
         {% else %}
