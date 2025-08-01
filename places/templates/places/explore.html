@@ -26,34 +26,56 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
-    <div class="mb-8">
+    <div class="mb-8 flex flex-col lg:flex-row lg:justify-between lg:items-center">
+        <div class="flex-1">
+            {% if location_context.is_in_korea %}
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Explore Halal Places" %}</h1>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Discover halal restaurants, markets, and prayer spaces near you" %}</p>
+            {% else %}
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Halal Places in Korea" %}</h1>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Plan your halal journey across South Korea - browse by city and region" %}</p>
+                
+            {% endif %}
+        </div>
+        
+        <!-- Desktop Location Button (Only visible on desktop) -->
         {% if location_context.is_in_korea %}
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Explore Halal Places" %}</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Discover halal restaurants, markets, and prayer spaces near you" %}</p>
+        <div class="hidden lg:block">
+            <button id="update-location-btn-desktop" type="button"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
+            >
+                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
+                    <i class="fas fa-map-marker-alt"></i>
+                </span>
+                <span>{% translate "Update My Location" %}</span>
+            </button>
+        </div>
         {% else %}
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Halal Places in Korea" %}</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Plan your halal journey across South Korea - browse by city and region" %}</p>
-            <!-- Trip Planning Info -->
-            <div class="mt-4 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-info-circle text-blue-400"></i>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-blue-700 dark:text-blue-300">
-                            {% translate "Planning a trip to Korea? Browse places by city to create your perfect halal itinerary." %}
-                        </p>
-                    </div>
+                <div class="hidden lg:flex items-center space-x-1 sm:space-x-2">
+                    <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <i class="fas fa-globe-americas mr-1"></i>
+                        <span class="hidden sm:inline">{% translate "Your location:" %}</span>
+                        {{ location_context.location.city|default:"International" }}
+                    </span>
+                    <button id="update-location-btn-desktop" type="button" class="text-primary-600 hover:text-primary-800 text-xs sm:text-sm">
+                        {% translate "Update" %}
+                    </button>
+                    <span class="w-2"></span>
+                    <button id="set-seoul-btn" type="button" 
+                        class="hidden lg:inline-flex items-center px-1.5 sm:px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                        title="{% translate 'Set location to Seoul' %}">
+                        <i class="fas fa-map-pin mr-1 text-xs"></i>
+                        <span class="hidden sm:inline">Seoul</span>
+                    </button>
                 </div>
-            </div>
         {% endif %}
     </div>
 
-    <!-- Location/Action Buttons -->
-    <div class="mb-4 flex justify-between items-center">
+    <!-- Mobile Location/Action Buttons -->
+    <div class="mb-4 flex justify-between items-center lg:hidden">
         <div class="flex items-center space-x-2 sm:space-x-3">
             {% if location_context.is_in_korea %}
-                <button id="update-location-btn" type="button"
+                <button id="update-location-btn-mobile" type="button"
                     class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-sm sm:text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
                 >
                     <span class="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
@@ -66,25 +88,23 @@
                 <div class="flex items-center space-x-1 sm:space-x-2">
                     <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         <i class="fas fa-globe-americas mr-1"></i>
-                        <span class="hidden sm:inline">{% translate "Browsing from:" %}</span>
-                        <span class="sm:hidden">{% translate "From:" %}</span>
+                        <span class="hidden sm:inline">{% translate "Your location:" %}</span>
+                        <span class="sm:hidden">{% translate "Location:" %}</span>
                         {{ location_context.location.city|default:"International" }}
                     </span>
-                    <button id="update-location-btn" type="button" class="text-primary-600 hover:text-primary-800 text-xs sm:text-sm">
-                        {% translate "Change" %}
+                    <button id="update-location-btn-mobile" type="button" class="text-primary-600 hover:text-primary-800 text-xs sm:text-sm">
+                        {% translate "Update" %}
+                    </button>
+                    
+                    <!-- Seoul Default Button (Development/Testing) - Only for international users -->
+                    <button id="set-seoul-btn-mobile" type="button" 
+                    class="lg:hidden inline-flex items-center px-1.5 sm:px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    title="{% translate 'Set location to Seoul' %}">
+                        <i class="fas fa-map-pin mr-1 text-xs"></i>
+                        <span class="hidden sm:inline">Seoul</span>
+                        <span class="sm:hidden">S</span>
                     </button>
                 </div>
-            {% endif %}
-            
-            <!-- Seoul Default Button (Development/Testing) - Only for international users -->
-            {% if not location_context.is_in_korea %}
-            <button id="set-seoul-btn" type="button" 
-                    class="inline-flex items-center px-1.5 sm:px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                    title="{% translate 'Set location to Seoul' %}">
-                <i class="fas fa-map-pin mr-1 text-xs"></i>
-                <span class="hidden sm:inline">Seoul</span>
-                <span class="sm:hidden">S</span>
-            </button>
             {% endif %}
         </div>
         
@@ -674,7 +694,16 @@
 <script>
 // Seoul Default Button AJAX (only for international users)
 {% if not location_context.is_in_korea %}
+// Seoul button
 document.getElementById('set-seoul-btn').onclick = function() {
+    setSeoulLocation();
+};
+document.getElementById('set-seoul-btn-mobile').onclick = function() {
+    setSeoulLocation();
+};
+
+// Shared Seoul location function
+function setSeoulLocation() {
     // Get CSRF token from the hidden form
     const csrfToken = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
     
@@ -704,11 +733,21 @@ document.getElementById('set-seoul-btn').onclick = function() {
         console.error('Error:', error);
         alert('{% translate "Error setting location to Seoul" %}');
     });
-};
+}
 {% endif %}
 
-// Update Location Button AJAX
-document.getElementById('update-location-btn').onclick = function() {
+// Update Location Button AJAX (Mobile)
+document.getElementById('update-location-btn-mobile').onclick = function() {
+    updateLocation();
+};
+
+// Update Location Button AJAX (Desktop)
+document.getElementById('update-location-btn-desktop').onclick = function() {
+    updateLocation();
+};
+
+// Shared location update function
+function updateLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             // Get CSRF token from the hidden form
@@ -739,6 +778,6 @@ document.getElementById('update-location-btn').onclick = function() {
     } else {
         alert('{% translate "Geolocation is not supported by your browser." %}');
     }
-};
+}
 </script>
 {% endblock %}
