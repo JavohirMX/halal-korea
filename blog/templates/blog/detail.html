@@ -5,6 +5,130 @@
 
 {% block meta_description %}{{ meta_description|default:post.excerpt }}{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Additional TinyMCE content styling */
+.blog-content h1, .blog-content h2, .blog-content h3, .blog-content h4, .blog-content h5, .blog-content h6 {
+    font-weight: 600;
+    line-height: 1.25;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.blog-content h1 { font-size: 2rem; }
+.blog-content h2 { font-size: 1.75rem; }
+.blog-content h3 { font-size: 1.5rem; }
+.blog-content h4 { font-size: 1.25rem; }
+.blog-content h5 { font-size: 1.125rem; }
+.blog-content h6 { font-size: 1rem; }
+
+.blog-content ul, .blog-content ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.blog-content ul {
+    list-style-type: disc;
+}
+
+.blog-content ol {
+    list-style-type: decimal;
+}
+
+.blog-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.blog-content blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #6b7280;
+}
+
+.blog-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+}
+
+.blog-content th, .blog-content td {
+    border: 1px solid #d1d5db;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.blog-content th {
+    background-color: #f9fafb;
+    font-weight: 600;
+}
+
+.blog-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.blog-content p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+.blog-content strong {
+    font-weight: 600;
+}
+
+.blog-content em {
+    font-style: italic;
+}
+
+.blog-content a {
+    color: #3b82f6;
+    text-decoration: underline;
+}
+
+.blog-content a:hover {
+    color: #2563eb;
+}
+
+/* Dark mode styles */
+.dark .blog-content h1, .dark .blog-content h2, .dark .blog-content h3, 
+.dark .blog-content h4, .dark .blog-content h5, .dark .blog-content h6 {
+    color: #ffffff;
+}
+
+.dark .blog-content p, .dark .blog-content li {
+    color: #d1d5db;
+}
+
+.dark .blog-content blockquote {
+    border-left-color: #60a5fa;
+    color: #9ca3af;
+}
+
+.dark .blog-content th {
+    background-color: #374151;
+    color: #ffffff;
+}
+
+.dark .blog-content th, .dark .blog-content td {
+    border-color: #4b5563;
+}
+
+.dark .blog-content a {
+    color: #60a5fa;
+}
+
+.dark .blog-content a:hover {
+    color: #93c5fd;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -86,11 +210,32 @@
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-8">
             <!-- Excerpt -->
             <div class="text-lg text-gray-600 dark:text-gray-300 mb-8 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border-l-4 border-primary-500">
-                {{ post.excerpt }}
+                {{ post.excerpt|safe }}
             </div>
 
             <!-- Main Content -->
-            <div class="prose prose-lg dark:prose-invert max-w-none">
+            <div class="blog-content prose prose-lg dark:prose-invert max-w-none 
+                        prose-headings:text-gray-900 dark:prose-headings:text-white
+                        prose-h1:text-3xl prose-h1:font-bold prose-h1:mb-4
+                        prose-h2:text-2xl prose-h2:font-semibold prose-h2:mb-3 prose-h2:mt-6
+                        prose-h3:text-xl prose-h3:font-semibold prose-h3:mb-2 prose-h3:mt-5
+                        prose-h4:text-lg prose-h4:font-medium prose-h4:mb-2 prose-h4:mt-4
+                        prose-h5:text-base prose-h5:font-medium prose-h5:mb-2 prose-h5:mt-3
+                        prose-h6:text-sm prose-h6:font-medium prose-h6:mb-2 prose-h6:mt-3
+                        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:mb-4 prose-p:leading-relaxed
+                        prose-ul:list-disc prose-ul:ml-6 prose-ul:mb-4
+                        prose-ol:list-decimal prose-ol:ml-6 prose-ol:mb-4
+                        prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-li:mb-1
+                        prose-blockquote:border-l-4 prose-blockquote:border-primary-500 prose-blockquote:pl-4 prose-blockquote:italic
+                        prose-strong:font-semibold prose-strong:text-gray-900 dark:prose-strong:text-white
+                        prose-em:italic
+                        prose-a:text-primary-600 dark:prose-a:text-primary-400 prose-a:underline hover:prose-a:text-primary-700
+                        prose-img:rounded-lg prose-img:shadow-md
+                        prose-table:min-w-full prose-table:border-collapse
+                        prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600 prose-th:px-4 prose-th:py-2 prose-th:bg-gray-50 dark:prose-th:bg-gray-700
+                        prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600 prose-td:px-4 prose-td:py-2
+                        prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                        prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto">
                 {{ post.content|safe }}
             </div>
         </div>

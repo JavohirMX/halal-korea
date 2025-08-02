@@ -257,6 +257,7 @@
     </style>
 
     {% block extra_head %}{% endblock %}
+    {% block extra_css %}{% endblock %}
 
     <!-- Prevent Dark Mode Flash -->
     <script>
@@ -298,7 +299,7 @@
                         </a>
                         <a href="{% url 'blog:home' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
-                            <i class="fas fa-blog mr-2"></i>{% translate "Blog" %}
+                            <i class="fas fa-newspaper mr-2"></i>{% translate "Blog" %}
                         </a>
                         <a href="{% url 'places:about' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
@@ -329,7 +330,7 @@
                         <a href="{% url 'blog:home' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200"
                            title="{% translate 'Blog' %}">
-                            <i class="fas fa-blog"></i>
+                            <i class="fas fa-newspaper"></i>
                         </a>
                         <a href="{% url 'prayer_times:prayer_times' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-2 rounded-md text-sm font-medium transition-all duration-200"
@@ -555,7 +556,7 @@
                     </a>
                     <a href="{% url 'blog:home' %}" 
                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <i class="fas fa-blog mr-2"></i>{% translate "Blog" %}
+                        <i class="fas fa-newspaper mr-2"></i>{% translate "Blog" %}
                     </a>
                     <a href="{% url 'places:about' %}" 
                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">
