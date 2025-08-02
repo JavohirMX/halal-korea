@@ -6,8 +6,3 @@ class BlogConfig(AppConfig):
     name = 'blog'
     verbose_name = 'Blog Management'
     
-    def ready(self):
-        """Initialize blog app"""
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.info("Blog app initialized successfully")
