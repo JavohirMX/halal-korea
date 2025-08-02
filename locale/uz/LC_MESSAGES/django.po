@@ -193,7 +193,11 @@ msgstr ""
 msgid "Submit a Place"
 msgstr ""
 
-#: places/templates/places/base.html:633
+#: places/templates/places/base.html:632
+msgid "Blog"
+msgstr "Blog"
+
+#: places/templates/places/base.html:637
 msgid "About Us"
 msgstr ""
 

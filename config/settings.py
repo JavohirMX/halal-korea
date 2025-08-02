@@ -57,11 +57,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'tinymce',
     'places',
     'reviews',
     'users',
     'prayer_times',
     'utils',
+    'blog',
     
 ]
 
@@ -247,6 +249,11 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'blog': {
+            'handlers': ['console', 'file', 'error_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
         'api': {
             'handlers': ['api_file', 'console'],
             'level': 'INFO',
@@ -269,7 +276,7 @@ if DEBUG:
     LOGGING['handlers']['console']['level'] = 'INFO'
     LOGGING['handlers']['file']['level'] = 'INFO'  # Enable DEBUG logs in files
     LOGGING['loggers']['django']['level'] = 'INFO'
-    for logger_name in ['places', 'reviews', 'users', 'prayer_times', 'utils']:
+    for logger_name in ['places', 'reviews', 'users', 'prayer_times', 'utils', 'blog']:
         LOGGING['loggers'][logger_name]['level'] = 'INFO'
 else:
     # In production, log WARNING and above to console
@@ -341,5 +348,44 @@ AUTH_USER_MODEL = 'users.User'
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
 
 LOGIN_URL = 'users:login'  # URL where users will be redirected when login is required
+
+# TinyMCE Configuration
+TINYMCE_DEFAULT_CONFIG = {
+    'cleanup_on_startup': True,
+    'custom_undo_redo_levels': 20,
+    'selector': 'textarea',
+    'theme': 'silver',
+    'plugins': '''
+            textcolor save link image media preview codesample contextmenu
+            table code lists fullscreen  insertdatetime  nonbreaking
+            contextmenu directionality searchreplace wordcount visualblocks
+            visualchars code fullscreen autolink lists  charmap print  hr
+            anchor pagebreak
+            ''',
+    'toolbar1': '''
+            fullscreen preview bold italic underline | fontselect,
+            fontsizeselect  | forecolor backcolor | alignleft alignright |
+            aligncenter alignjustify | indent outdent | bullist numlist table |
+            | link image media | codesample |
+            ''',
+    'toolbar2': '''
+            visualblocks visualchars |
+            charmap hr pagebreak nonbreaking anchor |  code |
+            ''',
+    'contextmenu': 'formats | link image',
+    'menubar': True,
+    'statusbar': True,
+    'width': '100%',
+    'height': 400,
+    'content_css': [
+        '/static/admin/css/base.css',
+    ],
+    'images_upload_url': '/tinymce/upload/',
+    'images_upload_credentials': True,
+    'file_picker_types': 'image',
+    'relative_urls': False,
+    'remove_script_host': False,
+    'convert_urls': True,
+}
 LOGIN_REDIRECT_URL = 'places:home'  # URL where users will be redirected after successful login
 LOGOUT_REDIRECT_URL = 'places:home'  # URL where users will be redirected after logout
