@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Avg, Q
+from django.db.models import Avg, Q, Value, FloatField
 from django.contrib.auth import get_user_model
 from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 from reviews.models import Review
@@ -9,7 +9,7 @@ from .forms import HalalPlaceForm, PlaceSuggestionForm, PlaceImageSuggestionForm
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import uuid
-from django.db.models.functions import Round
+from django.db.models.functions import Round, Coalesce
 from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
@@ -56,7 +56,10 @@ def home(request):
             logger.debug("Featured places ordered by distance for Korea user")
         else:
             # For international users: popular/highly-rated places
-            featured_places = featured_places.order_by('-average_rating', '-created_at')[:6]
+            # Use Coalesce to ensure places with no ratings appear last
+            featured_places = featured_places.annotate(
+                rating_for_sort=Coalesce('average_rating', Value(-1.0), output_field=FloatField())
+            ).order_by('-rating_for_sort', '-created_at')[:6]
             logger.debug("Featured places ordered by rating for international user")
         
         logger.info(f"Home page rendered with {featured_places.count()} featured places")
@@ -120,7 +123,10 @@ def explore(request):
         # Korea users get distance-based sorting
         places = places.annotate(distance=Distance('location', user_location))
         if sort == 'rating':
-            places = places.order_by('-average_rating', 'name')
+            # Use Coalesce to ensure places with no ratings appear last
+            places = places.annotate(
+                rating_for_sort=Coalesce('average_rating', Value(-1.0), output_field=FloatField())
+            ).order_by('-rating_for_sort', 'name')
         else:  # Default to distance sorting for Korea users
             places = places.order_by('distance')
     else:
@@ -130,7 +136,10 @@ def explore(request):
             places = places.annotate(distance=Distance('location', user_location))
             places = places.order_by('distance')
         else:  # Default to rating for international users
-            places = places.order_by('-average_rating', 'name')
+            # Use Coalesce to ensure places with no ratings appear last
+            places = places.annotate(
+                rating_for_sort=Coalesce('average_rating', Value(-1.0), output_field=FloatField())
+            ).order_by('-rating_for_sort', 'name')
     
     # Pagination
     paginator = Paginator(places, 20)  # Show 20 places per page
@@ -217,14 +226,23 @@ def get_places_json(request):
     if user_location:
         places = places.annotate(distance=Distance('location', user_location))
         if sort == 'rating':
-            places = places.order_by('-average_rating', 'name')
+            # Use Coalesce to ensure places with no ratings appear last
+            places = places.annotate(
+                rating_for_sort=Coalesce('average_rating', Value(-1.0), output_field=FloatField())
+            ).order_by('-rating_for_sort', 'name')
         else:  # Default to distance sorting
             places = places.order_by('distance')
     else:
         if sort == 'rating':
-            places = places.order_by('-average_rating', 'name')
+            # Use Coalesce to ensure places with no ratings appear last
+            places = places.annotate(
+                rating_for_sort=Coalesce('average_rating', Value(-1.0), output_field=FloatField())
+            ).order_by('-rating_for_sort', 'name')
         else:  # Default to rating if no location
-            places = places.order_by('-average_rating', 'name')
+            # Use Coalesce to ensure places with no ratings appear last
+            places = places.annotate(
+                rating_for_sort=Coalesce('average_rating', Value(-1.0), output_field=FloatField())
+            ).order_by('-rating_for_sort', 'name')
     
     # Pagination
     paginator = Paginator(places, 20)
