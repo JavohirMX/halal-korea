@@ -1,0 +1,242 @@
+{% load i18n %}
+
+<!-- Contact Section -->
+<section id="contact-section" class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="lg:grid lg:grid-cols-2 lg:gap-12">
+            <!-- Contact Info -->
+            <div class="mb-12 lg:mb-0">
+                <div class="max-w-lg">
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+                        {% trans "Get in Touch" %}
+                    </h2>
+                    <p class="mt-4 text-lg text-gray-600 dark:text-gray-300">
+                        {% trans "Have questions, suggestions, or feedback? We'd love to hear from you. Our team is here to help and improve your halal food experience in Korea." %}
+                    </p>
+                    
+                    <div class="mt-8 space-y-6">
+                        <!-- Email -->
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-envelope text-primary-600 dark:text-primary-400"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                                    {% trans "Email Us" %}
+                                </h3>
+                                <p class="mt-1 text-gray-600 dark:text-gray-400">
+                                    {% trans "Send us an email and we'll respond within 24 hours." %}
+                                </p>
+                                <a href="mailto:{{ STATIC_INFO.email }}" 
+                                   class="mt-2 inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-500">
+                                    {{ STATIC_INFO.email }}
+                                    <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Response Time -->
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clock text-primary-600 dark:text-primary-400"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                                    {% trans "Quick Response" %}
+                                </h3>
+                                <p class="mt-1 text-gray-600 dark:text-gray-400">
+                                    {% trans "We typically respond to messages within 24 hours during business days." %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Community -->
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-users text-primary-600 dark:text-primary-400"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                                    {% trans "Community Driven" %}
+                                </h3>
+                                <p class="mt-1 text-gray-600 dark:text-gray-400">
+                                    {% trans "Your feedback helps us improve our platform and serve the halal community better." %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div>
+                <div class="glass-card rounded-xl shadow-lg p-8">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                        {% trans "Send us a message" %}
+                    </h3>
+                    
+                    <!-- Form Container -->
+                    <div id="contact-form-container">
+                        <!-- Form will be loaded here via AJAX -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-spinner fa-spin text-2xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-500 dark:text-gray-400">{% trans "Loading contact form..." %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadContactForm();
+});
+
+function loadContactForm() {
+    fetch('{% url "contact:get_form_html" %}')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('contact-form-container').innerHTML = data.html;
+            initializeContactForm();
+        })
+        .catch(error => {
+            console.error('Error loading contact form:', error);
+            document.getElementById('contact-form-container').innerHTML = 
+                `<div class="text-center py-8">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-400 mb-4"></i>
+                    <p class="text-red-500 dark:text-red-400">{% trans "Error loading contact form. Please refresh the page." %}</p>
+                </div>`;
+        });
+}
+
+function initializeContactForm() {
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('contact-submit-btn');
+    const successDiv = document.getElementById('contact-success');
+    const errorDiv = document.getElementById('contact-error');
+    
+    if (!form) return;
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Clear previous messages
+        hideMessage(successDiv);
+        hideMessage(errorDiv);
+        clearFieldErrors();
+        
+        // Show loading state
+        setSubmitButtonLoading(true);
+        
+        const formData = new FormData(form);
+        
+        fetch(form.dataset.submitUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            setSubmitButtonLoading(false);
+            
+            if (data.success) {
+                // Show success message
+                document.getElementById('success-message').textContent = data.message;
+                showMessage(successDiv);
+                
+                // Reset form
+                form.reset();
+                
+                // Scroll to success message
+                successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                // Show field errors
+                if (data.field_errors) {
+                    showFieldErrors(data.field_errors);
+                }
+                
+                // Show general error
+                document.getElementById('error-message').textContent = data.error;
+                showMessage(errorDiv);
+                
+                // Scroll to error message
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting contact form:', error);
+            setSubmitButtonLoading(false);
+            
+            document.getElementById('error-message').textContent = 
+                '{% trans "An unexpected error occurred. Please try again later." %}';
+            showMessage(errorDiv);
+        });
+    });
+}
+
+function setSubmitButtonLoading(loading) {
+    const submitBtn = document.getElementById('contact-submit-btn');
+    const submitText = submitBtn.querySelector('.submit-text');
+    const loadingText = submitBtn.querySelector('.loading-text');
+    
+    if (loading) {
+        submitBtn.disabled = true;
+        submitText.classList.add('hidden');
+        loadingText.classList.remove('hidden');
+    } else {
+        submitBtn.disabled = false;
+        submitText.classList.remove('hidden');
+        loadingText.classList.add('hidden');
+    }
+}
+
+function showMessage(element) {
+    element.classList.remove('hidden');
+    element.classList.add('animate-fade-in');
+}
+
+function hideMessage(element) {
+    element.classList.add('hidden');
+    element.classList.remove('animate-fade-in');
+}
+
+function showFieldErrors(fieldErrors) {
+    for (const [field, errors] of Object.entries(fieldErrors)) {
+        const errorElement = document.querySelector(`[data-field="${field}"]`);
+        if (errorElement && errors.length > 0) {
+            errorElement.textContent = errors[0];
+            errorElement.classList.remove('hidden');
+        }
+    }
+}
+
+function clearFieldErrors() {
+    const errorElements = document.querySelectorAll('[data-field]');
+    errorElements.forEach(element => {
+        element.classList.add('hidden');
+        element.textContent = '';
+    });
+}
+</script>
+
+<style>
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+</style>

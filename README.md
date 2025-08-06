@@ -47,6 +47,7 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 ## ✨ Features
 
 ### 🏪 Place Management
+
 - **Categories**: Restaurants, Markets, Mosques, Prayer Rooms
 - **Verification System**: Admin approval workflow for submitted places
 - **Rich Information**: Photos, contact details, map links (Google, Kakao, Naver)
@@ -54,6 +55,7 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **Filtering & Sorting**: By category, distance, rating
 
 ### 👤 User Experience
+
 - **Authentication**: Custom user model with enhanced profiles
 - **Favorites**: Save and organize preferred places
 - **Reviews**: Rate and review visited places (1-5 stars)
@@ -61,16 +63,26 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **Language Preferences**: Persistent language selection
 
 ### 🕰️ Prayer Times
+
 - **Real-time Calculation**: Accurate prayer times for any Korean city
 - **Multiple Methods**: Support for different calculation methods (Muslim World League, etc.)
 - **Caching System**: Optimized performance with 23-hour cache
 - **Asr Options**: Hanafi and Standard calculation methods
 
 ### 🔧 Admin Features
+
 - **Content Moderation**: Approve/reject place submissions
 - **User Management**: Comprehensive user administration
 - **Analytics**: Built-in Django admin with custom logging
 - **Backup System**: Automated database backups with Telegram notifications
+
+### 💬 Contact System
+
+- **Contact Form**: Integrated contact forms on home and about pages
+- **Telegram Integration**: Instant notifications for new contact messages
+- **Rate Limiting**: Spam protection with IP and user-based limits
+- **Admin Management**: Full contact message management in admin panel
+- **Universal Access**: Available to both authenticated and anonymous users
 
 ## 🏗️ Architecture
 
@@ -109,6 +121,12 @@ halal-korea/
 │   ├── models.py         # Prayer time caching model
 │   ├── utils.py          # Prayer calculation utilities
 │   └── views.py          # Prayer time API views
+├── contact/              # Contact form system
+│   ├── models.py         # ContactMessage model
+│   ├── forms.py          # Contact form with validation
+│   ├── views.py          # AJAX form submission
+│   ├── rate_limiting.py  # Spam protection utilities
+│   └── templates/        # Contact form templates
 ├── utils/                # Shared utilities and helpers
 │   ├── location_manager.py  # Location detection and management
 │   ├── logging_utils.py     # Custom logging utilities
@@ -180,6 +198,7 @@ Visit `http://localhost:8000` to access the application.
 ### Development Environment
 
 1. **Virtual Environment Setup**
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -187,6 +206,7 @@ Visit `http://localhost:8000` to access the application.
    ```
 
 2. **Database Configuration**
+
    ```bash
    # Install PostgreSQL and PostGIS
    sudo apt-get install postgresql postgresql-contrib postgis
@@ -197,6 +217,7 @@ Visit `http://localhost:8000` to access the application.
    ```
 
 3. **Environment Variables**
+
    ```env
    # Database
    DB_NAME=halal_korea
@@ -219,6 +240,7 @@ Visit `http://localhost:8000` to access the application.
    ```
 
 4. **Static Files & Translations**
+
    ```bash
    python manage.py collectstatic
    python manage.py compilemessages
@@ -311,6 +333,7 @@ services:
 ## 📱 Apps & Modules
 
 ### Places App (`places/`)
+
 **Core functionality for halal place management**
 
 - **Models**: `HalalPlace` with PostGIS Point field
@@ -319,6 +342,7 @@ services:
 - **Features**: Photo uploads, multiple map links, GPS coordinates
 
 ### Users App (`users/`)
+
 **Authentication and user profile management**
 
 - **Custom User Model**: Extended Django user with favorites
@@ -327,6 +351,7 @@ services:
 - **Authentication Views**: Login, register, logout with custom templates
 
 ### Reviews App (`reviews/`)
+
 **Community review and rating system**
 
 - **Rating System**: 1-5 star ratings with comments
@@ -335,6 +360,7 @@ services:
 - **Display**: Average ratings calculated on-the-fly
 
 ### Prayer Times App (`prayer_times/`)
+
 **Islamic prayer time calculations**
 
 - **Calculation Methods**: Multiple Islamic calculation standards
@@ -343,6 +369,7 @@ services:
 - **API Integration**: External prayer time service integration
 
 ### Utils App (`utils/`)
+
 **Shared utilities and helper functions**
 
 - **Location Manager**: IP-based location detection
@@ -355,6 +382,7 @@ services:
 ### Core Models
 
 #### HalalPlace Model
+
 ```python
 class HalalPlace(models.Model):
     name = CharField(max_length=255)
@@ -375,6 +403,7 @@ class HalalPlace(models.Model):
 ```
 
 #### User Model
+
 ```python
 class User(AbstractUser):
     favorite_places = ManyToManyField(HalalPlace)
@@ -384,6 +413,7 @@ class User(AbstractUser):
 ```
 
 #### Review Model
+
 ```python
 class Review(models.Model):
     user = ForeignKey(User, CASCADE)
@@ -397,6 +427,7 @@ class Review(models.Model):
 ```
 
 #### PrayerTimeCache Model
+
 ```python
 class PrayerTimeCache(models.Model):
     city = CharField(max_length=100)
@@ -421,6 +452,7 @@ class PrayerTimeCache(models.Model):
 ### Available Commands
 
 #### Database Backup
+
 ```bash
 # Create and send backup to Telegram
 python manage.py backup_database
@@ -433,6 +465,7 @@ python manage.py backup_database --local-only
 ```
 
 #### Test Data Creation
+
 ```bash
 # Create sample places for development
 python manage.py create_test_data
@@ -442,6 +475,7 @@ python manage.py create_test_data --count 50
 ```
 
 #### Logging Test
+
 ```bash
 # Test logging system functionality
 python manage.py test_logging
@@ -563,17 +597,20 @@ python manage.py backup_database --local-only
 ### Places API
 
 #### Get Places JSON
+
 ```http
 GET /api/places/?category=restaurant&lat=37.5665&lng=126.9780&radius=5000
 ```
 
 **Parameters:**
+
 - `category` (optional): Filter by place category
 - `lat`, `lng` (optional): User location for distance calculation
 - `radius` (optional): Search radius in meters
 - `search` (optional): Text search in name and description
 
 **Response:**
+
 ```json
 {
   "places": [
@@ -600,6 +637,7 @@ GET /api/places/?category=restaurant&lat=37.5665&lng=126.9780&radius=5000
 ### Prayer Times API
 
 #### Get Prayer Times
+
 ```http
 POST /prayer/get-times/
 Content-Type: application/json
@@ -614,6 +652,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -636,6 +675,7 @@ Content-Type: application/json
 ### Location API
 
 #### Update User Location
+
 ```http
 POST /set-location/
 Content-Type: application/json
@@ -661,23 +701,27 @@ Content-Type: application/json
 ### Key UI Components
 
 #### Navigation
+
 - Responsive navbar with language selector
 - Mobile hamburger menu
 - User authentication status indicators
 
 #### Place Cards
+
 - Image carousel with lazy loading
 - Rating display with star icons
 - Distance calculation and display
 - Quick action buttons (favorite, directions)
 
 #### Map Integration
+
 - Google Maps with custom markers
 - Category-specific marker icons
 - Info windows with place previews
 - Real-time location detection
 
 #### Forms
+
 - Multi-step place submission form
 - Client-side validation
 - Image upload with preview
@@ -710,6 +754,7 @@ Content-Type: application/json
 ### Translation Management
 
 #### Mark Strings for Translation
+
 ```python
 from django.utils.translation import gettext_lazy as _
 
@@ -722,6 +767,7 @@ message = _("Welcome to Halal Korea")
 ```
 
 #### Update Translation Files
+
 ```bash
 # Extract translatable strings
 python manage.py makemessages -l ko
@@ -732,6 +778,7 @@ python manage.py compilemessages
 ```
 
 #### Translation Files Location
+
 ```
 locale/
 ├── en/LC_MESSAGES/
@@ -893,6 +940,7 @@ class PlaceTestCase(TestCase):
 ### Development Workflow
 
 1. **Fork the Repository**
+
    ```bash
    git clone <your-fork-url>
    cd halal-korea
@@ -900,11 +948,13 @@ class PlaceTestCase(TestCase):
    ```
 
 2. **Create Feature Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 3. **Development Environment**
+
    ```bash
    python -m venv venv
    source venv/bin/activate
@@ -920,6 +970,7 @@ class PlaceTestCase(TestCase):
    - Update documentation as needed
 
 5. **Commit and Push**
+
    ```bash
    git add .
    git commit -m "feat: add new feature description"
@@ -957,13 +1008,14 @@ class PlaceTestCase(TestCase):
 
 ### Community
 
-- **Email**: contact@halal-korea.com
+- **Email**: <contact@halal-korea.com>
 - **Issues**: Use GitHub issues for bug reports and feature requests
 - **Discussions**: GitHub discussions for questions and community support
 
 ### Professional Support
 
 For enterprise deployments and professional support:
+
 - Custom development and integration
 - Performance optimization consulting
 - Security audits and compliance
@@ -988,4 +1040,4 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) file for 
 
 **Built with ❤️ for the Muslim community in Korea**
 
-For more information, visit our website or contact our team. 
+For more information, visit our website or contact our team.

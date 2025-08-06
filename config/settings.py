@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'prayer_times',
     'utils',
     'blog',
+    'contact',
     
 ]
 

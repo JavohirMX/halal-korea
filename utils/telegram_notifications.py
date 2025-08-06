@@ -133,6 +133,66 @@ class TelegramNotifier:
             return False
 
 
+    def notify_contact_message(self, contact_data: Dict[str, Any]) -> bool:
+        """
+        Send a notification about a new contact form submission
+        
+        Args:
+            contact_data (dict): Dictionary containing contact information
+                Required keys: name, email, message
+                Optional keys: subject, user_type, user_id
+                
+        Returns:
+            bool: True if notification was sent successfully, False otherwise
+        """
+        if not self.enabled:
+            return False
+        
+        try:
+            # Extract required data
+            name = contact_data.get('name', 'Unknown')
+            email = contact_data.get('email', 'Unknown')
+            message = contact_data.get('message', '')
+            
+            # Optional data
+            subject = contact_data.get('subject', '')
+            user_type = contact_data.get('user_type', 'Anonymous')
+            user_id = contact_data.get('user_id', '')
+            
+            # Build the message
+            message_parts = [
+                "💬 <b>New Contact Message!</b>",
+                "",
+                f"👤 <b>Name:</b> {name}",
+                f"📧 <b>Email:</b> {email}",
+                f"🆔 <b>User Type:</b> {user_type}",
+            ]
+            
+            if user_id:
+                message_parts.append(f"🔢 <b>User ID:</b> {user_id}")
+            
+            if subject:
+                message_parts.append(f"📋 <b>Subject:</b> {subject}")
+            
+            # Truncate message if it's too long
+            truncated_message = message[:500] + "..." if len(message) > 500 else message
+            message_parts.extend([
+                "",
+                "💬 <b>Message:</b>",
+                f"<i>{truncated_message}</i>",
+                "",
+                "📧 <i>Please reply to the user's email address</i>"
+            ])
+            
+            notification_message = '\n'.join(message_parts)
+            
+            return self.send_message(notification_message)
+            
+        except Exception as e:
+            logger.error(f"Error formatting contact message notification: {str(e)}")
+            return False
+
+
 # Convenience functions for easy import
 def send_new_place_notification(place_data: Dict[str, Any]) -> bool:
     """
@@ -160,4 +220,18 @@ def send_telegram_notification(message: str, parse_mode: str = 'HTML') -> bool:
         bool: True if notification was sent successfully, False otherwise
     """
     notifier = TelegramNotifier()
-    return notifier.send_message(message, parse_mode) 
+    return notifier.send_message(message, parse_mode)
+
+
+def send_contact_message_notification(contact_data: Dict[str, Any]) -> bool:
+    """
+    Convenience function to send a contact form submission notification
+    
+    Args:
+        contact_data (dict): Dictionary containing contact information
+        
+    Returns:
+        bool: True if notification was sent successfully, False otherwise
+    """
+    notifier = TelegramNotifier()
+    return notifier.notify_contact_message(contact_data) 
