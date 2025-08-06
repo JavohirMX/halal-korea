@@ -714,6 +714,33 @@
     </div>
     {% endif %}
 
+    <!-- Email Verification Notice -->
+    {% if user.is_authenticated and not user.email_verified %}
+    <div class="bg-yellow-50 dark:bg-yellow-900/50 border-l-4 border-yellow-400 p-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                        <strong>{% translate "Email verification required" %}</strong> - 
+                        {% translate "Please verify your email address to submit places, reviews, and suggestions." %}
+                        <a href="{% url 'users:resend_activation' %}" class="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-300 ml-2">
+                            {% translate "Send verification email" %}
+                        </a>
+                    </p>
+                </div>
+                <div class="ml-3 flex-shrink-0">
+                    <button type="button" class="close-verification-notice bg-yellow-50 dark:bg-yellow-900/50 rounded-md p-1.5 text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/75 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2 focus:ring-offset-yellow-50 dark:focus:ring-offset-yellow-900/50">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Main Content -->
     <main>
         {% block content %}{% endblock %}
@@ -842,6 +869,17 @@
                     message.style.opacity = '0';
                     setTimeout(() => {
                         message.remove();
+                    }, 300);
+                });
+            });
+
+            // Handle email verification notice dismissal
+            document.querySelectorAll('.close-verification-notice').forEach(button => {
+                button.addEventListener('click', () => {
+                    const notice = button.closest('div[class*="bg-yellow-50"]');
+                    notice.style.opacity = '0';
+                    setTimeout(() => {
+                        notice.remove();
                     }, 300);
                 });
             });

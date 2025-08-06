@@ -7,6 +7,21 @@
 <div class="max-w-md w-full mx-auto px-4 sm:px-6 mt-8 sm:mt-12">
     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{% translate "Create an Account" %}</h2>
 
+    <!-- Email Verification Notice -->
+    <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-md">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>{% translate "Email Verification Required" %}</strong><br>
+                    {% translate "After registration, you'll need to verify your email address before you can log in. Please check your inbox for the activation email." %}
+                </p>
+            </div>
+        </div>
+    </div>
+
     {% if messages %}
     <div class="mb-4">
         {% for message in messages %}

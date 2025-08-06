@@ -1,0 +1,86 @@
+{% extends 'places/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Rate Limited" %} - {{ STATIC_INFO.site_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center px-4 py-8">
+    <div class="max-w-md w-full">
+        <div class="bg-white/80 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-8 text-center">
+            <!-- Warning Icon -->
+            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">
+                {% trans "Rate Limit Exceeded" %}
+            </h1>
+            
+            <!-- Description -->
+            <div class="text-gray-600 mb-8 space-y-3">
+                <p>
+                    {% trans "You've exceeded the maximum number of allowed requests. This is a security measure to protect our service." %}
+                </p>
+                
+                {% if error_message %}
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p class="text-sm text-yellow-800 font-medium">
+                        {{ error_message }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- What to do -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 text-left">
+                <h3 class="font-semibold text-blue-900 mb-2">
+                    📝 {% trans "What you can do:" %}
+                </h3>
+                <ul class="text-sm text-blue-800 space-y-1">
+                    <li>• {% trans "Wait for the time limit to reset" %}</li>
+                    <li>• {% trans "Try again in a few minutes" %}</li>
+                    <li>• {% trans "Contact support if you believe this is an error" %}</li>
+                </ul>
+            </div>
+            
+            <!-- Actions -->
+            <div class="space-y-3">
+                <a href="{% url 'places:home' %}" 
+                   class="block w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    {% trans "Return to Home" %}
+                </a>
+                
+                <button onclick="window.history.back()" 
+                        class="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                    {% trans "Go Back" %}
+                </button>
+            </div>
+            
+            <!-- Auto-refresh notice -->
+            <div class="mt-6 text-xs text-gray-500">
+                <p>{% trans "This page will automatically refresh in" %} <span id="countdown">60</span> {% trans "seconds" %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let timeLeft = 60;
+    const countdownElement = document.getElementById('countdown');
+    
+    const timer = setInterval(function() {
+        timeLeft--;
+        countdownElement.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            window.location.reload();
+        }
+    }, 1000);
+});
+</script>
+{% endblock %}

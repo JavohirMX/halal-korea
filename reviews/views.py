@@ -6,11 +6,13 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_http_methods
 from .models import Review
 from places.models import HalalPlace
+from users.decorators import email_verification_required
 import logging
 
 logger = logging.getLogger(__name__)
 
 @login_required
+@email_verification_required
 @require_http_methods(["POST"])
 def add_review(request, place_id):
     """Add a new review for a place."""
@@ -78,6 +80,7 @@ def add_review(request, place_id):
     return redirect('places:place_detail', pk=place_id)
 
 @login_required
+@email_verification_required
 def edit_review(request, review_id):
     """Edit an existing review."""
     review = get_object_or_404(Review, id=review_id, user=request.user)
@@ -129,6 +132,7 @@ def edit_review(request, review_id):
     return redirect('places:place_detail', pk=place_id)
 
 @login_required
+@email_verification_required
 @require_http_methods(["POST", "DELETE"])
 def delete_review(request, review_id):
     """Delete a review."""

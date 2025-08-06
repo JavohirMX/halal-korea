@@ -31,6 +31,7 @@ class User(AbstractUser):
         ('uz', "O'zbek"),
     ]
     preferred_language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
+    email_verified = models.BooleanField(default=False, help_text="Whether the user has verified their email address")
     
     updated_at = models.DateTimeField(auto_now=True)
 

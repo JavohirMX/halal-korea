@@ -29,12 +29,12 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS").split()
+ALLOWED_HOSTS = config("ALLOWED_HOSTS").split() # type: ignore
 
 # CSRF Settings for production
 # Add your production domain(s) to CSRF_TRUSTED_ORIGINS environment variable
 # Example: CSRF_TRUSTED_ORIGINS="https://halal-korea.com https://www.halal-korea.com"
-CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split()
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split() # type: ignore
 
 # Telegram Bot Notifications
 # Set TELEGRAM_NOTIFICATIONS_ENABLED=True in your .env file to enable notifications
@@ -124,6 +124,45 @@ DATABASES = {
 # DATABASES = {
 #     'default': dj_database_url.config(default=config("DATABASE_URL"))
 # }
+
+# Cache Configuration
+# https://docs.djangoproject.com/en/5.1/topics/cache/
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 3600,  # 1 hour default timeout
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,
+            'CULL_FREQUENCY': 3,
+        }
+    }
+}
+
+# For production, consider using Redis:
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': config('REDIS_URL', default='redis://127.0.0.1:6379/1'),
+#         'TIMEOUT': 3600,
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#         }
+#     }
+# }
+
+# Rate Limiting Configuration
+# These settings define the rate limits for various actions
+RATE_LIMIT_SETTINGS = {
+    'EMAIL_SEND_PER_IP_LIMIT': 5,          # emails per hour per IP
+    'EMAIL_SEND_PER_IP_WINDOW': 60,        # minutes
+    'EMAIL_SEND_PER_USER_LIMIT': 3,        # emails per 30 min per user
+    'EMAIL_SEND_PER_USER_WINDOW': 30,      # minutes
+    'REGISTRATION_PER_IP_LIMIT': 3,        # registrations per hour per IP
+    'REGISTRATION_PER_IP_WINDOW': 60,      # minutes
+    'LOGIN_ATTEMPTS_PER_IP_LIMIT': 10,     # login attempts per 30 min per IP
+    'LOGIN_ATTEMPTS_PER_IP_WINDOW': 30,    # minutes
+}
 
 # Logging Configuration
 LOGGING = {
@@ -349,6 +388,26 @@ AUTH_USER_MODEL = 'users.User'
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
 
 LOGIN_URL = 'users:login'  # URL where users will be redirected when login is required
+LOGIN_REDIRECT_URL = 'places:home'  # URL where users will be redirected after successful login
+LOGOUT_REDIRECT_URL = 'places:home'  # URL where users will be redirected after logout
+
+# Email Configuration
+if DEBUG:
+    # For development, emails will be printed to console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    # For production, use these settings with a service like SendGrid, Mailgun, etc.
+    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+    EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+    EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+    EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Halal Korea<noreply@halal-korea.com>')
+
+# Email verification settings
+EMAIL_VERIFICATION_TIMEOUT = config('EMAIL_VERIFICATION_TIMEOUT', default=86400, cast=int)  # 24 hours in seconds
 
 # TinyMCE Configuration
 TINYMCE_DEFAULT_CONFIG = {
@@ -388,5 +447,3 @@ TINYMCE_DEFAULT_CONFIG = {
     'remove_script_host': False,
     'convert_urls': True,
 }
-LOGIN_REDIRECT_URL = 'places:home'  # URL where users will be redirected after successful login
-LOGOUT_REDIRECT_URL = 'places:home'  # URL where users will be redirected after logout

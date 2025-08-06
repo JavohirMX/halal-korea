@@ -5,7 +5,7 @@ from django.db.models import Avg, Q
 from django.contrib.auth import get_user_model
 from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 from reviews.models import Review
-from .forms import HalalPlaceForm, PlaceSuggestionForm, PlaceImageSuggestionForm
+from .forms import HalalPlaceForm, PlaceSuggestionForm, PlaceImageSuggestionForm  # noqa: F401
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import uuid
@@ -20,6 +20,7 @@ from django.template.loader import render_to_string
 import json
 import logging
 from utils.telegram_notifications import send_new_place_notification
+from users.decorators import email_verification_required
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -310,6 +311,7 @@ def upload_photo(photo):
     return path  # Return just the path, not the full URL
 
 @login_required
+@email_verification_required
 def submit_place(request):
     """Handle place submission by authenticated users"""
     try:
@@ -438,6 +440,7 @@ def set_location(request):
 
 
 @login_required
+@email_verification_required
 def suggest_place_edit(request, pk):
     """Display form for suggesting edits to a place"""
     place = get_object_or_404(HalalPlace, pk=pk, status='approved')
