@@ -4,151 +4,226 @@
 {% block title %}{% translate "Sign up" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block content %}
-<div class="max-w-md w-full mx-auto px-4 sm:px-6 mt-8 sm:mt-12">
-    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{% translate "Create an Account" %}</h2>
-
-    <!-- Email Verification Notice -->
-    <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-md">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <i class="fas fa-info-circle text-blue-400"></i>
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="mx-auto h-16 w-16 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mb-4">
+                <i class="fas fa-user-plus text-2xl text-primary-600 dark:text-primary-400"></i>
             </div>
-            <div class="ml-3">
-                <p class="text-sm text-blue-800 dark:text-blue-200">
-                    <strong>{% translate "Email Verification Required" %}</strong><br>
-                    {% translate "After registration, you'll need to verify your email address before you can log in. Please check your inbox for the activation email." %}
-                </p>
-            </div>
-        </div>
-    </div>
-
-    {% if messages %}
-    <div class="mb-4">
-        {% for message in messages %}
-        <div class="p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-200{% else %}bg-green-50 dark:bg-green-900/50 text-green-700 dark:text-green-200{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <form method="POST" class="space-y-6">
-        {% csrf_token %}
-        
-        <!-- Username -->
-        <div>
-            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {% translate "Username" %} <span class="text-red-500">*</span>
-            </label>
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-user text-gray-400"></i>
-                </div>
-                <input type="text" 
-                       name="username" 
-                       id="username" 
-                       required 
-                       autocomplete="username"
-                       placeholder="{% translate 'Enter your username' %}"
-                       class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
-            </div>
-            {% if form.username.errors %}
-            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.username.errors.0 }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Email -->
-        <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {% translate "Email" %} <span class="text-red-500">*</span>
-            </label>
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-envelope text-gray-400"></i>
-                </div>
-                <input type="email" 
-                       name="email" 
-                       id="email" 
-                       required 
-                       autocomplete="email"
-                       placeholder="{% translate 'Enter your email' %}"
-                       class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
-            </div>
-            {% if form.email.errors %}
-            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.email.errors.0 }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Password -->
-        <div>
-            <label for="password1" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {% translate "Password" %} <span class="text-red-500">*</span>
-            </label>
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-lock text-gray-400"></i>
-                </div>
-                <input type="password" 
-                       name="password1" 
-                       id="password1" 
-                       required 
-                       autocomplete="new-password"
-                       placeholder="{% translate 'Create a password' %}"
-                       class="pl-10 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
-                <button type="button" 
-                        onclick="togglePassword('password1')"
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <i class="fas fa-eye text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"></i>
-                </button>
-            </div>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {% translate "Password must be at least 8 characters and contain letters and numbers" %}
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Create an Account" %}</h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                {% translate "Join our community and discover halal places" %}
             </p>
-            {% if form.password1.errors %}
-            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password1.errors.0 }}</p>
-            {% endif %}
         </div>
 
-        <!-- Confirm Password -->
-        <div>
-            <label for="password2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {% translate "Confirm Password" %}
-            </label>
-            <input type="password" 
-                   name="password2" 
-                   id="password2" 
-                   required 
-                   class="mt-1 block w-full h-11 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500">
-            {% if form.password2.errors %}
-            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password2.errors.0 }}</p>
-            {% endif %}
-        </div>
-
-        <div>
-            <button type="submit" 
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                {% translate "Sign up" %}
-            </button>
-        </div>
-    </form>
-
-    <div class="mt-6">
-        <div class="relative">
-            <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+        <!-- Messages -->
+        {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg shadow-sm {% if message.tags == 'error' %}bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-200 border border-red-200 dark:border-red-800{% else %}bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-200 border border-green-200 dark:border-green-800{% endif %}">
+                <div class="flex items-center">
+                    <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>
+                    {{ message }}
+                </div>
             </div>
-            <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                    {% translate "Already have an account?" %}
-                </span>
-            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Form Card -->
+
+        <!-- Form Card -->
+        <div class="glass-card rounded-xl p-8 shadow-xl">
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Name Fields Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- First Name -->
+                    <div>
+                        <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {% translate "First Name" %}
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" 
+                                   name="first_name" 
+                                   id="first_name" 
+                                   autocomplete="given-name"
+                                   placeholder="{% translate 'John' %}"
+                                   class="pl-10 block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400">
+                        </div>
+                        {% if form.first_name.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Last Name -->
+                    <div>
+                        <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {% translate "Last Name" %}
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" 
+                                   name="last_name" 
+                                   id="last_name" 
+                                   autocomplete="family-name"
+                                   placeholder="{% translate 'Doe' %}"
+                                   class="pl-10 block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400">
+                        </div>
+                        {% if form.last_name.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Username -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% translate "Username" %} <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-at text-gray-400"></i>
+                        </div>
+                        <input type="text" 
+                               name="username" 
+                               id="username" 
+                               required 
+                               autocomplete="username"
+                               placeholder="{% translate 'johndoe123' %}"
+                               class="pl-10 block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400">
+                    </div>
+                    {% if form.username.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% translate "Email" %} <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input type="email" 
+                               name="email" 
+                               id="email" 
+                               required 
+                               autocomplete="email"
+                               placeholder="{% translate 'john@example.com' %}"
+                               class="pl-10 block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400">
+                    </div>
+                    {% if form.email.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password1" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% translate "Password" %} <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" 
+                               name="password1" 
+                               id="password1" 
+                               required 
+                               autocomplete="new-password"
+                               placeholder="{% translate 'Create a strong password' %}"
+                               class="pl-10 pr-12 block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400">
+                        <button type="button" 
+                                onclick="togglePassword('password1')"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-primary-600 dark:hover:text-primary-400 transition duration-200">
+                            <i class="fas fa-eye text-gray-400" id="password1-icon"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <div class="flex items-start space-x-2">
+                            <i class="fas fa-info-circle text-gray-400 mt-0.5 text-xs"></i>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {% translate "Password must be at least 8 characters with letters and numbers" %}
+                            </p>
+                        </div>
+                    </div>
+                    {% if form.password1.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label for="password2" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {% translate "Confirm Password" %} <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" 
+                               name="password2" 
+                               id="password2" 
+                               required 
+                               autocomplete="new-password"
+                               placeholder="{% translate 'Confirm your password' %}"
+                               class="pl-10 pr-12 block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400">
+                        <button type="button" 
+                                onclick="togglePassword('password2')"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-primary-600 dark:hover:text-primary-400 transition duration-200">
+                            <i class="fas fa-eye text-gray-400" id="password2-icon"></i>
+                        </button>
+                    </div>
+                    {% if form.password2.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <i class="fas fa-user-plus text-primary-300 group-hover:text-primary-200"></i>
+                        </span>
+                        {% translate "Create Account" %}
+                    </button>
+                </div>
+            </form>
         </div>
 
+        <!-- Login Link -->
         <div class="mt-6">
-            <a href="{% url 'users:login' %}" 
-               class="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                {% translate "Log in" %}
-            </a>
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                        {% translate "Already have an account?" %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <a href="{% url 'users:login' %}" 
+                   class="group relative w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-sign-in-alt text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"></i>
+                    </span>
+                    {% translate "Sign In" %}
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -156,8 +231,7 @@
 <script>
 function togglePassword(inputId) {
     const input = document.getElementById(inputId);
-    const button = input.nextElementSibling;
-    const icon = button.querySelector('i');
+    const icon = document.getElementById(inputId + '-icon');
     
     if (input.type === 'password') {
         input.type = 'text';
@@ -169,5 +243,25 @@ function togglePassword(inputId) {
         icon.classList.add('fa-eye');
     }
 }
+
+// Form validation feedback
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+    
+    // Real-time password confirmation validation
+    password2.addEventListener('input', function() {
+        if (password1.value && password2.value) {
+            if (password1.value === password2.value) {
+                password2.classList.add('border-green-500');
+                password2.classList.remove('border-red-500');
+            } else {
+                password2.classList.add('border-red-500');
+                password2.classList.remove('border-green-500');
+            }
+        }
+    });
+});
 </script>
 {% endblock %} 

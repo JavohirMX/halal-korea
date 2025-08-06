@@ -18,6 +18,10 @@ class User(AbstractUser):
         verbose_name='user permissions',
     )
     
+    # Name fields
+    first_name = models.CharField(max_length=30, blank=True, help_text="User's first name")
+    last_name = models.CharField(max_length=30, blank=True, help_text="User's last name")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     favorite_places = models.ManyToManyField(
         'places.HalalPlace',
@@ -34,6 +38,11 @@ class User(AbstractUser):
     email_verified = models.BooleanField(default=False, help_text="Whether the user has verified their email address")
     
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def full_name(self):
+        """Return the user's full name."""
+        return f"{self.first_name} {self.last_name}".strip() or self.username
 
     class Meta:
         db_table = 'users_user'  # Explicitly set the table name

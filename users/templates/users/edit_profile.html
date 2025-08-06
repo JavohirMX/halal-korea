@@ -18,6 +18,38 @@
             <form method="POST" class="space-y-6">
                 {% csrf_token %}
 
+                <!-- First Name -->
+                <div>
+                    <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {% translate "First Name" %}
+                    </label>
+                    <input type="text" 
+                           name="first_name" 
+                           id="first_name" 
+                           value="{{ user.first_name }}"
+                           placeholder="{% translate 'Enter your first name' %}"
+                           class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 h-12 px-4 text-base">
+                    {% if form.first_name.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {% translate "Last Name" %}
+                    </label>
+                    <input type="text" 
+                           name="last_name" 
+                           id="last_name" 
+                           value="{{ user.last_name }}"
+                           placeholder="{% translate 'Enter your last name' %}"
+                           class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 h-12 px-4 text-base">
+                    {% if form.last_name.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
