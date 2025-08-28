@@ -4,15 +4,37 @@ import time
 def is_user_in_korea(location_data):
     """
     Determine if user is currently in Korea based on location data.
+    Uses multiple methods: country name, coordinates, and reverse geocoding.
     Returns True if user is in Korea, False if international.
     """
     if not location_data or location_data.get("error"):
         return False  # If we can't determine location, assume international
     
+    # Method 1: Check country code first (most reliable)
+    country_code = location_data.get("country_code", "").upper()
+    if country_code == "KR":
+        return True
+    
+    # Method 1b: Check country field if available
     country = location_data.get("country", "").lower()
-    # Check for various forms of "South Korea" or "Korea"
-    korea_indicators = ["south korea", "korea", "korean", "republic of korea"]
-    return any(indicator in country for indicator in korea_indicators)
+    if country:
+        korea_indicators = ["south korea", "korea", "korean", "republic of korea"]
+        if any(indicator in country for indicator in korea_indicators):
+            return True
+    
+    # Method 2: Check coordinates if country is missing or unclear
+    lat = location_data.get("lat")
+    lng = location_data.get("lng")
+    
+    if lat is not None and lng is not None:
+        return _is_coordinate_in_korea(float(lat), float(lng))
+    
+    # Method 3: If we have city but no clear country, try reverse geocoding
+    city = location_data.get("city", "").lower()
+    if city and not country:
+        return _is_city_in_korea(city)
+    
+    return False  # Default to international if unclear
 
 def get_user_location_context(request):
     """
@@ -80,6 +102,7 @@ def get_default_korea_location():
 def update_user_location(request, location_data):
     """
     Update user's location in session.
+    Enhanced to fill in missing country information for coordinates.
     location_data should be a dictionary containing at least 'city' or both 'lat' and 'lng'.
     """
     location = {
@@ -91,6 +114,22 @@ def update_user_location(request, location_data):
             'lat': location_data['lat'],
             'lng': location_data['lng']
         })
+        
+        # If country is missing but we have coordinates, try to determine it
+        if 'country' not in location_data or not location_data['country']:
+            if _is_coordinate_in_korea(float(location_data['lat']), float(location_data['lng'])):
+                # Try reverse geocoding to get proper location info
+                reverse_geo = get_korea_location_from_coordinates(
+                    float(location_data['lat']), 
+                    float(location_data['lng'])
+                )
+                if reverse_geo:
+                    location.update(reverse_geo)
+                else:
+                    # Fallback to basic Korea info
+                    location['country'] = 'South Korea'
+                    if 'city' not in location_data:
+                        location['city'] = 'Unknown City'
     
     if 'city' in location_data:
         location['city'] = location_data['city']
@@ -100,6 +139,90 @@ def update_user_location(request, location_data):
     
     request.session['user_location'] = location
     return location
+
+def _is_coordinate_in_korea(lat, lng):
+    """
+    Check if given coordinates fall within South Korea's boundaries.
+    Uses approximate bounding box for South Korea.
+    """
+    # South Korea approximate boundaries
+    # These coordinates cover mainland South Korea including Jeju Island
+    KOREA_BOUNDS = {
+        'north': 38.612,   # Northern border with North Korea
+        'south': 33.0,     # Southern tip including Jeju Island
+        'east': 131.87,    # Eastern coast
+        'west': 124.5      # Western coast
+    }
+    
+    return (KOREA_BOUNDS['south'] <= lat <= KOREA_BOUNDS['north'] and 
+            KOREA_BOUNDS['west'] <= lng <= KOREA_BOUNDS['east'])
+
+def _is_city_in_korea(city):
+    """
+    Check if a city name suggests it's in Korea.
+    This is a basic fallback for when we have city but no country.
+    """
+    korean_city_indicators = [
+        'seoul', 'busan', 'incheon', 'daegu', 'daejeon', 'gwangju',
+        'ulsan', 'sejong', 'suwon', 'goyang', 'yongin', 'changwon',
+        'jeju', 'cheongju', 'cheonan', 'jeonju', 'ansan', 'pohang',
+        'gimhae', 'pyeongtaek', 'siheung', 'bucheon', 'anyang'
+    ]
+    
+    return any(korean_city in city for korean_city in korean_city_indicators)
+
+def get_korea_location_from_coordinates(lat, lng):
+    """
+    Enhanced reverse geocoding for coordinates in Korea.
+    Returns location data with Korea country information.
+    """
+    try:
+        import requests
+        from django.core.cache import cache
+        
+        # Check cache first
+        cache_key = f'reverse_geocode_{lat}_{lng}'
+        cached_result = cache.get(cache_key)
+        if cached_result:
+            return cached_result
+        
+        # Use a free reverse geocoding service
+        response = requests.get(
+            'https://api.bigdatacloud.net/data/reverse-geocode-client',
+            params={'latitude': lat, 'longitude': lng, 'localityLanguage': 'en'},
+            timeout=5
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            result = {
+                'country': data.get('countryName', 'South Korea'),
+                'city': data.get('city', data.get('locality', 'Unknown')),
+                'lat': lat,
+                'lng': lng,
+                'is_reverse_geocoded': True
+            }
+            
+            # Cache for 24 hours since coordinates don't change
+            cache.set(cache_key, result, timeout=86400)
+            return result
+            
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f'Reverse geocoding failed for {lat}, {lng}: {str(e)}')
+    
+    # Fallback: if coordinates are in Korea, assume Korea
+    if _is_coordinate_in_korea(lat, lng):
+        return {
+            'country': 'South Korea',
+            'city': 'Unknown City',
+            'lat': lat,
+            'lng': lng,
+            'is_fallback': True
+        }
+    
+    return None
 
 def clear_user_location(request):
     """Clear user's location from session."""

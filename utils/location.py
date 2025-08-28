@@ -44,6 +44,7 @@ def get_ip_location(ip):
             location_data = {
                 "ip": ip,
                 "country": data.get("country"),
+                "country_code": data.get("countryCode"),  # Add ISO country code
                 "region": data.get("regionName"),
                 "city": data.get("city"),
                 "lat": data.get("lat"),
