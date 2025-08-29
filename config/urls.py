@@ -19,10 +19,15 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from blog.upload_views import tinymce_upload_view
+from utils.language_views import set_language, set_language_ajax, get_user_language_preferences
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('i18n/', include('django.conf.urls.i18n')),
+    # Enhanced language switching with user preference updates
+    path('i18n/setlang/', set_language, name='set_language'),
+    path('i18n/setlang-ajax/', set_language_ajax, name='set_language_ajax'),
+    path('i18n/preferences/', get_user_language_preferences, name='user_language_preferences'),
+    path('i18n/', include('django.conf.urls.i18n')),  # Keep for compatibility
     path('tinymce/', include('tinymce.urls')),
     path('tinymce/upload/', tinymce_upload_view, name='tinymce_upload'),
     path('', include('places.urls')),
