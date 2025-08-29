@@ -348,17 +348,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'en'  # Default/source language
 
+# English is the source language (no .po file needed)
+# Other languages require translation files
 LANGUAGES = [
-    ('en', 'English'),
-    ('ko', '한국어'),
-    ('uz', "O'zbek"),
+    ('en', 'English'),      # Source language (no translation file needed)
+    ('ko', '한국어'),       # Requires translation
+    ('uz', "O'zbek"),       # Requires translation
 ]
 
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
+
+# Configure English as source language (don't generate .po for English)
+# This prevents empty English translation files
+USE_L10N = True
+USE_I18N = True
 
 # Rosetta Translation Management Configuration
 ROSETTA_ENABLE_TRANSLATION_SUGGESTIONS = True
