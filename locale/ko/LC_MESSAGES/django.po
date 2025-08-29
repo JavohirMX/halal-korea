@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-29 16:13+0900\n"
+"POT-Creation-Date: 2025-08-30 02:36+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,7 +91,9 @@ msgstr "모든 연도 보기"
 msgid ""
 "Explore articles in %(category_name)s category. Discover insights about "
 "halal lifestyle in Korea."
-msgstr "%(category_name)s 카테고리의 글을 둘러보세요. 한국의 할랄 라이프스타일에 대한 인사이트를 발견하세요."
+msgstr ""
+"%(category_name)s 카테고리의 글을 둘러보세요. 한국의 할랄 라이프스타일에 대"
+"한 인사이트를 발견하세요."
 
 #: blog/templates/blog/category.html:138
 msgid "No articles in this category yet"
@@ -227,7 +229,9 @@ msgstr "다른 철자 변형을 시도해보세요"
 msgid ""
 "Articles tagged with %(tag_name)s. Discover insights about halal lifestyle "
 "in Korea."
-msgstr "%(tag_name)s 태그가 붙은 글들. 한국의 할랄 라이프스타일에 대한 인사이트를 발견하세요."
+msgstr ""
+"%(tag_name)s 태그가 붙은 글들. 한국의 할랄 라이프스타일에 대한 인사이트를 발"
+"견하세요."
 
 #: blog/templates/blog/tag.html:31
 msgid "Tag"
@@ -431,7 +435,9 @@ msgstr "연락하기"
 msgid ""
 "Have questions, suggestions, or feedback? We'd love to hear from you. Our "
 "team is here to help and improve your halal food experience in Korea."
-msgstr "질문, 제안 또는 피드백이 있으신가요? 여러분의 의견을 듣고 싶습니다. 저희 팀이 한국에서의 할랄 음식 경험을 도와드리고 개선하는 데 도움을 드리겠습니다."
+msgstr ""
+"질문, 제안 또는 피드백이 있으신가요? 여러분의 의견을 듣고 싶습니다. 저희 팀"
+"이 한국에서의 할랄 음식 경험을 도와드리고 개선하는 데 도움을 드리겠습니다."
 
 #: contact/templates/contact/section.html:27
 msgid "Email Us"
@@ -457,7 +463,9 @@ msgstr "커뮤니티 주도"
 msgid ""
 "Your feedback helps us improve our platform and serve the halal community "
 "better."
-msgstr "여러분의 피드백이 저희 플랫폼을 개선하고 할랄 커뮤니티에 더 나은 서비스를 제공하는 데 도움이 됩니다."
+msgstr ""
+"여러분의 피드백이 저희 플랫폼을 개선하고 할랄 커뮤니티에 더 나은 서비스를 제"
+"공하는 데 도움이 됩니다."
 
 #: contact/templates/contact/section.html:81
 msgid "Send us a message"
@@ -469,7 +477,8 @@ msgstr "연락처 양식 로딩 중..."
 
 #: contact/templates/contact/section.html:116
 msgid "Error loading contact form. Please refresh the page."
-msgstr "연락처 양식을 로드하는 중 오류가 발생했습니다. 페이지를 새로고침해주세요."
+msgstr ""
+"연락처 양식을 로드하는 중 오류가 발생했습니다. 페이지를 새로고침해주세요."
 
 #: contact/templates/contact/section.html:182 contact/views.py:85
 msgid "An unexpected error occurred. Please try again later."
@@ -513,14 +522,20 @@ msgid ""
 "Halal Korea aims to make life easier for Muslims living in and visiting "
 "South Korea by providing a comprehensive platform to find halal food, "
 "markets, and prayer spaces."
-msgstr "할랄 코리아는 할랄 음식, 시장, 기도 공간을 찾을 수 있는 종합적인 플랫폼을 제공하여 한국에 거주하고 방문하는 무슬림들의 삶을 더 쉽게 만드는 것을 목표로 합니다."
+msgstr ""
+"할랄 코리아는 할랄 음식, 시장, 기도 공간을 찾을 수 있는 종합적인 플랫폼을 제"
+"공하여 한국에 거주하고 방문하는 무슬림들의 삶을 더 쉽게 만드는 것을 목표로 합"
+"니다."
 
 #: places/templates/places/about.html:38
 msgid ""
 "We understand the challenges of finding halal options in a new country, and "
 "we're here to bridge that gap by connecting our community with verified "
 "halal establishments across Korea."
-msgstr "새로운 나라에서 할랄 옵션을 찾는 어려움을 이해하고 있으며, 저희는 커뮤니티를 한국 전역의 검증된 할랄 시설과 연결하여 그 격차를 해소하는 데 도움을 드리겠습니다."
+msgstr ""
+"새로운 나라에서 할랄 옵션을 찾는 어려움을 이해하고 있으며, 저희는 커뮤니티를 "
+"한국 전역의 검증된 할랄 시설과 연결하여 그 격차를 해소하는 데 도움을 드리겠습"
+"니다."
 
 #: places/templates/places/about.html:53
 msgid "What We Offer"
@@ -534,7 +549,9 @@ msgstr "커뮤니티 리뷰"
 msgid ""
 "Real experiences shared by our community members help others make informed "
 "decisions."
-msgstr "커뮤니티 구성원들이 공유한 실제 경험이 다른 사람들이 정보에 기반한 결정을 내리는 데 도움이 됩니다."
+msgstr ""
+"커뮤니티 구성원들이 공유한 실제 경험이 다른 사람들이 정보에 기반한 결정을 내"
+"리는 데 도움이 됩니다."
 
 #: places/templates/places/about.html:77
 msgid "Multi-Language Support"
@@ -552,7 +569,8 @@ msgstr "주변 장소 찾기"
 msgid ""
 "Discover halal restaurants, markets, and prayer spaces in your vicinity with "
 "our interactive map feature."
-msgstr "인터랙티브 지도 기능으로 주변의 할랄 레스토랑, 시장, 기도 공간을 발견하세요."
+msgstr ""
+"인터랙티브 지도 기능으로 주변의 할랄 레스토랑, 시장, 기도 공간을 발견하세요."
 
 #: places/templates/places/about.html:105
 msgid "Our Growing Community"
@@ -576,16 +594,23 @@ msgid ""
 "every effort to maintain accurate information, we strongly recommend "
 "verifying the halal status directly with each establishment before visiting. "
 "Your diligence helps maintain the integrity of our community."
-msgstr "저희 플랫폼에 등록된 모든 장소는 커뮤니티가 기여한 것입니다. 정확한 정보를 유지하기 위해 최선을 다하고 있지만, 방문하기 전에 각 시설에서 직접 할랄 상태를 확인하는 것을 강력히 권장합니다. 여러분의 꼼꼼함이 저희 커뮤니티의 신뢰성을 유지하는 데 도움이 됩니다."
+msgstr ""
+"저희 플랫폼에 등록된 모든 장소는 커뮤니티가 기여한 것입니다. 정확한 정보를 유"
+"지하기 위해 최선을 다하고 있지만, 방문하기 전에 각 시설에서 직접 할랄 상태를 "
+"확인하는 것을 강력히 권장합니다. 여러분의 꼼꼼함이 저희 커뮤니티의 신뢰성을 "
+"유지하는 데 도움이 됩니다."
 
 #: places/templates/places/base.html:19 places/templates/places/base.html:23
 msgid ""
 "Discover halal restaurants, markets, and prayer spaces across South Korea. "
 "Your comprehensive guide to halal dining and Islamic facilities in Korea."
-msgstr "한국 전역의 할랄 레스토랑, 시장, 기도 공간을 발견하세요. 한국의 할랄 식당과 이슬람 시설에 대한 종합 가이드입니다."
+msgstr ""
+"한국 전역의 할랄 레스토랑, 시장, 기도 공간을 발견하세요. 한국의 할랄 식당과 "
+"이슬람 시설에 대한 종합 가이드입니다."
 
 #: places/templates/places/base.html:22 places/templates/places/base.html:27
-#: places/templates/places/home.html:5
+#: places/templates/places/home.html:5 utils/context_processors.py:24
+#: utils/context_processors.py:25
 msgid "Halal Korea"
 msgstr "할랄 코리아"
 
@@ -642,7 +667,9 @@ msgstr "회원가입"
 msgid ""
 "Signed in as <span class=\"font-bold text-gray-700 dark:text-"
 "white\">%(username)s</span>"
-msgstr "<span class=\"font-bold text-gray-700 dark:text-white\">%(username)s</span>로 로그인됨"
+msgstr ""
+"<span class=\"font-bold text-gray-700 dark:text-white\">%(username)s</span>"
+"로 로그인됨"
 
 #: places/templates/places/base.html:653
 msgid "Logout"
@@ -711,7 +738,10 @@ msgid ""
 "Help us maintain and improve our platform to better serve the Muslim "
 "community in Korea.\n"
 "                Your support makes a difference!"
-msgstr "한국의 무슬림 커뮤니티에 더 나은 서비스를 제공하기 위해 저희 플랫폼을 유지하고 개선하는 데 도움을 주세요.\n                여러분의 지원이 변화를 만듭니다!"
+msgstr ""
+"한국의 무슬림 커뮤니티에 더 나은 서비스를 제공하기 위해 저희 플랫폼을 유지하"
+"고 개선하는 데 도움을 주세요.\n"
+"                여러분의 지원이 변화를 만듭니다!"
 
 #: places/templates/places/donate.html:31
 msgid "One-time Donation"
@@ -798,7 +828,8 @@ msgstr "제 기부금은 어떻게 사용되나요?"
 msgid ""
 "Your donations directly support server costs, development, and community "
 "outreach efforts."
-msgstr "여러분의 기부금은 서버 비용, 개발, 커뮤니티 확산 노력을 직접 지원합니다."
+msgstr ""
+"여러분의 기부금은 서버 비용, 개발, 커뮤니티 확산 노력을 직접 지원합니다."
 
 #: places/templates/places/donate.html:126
 msgid "Why does Halal Korea need donations?"
@@ -809,7 +840,10 @@ msgid ""
 "As a non-profit community platform, we don't run ads or have other revenue "
 "streams. Your donations help us maintain and improve our services, ensuring "
 "Muslims in Korea have access to reliable halal information and resources."
-msgstr "비영리 커뮤니티 플랫폼으로서 저희는 광고를 운영하거나 다른 수익원이 없습니다. 여러분의 기부가 저희 서비스를 유지하고 개선하는 데 도움이 되어 한국의 무슬림들이 신뢰할 수 있는 할랄 정보와 자원에 접근할 수 있도록 보장합니다."
+msgstr ""
+"비영리 커뮤니티 플랫폼으로서 저희는 광고를 운영하거나 다른 수익원이 없습니"
+"다. 여러분의 기부가 저희 서비스를 유지하고 개선하는 데 도움이 되어 한국의 무"
+"슬림들이 신뢰할 수 있는 할랄 정보와 자원에 접근할 수 있도록 보장합니다."
 
 #: places/templates/places/donate.html:130
 msgid "Can I donate from outside Korea?"
@@ -997,11 +1031,14 @@ msgstr "한국으로의 할랄 여행을 계획하고 계신가요?"
 msgid ""
 "Discover verified halal restaurants, markets, and prayer spaces across South "
 "Korea for your trip."
-msgstr "여행을 위해 한국 전역의 검증된 할랄 레스토랑, 시장, 기도 공간을 발견하세요."
+msgstr ""
+"여행을 위해 한국 전역의 검증된 할랄 레스토랑, 시장, 기도 공간을 발견하세요."
 
 #: places/templates/places/home.html:39
 msgid "Planning a trip to Korea? We'll help you find the best halal options!"
-msgstr "한국 여행을 계획하고 계신가요? 최고의 할랄 옵션을 찾는 데 도움을 드리겠습니다!"
+msgstr ""
+"한국 여행을 계획하고 계신가요? 최고의 할랄 옵션을 찾는 데 도움을 드리겠습니"
+"다!"
 
 #: places/templates/places/home.html:50
 msgid "Search places in Korea..."
@@ -1113,7 +1150,9 @@ msgstr "수집하는 정보"
 msgid ""
 "When you use %(STATIC_INFO.site_name)s, we may collect the following types "
 "of information:"
-msgstr "%(STATIC_INFO.site_name)s를 사용할 때 다음과 같은 유형의 정보를 수집할 수 있습니다:"
+msgstr ""
+"%(STATIC_INFO.site_name)s를 사용할 때 다음과 같은 유형의 정보를 수집할 수 있"
+"습니다:"
 
 #: places/templates/places/legal.html:57
 msgid ""
@@ -1169,7 +1208,9 @@ msgstr "정보 공유"
 msgid ""
 "We do not sell, trade, or otherwise transfer your personal information to "
 "third parties without your consent, except:"
-msgstr "동의 없이 개인정보를 제3자에게 판매, 거래 또는 이전하지 않습니다. 단, 다음의 경우는 예외입니다:"
+msgstr ""
+"동의 없이 개인정보를 제3자에게 판매, 거래 또는 이전하지 않습니다. 단, 다음의 "
+"경우는 예외입니다:"
 
 #: places/templates/places/legal.html:80
 msgid "When required by law or to comply with legal processes"
@@ -1192,7 +1233,9 @@ msgid ""
 "We implement appropriate security measures to protect your personal "
 "information against unauthorized access, alteration, disclosure, or "
 "destruction."
-msgstr "개인정보를 무단 접근, 변경, 공개 또는 파괴로부터 보호하기 위해 적절한 보안 조치를 구현합니다."
+msgstr ""
+"개인정보를 무단 접근, 변경, 공개 또는 파괴로부터 보호하기 위해 적절한 보안 조"
+"치를 구현합니다."
 
 #: places/templates/places/legal.html:92
 msgid "Your Rights"
@@ -1227,7 +1270,9 @@ msgstr "약관 동의"
 msgid ""
 "By accessing and using %(STATIC_INFO.site_name)s, you accept and agree to be "
 "bound by the terms and provision of this agreement."
-msgstr "%(STATIC_INFO.site_name)s에 접근하고 사용함으로써 이 계약의 약관 및 조항에 구속되는 것에 동의하고 수락합니다."
+msgstr ""
+"%(STATIC_INFO.site_name)s에 접근하고 사용함으로써 이 계약의 약관 및 조항에 구"
+"속되는 것에 동의하고 수락합니다."
 
 #: places/templates/places/legal.html:121
 msgid "Use License"
@@ -1238,7 +1283,10 @@ msgid ""
 "Permission is granted to temporarily use our service for personal, non-"
 "commercial transitory viewing only. This is the grant of a license, not a "
 "transfer of title, and under this license you may not:"
-msgstr "개인적이고 비상업적인 일시적 보기 목적으로만 저희 서비스를 임시로 사용할 수 있는 권한이 부여됩니다. 이는 소유권 이전이 아닌 라이선스 부여이며, 이 라이선스 하에서 다음을 할 수 없습니다:"
+msgstr ""
+"개인적이고 비상업적인 일시적 보기 목적으로만 저희 서비스를 임시로 사용할 수 "
+"있는 권한이 부여됩니다. 이는 소유권 이전이 아닌 라이선스 부여이며, 이 라이선"
+"스 하에서 다음을 할 수 없습니다:"
 
 #: places/templates/places/legal.html:124
 msgid "Modify or copy the materials"
@@ -1319,7 +1367,10 @@ msgid ""
 "basis. We make no representations or warranties of any kind regarding the "
 "halal status of establishments listed on our platform. Users are strongly "
 "advised to verify halal certification independently."
-msgstr "%(STATIC_INFO.site_name)s의 정보는 '있는 그대로' 제공됩니다. 저희는 플랫폼에 등록된 시설의 할랄 상태에 대해 어떠한 진술이나 보증도 하지 않습니다. 사용자는 할랄 인증을 독립적으로 확인하는 것을 강력히 권장받습니다."
+msgstr ""
+"%(STATIC_INFO.site_name)s의 정보는 '있는 그대로' 제공됩니다. 저희는 플랫폼에 "
+"등록된 시설의 할랄 상태에 대해 어떠한 진술이나 보증도 하지 않습니다. 사용자"
+"는 할랄 인증을 독립적으로 확인하는 것을 강력히 권장받습니다."
 
 #: places/templates/places/legal.html:159
 msgid "Limitations"
@@ -1331,7 +1382,9 @@ msgid ""
 "%(STATIC_INFO.site_name)s or its suppliers will not be held liable for any "
 "damages that will arise with the use or inability to use the materials on "
 "our website."
-msgstr "%(STATIC_INFO.site_name)s 또는 그 공급업체는 저희 웹사이트의 자료 사용 또는 사용 불가능으로 인해 발생하는 모든 손해에 대해 책임을 지지 않습니다."
+msgstr ""
+"%(STATIC_INFO.site_name)s 또는 그 공급업체는 저희 웹사이트의 자료 사용 또는 "
+"사용 불가능으로 인해 발생하는 모든 손해에 대해 책임을 지지 않습니다."
 
 #: places/templates/places/legal.html:177
 msgid "What Are Cookies"
@@ -1343,7 +1396,10 @@ msgid ""
 "device when you visit our website. They help us provide you with a better "
 "experience by remembering your preferences and understanding how you use our "
 "site."
-msgstr "쿠키는 저희 웹사이트를 방문할 때 컴퓨터나 모바일 기기에 저장되는 작은 텍스트 파일입니다. 선호도를 기억하고 사이트 사용 방법을 이해하여 더 나은 경험을 제공하는 데 도움이 됩니다."
+msgstr ""
+"쿠키는 저희 웹사이트를 방문할 때 컴퓨터나 모바일 기기에 저장되는 작은 텍스트 "
+"파일입니다. 선호도를 기억하고 사이트 사용 방법을 이해하여 더 나은 경험을 제공"
+"하는 데 도움이 됩니다."
 
 #: places/templates/places/legal.html:182
 msgid "How We Use Cookies"
@@ -1365,7 +1421,8 @@ msgstr "선호도 쿠키: 설정과 언어 선호도 기억"
 #: places/templates/places/legal.html:187
 msgid ""
 "Analytics cookies: Help us understand how visitors interact with our website"
-msgstr "분석 쿠키: 방문자가 저희 웹사이트와 상호작용하는 방법을 이해하는 데 도움"
+msgstr ""
+"분석 쿠키: 방문자가 저희 웹사이트와 상호작용하는 방법을 이해하는 데 도움"
 
 #: places/templates/places/legal.html:188
 msgid "Functionality cookies: Enable enhanced features and personalization"
@@ -1447,7 +1504,9 @@ msgstr "모바일 설정: 모바일 기기에서 설정 조정"
 msgid ""
 "Please note that disabling certain cookies may affect the functionality of "
 "our website and your user experience."
-msgstr "특정 쿠키를 비활성화하면 저희 웹사이트의 기능과 사용자 경험에 영향을 줄 수 있습니다."
+msgstr ""
+"특정 쿠키를 비활성화하면 저희 웹사이트의 기능과 사용자 경험에 영향을 줄 수 있"
+"습니다."
 
 #: places/templates/places/legal.html:253
 msgid "Updates to This Policy"
@@ -1458,7 +1517,9 @@ msgid ""
 "We may update this Cookie Policy from time to time. We will notify you of "
 "any changes by posting the new policy on this page with an updated revision "
 "date."
-msgstr "이 쿠키 정책을 때때로 업데이트할 수 있습니다. 업데이트된 수정 날짜와 함께 이 페이지에 새 정책을 게시하여 변경 사항을 알려드립니다."
+msgstr ""
+"이 쿠키 정책을 때때로 업데이트할 수 있습니다. 업데이트된 수정 날짜와 함께 이 "
+"페이지에 새 정책을 게시하여 변경 사항을 알려드립니다."
 
 #: places/templates/places/legal.html:264
 msgid "Questions About Our Legal Policies?"
@@ -1468,7 +1529,9 @@ msgstr "저희 법적 정책에 대한 질문이 있으신가요?"
 msgid ""
 "If you have any questions about our Privacy Policy, Terms of Service, or "
 "Cookie Policy, please don't hesitate to contact us."
-msgstr "개인정보 처리방침, 서비스 이용약관 또는 쿠키 정책에 대한 질문이 있으시면 언제든지 저희에게 연락해주세요."
+msgstr ""
+"개인정보 처리방침, 서비스 이용약관 또는 쿠키 정책에 대한 질문이 있으시면 언제"
+"든지 저희에게 연락해주세요."
 
 #: places/templates/places/my_contributions.html:5
 #: places/templates/places/my_contributions.html:37
@@ -1628,7 +1691,9 @@ msgstr "다음"
 msgid ""
 "You haven't submitted any places yet. Help grow our community by adding "
 "places you know!"
-msgstr "아직 장소를 제출하지 않았습니다. 알고 있는 장소를 추가하여 저희 커뮤니티 성장에 도움을 주세요!"
+msgstr ""
+"아직 장소를 제출하지 않았습니다. 알고 있는 장소를 추가하여 저희 커뮤니티 성장"
+"에 도움을 주세요!"
 
 #: places/templates/places/my_contributions.html:380
 msgid "Field Edit Suggestions"
@@ -1682,7 +1747,9 @@ msgstr "아직 필드 제안이 없습니다"
 msgid ""
 "You haven't suggested any field edits yet. Visit a place page and click "
 "'Suggest Edit' to get started!"
-msgstr "아직 필드 편집을 제안하지 않았습니다. 장소 페이지를 방문하고 '편집 제안'을 클릭하여 시작하세요!"
+msgstr ""
+"아직 필드 편집을 제안하지 않았습니다. 장소 페이지를 방문하고 '편집 제안'을 클"
+"릭하여 시작하세요!"
 
 #: places/templates/places/my_contributions.html:573
 msgid "Image Upload Suggestions"
@@ -1712,7 +1779,9 @@ msgstr "아직 이미지 제안이 없습니다"
 msgid ""
 "You haven't uploaded any images yet. Visit a place page and click 'Suggest "
 "Edit' to upload photos!"
-msgstr "아직 이미지를 업로드하지 않았습니다. 장소 페이지를 방문하고 '편집 제안'을 클릭하여 사진을 업로드하세요!"
+msgstr ""
+"아직 이미지를 업로드하지 않았습니다. 장소 페이지를 방문하고 '편집 제안'을 클"
+"릭하여 사진을 업로드하세요!"
 
 #: places/templates/places/partials/place_list.html:62
 #: places/templates/places/place_detail.html:231
@@ -1753,7 +1822,10 @@ msgid ""
 "This place has been added by our community. While we strive to maintain "
 "accurate information, we recommend verifying the halal status directly with "
 "the establishment before visiting."
-msgstr "이 장소는 저희 커뮤니티가 추가한 것입니다. 정확한 정보를 유지하기 위해 최선을 다하고 있지만, 방문하기 전에 시설에서 직접 할랄 상태를 확인하는 것을 권장합니다."
+msgstr ""
+"이 장소는 저희 커뮤니티가 추가한 것입니다. 정확한 정보를 유지하기 위해 최선"
+"을 다하고 있지만, 방문하기 전에 시설에서 직접 할랄 상태를 확인하는 것을 권장"
+"합니다."
 
 #: places/templates/places/place_detail.html:183
 msgid "No ratings yet"
@@ -1997,7 +2069,9 @@ msgid ""
 "Note: <strong>Mosque</strong> is for dedicated Islamic centers, while "
 "<strong>Prayer Room</strong> is for designated prayer spaces in other "
 "locations."
-msgstr "참고: <strong>모스크</strong>는 전용 이슬람 센터용이고, <strong>기도실</strong>은 다른 장소의 지정된 기도 공간용입니다."
+msgstr ""
+"참고: <strong>모스크</strong>는 전용 이슬람 센터용이고, <strong>기도실</"
+"strong>은 다른 장소의 지정된 기도 공간용입니다."
 
 #: places/templates/places/submit_place.html:463
 msgid "Preview"
@@ -2021,7 +2095,8 @@ msgstr "개선 사항 제안"
 
 #: places/templates/places/suggest_edit.html:92
 msgid "Help our community by suggesting better information or adding photos"
-msgstr "더 나은 정보를 제안하거나 사진을 추가하여 저희 커뮤니티에 도움을 주세요"
+msgstr ""
+"더 나은 정보를 제안하거나 사진을 추가하여 저희 커뮤니티에 도움을 주세요"
 
 #: places/templates/places/suggest_edit.html:109
 msgid "Min Impact"
@@ -2393,7 +2468,10 @@ msgid ""
 "Prayer times are provided by <a href=\"https://aladhan.com/\" "
 "target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 "
 "dark:hover:text-primary-400\">aladhan.com</a>"
-msgstr "기도 시간은 <a href=\"https://aladhan.com/\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 dark:hover:text-primary-400\">aladhan.com</a>에서 제공됩니다"
+msgstr ""
+"기도 시간은 <a href=\"https://aladhan.com/\" target=\"_blank\" "
+"rel=\"noopener\" class=\"underline hover:text-primary-600 dark:hover:text-"
+"primary-400\">aladhan.com</a>에서 제공됩니다"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:286
 msgid "Fajr (Tomorrow)"
@@ -2456,7 +2534,8 @@ msgstr "위치를 가져오는 중 오류가 발생했습니다. 수동으로 �
 #: prayer_times/templates/prayer_times/prayer_times.html:457
 msgid ""
 "Geolocation is not supported by your browser. Please select a city manually."
-msgstr "브라우저에서 지리적 위치를 지원하지 않습니다. 수동으로 도시를 선택해주세요."
+msgstr ""
+"브라우저에서 지리적 위치를 지원하지 않습니다. 수동으로 도시를 선택해주세요."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:477
 #: prayer_times/templates/prayer_times/prayer_times.html:501
@@ -2472,7 +2551,9 @@ msgstr "설정 업데이트 오류:"
 msgid ""
 "Please verify your email address to access this feature. Check your inbox "
 "for the verification email."
-msgstr "이 기능에 접근하려면 이메일 주소를 인증해주세요. 인증 이메일을 받은 편지함을 확인하세요."
+msgstr ""
+"이 기능에 접근하려면 이메일 주소를 인증해주세요. 인증 이메일을 받은 편지함을 "
+"확인하세요."
 
 #: users/templates/users/activation_result.html:4
 #: users/templates/users/activation_result.html:12
@@ -2487,7 +2568,9 @@ msgstr "이메일 인증 성공!"
 msgid ""
 "Your email has been verified successfully! You can now submit places, write "
 "reviews, and make suggestions."
-msgstr "이메일이 성공적으로 인증되었습니다! 이제 장소를 제출하고, 리뷰를 작성하고, 제안을 할 수 있습니다."
+msgstr ""
+"이메일이 성공적으로 인증되었습니다! 이제 장소를 제출하고, 리뷰를 작성하고, 제"
+"안을 할 수 있습니다."
 
 #: users/templates/users/activation_result.html:33
 #: users/templates/users/check_email.html:58
@@ -2533,7 +2616,8 @@ msgstr "이메일을 확인하고 인증 링크를 클릭하여 가입을 완료
 msgid ""
 "The activation link will expire in 24 hours. Don't forget to check your spam "
 "folder!"
-msgstr "인증 링크는 24시간 후 만료됩니다. 스팸 폴더도 확인하는 것을 잊지 마세요!"
+msgstr ""
+"인증 링크는 24시간 후 만료됩니다. 스팸 폴더도 확인하는 것을 잊지 마세요!"
 
 #: users/templates/users/check_email.html:53
 msgid "Resend Email"
@@ -2614,7 +2698,9 @@ msgstr "안녕하세요"
 msgid ""
 "Thank you for joining our community! To complete your registration and start "
 "exploring halal places in Korea, please verify your email address."
-msgstr "저희 커뮤니티에 가입해주셔서 감사합니다! 가입을 완료하고 한국의 할랄 장소를 탐색하기 시작하려면 이메일 주소를 인증해주세요."
+msgstr ""
+"저희 커뮤니티에 가입해주셔서 감사합니다! 가입을 완료하고 한국의 할랄 장소를 "
+"탐색하기 시작하려면 이메일 주소를 인증해주세요."
 
 #: users/templates/users/email/activation_email.html:75
 msgid "Verify My Email"
@@ -2691,7 +2777,9 @@ msgid ""
 "Thank you for registering an account with Halal Korea. To complete your "
 "registration and start exploring halal places in Korea, please verify your "
 "email address by clicking the link below:"
-msgstr "할랄 코리아에 계정을 등록해주셔서 감사합니다. 가입을 완료하고 한국의 할랄 장소를 탐색하기 시작하려면 아래 링크를 클릭하여 이메일 주소를 인증해주세요:"
+msgstr ""
+"할랄 코리아에 계정을 등록해주셔서 감사합니다. 가입을 완료하고 한국의 할랄 장"
+"소를 탐색하기 시작하려면 아래 링크를 클릭하여 이메일 주소를 인증해주세요:"
 
 #: users/templates/users/email/activation_email.txt:10
 msgid "ACTIVATION LINK:"
@@ -2802,7 +2890,9 @@ msgstr "요청 제한 초과"
 msgid ""
 "You've exceeded the maximum number of allowed requests. This is a security "
 "measure to protect our service."
-msgstr "허용된 최대 요청 수를 초과했습니다. 이는 저희 서비스를 보호하기 위한 보안 조치입니다."
+msgstr ""
+"허용된 최대 요청 수를 초과했습니다. 이는 저희 서비스를 보호하기 위한 보안 조"
+"치입니다."
 
 #: users/templates/users/rate_limited.html:40
 msgid "What you can do:"
@@ -2911,3 +3001,21 @@ msgstr "이메일 주소를 입력하세요"
 #: users/templates/users/resend_activation.html:134
 msgid "Back to Login"
 msgstr "로그인으로 돌아가기"
+
+# Static Info Translations
+#: utils/context_processors.py:26
+msgid "Find halal food and services across South Korea"
+msgstr "한국 전역의 할랄 음식과 서비스를 찾아보세요"
+
+#: utils/context_processors.py:27
+msgid ""
+"Find halal food and services across South Korea. Join our community and "
+"discover verified halal places."
+msgstr ""
+"한국 전역의 할랄 음식과 서비스를 찾아보세요. 저희 커뮤니티에 참여하고 검증된 "
+"할랄 장소를 발견하세요."
+
+#: utils/context_processors.py:30
+#, python-brace-format
+msgid "© {year} Halal Korea. All rights reserved."
+msgstr "© {year} Halal Korea. 모든 권리 보유."

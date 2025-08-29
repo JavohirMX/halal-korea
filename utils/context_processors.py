@@ -1,6 +1,7 @@
 from .location_manager import get_user_location
 from config import static_info
 from datetime import datetime
+from django.utils.translation import gettext as _
 
 def user_location(request):
     """
@@ -19,8 +20,14 @@ def static_info_context(request):
     # Create a copy of the static info to avoid modifying the original
     info = dict(static_info.INFO)
     
-    # Replace placeholders with actual values
-    if 'copyright_text' in info:
-        info['copyright_text'] = info['copyright_text'].format(year=datetime.now().year)
+    # Add translatable texts
+    info['company_name'] = _('Halal Korea')
+    info['site_name'] = _('Halal Korea')
+    info['site_tagline'] = _('Find halal food and services across South Korea')
+    info['meta_description'] = _('Find halal food and services across South Korea. Join our community and discover verified halal places.')
+    
+    # Handle copyright text with year formatting
+    copyright_text = _('© {year} Halal Korea. All rights reserved.')
+    info['copyright_text'] = copyright_text.format(year=datetime.now().year)
     
     return {'STATIC_INFO': info}

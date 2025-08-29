@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-29 16:13+0900\n"
+"POT-Creation-Date: 2025-08-30 02:36+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,7 +75,8 @@ msgstr "Arxivlangan maqolalar yo'q"
 
 #: blog/templates/blog/archive.html:188
 msgid "Check out our latest articles or browse other time periods"
-msgstr "Eng so'nggi maqolalarimizni ko'ring yoki boshqa davrlarni ko'rib chiqing"
+msgstr ""
+"Eng so'nggi maqolalarimizni ko'ring yoki boshqa davrlarni ko'rib chiqing"
 
 #: blog/templates/blog/archive.html:194 blog/templates/blog/category.html:146
 #: blog/templates/blog/search.html:180 blog/templates/blog/tag.html:156
@@ -91,7 +92,9 @@ msgstr "Barcha yillarni ko'rish"
 msgid ""
 "Explore articles in %(category_name)s category. Discover insights about "
 "halal lifestyle in Korea."
-msgstr "%(category_name)s toifasidagi maqolalarni kashf eting. Koreyadagi halol hayot haqida ma'lumot oling."
+msgstr ""
+"%(category_name)s toifasidagi maqolalarni kashf eting. Koreyadagi halol "
+"hayot haqida ma'lumot oling."
 
 #: blog/templates/blog/category.html:138
 msgid "No articles in this category yet"
@@ -196,7 +199,9 @@ msgstr "Maqolalar topilmadi"
 
 #: blog/templates/blog/search.html:174
 msgid "Try adjusting your search terms or browse our categories"
-msgstr "Qidiruv so'zlarini o'zgartirishga harakat qiling yoki toifalarimizni ko'rib chiqing"
+msgstr ""
+"Qidiruv so'zlarini o'zgartirishga harakat qiling yoki toifalarimizni ko'rib "
+"chiqing"
 
 #: blog/templates/blog/search.html:185
 msgid "Clear Search"
@@ -227,7 +232,9 @@ msgstr "Turli xil yozish variantlarini sinab ko'ring"
 msgid ""
 "Articles tagged with %(tag_name)s. Discover insights about halal lifestyle "
 "in Korea."
-msgstr "%(tag_name)s bilan belgilangan maqolalar. Koreyadagi halol hayot haqida ma'lumot oling."
+msgstr ""
+"%(tag_name)s bilan belgilangan maqolalar. Koreyadagi halol hayot haqida "
+"ma'lumot oling."
 
 #: blog/templates/blog/tag.html:31
 msgid "Tag"
@@ -337,7 +344,9 @@ msgstr "Xabaringizni toifalarga ajratishga yordam beradi"
 
 #: contact/forms.py:41
 msgid "Share your thoughts, questions, or feedback"
-msgstr "O'zingizning fikrlaringiz, savollaringiz yoki fikr-mulohazalaringizni ulashing"
+msgstr ""
+"O'zingizning fikrlaringiz, savollaringiz yoki fikr-mulohazalaringizni "
+"ulashing"
 
 #: contact/forms.py:57
 msgid "Please enter a message."
@@ -431,7 +440,10 @@ msgstr "Biz bilan bog'laning"
 msgid ""
 "Have questions, suggestions, or feedback? We'd love to hear from you. Our "
 "team is here to help and improve your halal food experience in Korea."
-msgstr "Savollaringiz, takliflaringiz yoki fikr-mulohazalaringiz bormi? Sizdan eshitishni xohlaymiz. Bizning jamoa Koreyadagi halol ovqat tajribangizni yaxshilash va yordam berish uchun shu yerda."
+msgstr ""
+"Savollaringiz, takliflaringiz yoki fikr-mulohazalaringiz bormi? Sizdan "
+"eshitishni xohlaymiz. Bizning jamoa Koreyadagi halol ovqat tajribangizni "
+"yaxshilash va yordam berish uchun shu yerda."
 
 #: contact/templates/contact/section.html:27
 msgid "Email Us"
@@ -457,7 +469,9 @@ msgstr "Jamiyat tomonidan boshqariladi"
 msgid ""
 "Your feedback helps us improve our platform and serve the halal community "
 "better."
-msgstr "Sizning fikr-mulohazalaringiz platformamizni yaxshilash va halol jamiyatiga yaxshiroq xizmat qilishga yordam beradi."
+msgstr ""
+"Sizning fikr-mulohazalaringiz platformamizni yaxshilash va halol jamiyatiga "
+"yaxshiroq xizmat qilishga yordam beradi."
 
 #: contact/templates/contact/section.html:81
 msgid "Send us a message"
@@ -513,14 +527,20 @@ msgid ""
 "Halal Korea aims to make life easier for Muslims living in and visiting "
 "South Korea by providing a comprehensive platform to find halal food, "
 "markets, and prayer spaces."
-msgstr "Halal Korea Janubiy Koreyada yashayotgan va tashrif buyuruvchi musulmonlar uchun halol ovqat, bozorlar va namoz joylarini topish uchun keng qamrovli platforma taqdim etish orqali hayotni osonlashtirishni maqsad qiladi."
+msgstr ""
+"Halal Korea Janubiy Koreyada yashayotgan va tashrif buyuruvchi musulmonlar "
+"uchun halol ovqat, bozorlar va namoz joylarini topish uchun keng qamrovli "
+"platforma taqdim etish orqali hayotni osonlashtirishni maqsad qiladi."
 
 #: places/templates/places/about.html:38
 msgid ""
 "We understand the challenges of finding halal options in a new country, and "
 "we're here to bridge that gap by connecting our community with verified "
 "halal establishments across Korea."
-msgstr "Biz yangi mamlakatda halol variantlarni topish qiyinchiliklarini tushunamiz va jamiyatimizni Koreya bo'ylab tasdiqlangan halol muassasalar bilan bog'lash orqali bu bo'shliqni to'ldirish uchun shu yerda turibmiz."
+msgstr ""
+"Biz yangi mamlakatda halol variantlarni topish qiyinchiliklarini tushunamiz "
+"va jamiyatimizni Koreya bo'ylab tasdiqlangan halol muassasalar bilan "
+"bog'lash orqali bu bo'shliqni to'ldirish uchun shu yerda turibmiz."
 
 #: places/templates/places/about.html:53
 msgid "What We Offer"
@@ -534,7 +554,9 @@ msgstr "Jamiyat sharhlari"
 msgid ""
 "Real experiences shared by our community members help others make informed "
 "decisions."
-msgstr "Jamiyat a'zolarimiz tomonidan ulashilgan haqiqiy tajribalar boshqalarga ma'lumotli qarorlar qabul qilishga yordam beradi."
+msgstr ""
+"Jamiyat a'zolarimiz tomonidan ulashilgan haqiqiy tajribalar boshqalarga "
+"ma'lumotli qarorlar qabul qilishga yordam beradi."
 
 #: places/templates/places/about.html:77
 msgid "Multi-Language Support"
@@ -542,7 +564,9 @@ msgstr "Ko'p tilli qo'llab-quvvatlash"
 
 #: places/templates/places/about.html:79
 msgid "Available in English, Korean, and Uzbek to serve our diverse community."
-msgstr "Turli xil jamiyatimizga xizmat qilish uchun ingliz, koreys va o'zbek tillarida mavjud."
+msgstr ""
+"Turli xil jamiyatimizga xizmat qilish uchun ingliz, koreys va o'zbek "
+"tillarida mavjud."
 
 #: places/templates/places/about.html:93
 msgid "Find Nearby Places"
@@ -552,7 +576,9 @@ msgstr "Yaqin joylarni topish"
 msgid ""
 "Discover halal restaurants, markets, and prayer spaces in your vicinity with "
 "our interactive map feature."
-msgstr "Interaktiv xarita xususiyatimiz bilan atrofingizdagi halol restoranlar, bozorlar va namoz joylarini kashf eting."
+msgstr ""
+"Interaktiv xarita xususiyatimiz bilan atrofingizdagi halol restoranlar, "
+"bozorlar va namoz joylarini kashf eting."
 
 #: places/templates/places/about.html:105
 msgid "Our Growing Community"
@@ -576,16 +602,25 @@ msgid ""
 "every effort to maintain accurate information, we strongly recommend "
 "verifying the halal status directly with each establishment before visiting. "
 "Your diligence helps maintain the integrity of our community."
-msgstr "Platformamizda keltirilgan barcha joylar jamiyat tomonidan taqdim etilgan. Aniq ma'lumotlarni saqlash uchun har qanday sa'y-harakatni qilgan bo'lsak ham, tashrif buyurishdan oldin har bir muassasa bilan to'g'ridan-to'g'ri halol holatini tekshirishni kuchli tavsiya qilamiz. Sizning tirishqoqligingiz jamiyatimizning yaxlitligini saqlashga yordam beradi."
+msgstr ""
+"Platformamizda keltirilgan barcha joylar jamiyat tomonidan taqdim etilgan. "
+"Aniq ma'lumotlarni saqlash uchun har qanday sa'y-harakatni qilgan bo'lsak "
+"ham, tashrif buyurishdan oldin har bir muassasa bilan to'g'ridan-to'g'ri "
+"halol holatini tekshirishni kuchli tavsiya qilamiz. Sizning "
+"tirishqoqligingiz jamiyatimizning yaxlitligini saqlashga yordam beradi."
 
 #: places/templates/places/base.html:19 places/templates/places/base.html:23
 msgid ""
 "Discover halal restaurants, markets, and prayer spaces across South Korea. "
 "Your comprehensive guide to halal dining and Islamic facilities in Korea."
-msgstr "Janubiy Koreya bo'ylab halol restoranlar, bozorlar va namoz joylarini kashf eting. Koreyadagi halol ovqatlanish va islomiy muassasalar bo'yicha sizning keng qamrovli yo'riqnomaniz."
+msgstr ""
+"Janubiy Koreya bo'ylab halol restoranlar, bozorlar va namoz joylarini kashf "
+"eting. Koreyadagi halol ovqatlanish va islomiy muassasalar bo'yicha sizning "
+"keng qamrovli yo'riqnomaniz."
 
 #: places/templates/places/base.html:22 places/templates/places/base.html:27
-#: places/templates/places/home.html:5
+#: places/templates/places/home.html:5 utils/context_processors.py:24
+#: utils/context_processors.py:25
 msgid "Halal Korea"
 msgstr "Halal Korea"
 
@@ -642,7 +677,9 @@ msgstr "Ro'yxatdan o'tish"
 msgid ""
 "Signed in as <span class=\"font-bold text-gray-700 dark:text-"
 "white\">%(username)s</span>"
-msgstr "<span class=\"font-bold text-gray-700 dark:text-white\">%(username)s</span> sifatida kirgan"
+msgstr ""
+"<span class=\"font-bold text-gray-700 dark:text-white\">%(username)s</span> "
+"sifatida kirgan"
 
 #: places/templates/places/base.html:653
 msgid "Logout"
@@ -655,7 +692,9 @@ msgstr "Elektron pochta tasdiqlash talab qilinadi"
 #: places/templates/places/base.html:730
 msgid ""
 "Please verify your email address to submit places, reviews, and suggestions."
-msgstr "Iltimos, joylar, sharhlar va takliflarni yuborish uchun elektron pochta manzilingizni tasdiqlang."
+msgstr ""
+"Iltimos, joylar, sharhlar va takliflarni yuborish uchun elektron pochta "
+"manzilingizni tasdiqlang."
 
 #: places/templates/places/base.html:732
 msgid "Send verification email"
@@ -711,7 +750,10 @@ msgid ""
 "Help us maintain and improve our platform to better serve the Muslim "
 "community in Korea.\n"
 "                Your support makes a difference!"
-msgstr "Koreyadagi musulmon jamiyatiga yaxshiroq xizmat qilish uchun platformamizni saqlash va yaxshilashga yordam bering.\n                Sizning qo'llab-quvvatlashingiz farq qiladi!"
+msgstr ""
+"Koreyadagi musulmon jamiyatiga yaxshiroq xizmat qilish uchun platformamizni "
+"saqlash va yaxshilashga yordam bering.\n"
+"                Sizning qo'llab-quvvatlashingiz farq qiladi!"
 
 #: places/templates/places/donate.html:31
 msgid "One-time Donation"
@@ -719,7 +761,8 @@ msgstr "Bir martalik xayriya"
 
 #: places/templates/places/donate.html:33
 msgid "Make a single contribution to support our mission"
-msgstr "Bizning vazifamizni qo'llab-quvvatlash uchun bir martalik hissa qo'shing"
+msgstr ""
+"Bizning vazifamizni qo'llab-quvvatlash uchun bir martalik hissa qo'shing"
 
 #: places/templates/places/donate.html:36
 msgid "Donate Now"
@@ -798,7 +841,9 @@ msgstr "Mening xayriyam qanday ishlatiladi?"
 msgid ""
 "Your donations directly support server costs, development, and community "
 "outreach efforts."
-msgstr "Sizning xayriyalaringiz to'g'ridan-to'g'ri server xarajatlari, rivojlanish va jamiyat bilan bog'lanish sa'y-harakatlarini qo'llab-quvvatlaydi."
+msgstr ""
+"Sizning xayriyalaringiz to'g'ridan-to'g'ri server xarajatlari, rivojlanish "
+"va jamiyat bilan bog'lanish sa'y-harakatlarini qo'llab-quvvatlaydi."
 
 #: places/templates/places/donate.html:126
 msgid "Why does Halal Korea need donations?"
@@ -809,7 +854,11 @@ msgid ""
 "As a non-profit community platform, we don't run ads or have other revenue "
 "streams. Your donations help us maintain and improve our services, ensuring "
 "Muslims in Korea have access to reliable halal information and resources."
-msgstr "Notijorat jamiyat platformasi sifatida biz reklamalar yoki boshqa daromad manbalariga ega emasmiz. Sizning xayriyalaringiz xizmatlarimizni saqlash va yaxshilashga yordam beradi, Koreyadagi musulmonlarga ishonchli halol ma'lumot va resurslarga kirish imkonini beradi."
+msgstr ""
+"Notijorat jamiyat platformasi sifatida biz reklamalar yoki boshqa daromad "
+"manbalariga ega emasmiz. Sizning xayriyalaringiz xizmatlarimizni saqlash va "
+"yaxshilashga yordam beradi, Koreyadagi musulmonlarga ishonchli halol "
+"ma'lumot va resurslarga kirish imkonini beradi."
 
 #: places/templates/places/donate.html:130
 msgid "Can I donate from outside Korea?"
@@ -817,7 +866,8 @@ msgstr "Koreyadan tashqaridan xayriya qilishim mumkinmi?"
 
 #: places/templates/places/donate.html:133
 msgid "Yes! We accept international donations through various payment methods."
-msgstr "Ha! Biz turli xil to'lov usullari orqali xalqaro xayriyalarni qabul qilamiz."
+msgstr ""
+"Ha! Biz turli xil to'lov usullari orqali xalqaro xayriyalarni qabul qilamiz."
 
 #: places/templates/places/explore.html:19
 #: places/templates/places/explore.html:32
@@ -826,7 +876,8 @@ msgstr "Halol joylarni kashf etish"
 
 #: places/templates/places/explore.html:33
 msgid "Discover halal restaurants, markets, and prayer spaces near you"
-msgstr "Atrofingizdagi halol restoranlar, bozorlar va namoz joylarini kashf eting"
+msgstr ""
+"Atrofingizdagi halol restoranlar, bozorlar va namoz joylarini kashf eting"
 
 #: places/templates/places/explore.html:35
 msgid "Halal Places in Korea"
@@ -834,7 +885,9 @@ msgstr "Koreyadagi halol joylar"
 
 #: places/templates/places/explore.html:36
 msgid "Plan your halal journey across South Korea - browse by city and region"
-msgstr "Janubiy Koreya bo'ylab halol sayohatingizni rejalashtiring - shahar va mintaqa bo'yicha ko'ring"
+msgstr ""
+"Janubiy Koreya bo'ylab halol sayohatingizni rejalashtiring - shahar va "
+"mintaqa bo'yicha ko'ring"
 
 #: places/templates/places/explore.html:50
 #: places/templates/places/explore.html:84
@@ -987,7 +1040,8 @@ msgstr "Geolokatsiya brauzeringiz tomonidan qo'llab-quvvatlanmaydi."
 
 #: places/templates/places/home.html:26
 msgid "Discover halal restaurants, markets, and prayer spaces near you."
-msgstr "Atrofingizdagi halol restoranlar, bozorlar va namoz joylarini kashf eting."
+msgstr ""
+"Atrofingizdagi halol restoranlar, bozorlar va namoz joylarini kashf eting."
 
 #: places/templates/places/home.html:30
 msgid "Planning Your Halal Journey to Korea?"
@@ -997,11 +1051,15 @@ msgstr "Koreyaga halol sayohatingizni rejalashtirmoqchimisiz?"
 msgid ""
 "Discover verified halal restaurants, markets, and prayer spaces across South "
 "Korea for your trip."
-msgstr "Sayohatingiz uchun Janubiy Koreya bo'ylab tasdiqlangan halol restoranlar, bozorlar va namoz joylarini kashf eting."
+msgstr ""
+"Sayohatingiz uchun Janubiy Koreya bo'ylab tasdiqlangan halol restoranlar, "
+"bozorlar va namoz joylarini kashf eting."
 
 #: places/templates/places/home.html:39
 msgid "Planning a trip to Korea? We'll help you find the best halal options!"
-msgstr "Koreyaga sayohat rejalashtirmoqchimisiz? Eng yaxshi halol variantlarni topishga yordam beramiz!"
+msgstr ""
+"Koreyaga sayohat rejalashtirmoqchimisiz? Eng yaxshi halol variantlarni "
+"topishga yordam beramiz!"
 
 #: places/templates/places/home.html:50
 msgid "Search places in Korea..."
@@ -1085,7 +1143,9 @@ msgstr "Halol joyni bilasizmi? Ulashing!"
 
 #: places/templates/places/home.html:238
 msgid "Help us grow our community by submitting halal places you know!"
-msgstr "Bilgan halol joylaringizni yuborish orqali jamiyatimizning o'sishiga yordam bering!"
+msgstr ""
+"Bilgan halol joylaringizni yuborish orqali jamiyatimizning o'sishiga yordam "
+"bering!"
 
 #: places/templates/places/legal.html:5
 msgid "Legal"
@@ -1113,17 +1173,22 @@ msgstr "Yig'adigan ma'lumotlarimiz"
 msgid ""
 "When you use %(STATIC_INFO.site_name)s, we may collect the following types "
 "of information:"
-msgstr "%(STATIC_INFO.site_name)s-dan foydalanganda biz quyidagi turdagi ma'lumotlarni yig'ishimiz mumkin:"
+msgstr ""
+"%(STATIC_INFO.site_name)s-dan foydalanganda biz quyidagi turdagi "
+"ma'lumotlarni yig'ishimiz mumkin:"
 
 #: places/templates/places/legal.html:57
 msgid ""
 "Personal information you provide when creating an account (name, email "
 "address)"
-msgstr "Hisob yaratishda taqdim etgan shaxsiy ma'lumotlar (ism, elektron pochta manzili)"
+msgstr ""
+"Hisob yaratishda taqdim etgan shaxsiy ma'lumotlar (ism, elektron pochta "
+"manzili)"
 
 #: places/templates/places/legal.html:58
 msgid "Location data when you use our location-based services"
-msgstr "Manzilga asoslangan xizmatlarimizdan foydalanganda joylashuv ma'lumotlari"
+msgstr ""
+"Manzilga asoslangan xizmatlarimizdan foydalanganda joylashuv ma'lumotlari"
 
 #: places/templates/places/legal.html:59
 msgid "Information you provide when submitting places or reviews"
@@ -1169,7 +1234,10 @@ msgstr "Ma'lumotlarni ulashish"
 msgid ""
 "We do not sell, trade, or otherwise transfer your personal information to "
 "third parties without your consent, except:"
-msgstr "Biz sizning roziligingizsiz shaxsiy ma'lumotlaringizni uchinchi tomonlarga sotmaymiz, savdo qilmaymiz yoki boshqa yo'l bilan uzatmaymiz, bundan mustasno:"
+msgstr ""
+"Biz sizning roziligingizsiz shaxsiy ma'lumotlaringizni uchinchi tomonlarga "
+"sotmaymiz, savdo qilmaymiz yoki boshqa yo'l bilan uzatmaymiz, bundan "
+"mustasno:"
 
 #: places/templates/places/legal.html:80
 msgid "When required by law or to comply with legal processes"
@@ -1177,11 +1245,14 @@ msgstr "Qonun talab qilganda yoki huquqiy jarayonlarga rioya qilish uchun"
 
 #: places/templates/places/legal.html:81
 msgid "To protect our rights, property, or safety"
-msgstr "Bizning huquqlarimiz, mulkimiz yoki xavfsizligimizni himoya qilish uchun"
+msgstr ""
+"Bizning huquqlarimiz, mulkimiz yoki xavfsizligimizni himoya qilish uchun"
 
 #: places/templates/places/legal.html:82
 msgid "With trusted service providers who assist in operating our website"
-msgstr "Veb-saytimizni boshqarishda yordam beradigan ishonchli xizmat ko'rsatuvchilar bilan"
+msgstr ""
+"Veb-saytimizni boshqarishda yordam beradigan ishonchli xizmat "
+"ko'rsatuvchilar bilan"
 
 #: places/templates/places/legal.html:87
 msgid "Data Security"
@@ -1192,7 +1263,10 @@ msgid ""
 "We implement appropriate security measures to protect your personal "
 "information against unauthorized access, alteration, disclosure, or "
 "destruction."
-msgstr "Biz sizning shaxsiy ma'lumotlaringizni ruxsatsiz kirish, o'zgartirish, oshkor etish yoki yo'q qilishdan himoya qilish uchun tegishli xavfsizlik choralarini amalga oshiramiz."
+msgstr ""
+"Biz sizning shaxsiy ma'lumotlaringizni ruxsatsiz kirish, o'zgartirish, "
+"oshkor etish yoki yo'q qilishdan himoya qilish uchun tegishli xavfsizlik "
+"choralarini amalga oshiramiz."
 
 #: places/templates/places/legal.html:92
 msgid "Your Rights"
@@ -1227,7 +1301,10 @@ msgstr "Shartlarni qabul qilish"
 msgid ""
 "By accessing and using %(STATIC_INFO.site_name)s, you accept and agree to be "
 "bound by the terms and provision of this agreement."
-msgstr "%(STATIC_INFO.site_name)s-ga kirish va undan foydalanish orqali siz bu kelishuvning shartlari va qoidalariga bog'lanishni qabul qilasiz va rozilik bildirasiz."
+msgstr ""
+"%(STATIC_INFO.site_name)s-ga kirish va undan foydalanish orqali siz bu "
+"kelishuvning shartlari va qoidalariga bog'lanishni qabul qilasiz va rozilik "
+"bildirasiz."
 
 #: places/templates/places/legal.html:121
 msgid "Use License"
@@ -1238,7 +1315,10 @@ msgid ""
 "Permission is granted to temporarily use our service for personal, non-"
 "commercial transitory viewing only. This is the grant of a license, not a "
 "transfer of title, and under this license you may not:"
-msgstr "Xizmatimizdan shaxsiy, tijorat bo'lmagan vaqtinchalik ko'rish uchun foydalanish ruxsati beriladi. Bu litsenziya berish, unvon uzatish emas va bu litsenziya ostida siz quyidagilarni qila olmaysiz:"
+msgstr ""
+"Xizmatimizdan shaxsiy, tijorat bo'lmagan vaqtinchalik ko'rish uchun "
+"foydalanish ruxsati beriladi. Bu litsenziya berish, unvon uzatish emas va bu "
+"litsenziya ostida siz quyidagilarni qila olmaysiz:"
 
 #: places/templates/places/legal.html:124
 msgid "Modify or copy the materials"
@@ -1250,11 +1330,14 @@ msgstr "Materiallarni har qanday tijorat maqsadida ishlatish"
 
 #: places/templates/places/legal.html:126
 msgid "Attempt to decompile or reverse engineer any software"
-msgstr "Har qanday dasturiy ta'minotni dekompilyatsiya qilish yoki teskari muhandislik qilishga urinish"
+msgstr ""
+"Har qanday dasturiy ta'minotni dekompilyatsiya qilish yoki teskari "
+"muhandislik qilishga urinish"
 
 #: places/templates/places/legal.html:127
 msgid "Remove any copyright or other proprietary notations"
-msgstr "Har qanday mualliflik huquqi yoki boshqa mulkiy belgilarni olib tashlash"
+msgstr ""
+"Har qanday mualliflik huquqi yoki boshqa mulkiy belgilarni olib tashlash"
 
 #: places/templates/places/legal.html:132
 msgid "User Content"
@@ -1267,7 +1350,9 @@ msgstr "Kontent yuborganingizda (joylar, sharhlar, fotolar), siz:"
 #: places/templates/places/legal.html:135
 msgid ""
 "Grant us a non-exclusive license to use, display, and distribute your content"
-msgstr "Bizga kontentingizni ishlatish, ko'rsatish va tarqatish uchun eksklyuziv bo'lmagan litsenziya berasiz"
+msgstr ""
+"Bizga kontentingizni ishlatish, ko'rsatish va tarqatish uchun eksklyuziv "
+"bo'lmagan litsenziya berasiz"
 
 #: places/templates/places/legal.html:136
 msgid "Confirm that you have the right to submit such content"
@@ -1275,11 +1360,14 @@ msgstr "Bunday kontentni yuborish huquqiga ega ekanligingizni tasdiqlaysiz"
 
 #: places/templates/places/legal.html:137
 msgid "Agree not to submit false, misleading, or harmful content"
-msgstr "Yolg'on, chalg'ituvchi yoki zararli kontent yubormaslikka rozilik bildirasiz"
+msgstr ""
+"Yolg'on, chalg'ituvchi yoki zararli kontent yubormaslikka rozilik bildirasiz"
 
 #: places/templates/places/legal.html:138
 msgid "Understand that we may moderate and remove content at our discretion"
-msgstr "Biz o'z ixtiyorimiz bilan kontentni moderatsiya qilish va olib tashlashimiz mumkinligini tushunasiz"
+msgstr ""
+"Biz o'z ixtiyorimiz bilan kontentni moderatsiya qilish va olib tashlashimiz "
+"mumkinligini tushunasiz"
 
 #: places/templates/places/legal.html:143
 msgid "Prohibited Uses"
@@ -1291,22 +1379,29 @@ msgstr "Siz xizmatimizdan quyidagicha foydalana olmaysiz:"
 
 #: places/templates/places/legal.html:146
 msgid "For any unlawful purpose or to solicit others to unlawful acts"
-msgstr "Har qanday noqonuniy maqsad uchun yoki boshqalarni noqonuniy harakatlarga chaqirish uchun"
+msgstr ""
+"Har qanday noqonuniy maqsad uchun yoki boshqalarni noqonuniy harakatlarga "
+"chaqirish uchun"
 
 #: places/templates/places/legal.html:147
 msgid ""
 "To violate any international, federal, provincial, or state regulations or "
 "laws"
-msgstr "Har qanday xalqaro, federal, viloyat yoki davlat qoidalari yoki qonunlarini buzish uchun"
+msgstr ""
+"Har qanday xalqaro, federal, viloyat yoki davlat qoidalari yoki qonunlarini "
+"buzish uchun"
 
 #: places/templates/places/legal.html:148
 msgid ""
 "To transmit or procure the sending of any advertising or promotional material"
-msgstr "Har qanday reklama yoki targ'ibot materiallarini uzatish yoki yuborishni ta'minlash uchun"
+msgstr ""
+"Har qanday reklama yoki targ'ibot materiallarini uzatish yoki yuborishni "
+"ta'minlash uchun"
 
 #: places/templates/places/legal.html:149
 msgid "To impersonate or attempt to impersonate another user"
-msgstr "Boshqa foydalanuvchini taqlid qilish yoki taqlid qilishga urinish uchun"
+msgstr ""
+"Boshqa foydalanuvchini taqlid qilish yoki taqlid qilishga urinish uchun"
 
 #: places/templates/places/legal.html:154
 msgid "Disclaimer"
@@ -1319,7 +1414,11 @@ msgid ""
 "basis. We make no representations or warranties of any kind regarding the "
 "halal status of establishments listed on our platform. Users are strongly "
 "advised to verify halal certification independently."
-msgstr "%(STATIC_INFO.site_name)s-dagi ma'lumotlar 'boricha' asosida taqdim etiladi. Biz platformamizda keltirilgan muassasalarning halol holati haqida hech qanday vakillik yoki kafolat bermaymiz. Foydalanuvchilarga halol sertifikatini mustaqil tekshirish kuchli tavsiya etiladi."
+msgstr ""
+"%(STATIC_INFO.site_name)s-dagi ma'lumotlar 'boricha' asosida taqdim etiladi. "
+"Biz platformamizda keltirilgan muassasalarning halol holati haqida hech "
+"qanday vakillik yoki kafolat bermaymiz. Foydalanuvchilarga halol "
+"sertifikatini mustaqil tekshirish kuchli tavsiya etiladi."
 
 #: places/templates/places/legal.html:159
 msgid "Limitations"
@@ -1331,7 +1430,10 @@ msgid ""
 "%(STATIC_INFO.site_name)s or its suppliers will not be held liable for any "
 "damages that will arise with the use or inability to use the materials on "
 "our website."
-msgstr "%(STATIC_INFO.site_name)s yoki uning yetkazib beruvchilari veb-saytimizdagi materiallardan foydalanish yoki foydalana olmaslik natijasida yuzaga keladigan har qanday zarar uchun javobgar bo'lmaydi."
+msgstr ""
+"%(STATIC_INFO.site_name)s yoki uning yetkazib beruvchilari veb-saytimizdagi "
+"materiallardan foydalanish yoki foydalana olmaslik natijasida yuzaga "
+"keladigan har qanday zarar uchun javobgar bo'lmaydi."
 
 #: places/templates/places/legal.html:177
 msgid "What Are Cookies"
@@ -1343,7 +1445,11 @@ msgid ""
 "device when you visit our website. They help us provide you with a better "
 "experience by remembering your preferences and understanding how you use our "
 "site."
-msgstr "Cookie - bu veb-saytimizga tashrif buyurganingizda kompyuteringiz yoki mobil qurilmangizga joylashtiriladigan kichik matn fayllari. Ular sizning afzalliklaringizni eslab qolish va saytimizdan qanday foydalanishingizni tushunish orqali sizga yaxshiroq tajriba taqdim etishga yordam beradi."
+msgstr ""
+"Cookie - bu veb-saytimizga tashrif buyurganingizda kompyuteringiz yoki mobil "
+"qurilmangizga joylashtiriladigan kichik matn fayllari. Ular sizning "
+"afzalliklaringizni eslab qolish va saytimizdan qanday foydalanishingizni "
+"tushunish orqali sizga yaxshiroq tajriba taqdim etishga yordam beradi."
 
 #: places/templates/places/legal.html:182
 msgid "How We Use Cookies"
@@ -1352,7 +1458,8 @@ msgstr "Cookie-larni qanday ishlatamiz"
 #: places/templates/places/legal.html:183
 #, python-format
 msgid "%(STATIC_INFO.site_name)s uses cookies for several purposes:"
-msgstr "%(STATIC_INFO.site_name)s cookie-larni bir necha maqsad uchun ishlatadi:"
+msgstr ""
+"%(STATIC_INFO.site_name)s cookie-larni bir necha maqsad uchun ishlatadi:"
 
 #: places/templates/places/legal.html:185
 msgid "Essential cookies: Required for the website to function properly"
@@ -1360,16 +1467,22 @@ msgstr "Asosiy cookie-lar: Veb-sayt to'g'ri ishlashi uchun zarur"
 
 #: places/templates/places/legal.html:186
 msgid "Preference cookies: Remember your settings and language preferences"
-msgstr "Afzallik cookie-lari: Sizning sozlamalaringiz va til afzalliklaringizni eslab qoladi"
+msgstr ""
+"Afzallik cookie-lari: Sizning sozlamalaringiz va til afzalliklaringizni "
+"eslab qoladi"
 
 #: places/templates/places/legal.html:187
 msgid ""
 "Analytics cookies: Help us understand how visitors interact with our website"
-msgstr "Tahlil cookie-lari: Tashrif buyuruvchilar veb-saytimiz bilan qanday o'zaro ta'sir qilishini tushunishga yordam beradi"
+msgstr ""
+"Tahlil cookie-lari: Tashrif buyuruvchilar veb-saytimiz bilan qanday o'zaro "
+"ta'sir qilishini tushunishga yordam beradi"
 
 #: places/templates/places/legal.html:188
 msgid "Functionality cookies: Enable enhanced features and personalization"
-msgstr "Funksionallik cookie-lari: Kengaytirilgan xususiyatlar va shaxsiylashtirishni yoqadi"
+msgstr ""
+"Funksionallik cookie-lari: Kengaytirilgan xususiyatlar va "
+"shaxsiylashtirishni yoqadi"
 
 #: places/templates/places/legal.html:193
 msgid "Types of Cookies We Use"
@@ -1381,7 +1494,8 @@ msgstr "Sessiya Cookie-lari"
 
 #: places/templates/places/legal.html:199
 msgid "Temporary cookies that expire when you close your browser"
-msgstr "Brauzeringizni yopganingizda muddati tugaydigan vaqtinchalik cookie-lar"
+msgstr ""
+"Brauzeringizni yopganingizda muddati tugaydigan vaqtinchalik cookie-lar"
 
 #: places/templates/places/legal.html:205
 msgid "Persistent Cookies"
@@ -1413,15 +1527,19 @@ msgstr "Uchinchi tomon xizmatlari"
 
 #: places/templates/places/legal.html:228
 msgid "We use the following third-party services that may set cookies:"
-msgstr "Biz cookie-larni o'rnatishi mumkin bo'lgan quyidagi uchinchi tomon xizmatlaridan foydalanamiz:"
+msgstr ""
+"Biz cookie-larni o'rnatishi mumkin bo'lgan quyidagi uchinchi tomon "
+"xizmatlaridan foydalanamiz:"
 
 #: places/templates/places/legal.html:230
 msgid "To analyze website traffic and user behavior"
-msgstr "Veb-sayt trafigi va foydalanuvchi xatti-harakatlarini tahlil qilish uchun"
+msgstr ""
+"Veb-sayt trafigi va foydalanuvchi xatti-harakatlarini tahlil qilish uchun"
 
 #: places/templates/places/legal.html:231
 msgid "To provide location-based services and mapping functionality"
-msgstr "Manzilga asoslangan xizmatlar va xarita funksionalligini taqdim etish uchun"
+msgstr ""
+"Manzilga asoslangan xizmatlar va xarita funksionalligini taqdim etish uchun"
 
 #: places/templates/places/legal.html:236
 msgid "Managing Cookies"
@@ -1429,15 +1547,21 @@ msgstr "Cookie-larni boshqarish"
 
 #: places/templates/places/legal.html:237
 msgid "You can control and manage cookies in several ways:"
-msgstr "Siz cookie-larni bir necha yo'l bilan boshqarishingiz va boshqarishingiz mumkin:"
+msgstr ""
+"Siz cookie-larni bir necha yo'l bilan boshqarishingiz va boshqarishingiz "
+"mumkin:"
 
 #: places/templates/places/legal.html:239
 msgid "Browser settings: Most browsers allow you to refuse or delete cookies"
-msgstr "Brauzer sozlamalari: Ko'pchilik brauzerlar cookie-larni rad etish yoki o'chirish imkonini beradi"
+msgstr ""
+"Brauzer sozlamalari: Ko'pchilik brauzerlar cookie-larni rad etish yoki "
+"o'chirish imkonini beradi"
 
 #: places/templates/places/legal.html:240
 msgid "Opt-out tools: Use tools provided by advertising networks"
-msgstr "Voz kechish vositalari: Reklama tarmoqlari tomonidan taqdim etilgan vositalardan foydalaning"
+msgstr ""
+"Voz kechish vositalari: Reklama tarmoqlari tomonidan taqdim etilgan "
+"vositalardan foydalaning"
 
 #: places/templates/places/legal.html:241
 msgid "Mobile settings: Adjust settings on your mobile device"
@@ -1447,7 +1571,9 @@ msgstr "Mobil sozlamalar: Mobil qurilmangizdagi sozlamalarni sozlang"
 msgid ""
 "Please note that disabling certain cookies may affect the functionality of "
 "our website and your user experience."
-msgstr "Iltimos, ma'lum cookie-larni o'chirish veb-saytimizning funksionalligi va foydalanuvchi tajribangizga ta'sir qilishi mumkinligini unutmang."
+msgstr ""
+"Iltimos, ma'lum cookie-larni o'chirish veb-saytimizning funksionalligi va "
+"foydalanuvchi tajribangizga ta'sir qilishi mumkinligini unutmang."
 
 #: places/templates/places/legal.html:253
 msgid "Updates to This Policy"
@@ -1458,7 +1584,10 @@ msgid ""
 "We may update this Cookie Policy from time to time. We will notify you of "
 "any changes by posting the new policy on this page with an updated revision "
 "date."
-msgstr "Biz bu Cookie siyosatini vaqti-vaqti bilan yangilashimiz mumkin. Biz har qanday o'zgarishlar haqida sizni yangilangan qayta ko'rib chiqish sanasi bilan bu sahifada yangi siyosatni joylashtirish orqali xabardor qilamiz."
+msgstr ""
+"Biz bu Cookie siyosatini vaqti-vaqti bilan yangilashimiz mumkin. Biz har "
+"qanday o'zgarishlar haqida sizni yangilangan qayta ko'rib chiqish sanasi "
+"bilan bu sahifada yangi siyosatni joylashtirish orqali xabardor qilamiz."
 
 #: places/templates/places/legal.html:264
 msgid "Questions About Our Legal Policies?"
@@ -1468,7 +1597,10 @@ msgstr "Bizning huquqiy siyosatlarimiz haqida savollaringiz bormi?"
 msgid ""
 "If you have any questions about our Privacy Policy, Terms of Service, or "
 "Cookie Policy, please don't hesitate to contact us."
-msgstr "Agar bizning Maxfiylik siyosati, Xizmat ko'rsatish shartlari yoki Cookie siyosatimiz haqida savollaringiz bo'lsa, iltimos, biz bilan bog'lanishdan tortinmang."
+msgstr ""
+"Agar bizning Maxfiylik siyosati, Xizmat ko'rsatish shartlari yoki Cookie "
+"siyosatimiz haqida savollaringiz bo'lsa, iltimos, biz bilan bog'lanishdan "
+"tortinmang."
 
 #: places/templates/places/my_contributions.html:5
 #: places/templates/places/my_contributions.html:37
@@ -1489,7 +1621,9 @@ msgstr "Qaytish"
 #: places/templates/places/my_contributions.html:39
 msgid ""
 "Your submitted places and edit suggestions that help build our community"
-msgstr "Jamiyatimizni qurishga yordam beradigan sizning yuborgan joylaringiz va tahrir takliflaringiz"
+msgstr ""
+"Jamiyatimizni qurishga yordam beradigan sizning yuborgan joylaringiz va "
+"tahrir takliflaringiz"
 
 #: places/templates/places/my_contributions.html:53
 #: places/templates/places/my_contributions.html:95
@@ -1628,7 +1762,9 @@ msgstr "Keyingi"
 msgid ""
 "You haven't submitted any places yet. Help grow our community by adding "
 "places you know!"
-msgstr "Siz hali hech qanday joy yubormagansiz. Bilgan joylaringizni qo'shish orqali jamiyatimizning o'sishiga yordam bering!"
+msgstr ""
+"Siz hali hech qanday joy yubormagansiz. Bilgan joylaringizni qo'shish orqali "
+"jamiyatimizning o'sishiga yordam bering!"
 
 #: places/templates/places/my_contributions.html:380
 msgid "Field Edit Suggestions"
@@ -1682,7 +1818,9 @@ msgstr "Hali maydon takliflari yo'q"
 msgid ""
 "You haven't suggested any field edits yet. Visit a place page and click "
 "'Suggest Edit' to get started!"
-msgstr "Siz hali hech qanday maydon tahririni taklif qilmagansiz. Joy sahifasiga tashrif buyuring va boshlash uchun 'Tahrir taklif qilish'ni bosing!"
+msgstr ""
+"Siz hali hech qanday maydon tahririni taklif qilmagansiz. Joy sahifasiga "
+"tashrif buyuring va boshlash uchun 'Tahrir taklif qilish'ni bosing!"
 
 #: places/templates/places/my_contributions.html:573
 msgid "Image Upload Suggestions"
@@ -1712,7 +1850,9 @@ msgstr "Hali rasm takliflari yo'q"
 msgid ""
 "You haven't uploaded any images yet. Visit a place page and click 'Suggest "
 "Edit' to upload photos!"
-msgstr "Siz hali hech qanday rasm yuklamagansiz. Joy sahifasiga tashrif buyuring va fotolar yuklash uchun 'Tahrir taklif qilish'ni bosing!"
+msgstr ""
+"Siz hali hech qanday rasm yuklamagansiz. Joy sahifasiga tashrif buyuring va "
+"fotolar yuklash uchun 'Tahrir taklif qilish'ni bosing!"
 
 #: places/templates/places/partials/place_list.html:62
 #: places/templates/places/place_detail.html:231
@@ -1753,7 +1893,11 @@ msgid ""
 "This place has been added by our community. While we strive to maintain "
 "accurate information, we recommend verifying the halal status directly with "
 "the establishment before visiting."
-msgstr "Bu joy jamiyatimiz tomonidan qo'shilgan. Aniq ma'lumotlarni saqlash uchun har qanday sa'y-harakatni qilgan bo'lsak ham, tashrif buyurishdan oldin halol holatini to'g'ridan-to'g'ri muassasa bilan tekshirishni tavsiya qilamiz."
+msgstr ""
+"Bu joy jamiyatimiz tomonidan qo'shilgan. Aniq ma'lumotlarni saqlash uchun "
+"har qanday sa'y-harakatni qilgan bo'lsak ham, tashrif buyurishdan oldin "
+"halol holatini to'g'ridan-to'g'ri muassasa bilan tekshirishni tavsiya "
+"qilamiz."
 
 #: places/templates/places/place_detail.html:183
 msgid "No ratings yet"
@@ -1881,7 +2025,8 @@ msgstr "Yangi joy qo'shish"
 
 #: places/templates/places/submit_place.html:148
 msgid "Help others find halal places by submitting a new location"
-msgstr "Yangi joy qo'shish orqali boshqalarga halol joylarni topishga yordam bering"
+msgstr ""
+"Yangi joy qo'shish orqali boshqalarga halol joylarni topishga yordam bering"
 
 #: places/templates/places/submit_place.html:160
 msgid "Place Name"
@@ -1997,7 +2142,10 @@ msgid ""
 "Note: <strong>Mosque</strong> is for dedicated Islamic centers, while "
 "<strong>Prayer Room</strong> is for designated prayer spaces in other "
 "locations."
-msgstr "Eslatma: <strong>Masjid</strong> maxsus islomiy markazlar uchun, <strong>Namoz xonasi</strong> esa boshqa joylardagi belgilangan namoz joylari uchun."
+msgstr ""
+"Eslatma: <strong>Masjid</strong> maxsus islomiy markazlar uchun, "
+"<strong>Namoz xonasi</strong> esa boshqa joylardagi belgilangan namoz "
+"joylari uchun."
 
 #: places/templates/places/submit_place.html:463
 msgid "Preview"
@@ -2021,7 +2169,9 @@ msgstr "Yaxshilanishlar taklif qilish"
 
 #: places/templates/places/suggest_edit.html:92
 msgid "Help our community by suggesting better information or adding photos"
-msgstr "Yaxshiroq ma'lumot taklif qilish yoki fotolar qo'shish orqali jamiyatimizga yordam bering"
+msgstr ""
+"Yaxshiroq ma'lumot taklif qilish yoki fotolar qo'shish orqali jamiyatimizga "
+"yordam bering"
 
 #: places/templates/places/suggest_edit.html:109
 msgid "Min Impact"
@@ -2168,7 +2318,9 @@ msgstr "O'zgarishlaringizni tushuntiring"
 #: places/templates/places/suggest_edit.html:510
 msgid ""
 "This explanation will apply to all your field changes and image uploads."
-msgstr "Bu tushuntirish barcha maydon o'zgarishlari va rasm yuklashlaringizga qo'llaniladi."
+msgstr ""
+"Bu tushuntirish barcha maydon o'zgarishlari va rasm yuklashlaringizga "
+"qo'llaniladi."
 
 #: places/templates/places/suggest_edit.html:529
 msgid "Please fix these issues:"
@@ -2184,7 +2336,9 @@ msgstr "o'zgarishlar"
 #: places/templates/places/suggest_edit.html:866
 #: places/templates/places/suggest_edit.html:872
 msgid "Select fields to edit or upload images to create suggestions."
-msgstr "Takliflar yaratish uchun tahrirlash maydonlarini tanlang yoki rasmlar yuklang."
+msgstr ""
+"Takliflar yaratish uchun tahrirlash maydonlarini tanlang yoki rasmlar "
+"yuklang."
 
 #: places/templates/places/suggest_edit.html:569
 msgid "Suggestion Summary"
@@ -2229,7 +2383,9 @@ msgstr "Joriy manzilingiz va Koreya uchun namoz vaqtlari"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:22
 msgid "We show your local prayer times and Korea times for trip planning."
-msgstr "Biz sayohat rejalashtirish uchun mahalliy namoz vaqtlaringiz va Koreya vaqtlarini ko'rsatamiz."
+msgstr ""
+"Biz sayohat rejalashtirish uchun mahalliy namoz vaqtlaringiz va Koreya "
+"vaqtlarini ko'rsatamiz."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:68
 msgid "Search city..."
@@ -2393,7 +2549,10 @@ msgid ""
 "Prayer times are provided by <a href=\"https://aladhan.com/\" "
 "target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 "
 "dark:hover:text-primary-400\">aladhan.com</a>"
-msgstr "Namoz vaqtlari <a href=\"https://aladhan.com/\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 dark:hover:text-primary-400\">aladhan.com</a> tomonidan taqdim etiladi"
+msgstr ""
+"Namoz vaqtlari <a href=\"https://aladhan.com/\" target=\"_blank\" "
+"rel=\"noopener\" class=\"underline hover:text-primary-600 dark:hover:text-"
+"primary-400\">aladhan.com</a> tomonidan taqdim etiladi"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:286
 msgid "Fajr (Tomorrow)"
@@ -2456,7 +2615,9 @@ msgstr "Manzilingizni olishda xatolik. Iltimos, shaharni qo'lda tanlang."
 #: prayer_times/templates/prayer_times/prayer_times.html:457
 msgid ""
 "Geolocation is not supported by your browser. Please select a city manually."
-msgstr "Geolokatsiya brauzeringiz tomonidan qo'llab-quvvatlanmaydi. Iltimos, shaharni qo'lda tanlang."
+msgstr ""
+"Geolokatsiya brauzeringiz tomonidan qo'llab-quvvatlanmaydi. Iltimos, "
+"shaharni qo'lda tanlang."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:477
 #: prayer_times/templates/prayer_times/prayer_times.html:501
@@ -2472,7 +2633,9 @@ msgstr "Sozlamalarni yangilashda xatolik:"
 msgid ""
 "Please verify your email address to access this feature. Check your inbox "
 "for the verification email."
-msgstr "Bu xususiyatdan foydalanish uchun iltimos, elektron pochta manzilingizni tasdiqlang. Tasdiqlash xabarini pochta qutingizda tekshiring."
+msgstr ""
+"Bu xususiyatdan foydalanish uchun iltimos, elektron pochta manzilingizni "
+"tasdiqlang. Tasdiqlash xabarini pochta qutingizda tekshiring."
 
 #: users/templates/users/activation_result.html:4
 #: users/templates/users/activation_result.html:12
@@ -2487,7 +2650,9 @@ msgstr "Elektron pochta muvaffaqiyatli tasdiqlandi!"
 msgid ""
 "Your email has been verified successfully! You can now submit places, write "
 "reviews, and make suggestions."
-msgstr "Sizning elektron pochtangiz muvaffaqiyatli tasdiqlandi! Endi joylar yuborishingiz, sharhlar yozishingiz va takliflar berishingiz mumkin."
+msgstr ""
+"Sizning elektron pochtangiz muvaffaqiyatli tasdiqlandi! Endi joylar "
+"yuborishingiz, sharhlar yozishingiz va takliflar berishingiz mumkin."
 
 #: users/templates/users/activation_result.html:33
 #: users/templates/users/check_email.html:58
@@ -2527,13 +2692,17 @@ msgstr "Biz faollashtirish xabarini yubordik"
 msgid ""
 "Please check your email and click the activation link to complete your "
 "registration."
-msgstr "Iltimos, elektron pochtangizni tekshiring va ro'yxatdan o'tishni tugatish uchun faollashtirish havolasini bosing."
+msgstr ""
+"Iltimos, elektron pochtangizni tekshiring va ro'yxatdan o'tishni tugatish "
+"uchun faollashtirish havolasini bosing."
 
 #: users/templates/users/check_email.html:43
 msgid ""
 "The activation link will expire in 24 hours. Don't forget to check your spam "
 "folder!"
-msgstr "Faollashtirish havolasi 24 soatdan keyin muddati tugaydi. Spam papkasini tekshirishni unutmang!"
+msgstr ""
+"Faollashtirish havolasi 24 soatdan keyin muddati tugaydi. Spam papkasini "
+"tekshirishni unutmang!"
 
 #: users/templates/users/check_email.html:53
 msgid "Resend Email"
@@ -2614,7 +2783,10 @@ msgstr "Salom"
 msgid ""
 "Thank you for joining our community! To complete your registration and start "
 "exploring halal places in Korea, please verify your email address."
-msgstr "Jamiyatimizga qo'shilganingiz uchun rahmat! Ro'yxatdan o'tishni tugatish va Koreyadagi halol joylarni kashf etishni boshlash uchun iltimos, elektron pochta manzilingizni tasdiqlang."
+msgstr ""
+"Jamiyatimizga qo'shilganingiz uchun rahmat! Ro'yxatdan o'tishni tugatish va "
+"Koreyadagi halol joylarni kashf etishni boshlash uchun iltimos, elektron "
+"pochta manzilingizni tasdiqlang."
 
 #: users/templates/users/email/activation_email.html:75
 msgid "Verify My Email"
@@ -2642,7 +2814,9 @@ msgstr "Faqat bir marta ishlatiladi"
 
 #: users/templates/users/email/activation_email.html:114
 msgid "If you didn't create this account, please ignore this email"
-msgstr "Agar siz bu hisobni yaratmagan bo'lsangiz, iltimos, bu xabarni e'tiborsiz qoldiring"
+msgstr ""
+"Agar siz bu hisobni yaratmagan bo'lsangiz, iltimos, bu xabarni e'tiborsiz "
+"qoldiring"
 
 #: users/templates/users/email/activation_email.html:129
 msgid "What's next?"
@@ -2691,7 +2865,10 @@ msgid ""
 "Thank you for registering an account with Halal Korea. To complete your "
 "registration and start exploring halal places in Korea, please verify your "
 "email address by clicking the link below:"
-msgstr "Halal Korea bilan hisob ro'yxatdan o'tkazganingiz uchun rahmat. Ro'yxatdan o'tishni tugatish va Koreyadagi halol joylarni kashf etishni boshlash uchun iltimos, quyidagi havolani bosib elektron pochta manzilingizni tasdiqlang:"
+msgstr ""
+"Halal Korea bilan hisob ro'yxatdan o'tkazganingiz uchun rahmat. Ro'yxatdan "
+"o'tishni tugatish va Koreyadagi halol joylarni kashf etishni boshlash uchun "
+"iltimos, quyidagi havolani bosib elektron pochta manzilingizni tasdiqlang:"
 
 #: users/templates/users/email/activation_email.txt:10
 msgid "ACTIVATION LINK:"
@@ -2707,11 +2884,14 @@ msgstr "Bu faollashtirish havolasi 24 soatdan keyin muddati tugaydi"
 
 #: users/templates/users/email/activation_email.txt:15
 msgid "If you did not create an account, please ignore this email"
-msgstr "Agar siz hisob yaratmagan bo'lsangiz, iltimos, bu xabarni e'tiborsiz qoldiring"
+msgstr ""
+"Agar siz hisob yaratmagan bo'lsangiz, iltimos, bu xabarni e'tiborsiz "
+"qoldiring"
 
 #: users/templates/users/email/activation_email.txt:16
 msgid "For security reasons, this link can only be used once"
-msgstr "Xavfsizlik sabablariga ko'ra, bu havola faqat bir marta ishlatilishi mumkin"
+msgstr ""
+"Xavfsizlik sabablariga ko'ra, bu havola faqat bir marta ishlatilishi mumkin"
 
 #: users/templates/users/email/activation_email.txt:20
 msgid "Need help?"
@@ -2802,7 +2982,9 @@ msgstr "Cheklov oshirildi"
 msgid ""
 "You've exceeded the maximum number of allowed requests. This is a security "
 "measure to protect our service."
-msgstr "Siz ruxsat etilgan so'rovlar sonini oshirdingiz. Bu xizmatimizni himoya qilish uchun xavfsizlik chorasidir."
+msgstr ""
+"Siz ruxsat etilgan so'rovlar sonini oshirdingiz. Bu xizmatimizni himoya "
+"qilish uchun xavfsizlik chorasidir."
 
 #: users/templates/users/rate_limited.html:40
 msgid "What you can do:"
@@ -2862,7 +3044,9 @@ msgstr "Kuchli parol yarating"
 
 #: users/templates/users/register.html:156
 msgid "Password must be at least 8 characters with letters and numbers"
-msgstr "Parol kamida 8 ta belgidan iborat bo'lishi va harflar va raqamlarni o'z ichiga olishi kerak"
+msgstr ""
+"Parol kamida 8 ta belgidan iborat bo'lishi va harflar va raqamlarni o'z "
+"ichiga olishi kerak"
 
 #: users/templates/users/register.html:168
 msgid "Confirm Password"
@@ -2886,11 +3070,15 @@ msgstr "Kirish"
 
 #: users/templates/users/resend_activation.html:17
 msgid "We'll send a new verification email to your registered email address."
-msgstr "Biz sizning ro'yxatdan o'tgan elektron pochta manzilingizga yangi tasdiqlash xabarini yuboramiz."
+msgstr ""
+"Biz sizning ro'yxatdan o'tgan elektron pochta manzilingizga yangi tasdiqlash "
+"xabarini yuboramiz."
 
 #: users/templates/users/resend_activation.html:21
 msgid "Enter your email address and we'll send you a new activation link."
-msgstr "Elektron pochta manzilingizni kiriting va biz sizga yangi faollashtirish havolasini yuboramiz."
+msgstr ""
+"Elektron pochta manzilingizni kiriting va biz sizga yangi faollashtirish "
+"havolasini yuboramiz."
 
 #: users/templates/users/resend_activation.html:62
 msgid "Resend Verification Email"
@@ -2911,3 +3099,20 @@ msgstr "Elektron pochta manzilingizni kiriting"
 #: users/templates/users/resend_activation.html:134
 msgid "Back to Login"
 msgstr "Kirishga qaytish"
+
+#: utils/context_processors.py:26
+#| msgid "Discover halal places across Korea"
+msgid "Find halal food and services across South Korea"
+msgstr "Koreya bo'ylab halol joylarni kashf eting"
+
+#: utils/context_processors.py:27
+msgid ""
+"Find halal food and services across South Korea. Join our community and "
+"discover verified halal places."
+msgstr ""
+"Butun Janubiy Koreya bo'ylab halol ovqat va xizmatlarni toping. Hamjamiyatimizga qo'shiling va tasdiqlangan halol joylarni kashf eting."
+
+#: utils/context_processors.py:30
+#, python-brace-format
+msgid "© {year} Halal Korea. All rights reserved."
+msgstr "© {year} Halal Korea. Barcha huquqlar himoyalangan."
