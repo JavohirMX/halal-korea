@@ -33,7 +33,7 @@
                     document.getElementById('place-address').value = response.results[0].formatted_address;
                 }
             } catch (error) {
-                console.error('{% translate "Geocoding error:" %}', error);
+                console.error("{% translate 'Geocoding error:'|escapejs %}", error);
             }
         }
 
@@ -78,7 +78,7 @@
                     map.setCenter(location);
                 }
             } catch (error) {
-                console.error('{% translate "Geocoding error:" %}', error);
+                console.error("{% translate 'Geocoding error:'|escapejs %}", error);
             }
         }
 
@@ -511,7 +511,7 @@
         
         if (!lat || !lng) {
             e.preventDefault();
-            alert('{% translate "Please select a location on the map" %}');
+            alert("{% translate 'Please select a location on the map'|escapejs %}");
         }
     });
 

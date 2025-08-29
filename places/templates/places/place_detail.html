@@ -299,7 +299,7 @@
                                         <form action="{% url 'reviews:delete_review' review.id %}" 
                                               method="POST" 
                                               class="inline"
-                                              onsubmit="return confirm('{% translate 'Are you sure you want to delete your review?' %}');">
+                                              onsubmit='return confirm("{% translate 'Are you sure you want to delete your review?'|escapejs %}");'>
                                             {% csrf_token %}
                                             <button type="submit" 
                                                     class="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
@@ -586,7 +586,7 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('{% translate "Network response was not ok" %}');
+                    throw new Error("{% translate 'Network response was not ok'|escapejs %}");
                 }
 
                 const data = await response.json();
@@ -599,7 +599,7 @@
                 }
 
                 // Optional: Show success message
-                const message = data.status === 'added' ? '{% translate "Added to favorites" %}' : '{% translate "Removed from favorites" %}';
+                const message = data.status === 'added' ? "{% translate 'Added to favorites'|escapejs %}" : "{% translate 'Removed from favorites'|escapejs %}";
                 // You could add a toast notification here if desired
                 Toastify({
                     text: message,
@@ -612,14 +612,14 @@
                 }).showToast();
 
             } catch (error) {
-                console.error('{% translate "Error toggling favorite:" %}', error);
+                console.error("{% translate 'Error toggling favorite:'|escapejs %}", error);
                 // Revert UI on error
                 heartIcon.classList.toggle('text-red-600');
                 heartIcon.classList.toggle('text-gray-400');
                 heartIcon.classList.toggle('dark:text-gray-600');
                 // Optional: Show error message to user
                 Toastify({
-                    text: "{% translate 'Could not update favorite status. Please try again.' %}",
+                    text: "{% translate 'Could not update favorite status. Please try again.'|escapejs %}",
                     duration: 3000,
                     gravity: "top",
                     position: "right",
@@ -648,7 +648,7 @@
                     // Fallback for browsers that don't support Web Share API
                     await navigator.clipboard.writeText(window.location.href);
                     Toastify({
-                        text: "{% translate 'Link copied to clipboard!' %}",
+                        text: "{% translate 'Link copied to clipboard!'|escapejs %}",
                         duration: 3000,
                         gravity: "top",
                         position: "right",
@@ -658,9 +658,9 @@
                     }).showToast();
                 }
             } catch (error) {
-                console.error('{% translate "Error sharing:" %}', error);
+                console.error("{% translate 'Error sharing:'|escapejs %}", error);
                 Toastify({
-                    text: "{% translate 'Failed to share. Please try again.' %}",
+                    text: "{% translate 'Failed to share. Please try again.'|escapejs %}",
                         duration: 3000,
                         gravity: "top",
                         position: "right",
@@ -723,7 +723,7 @@
     function copyAddress(address) {
         navigator.clipboard.writeText(address).then(() => {
             Toastify({
-                text: "{% translate 'Address copied to clipboard!' %}",
+                text: "{% translate 'Address copied to clipboard!'|escapejs %}",
                 duration: 3000,
                 gravity: "top",
                 position: "right",
@@ -732,9 +732,9 @@
                 },
             }).showToast();
         }).catch(err => {
-            console.error('{% translate "Failed to copy address:" %}', err);
+            console.error("{% translate 'Failed to copy address:'|escapejs %}", err);
             Toastify({
-                text: "{% translate 'Failed to copy address. Please try again.' %}",
+                text: "{% translate 'Failed to copy address. Please try again.'|escapejs %}",
                 duration: 3000,
                 gravity: "top",
                 position: "right",

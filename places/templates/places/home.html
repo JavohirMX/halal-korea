@@ -270,16 +270,16 @@ document.getElementById('find-nearest-btn').onclick = function() {
                 if (data.success) {
                     window.location.href = "{% url 'places:explore' %}";
                 } else {
-                    alert('{% translate "Failed to update location: " %}' + (data.error || '{% translate "Unknown error" %}'));
+                    alert("{% translate 'Failed to update location: '|escapejs %}" + (data.error || "{% translate 'Unknown error'|escapejs %}"));
                 }
             }).catch(error => {
-                alert('{% translate "Failed to update location: " %}' + error);
+                alert("{% translate 'Failed to update location: '|escapejs %}" + error);
             });
         }, function(error) {
-            alert('{% translate "Could not get your location: " %}' + error.message);
+            alert("{% translate 'Could not get your location: '|escapejs %}" + error.message);
         });
     } else {
-        alert('{% translate "Geolocation is not supported by your browser." %}');
+        alert("{% translate 'Geolocation is not supported by your browser.'|escapejs %}");
     }
 };
 </script>

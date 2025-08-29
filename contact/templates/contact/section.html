@@ -179,7 +179,7 @@ function initializeContactForm() {
             setSubmitButtonLoading(false);
             
             document.getElementById('error-message').textContent = 
-                '{% trans "An unexpected error occurred. Please try again later." %}';
+                "{% trans 'An unexpected error occurred. Please try again later.' %}";
             showMessage(errorDiv);
         });
     });

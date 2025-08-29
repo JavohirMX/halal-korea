@@ -283,7 +283,7 @@
         const fajrTimeTomorrow = parseTime(document.querySelector('td[data-time]').dataset.time);
         fajrTimeTomorrow.setDate(fajrTimeTomorrow.getDate() + 1);
         prayerTimes.push(fajrTimeTomorrow);
-        prayerNames.push("{% translate 'Fajr (Tomorrow)' %}");
+        prayerNames.push("{% translate 'Fajr (Tomorrow)'|escapejs %}");
     
         // Find current prayer
         let currentPrayerIndex = -1;
@@ -307,7 +307,7 @@
         let nextPrayerIndex = prayerTimes.findIndex(time => time > now);
         
         if (nextPrayerIndex === -1) {
-            document.getElementById("countdown-display").textContent = "{% translate 'All prayer times have passed.' %}";
+            document.getElementById("countdown-display").textContent = "{% translate 'All prayer times have passed.'|escapejs %}";
             return;
         }
     
@@ -364,12 +364,12 @@
                 prayerTimesBody.innerHTML = '';
                 
                 const prayers = [
-                    { name: '{% translate "Fajr" %}', time: data.data.timings.Fajr },
-                    { name: '{% translate "Sunrise" %}', time: data.data.timings.Sunrise },
-                    { name: '{% translate "Dhuhr" %}', time: data.data.timings.Dhuhr },
-                    { name: '{% translate "Asr" %}', time: data.data.timings.Asr },
-                    { name: '{% translate "Maghrib" %}', time: data.data.timings.Maghrib },
-                    { name: '{% translate "Isha" %}', time: data.data.timings.Isha }
+                    { name: "{% translate 'Fajr'|escapejs %}", time: data.data.timings.Fajr },
+                    { name: "{% translate 'Sunrise'|escapejs %}", time: data.data.timings.Sunrise },
+                    { name: "{% translate 'Dhuhr'|escapejs %}", time: data.data.timings.Dhuhr },
+                    { name: "{% translate 'Asr'|escapejs %}", time: data.data.timings.Asr },
+                    { name: "{% translate 'Maghrib'|escapejs %}", time: data.data.timings.Maghrib },
+                    { name: "{% translate 'Isha'|escapejs %}", time: data.data.timings.Isha }
                 ];
                 
                 prayers.forEach(prayer => {
@@ -387,10 +387,10 @@
                 document.getElementById('content-container').classList.remove('hidden');
                 updateCountdown();
             } else {
-                throw new Error(data.error || '{% translate "Failed to load prayer times" %}');
+                throw new Error(data.error || "{% translate 'Failed to load prayer times'|escapejs %}");
             }
         } catch (error) {
-            console.error('{% translate "Error loading prayer times:" %}', error);
+                            console.error("{% translate 'Error loading prayer times:'|escapejs %}", error);
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('error-state').classList.remove('hidden');
         }
@@ -412,11 +412,11 @@
             if (data.success) {
                 loadPrayerTimes();
             } else {
-                console.error('{% translate "Failed to update location:" %}', data.error);
+                console.error("{% translate 'Failed to update location:'|escapejs %}", data.error);
             }
         })
         .catch(error => {
-            console.error('{% translate "Error updating location:" %}', error);
+            console.error("{% translate 'Error updating location:'|escapejs %}", error);
         });
     }
 
@@ -440,21 +440,21 @@
                         if (data.success) {
                             loadPrayerTimes();
                         } else {
-                            alert('{% translate "Could not determine location. Please select a city manually." %}');
+                            alert("{% translate 'Could not determine location. Please select a city manually.'|escapejs %}");
                         }
                     })
                     .catch(error => {
-                        console.error('{% translate "Error getting location:" %}', error);
-                        alert('{% translate "Error getting your location. Please select a city manually." %}');
+                        console.error("{% translate 'Error getting location:'|escapejs %}", error);
+                        alert("{% translate 'Error getting your location. Please select a city manually.'|escapejs %}");
                     });
                 },
                 function(error) {
-                    console.error('{% translate "Error getting location:" %}', error);
-                    alert('{% translate "Error getting your location. Please select a city manually." %}');
+                                      console.error("{% translate 'Error getting location:'|escapejs %}", error);
+                  alert("{% translate 'Error getting your location. Please select a city manually.'|escapejs %}");
                 }
             );
         } else {
-            alert('{% translate "Geolocation is not supported by your browser. Please select a city manually." %}');
+            alert("{% translate 'Geolocation is not supported by your browser. Please select a city manually.'|escapejs %}");
         }
     }
 
@@ -474,11 +474,11 @@
             if (data.success) {
                 loadPrayerTimes();
             } else {
-                console.error('{% translate "Failed to update settings:" %}', data.error);
+                console.error("{% translate 'Failed to update settings:'|escapejs %}", data.error);
             }
         })
         .catch(error => {
-            console.error('{% translate "Error updating settings:" %}', error);
+            console.error("{% translate 'Error updating settings:'|escapejs %}", error);
         });
     }
 
@@ -498,11 +498,11 @@
             if (data.success) {
                 loadPrayerTimes();
             } else {
-                console.error('{% translate "Failed to update settings:" %}', data.error);
+                console.error("{% translate 'Failed to update settings:'|escapejs %}", data.error);
             }
         })
         .catch(error => {
-            console.error('{% translate "Error updating settings:" %}', error);
+            console.error("{% translate 'Error updating settings:'|escapejs %}", error);
         });
     }
 </script>

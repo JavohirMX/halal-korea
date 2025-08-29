@@ -348,7 +348,7 @@
         // Add markers for each place
                 addPlacesToMap(data.places);
             })
-            .catch(error => console.error('{% translate "Error loading places:" %}', error));
+            .catch(error => console.error("{% translate 'Error loading places:'|escapejs %}", error));
     }
     
     // Add places to the map
@@ -390,7 +390,7 @@
             content: `
                 <div class="text-center">
                     <p class="font-semibold text-black text-md">${place.name}</p>
-                    <p class="text-sm text-gray-600">${place.category === 'prayer_room' ? '{% translate "Prayer Space" %}' : place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
+                    <p class="text-sm text-gray-600">${place.category === 'prayer_room' ? "{% translate 'Prayer Space'|escapejs %}" : place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
                     <a href="/place/${place.id}/" 
                        class="text-primary-600 hover:text-primary-700 text-sm">
                         {% translate "View Details" %}
@@ -507,7 +507,7 @@
             }
         })
         .catch(error => {
-            console.error('{% translate "Error loading more places:" %}', error);
+            console.error("{% translate 'Error loading more places:'|escapejs %}", error);
             isLoading = false;
             
             // Safely hide the spinner on error
@@ -601,7 +601,7 @@
             isLoading = false;
         })
         .catch(error => {
-            console.error('{% translate "Error applying filters:" %}', error);
+            console.error("{% translate 'Error applying filters:'|escapejs %}", error);
             isLoading = false;
         });
     }
@@ -727,11 +727,11 @@ function setSeoulLocation() {
         if (data.success) {
             window.location.reload();
         } else {
-            alert('{% translate "Failed to set location to Seoul" %}');
+            alert("{% translate 'Failed to set location to Seoul'|escapejs %}");
         }
     }).catch(error => {
         console.error('Error:', error);
-        alert('{% translate "Error setting location to Seoul" %}');
+        alert("{% translate 'Error setting location to Seoul'|escapejs %}");
     });
 }
 {% endif %}
@@ -767,16 +767,16 @@ function updateLocation() {
                 if (data.success) {
                     window.location.reload();
                 } else {
-                    alert('{% translate "Failed to update location: " %}' + (data.error || '{% translate "Unknown error" %}'));
+                    alert("{% translate 'Failed to update location: '|escapejs %}" + (data.error || "{% translate 'Unknown error'|escapejs %}"));
                 }
             }).catch(error => {
-                alert('{% translate "Failed to update location: " %}' + error);
+                alert("{% translate 'Failed to update location: '|escapejs %}" + error);
             });
         }, function(error) {
-            alert('{% translate "Could not get your location: " %}' + error.message);
+            alert("{% translate 'Could not get your location: '|escapejs %}" + error.message);
         });
     } else {
-        alert('{% translate "Geolocation is not supported by your browser." %}');
+        alert("{% translate 'Geolocation is not supported by your browser.'|escapejs %}");
     }
 }
 </script>
