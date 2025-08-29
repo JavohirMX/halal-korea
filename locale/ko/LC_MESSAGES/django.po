@@ -22,7 +22,7 @@ msgstr ""
 #: blog/templates/blog/detail.html:138 blog/templates/blog/search.html:12
 #: blog/templates/blog/tag.html:16 places/templates/places/place_detail.html:67
 msgid "Home"
-msgstr ""
+msgstr "홈"
 
 #: blog/templates/blog/archive.html:14 blog/templates/blog/category.html:4
 #: blog/templates/blog/category.html:18 blog/templates/blog/detail.html:140
@@ -36,539 +36,539 @@ msgstr "블로그"
 #: blog/templates/blog/archive.html:18 blog/templates/blog/archive.html:20
 #: blog/templates/blog/archive.html:22 blog/templates/blog/archive.html:32
 msgid "Archive"
-msgstr ""
+msgstr "아카이브"
 
 #: blog/templates/blog/archive.html:41
 msgid "Blog Archive"
-msgstr ""
+msgstr "블로그 아카이브"
 
 #: blog/templates/blog/archive.html:47 blog/templates/blog/category.html:35
 #: blog/templates/blog/tag.html:39
 #, python-format
 msgid "%(counter)s article"
 msgid_plural "%(counter)s articles"
-msgstr[0] ""
+msgstr[0] "%(counter)개의 글"
 
 #: blog/templates/blog/archive.html:49
 msgid "in this month"
-msgstr ""
+msgstr "이번 달에"
 
 #: blog/templates/blog/archive.html:51
 msgid "in this year"
-msgstr ""
+msgstr "올해에"
 
 #: blog/templates/blog/archive.html:61
 msgid "Browse by Year"
-msgstr ""
+msgstr "연도별로 보기"
 
 #: blog/templates/blog/archive.html:180
 msgid "No articles published in this month"
-msgstr ""
+msgstr "이번 달에 발행된 글이 없습니다"
 
 #: blog/templates/blog/archive.html:182
 msgid "No articles published in this year"
-msgstr ""
+msgstr "올해에 발행된 글이 없습니다"
 
 #: blog/templates/blog/archive.html:184
 msgid "No archived articles"
-msgstr ""
+msgstr "보관된 글이 없습니다"
 
 #: blog/templates/blog/archive.html:188
 msgid "Check out our latest articles or browse other time periods"
-msgstr ""
+msgstr "최신 글을 확인하거나 다른 기간을 둘러보세요"
 
 #: blog/templates/blog/archive.html:194 blog/templates/blog/category.html:146
 #: blog/templates/blog/search.html:180 blog/templates/blog/tag.html:156
 msgid "Back to Blog"
-msgstr ""
+msgstr "블로그로 돌아가기"
 
 #: blog/templates/blog/archive.html:200
 msgid "Browse All Years"
-msgstr ""
+msgstr "모든 연도 보기"
 
 #: blog/templates/blog/category.html:7
 #, python-format
 msgid ""
 "Explore articles in %(category_name)s category. Discover insights about "
 "halal lifestyle in Korea."
-msgstr ""
+msgstr "%(category_name)s 카테고리의 글을 둘러보세요. 한국의 할랄 라이프스타일에 대한 인사이트를 발견하세요."
 
 #: blog/templates/blog/category.html:138
 msgid "No articles in this category yet"
-msgstr ""
+msgstr "아직 이 카테고리에 글이 없습니다"
 
 #: blog/templates/blog/category.html:141 blog/templates/blog/tag.html:151
 msgid "Check back soon for new content!"
-msgstr ""
+msgstr "곧 새로운 콘텐츠를 확인해보세요!"
 
 #: blog/templates/blog/detail.html:176
 msgid "views"
-msgstr ""
+msgstr "조회수"
 
 #: blog/templates/blog/detail.html:181
 msgid "Updated"
-msgstr ""
+msgstr "업데이트됨"
 
 #: blog/templates/blog/detail.html:248
 msgid "Related Places"
-msgstr ""
+msgstr "관련 장소"
 
 #: blog/templates/blog/detail.html:277
 msgid "Share this article"
-msgstr ""
+msgstr "이 글 공유하기"
 
 #: blog/templates/blog/detail.html:284
 msgid "Twitter"
-msgstr ""
+msgstr "트위터"
 
 #: blog/templates/blog/detail.html:290
 msgid "Facebook"
-msgstr ""
+msgstr "페이스북"
 
 #: blog/templates/blog/detail.html:295
 msgid "Copy Link"
-msgstr ""
+msgstr "링크 복사"
 
 #: blog/templates/blog/detail.html:305
 msgid "Related Articles"
-msgstr ""
+msgstr "관련 글"
 
 #: blog/templates/blog/detail.html:349
 msgid "Copied!"
-msgstr ""
+msgstr "복사됨!"
 
 #: blog/templates/blog/home.html:30
 msgid "Featured Post"
-msgstr ""
+msgstr "추천 글"
 
 #: blog/templates/blog/home.html:62
 msgid "Read More"
-msgstr ""
+msgstr "더 보기"
 
 #: blog/templates/blog/home.html:82
 msgid "Discover the latest articles about halal lifestyle in Korea"
-msgstr ""
+msgstr "한국의 할랄 라이프스타일에 대한 최신 글을 발견하세요"
 
 #: blog/templates/blog/home.html:170
 msgid "No blog posts yet"
-msgstr ""
+msgstr "아직 블로그 글이 없습니다"
 
 #: blog/templates/blog/home.html:173
 msgid "Check back soon for new articles!"
-msgstr ""
+msgstr "곧 새로운 글을 확인해보세요!"
 
 #: blog/templates/blog/home.html:185
 msgid "Categories"
-msgstr ""
+msgstr "카테고리"
 
 #: blog/templates/blog/home.html:206 blog/templates/blog/search.html:29
 msgid "Search Blog"
-msgstr ""
+msgstr "블로그 검색"
 
 #: blog/templates/blog/home.html:212
 msgid "Search articles..."
-msgstr ""
+msgstr "글 검색..."
 
 #: blog/templates/blog/home.html:220 blog/templates/blog/search.html:18
 #: blog/templates/blog/search.html:20 blog/templates/blog/search.html:47
 #: places/templates/places/home.html:52
 msgid "Search"
-msgstr ""
+msgstr "검색"
 
 #: blog/templates/blog/search.html:39
 msgid "Search articles, categories, tags..."
-msgstr ""
+msgstr "글, 카테고리, 태그 검색..."
 
 #: blog/templates/blog/search.html:58
 #, python-format
 msgid "%(counter)s result for \"%(query)s\""
 msgid_plural "%(counter)s results for \"%(query)s\""
-msgstr[0] ""
+msgstr[0] "\"%(query)s\"에 대한 %(counter)개의 결과"
 
 #: blog/templates/blog/search.html:60
 #, python-format
 msgid "No results for \"%(query)s\""
-msgstr ""
+msgstr "\"%(query)s\"에 대한 결과가 없습니다"
 
 #: blog/templates/blog/search.html:171
 msgid "No articles found"
-msgstr ""
+msgstr "글을 찾을 수 없습니다"
 
 #: blog/templates/blog/search.html:174
 msgid "Try adjusting your search terms or browse our categories"
-msgstr ""
+msgstr "검색어를 조정하거나 카테고리를 둘러보세요"
 
 #: blog/templates/blog/search.html:185
 msgid "Clear Search"
-msgstr ""
+msgstr "검색 지우기"
 
 #: blog/templates/blog/search.html:194
 msgid "Search Tips"
-msgstr ""
+msgstr "검색 팁"
 
 #: blog/templates/blog/search.html:199
 msgid "Search by keywords, titles, or content"
-msgstr ""
+msgstr "키워드, 제목 또는 내용으로 검색"
 
 #: blog/templates/blog/search.html:203
 msgid "Use category names to find related articles"
-msgstr ""
+msgstr "카테고리 이름을 사용하여 관련 글 찾기"
 
 #: blog/templates/blog/search.html:207
 msgid "Search for specific tags to narrow results"
-msgstr ""
+msgstr "특정 태그로 검색하여 결과 좁히기"
 
 #: blog/templates/blog/search.html:211
 msgid "Try different spelling variations"
-msgstr ""
+msgstr "다른 철자 변형을 시도해보세요"
 
 #: blog/templates/blog/tag.html:7
 #, python-format
 msgid ""
 "Articles tagged with %(tag_name)s. Discover insights about halal lifestyle "
 "in Korea."
-msgstr ""
+msgstr "%(tag_name)s 태그가 붙은 글들. 한국의 할랄 라이프스타일에 대한 인사이트를 발견하세요."
 
 #: blog/templates/blog/tag.html:31
 msgid "Tag"
-msgstr ""
+msgstr "태그"
 
 #: blog/templates/blog/tag.html:40
 msgid "with this tag"
-msgstr ""
+msgstr "이 태그로"
 
 #: blog/templates/blog/tag.html:148
 msgid "No articles with this tag yet"
-msgstr ""
+msgstr "아직 이 태그가 붙은 글이 없습니다"
 
 #: contact/admin.py:17 places/templates/places/suggest_edit.html:253
 msgid "Contact Information"
-msgstr ""
+msgstr "연락처 정보"
 
 #: contact/admin.py:20 contact/forms.py:37
 msgid "Message"
-msgstr ""
+msgstr "메시지"
 
 #: contact/admin.py:23
 msgid "Metadata"
-msgstr ""
+msgstr "메타데이터"
 
 #: contact/admin.py:27 contact/admin.py:68
 msgid "Status"
-msgstr ""
+msgstr "상태"
 
 #: contact/admin.py:36
 msgid "(No subject)"
-msgstr ""
+msgstr "(제목 없음)"
 
 #: contact/admin.py:37 contact/forms.py:36
 msgid "Subject"
-msgstr ""
+msgstr "제목"
 
 #: contact/admin.py:44
 msgid "Registered User"
-msgstr ""
+msgstr "등록된 사용자"
 
 #: contact/admin.py:48
 msgid "Anonymous"
-msgstr ""
+msgstr "익명"
 
 #: contact/admin.py:50
 msgid "User Type"
-msgstr ""
+msgstr "사용자 유형"
 
 #: contact/admin.py:57
 msgid "Responded"
-msgstr ""
+msgstr "응답됨"
 
 #: contact/admin.py:62
 msgid "Read"
-msgstr ""
+msgstr "읽음"
 
 #: contact/admin.py:66
 msgid "Unread"
-msgstr ""
+msgstr "읽지 않음"
 
 #: contact/admin.py:80
 #, python-brace-format
 msgid "{updated} message(s) marked as read."
-msgstr ""
+msgstr "{updated}개의 메시지가 읽음으로 표시되었습니다."
 
 #: contact/admin.py:82
 msgid "Mark selected messages as read"
-msgstr ""
+msgstr "선택된 메시지를 읽음으로 표시"
 
 #: contact/admin.py:93
 #, python-brace-format
 msgid "{updated} message(s) marked as responded."
-msgstr ""
+msgstr "{updated}개의 메시지가 응답됨으로 표시되었습니다."
 
 #: contact/admin.py:95
 msgid "Mark selected messages as responded"
-msgstr ""
+msgstr "선택된 메시지를 응답됨으로 표시"
 
 #: contact/forms.py:15
 msgid "Your full name"
-msgstr ""
+msgstr "전체 이름"
 
 #: contact/forms.py:20
 msgid "your.email@example.com"
-msgstr ""
+msgstr "your.email@example.com"
 
 #: contact/forms.py:24
 msgid "What is this about? (optional)"
-msgstr ""
+msgstr "무엇에 관한 것인가요? (선택사항)"
 
 #: contact/forms.py:29
 msgid "Tell us what's on your mind..."
-msgstr ""
+msgstr "생각하시는 것을 알려주세요..."
 
 #: contact/forms.py:34
 msgid "Full Name"
-msgstr ""
+msgstr "전체 이름"
 
 #: contact/forms.py:35 users/templates/users/resend_activation.html:84
 msgid "Email Address"
-msgstr ""
+msgstr "이메일 주소"
 
 #: contact/forms.py:40
 msgid "Helps us categorize your message"
-msgstr ""
+msgstr "메시지 분류에 도움이 됩니다"
 
 #: contact/forms.py:41
 msgid "Share your thoughts, questions, or feedback"
-msgstr ""
+msgstr "생각, 질문 또는 피드백을 공유해주세요"
 
 #: contact/forms.py:57
 msgid "Please enter a message."
-msgstr ""
+msgstr "메시지를 입력해주세요."
 
 #: contact/forms.py:63
 msgid "Please enter a valid name."
-msgstr ""
+msgstr "유효한 이름을 입력해주세요."
 
 #: contact/templates/contact/form.html:9
 msgid "Have an account? "
-msgstr ""
+msgstr "계정이 있으신가요? "
 
 #: contact/templates/contact/form.html:9 places/templates/places/base.html:514
 #: places/templates/places/base.html:660 users/templates/users/login.html:4
 #: users/templates/users/login.html:87
 msgid "Log in"
-msgstr ""
+msgstr "로그인"
 
 #: contact/templates/contact/form.html:9
 msgid "to pre-fill your information."
-msgstr ""
+msgstr "정보를 미리 입력하세요."
 
 #: contact/templates/contact/form.html:69
 msgid "Send Message"
-msgstr ""
+msgstr "메시지 보내기"
 
 #: contact/templates/contact/form.html:73
 msgid "Sending..."
-msgstr ""
+msgstr "전송 중..."
 
 #: contact/templates/contact/form.html:83 contact/views.py:66
 msgid "Thank you for your message! We'll get back to you soon."
-msgstr ""
+msgstr "메시지를 보내주셔서 감사합니다! 곧 답변드리겠습니다."
 
 #: contact/templates/contact/rate_limited.html:14 contact/views.py:107
 #: users/templates/users/rate_limited.html:4
 msgid "Rate Limited"
-msgstr ""
+msgstr "요청 제한"
 
 #: contact/templates/contact/rate_limited.html:27
 msgid "Rate Limits"
-msgstr ""
+msgstr "요청 제한"
 
 #: contact/templates/contact/rate_limited.html:30
 msgid "1 message per 5 minutes"
-msgstr ""
+msgstr "5분당 1개 메시지"
 
 #: contact/templates/contact/rate_limited.html:31
 msgid "3 messages per hour (anonymous users)"
-msgstr ""
+msgstr "시간당 3개 메시지 (익명 사용자)"
 
 #: contact/templates/contact/rate_limited.html:32
 msgid "5 messages per hour (registered users)"
-msgstr ""
+msgstr "시간당 5개 메시지 (등록된 사용자)"
 
 #: contact/templates/contact/rate_limited.html:41
 msgid "What you can do"
-msgstr ""
+msgstr "할 수 있는 일"
 
 #: contact/templates/contact/rate_limited.html:44
 msgid "Wait a few minutes and try again"
-msgstr ""
+msgstr "몇 분 기다린 후 다시 시도하세요"
 
 #: contact/templates/contact/rate_limited.html:45
 msgid "Check if you already sent a similar message"
-msgstr ""
+msgstr "이미 비슷한 메시지를 보냈는지 확인하세요"
 
 #: contact/templates/contact/rate_limited.html:47
 msgid "Create an account"
-msgstr ""
+msgstr "계정 만들기"
 
 #: contact/templates/contact/rate_limited.html:47
 msgid "for higher limits"
-msgstr ""
+msgstr "더 높은 제한을 위해"
 
 #: contact/templates/contact/rate_limited.html:59
 msgid "Go Home"
-msgstr ""
+msgstr "홈으로 가기"
 
 #: contact/templates/contact/rate_limited.html:66
 #: users/templates/users/rate_limited.html:58
 msgid "Go Back"
-msgstr ""
+msgstr "돌아가기"
 
 #: contact/templates/contact/section.html:11
 msgid "Get in Touch"
-msgstr ""
+msgstr "연락하기"
 
 #: contact/templates/contact/section.html:14
 msgid ""
 "Have questions, suggestions, or feedback? We'd love to hear from you. Our "
 "team is here to help and improve your halal food experience in Korea."
-msgstr ""
+msgstr "질문, 제안 또는 피드백이 있으신가요? 여러분의 의견을 듣고 싶습니다. 저희 팀이 한국에서의 할랄 음식 경험을 도와드리고 개선하는 데 도움을 드리겠습니다."
 
 #: contact/templates/contact/section.html:27
 msgid "Email Us"
-msgstr ""
+msgstr "이메일 보내기"
 
 #: contact/templates/contact/section.html:30
 msgid "Send us an email and we'll respond within 24 hours."
-msgstr ""
+msgstr "이메일을 보내주시면 24시간 내에 답변드리겠습니다."
 
 #: contact/templates/contact/section.html:49
 msgid "Quick Response"
-msgstr ""
+msgstr "빠른 응답"
 
 #: contact/templates/contact/section.html:52
 msgid "We typically respond to messages within 24 hours during business days."
-msgstr ""
+msgstr "평일에는 보통 24시간 내에 메시지에 답변드립니다."
 
 #: contact/templates/contact/section.html:66
 msgid "Community Driven"
-msgstr ""
+msgstr "커뮤니티 주도"
 
 #: contact/templates/contact/section.html:69
 msgid ""
 "Your feedback helps us improve our platform and serve the halal community "
 "better."
-msgstr ""
+msgstr "여러분의 피드백이 저희 플랫폼을 개선하고 할랄 커뮤니티에 더 나은 서비스를 제공하는 데 도움이 됩니다."
 
 #: contact/templates/contact/section.html:81
 msgid "Send us a message"
-msgstr ""
+msgstr "메시지 보내기"
 
 #: contact/templates/contact/section.html:89
 msgid "Loading contact form..."
-msgstr ""
+msgstr "연락처 양식 로딩 중..."
 
 #: contact/templates/contact/section.html:116
 msgid "Error loading contact form. Please refresh the page."
-msgstr ""
+msgstr "연락처 양식을 로드하는 중 오류가 발생했습니다. 페이지를 새로고침해주세요."
 
 #: contact/templates/contact/section.html:182 contact/views.py:85
 msgid "An unexpected error occurred. Please try again later."
-msgstr ""
+msgstr "예상치 못한 오류가 발생했습니다. 나중에 다시 시도해주세요."
 
 #: contact/views.py:77
 msgid "Please check the form for errors."
-msgstr ""
+msgstr "양식의 오류를 확인해주세요."
 
 #: contact/views.py:104
 msgid "You have exceeded the rate limit for contact messages."
-msgstr ""
+msgstr "연락처 메시지의 요청 제한을 초과했습니다."
 
 #: places/templates/places/404.html:5
 msgid "404 - Page Not Found"
-msgstr ""
+msgstr "404 - 페이지를 찾을 수 없습니다"
 
 #: places/templates/places/404.html:12
 msgid "Page Not Found"
-msgstr ""
+msgstr "페이지를 찾을 수 없습니다"
 
 #: places/templates/places/404.html:14
 msgid "Oops! The page you're looking for doesn't exist or has been moved."
-msgstr ""
+msgstr "앗! 찾고 계신 페이지가 존재하지 않거나 이동되었습니다."
 
 #: places/templates/places/404.html:23
 msgid "Return Home"
-msgstr ""
+msgstr "홈으로 돌아가기"
 
 #: places/templates/places/about.html:5 places/templates/places/about.html:14
 #: places/templates/places/base.html:307 places/templates/places/base.html:565
 msgid "About"
-msgstr ""
+msgstr "소개"
 
 #: places/templates/places/about.html:33 places/templates/places/about.html:43
 msgid "Our Mission"
-msgstr ""
+msgstr "저희의 미션"
 
 #: places/templates/places/about.html:35
 msgid ""
 "Halal Korea aims to make life easier for Muslims living in and visiting "
 "South Korea by providing a comprehensive platform to find halal food, "
 "markets, and prayer spaces."
-msgstr ""
+msgstr "할랄 코리아는 할랄 음식, 시장, 기도 공간을 찾을 수 있는 종합적인 플랫폼을 제공하여 한국에 거주하고 방문하는 무슬림들의 삶을 더 쉽게 만드는 것을 목표로 합니다."
 
 #: places/templates/places/about.html:38
 msgid ""
 "We understand the challenges of finding halal options in a new country, and "
 "we're here to bridge that gap by connecting our community with verified "
 "halal establishments across Korea."
-msgstr ""
+msgstr "새로운 나라에서 할랄 옵션을 찾는 어려움을 이해하고 있으며, 저희는 커뮤니티를 한국 전역의 검증된 할랄 시설과 연결하여 그 격차를 해소하는 데 도움을 드리겠습니다."
 
 #: places/templates/places/about.html:53
 msgid "What We Offer"
-msgstr ""
+msgstr "저희가 제공하는 것"
 
 #: places/templates/places/about.html:63 places/templates/places/about.html:120
 msgid "Community Reviews"
-msgstr ""
+msgstr "커뮤니티 리뷰"
 
 #: places/templates/places/about.html:65
 msgid ""
 "Real experiences shared by our community members help others make informed "
 "decisions."
-msgstr ""
+msgstr "커뮤니티 구성원들이 공유한 실제 경험이 다른 사람들이 정보에 기반한 결정을 내리는 데 도움이 됩니다."
 
 #: places/templates/places/about.html:77
 msgid "Multi-Language Support"
-msgstr ""
+msgstr "다국어 지원"
 
 #: places/templates/places/about.html:79
 msgid "Available in English, Korean, and Uzbek to serve our diverse community."
-msgstr ""
+msgstr "다양한 커뮤니티를 위해 영어, 한국어, 우즈벡어로 제공됩니다."
 
 #: places/templates/places/about.html:93
 msgid "Find Nearby Places"
-msgstr ""
+msgstr "주변 장소 찾기"
 
 #: places/templates/places/about.html:95
 msgid ""
 "Discover halal restaurants, markets, and prayer spaces in your vicinity with "
 "our interactive map feature."
-msgstr ""
+msgstr "인터랙티브 지도 기능으로 주변의 할랄 레스토랑, 시장, 기도 공간을 발견하세요."
 
 #: places/templates/places/about.html:105
 msgid "Our Growing Community"
-msgstr ""
+msgstr "성장하는 저희 커뮤니티"
 
 #: places/templates/places/about.html:112
 msgid "Community Added Places"
-msgstr ""
+msgstr "커뮤니티가 추가한 장소"
 
 #: places/templates/places/about.html:128
 msgid "Active Users"
-msgstr ""
+msgstr "활성 사용자"
 
 #: places/templates/places/about.html:144
 msgid "Important Notice"
-msgstr ""
+msgstr "중요한 안내"
 
 #: places/templates/places/about.html:146
 msgid ""
@@ -576,40 +576,40 @@ msgid ""
 "every effort to maintain accurate information, we strongly recommend "
 "verifying the halal status directly with each establishment before visiting. "
 "Your diligence helps maintain the integrity of our community."
-msgstr ""
+msgstr "저희 플랫폼에 등록된 모든 장소는 커뮤니티가 기여한 것입니다. 정확한 정보를 유지하기 위해 최선을 다하고 있지만, 방문하기 전에 각 시설에서 직접 할랄 상태를 확인하는 것을 강력히 권장합니다. 여러분의 꼼꼼함이 저희 커뮤니티의 신뢰성을 유지하는 데 도움이 됩니다."
 
 #: places/templates/places/base.html:19 places/templates/places/base.html:23
 msgid ""
 "Discover halal restaurants, markets, and prayer spaces across South Korea. "
 "Your comprehensive guide to halal dining and Islamic facilities in Korea."
-msgstr ""
+msgstr "한국 전역의 할랄 레스토랑, 시장, 기도 공간을 발견하세요. 한국의 할랄 식당과 이슬람 시설에 대한 종합 가이드입니다."
 
 #: places/templates/places/base.html:22 places/templates/places/base.html:27
 #: places/templates/places/home.html:5
 msgid "Halal Korea"
-msgstr ""
+msgstr "할랄 코리아"
 
 #: places/templates/places/base.html:22 places/templates/places/base.html:27
 #: places/templates/places/home.html:5 places/templates/places/home.html:23
 msgid "Find Halal Places in Korea"
-msgstr ""
+msgstr "한국의 할랄 장소 찾기"
 
 #: places/templates/places/base.html:295 places/templates/places/base.html:323
 #: places/templates/places/base.html:553
 #: places/templates/places/place_detail.html:69
 msgid "Explore"
-msgstr ""
+msgstr "둘러보기"
 
 #: places/templates/places/base.html:299 places/templates/places/base.html:328
 #: places/templates/places/base.html:557
 #: places/templates/places/submit_place.html:360
 msgid "Submit Place"
-msgstr ""
+msgstr "장소 제출"
 
 #: places/templates/places/base.html:311 places/templates/places/base.html:569
 #: places/templates/places/donate.html:4
 msgid "Donate"
-msgstr ""
+msgstr "기부"
 
 #: places/templates/places/base.html:315 places/templates/places/base.html:338
 #: places/templates/places/base.html:573
@@ -618,52 +618,52 @@ msgstr ""
 #: prayer_times/templates/prayer_times/prayer_times.html:10
 #: prayer_times/templates/prayer_times/prayer_times.html:13
 msgid "Prayer Times"
-msgstr ""
+msgstr "기도 시간"
 
 #: places/templates/places/base.html:494 places/templates/places/base.html:645
 msgid "Profile"
-msgstr ""
+msgstr "프로필"
 
 #: places/templates/places/base.html:498 places/templates/places/base.html:648
 msgid "Settings"
-msgstr ""
+msgstr "설정"
 
 #: places/templates/places/base.html:504
 msgid "Log out"
-msgstr ""
+msgstr "로그아웃"
 
 #: places/templates/places/base.html:518 places/templates/places/base.html:663
 #: users/templates/users/login.html:107 users/templates/users/register.html:4
 msgid "Sign up"
-msgstr ""
+msgstr "회원가입"
 
 #: places/templates/places/base.html:642
 #, python-format
 msgid ""
 "Signed in as <span class=\"font-bold text-gray-700 dark:text-"
 "white\">%(username)s</span>"
-msgstr ""
+msgstr "<span class=\"font-bold text-gray-700 dark:text-white\">%(username)s</span>로 로그인됨"
 
 #: places/templates/places/base.html:653
 msgid "Logout"
-msgstr ""
+msgstr "로그아웃"
 
 #: places/templates/places/base.html:729
 msgid "Email verification required"
-msgstr ""
+msgstr "이메일 인증 필요"
 
 #: places/templates/places/base.html:730
 msgid ""
 "Please verify your email address to submit places, reviews, and suggestions."
-msgstr ""
+msgstr "장소, 리뷰, 제안을 제출하려면 이메일 주소를 인증해주세요."
 
 #: places/templates/places/base.html:732
 msgid "Send verification email"
-msgstr ""
+msgstr "인증 이메일 보내기"
 
 #: places/templates/places/base.html:781
 msgid "Quick Links"
-msgstr ""
+msgstr "빠른 링크"
 
 #: places/templates/places/base.html:785
 #: places/templates/places/my_contributions.html:563
@@ -671,646 +671,646 @@ msgstr ""
 #: users/templates/users/profile.html:157
 #: users/templates/users/profile.html:198
 msgid "Explore Places"
-msgstr ""
+msgstr "장소 둘러보기"
 
 #: places/templates/places/base.html:790 places/templates/places/home.html:242
 #: places/templates/places/my_contributions.html:370
 #: places/templates/places/submit_place.html:4
 msgid "Submit a Place"
-msgstr ""
+msgstr "장소 제출"
 
 #: places/templates/places/base.html:800
 msgid "About Us"
-msgstr ""
+msgstr "저희에 대해"
 
 #: places/templates/places/base.html:808
 msgid "Contact"
-msgstr ""
+msgstr "연락처"
 
 #: places/templates/places/base.html:839 places/templates/places/legal.html:28
 #: places/templates/places/legal.html:48
 msgid "Privacy Policy"
-msgstr ""
+msgstr "개인정보 처리방침"
 
 #: places/templates/places/base.html:842 places/templates/places/legal.html:31
 #: places/templates/places/legal.html:110
 msgid "Terms of Service"
-msgstr ""
+msgstr "서비스 이용약관"
 
 #: places/templates/places/base.html:845 places/templates/places/legal.html:34
 #: places/templates/places/legal.html:171
 msgid "Cookie Policy"
-msgstr ""
+msgstr "쿠키 정책"
 
 #: places/templates/places/donate.html:12
 msgid "Support Halal Korea"
-msgstr ""
+msgstr "할랄 코리아 지원하기"
 
 #: places/templates/places/donate.html:15
 msgid ""
 "Help us maintain and improve our platform to better serve the Muslim "
 "community in Korea.\n"
 "                Your support makes a difference!"
-msgstr ""
+msgstr "한국의 무슬림 커뮤니티에 더 나은 서비스를 제공하기 위해 저희 플랫폼을 유지하고 개선하는 데 도움을 주세요.\n                여러분의 지원이 변화를 만듭니다!"
 
 #: places/templates/places/donate.html:31
 msgid "One-time Donation"
-msgstr ""
+msgstr "일회성 기부"
 
 #: places/templates/places/donate.html:33
 msgid "Make a single contribution to support our mission"
-msgstr ""
+msgstr "저희 미션을 지원하기 위한 단일 기부"
 
 #: places/templates/places/donate.html:36
 msgid "Donate Now"
-msgstr ""
+msgstr "지금 기부하기"
 
 #: places/templates/places/donate.html:47
 msgid "Monthly Support"
-msgstr ""
+msgstr "월간 지원"
 
 #: places/templates/places/donate.html:49
 msgid "Become a regular supporter with monthly donations"
-msgstr ""
+msgstr "월간 기부로 정기 후원자가 되세요"
 
 #: places/templates/places/donate.html:52
 msgid "Subscribe Monthly"
-msgstr ""
+msgstr "월간 구독"
 
 #: places/templates/places/donate.html:63
 msgid "Corporate Sponsorship"
-msgstr ""
+msgstr "기업 후원"
 
 #: places/templates/places/donate.html:65
 msgid "Partner with us as a corporate sponsor"
-msgstr ""
+msgstr "기업 후원자로서 저희와 파트너십을 맺으세요"
 
 #: places/templates/places/donate.html:68
 #: places/templates/places/legal.html:272
 msgid "Contact Us"
-msgstr ""
+msgstr "저희에게 연락하기"
 
 #: places/templates/places/donate.html:76
 msgid "Why Donate?"
-msgstr ""
+msgstr "왜 기부하나요?"
 
 #: places/templates/places/donate.html:83
 msgid "Server Costs"
-msgstr ""
+msgstr "서버 비용"
 
 #: places/templates/places/donate.html:85
 msgid "Help us maintain reliable and fast server infrastructure"
-msgstr ""
+msgstr "안정적이고 빠른 서버 인프라를 유지하는 데 도움을 주세요"
 
 #: places/templates/places/donate.html:92
 msgid "Development"
-msgstr ""
+msgstr "개발"
 
 #: places/templates/places/donate.html:94
 msgid "Support ongoing development of new features"
-msgstr ""
+msgstr "새로운 기능의 지속적인 개발을 지원하세요"
 
 #: places/templates/places/donate.html:101
 msgid "Community Growth"
-msgstr ""
+msgstr "커뮤니티 성장"
 
 #: places/templates/places/donate.html:103
 msgid "Help us reach and serve more Muslims in Korea"
-msgstr ""
+msgstr "한국의 더 많은 무슬림에게 도달하고 서비스를 제공하는 데 도움을 주세요"
 
 #: places/templates/places/donate.html:110
 msgid "Sustainability"
-msgstr ""
+msgstr "지속가능성"
 
 #: places/templates/places/donate.html:112
 msgid "Ensure long-term sustainability of the platform"
-msgstr ""
+msgstr "플랫폼의 장기적인 지속가능성을 보장하세요"
 
 #: places/templates/places/donate.html:119
 msgid "Frequently Asked Questions"
-msgstr ""
+msgstr "자주 묻는 질문"
 
 #: places/templates/places/donate.html:122
 msgid "How is my donation used?"
-msgstr ""
+msgstr "제 기부금은 어떻게 사용되나요?"
 
 #: places/templates/places/donate.html:123
 msgid ""
 "Your donations directly support server costs, development, and community "
 "outreach efforts."
-msgstr ""
+msgstr "여러분의 기부금은 서버 비용, 개발, 커뮤니티 확산 노력을 직접 지원합니다."
 
 #: places/templates/places/donate.html:126
 msgid "Why does Halal Korea need donations?"
-msgstr ""
+msgstr "왜 할랄 코리아가 기부가 필요한가요?"
 
 #: places/templates/places/donate.html:127
 msgid ""
 "As a non-profit community platform, we don't run ads or have other revenue "
 "streams. Your donations help us maintain and improve our services, ensuring "
 "Muslims in Korea have access to reliable halal information and resources."
-msgstr ""
+msgstr "비영리 커뮤니티 플랫폼으로서 저희는 광고를 운영하거나 다른 수익원이 없습니다. 여러분의 기부가 저희 서비스를 유지하고 개선하는 데 도움이 되어 한국의 무슬림들이 신뢰할 수 있는 할랄 정보와 자원에 접근할 수 있도록 보장합니다."
 
 #: places/templates/places/donate.html:130
 msgid "Can I donate from outside Korea?"
-msgstr ""
+msgstr "한국 외부에서도 기부할 수 있나요?"
 
 #: places/templates/places/donate.html:133
 msgid "Yes! We accept international donations through various payment methods."
-msgstr ""
+msgstr "네! 다양한 결제 방법을 통해 국제 기부를 받고 있습니다."
 
 #: places/templates/places/explore.html:19
 #: places/templates/places/explore.html:32
 msgid "Explore Halal Places"
-msgstr ""
+msgstr "할랄 장소 둘러보기"
 
 #: places/templates/places/explore.html:33
 msgid "Discover halal restaurants, markets, and prayer spaces near you"
-msgstr ""
+msgstr "주변의 할랄 레스토랑, 시장, 기도 공간을 발견하세요"
 
 #: places/templates/places/explore.html:35
 msgid "Halal Places in Korea"
-msgstr ""
+msgstr "한국의 할랄 장소"
 
 #: places/templates/places/explore.html:36
 msgid "Plan your halal journey across South Korea - browse by city and region"
-msgstr ""
+msgstr "한국 전역의 할랄 여행을 계획하세요 - 도시와 지역별로 둘러보기"
 
 #: places/templates/places/explore.html:50
 #: places/templates/places/explore.html:84
 msgid "Update My Location"
-msgstr ""
+msgstr "내 위치 업데이트"
 
 #: places/templates/places/explore.html:57
 #: places/templates/places/explore.html:91
 msgid "Your location:"
-msgstr ""
+msgstr "귀하의 위치:"
 
 #: places/templates/places/explore.html:61
 #: places/templates/places/explore.html:96
 msgid "Update"
-msgstr ""
+msgstr "업데이트"
 
 #: places/templates/places/explore.html:66
 #: places/templates/places/explore.html:102
 msgid "Set location to Seoul"
-msgstr ""
+msgstr "위치를 서울로 설정"
 
 #: places/templates/places/explore.html:85
 #: places/templates/places/submit_place.html:218
 msgid "Location"
-msgstr ""
+msgstr "위치"
 
 #: places/templates/places/explore.html:92
 msgid "Location:"
-msgstr ""
+msgstr "위치:"
 
 #: places/templates/places/explore.html:118
 msgid "View Map"
-msgstr ""
+msgstr "지도 보기"
 
 #: places/templates/places/explore.html:119
 msgid "Map"
-msgstr ""
+msgstr "지도"
 
 #: places/templates/places/explore.html:136
 #: places/templates/places/home.html:50
 msgid "Search places..."
-msgstr ""
+msgstr "장소 검색..."
 
 #: places/templates/places/explore.html:153
 #: places/templates/places/explore.html:222
 msgid "All Categories"
-msgstr ""
+msgstr "모든 카테고리"
 
 #: places/templates/places/explore.html:154
 #: places/templates/places/explore.html:223
 #: places/templates/places/home.html:97
 msgid "Restaurants"
-msgstr ""
+msgstr "레스토랑"
 
 #: places/templates/places/explore.html:155
 #: places/templates/places/explore.html:224
 #: places/templates/places/home.html:117
 msgid "Markets"
-msgstr ""
+msgstr "시장"
 
 #: places/templates/places/explore.html:156
 #: places/templates/places/explore.html:225
 #: places/templates/places/home.html:137
 msgid "Mosques & Prayer Rooms"
-msgstr ""
+msgstr "모스크 & 기도실"
 
 #: places/templates/places/explore.html:172
 msgid "All Cities"
-msgstr ""
+msgstr "모든 도시"
 
 #: places/templates/places/explore.html:201
 #: places/templates/places/explore.html:240
 msgid "Sort by Distance"
-msgstr ""
+msgstr "거리순 정렬"
 
 #: places/templates/places/explore.html:202
 #: places/templates/places/explore.html:241
 msgid "Sort by Rating"
-msgstr ""
+msgstr "평점순 정렬"
 
 #: places/templates/places/explore.html:204
 #: places/templates/places/explore.html:243
 msgid "Most Popular"
-msgstr ""
+msgstr "가장 인기있는"
 
 #: places/templates/places/explore.html:205
 #: places/templates/places/explore.html:244
 msgid "By Location"
-msgstr ""
+msgstr "위치별"
 
 #: places/templates/places/explore.html:267
 #: places/templates/places/explore.html:482
 #: places/templates/places/explore.html:582
 msgid "Loading more places..."
-msgstr ""
+msgstr "더 많은 장소 로딩 중..."
 
 #: places/templates/places/explore.html:297
 msgid "Your Location"
-msgstr ""
+msgstr "귀하의 위치"
 
 #: places/templates/places/explore.html:351
 msgid "Error loading places:"
-msgstr ""
+msgstr "장소 로딩 오류:"
 
 #: places/templates/places/explore.html:393
 msgid "Prayer Space"
-msgstr ""
+msgstr "기도 공간"
 
 #: places/templates/places/explore.html:396
 #: users/templates/users/profile.html:145
 msgid "View Details"
-msgstr ""
+msgstr "상세 보기"
 
 #: places/templates/places/explore.html:510
 msgid "Error loading more places:"
-msgstr ""
+msgstr "더 많은 장소 로딩 오류:"
 
 #: places/templates/places/explore.html:604
 msgid "Error applying filters:"
-msgstr ""
+msgstr "필터 적용 오류:"
 
 #: places/templates/places/explore.html:730
 msgid "Failed to set location to Seoul"
-msgstr ""
+msgstr "위치를 서울로 설정하는 데 실패했습니다"
 
 #: places/templates/places/explore.html:734
 msgid "Error setting location to Seoul"
-msgstr ""
+msgstr "위치를 서울로 설정하는 중 오류가 발생했습니다"
 
 #: places/templates/places/explore.html:770
 #: places/templates/places/explore.html:773
 #: places/templates/places/home.html:273 places/templates/places/home.html:276
 msgid "Failed to update location: "
-msgstr ""
+msgstr "위치 업데이트 실패: "
 
 #: places/templates/places/explore.html:770
 #: places/templates/places/home.html:273
 msgid "Unknown error"
-msgstr ""
+msgstr "알 수 없는 오류"
 
 #: places/templates/places/explore.html:776
 #: places/templates/places/home.html:279
 msgid "Could not get your location: "
-msgstr ""
+msgstr "위치를 가져올 수 없습니다: "
 
 #: places/templates/places/explore.html:779
 #: places/templates/places/home.html:282
 msgid "Geolocation is not supported by your browser."
-msgstr ""
+msgstr "브라우저에서 지리적 위치를 지원하지 않습니다."
 
 #: places/templates/places/home.html:26
 msgid "Discover halal restaurants, markets, and prayer spaces near you."
-msgstr ""
+msgstr "주변의 할랄 레스토랑, 시장, 기도 공간을 발견하세요."
 
 #: places/templates/places/home.html:30
 msgid "Planning Your Halal Journey to Korea?"
-msgstr ""
+msgstr "한국으로의 할랄 여행을 계획하고 계신가요?"
 
 #: places/templates/places/home.html:33
 msgid ""
 "Discover verified halal restaurants, markets, and prayer spaces across South "
 "Korea for your trip."
-msgstr ""
+msgstr "여행을 위해 한국 전역의 검증된 할랄 레스토랑, 시장, 기도 공간을 발견하세요."
 
 #: places/templates/places/home.html:39
 msgid "Planning a trip to Korea? We'll help you find the best halal options!"
-msgstr ""
+msgstr "한국 여행을 계획하고 계신가요? 최고의 할랄 옵션을 찾는 데 도움을 드리겠습니다!"
 
 #: places/templates/places/home.html:50
 msgid "Search places in Korea..."
-msgstr ""
+msgstr "한국의 장소 검색..."
 
 #: places/templates/places/home.html:60
 #: users/templates/users/resend_activation.html:117
 msgid "or"
-msgstr ""
+msgstr "또는"
 
 #: places/templates/places/home.html:70
 msgid "Find Places Near Me"
-msgstr ""
+msgstr "내 주변 장소 찾기"
 
 #: places/templates/places/home.html:78
 msgid "Browse All Places"
-msgstr ""
+msgstr "모든 장소 둘러보기"
 
 #: places/templates/places/home.html:100
 msgid "Find halal restaurants near you"
-msgstr ""
+msgstr "주변의 할랄 레스토랑 찾기"
 
 #: places/templates/places/home.html:102
 msgid "Find halal restaurants in Korea"
-msgstr ""
+msgstr "한국의 할랄 레스토랑 찾기"
 
 #: places/templates/places/home.html:120
 msgid "Discover halal grocery stores"
-msgstr ""
+msgstr "할랄 식료품점 발견하기"
 
 #: places/templates/places/home.html:122
 msgid "Find halal markets for your trip"
-msgstr ""
+msgstr "여행을 위한 할랄 시장 찾기"
 
 #: places/templates/places/home.html:140
 msgid "Find nearby prayer spaces"
-msgstr ""
+msgstr "주변 기도 공간 찾기"
 
 #: places/templates/places/home.html:142
 msgid "Prayer spaces for your journey"
-msgstr ""
+msgstr "여행을 위한 기도 공간"
 
 #: places/templates/places/home.html:157
 msgid "Explore All"
-msgstr ""
+msgstr "모두 둘러보기"
 
 #: places/templates/places/home.html:158
 msgid "Discover all halal places in Korea"
-msgstr ""
+msgstr "한국의 모든 할랄 장소 발견하기"
 
 #: places/templates/places/home.html:170
 msgid "Featured Places"
-msgstr ""
+msgstr "추천 장소"
 
 #: places/templates/places/home.html:172
 msgid "Popular Places to Visit"
-msgstr ""
+msgstr "방문하기 좋은 인기 장소"
 
 #: places/templates/places/home.html:203
 #, python-format
 msgid "(%(review_count)s review)"
 msgid_plural "(%(review_count)s reviews)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "(%(review_count)개의 리뷰)"
+msgstr[1] "(%(review_count)개의 리뷰)"
 
 #: places/templates/places/home.html:219
 msgid "Stay Updated with Prayer Times"
-msgstr ""
+msgstr "기도 시간으로 최신 정보 유지하기"
 
 #: places/templates/places/home.html:222
 msgid "Check the latest prayer times for your location."
-msgstr ""
+msgstr "귀하의 위치에 대한 최신 기도 시간을 확인하세요."
 
 #: places/templates/places/home.html:226
 msgid "View Prayer Times"
-msgstr ""
+msgstr "기도 시간 보기"
 
 #: places/templates/places/home.html:235
 msgid "Know a Halal Spot? Share It!"
-msgstr ""
+msgstr "할랄 장소를 알고 계신가요? 공유해주세요!"
 
 #: places/templates/places/home.html:238
 msgid "Help us grow our community by submitting halal places you know!"
-msgstr ""
+msgstr "아는 할랄 장소를 제출하여 저희 커뮤니티 성장에 도움을 주세요!"
 
 #: places/templates/places/legal.html:5
 msgid "Legal"
-msgstr ""
+msgstr "법적 고지"
 
 #: places/templates/places/legal.html:14
 msgid "Legal Information"
-msgstr ""
+msgstr "법적 정보"
 
 #: places/templates/places/legal.html:17
 msgid "Privacy Policy, Terms of Service, and Cookie Policy"
-msgstr ""
+msgstr "개인정보 처리방침, 서비스 이용약관 및 쿠키 정책"
 
 #: places/templates/places/legal.html:50 places/templates/places/legal.html:112
 #: places/templates/places/legal.html:173
 msgid "Last updated: January 2024"
-msgstr ""
+msgstr "최종 업데이트: 2024년 1월"
 
 #: places/templates/places/legal.html:54
 msgid "Information We Collect"
-msgstr ""
+msgstr "수집하는 정보"
 
 #: places/templates/places/legal.html:55
 #, python-format
 msgid ""
 "When you use %(STATIC_INFO.site_name)s, we may collect the following types "
 "of information:"
-msgstr ""
+msgstr "%(STATIC_INFO.site_name)s를 사용할 때 다음과 같은 유형의 정보를 수집할 수 있습니다:"
 
 #: places/templates/places/legal.html:57
 msgid ""
 "Personal information you provide when creating an account (name, email "
 "address)"
-msgstr ""
+msgstr "계정 생성 시 제공하는 개인정보 (이름, 이메일 주소)"
 
 #: places/templates/places/legal.html:58
 msgid "Location data when you use our location-based services"
-msgstr ""
+msgstr "위치 기반 서비스 사용 시 위치 데이터"
 
 #: places/templates/places/legal.html:59
 msgid "Information you provide when submitting places or reviews"
-msgstr ""
+msgstr "장소나 리뷰 제출 시 제공하는 정보"
 
 #: places/templates/places/legal.html:60
 msgid "Usage data and analytics to improve our service"
-msgstr ""
+msgstr "서비스 개선을 위한 사용 데이터 및 분석"
 
 #: places/templates/places/legal.html:65
 msgid "How We Use Your Information"
-msgstr ""
+msgstr "정보 사용 방법"
 
 #: places/templates/places/legal.html:66
 msgid "We use the information we collect to:"
-msgstr ""
+msgstr "수집한 정보를 다음과 같이 사용합니다:"
 
 #: places/templates/places/legal.html:68
 msgid "Provide and maintain our services"
-msgstr ""
+msgstr "서비스 제공 및 유지"
 
 #: places/templates/places/legal.html:69
 msgid "Show you relevant halal places near your location"
-msgstr ""
+msgstr "귀하의 위치 근처 관련 할랄 장소 표시"
 
 #: places/templates/places/legal.html:70
 msgid "Enable you to submit and review places"
-msgstr ""
+msgstr "장소 제출 및 리뷰 작성 가능"
 
 #: places/templates/places/legal.html:71
 msgid "Communicate with you about our services"
-msgstr ""
+msgstr "서비스에 대한 소통"
 
 #: places/templates/places/legal.html:72
 msgid "Improve our platform and user experience"
-msgstr ""
+msgstr "플랫폼 및 사용자 경험 개선"
 
 #: places/templates/places/legal.html:77
 msgid "Information Sharing"
-msgstr ""
+msgstr "정보 공유"
 
 #: places/templates/places/legal.html:78
 msgid ""
 "We do not sell, trade, or otherwise transfer your personal information to "
 "third parties without your consent, except:"
-msgstr ""
+msgstr "동의 없이 개인정보를 제3자에게 판매, 거래 또는 이전하지 않습니다. 단, 다음의 경우는 예외입니다:"
 
 #: places/templates/places/legal.html:80
 msgid "When required by law or to comply with legal processes"
-msgstr ""
+msgstr "법률에 의해 요구되거나 법적 절차 준수를 위해 필요한 경우"
 
 #: places/templates/places/legal.html:81
 msgid "To protect our rights, property, or safety"
-msgstr ""
+msgstr "저희의 권리, 재산 또는 안전을 보호하기 위해"
 
 #: places/templates/places/legal.html:82
 msgid "With trusted service providers who assist in operating our website"
-msgstr ""
+msgstr "웹사이트 운영을 지원하는 신뢰할 수 있는 서비스 제공업체와"
 
 #: places/templates/places/legal.html:87
 msgid "Data Security"
-msgstr ""
+msgstr "데이터 보안"
 
 #: places/templates/places/legal.html:88
 msgid ""
 "We implement appropriate security measures to protect your personal "
 "information against unauthorized access, alteration, disclosure, or "
 "destruction."
-msgstr ""
+msgstr "개인정보를 무단 접근, 변경, 공개 또는 파괴로부터 보호하기 위해 적절한 보안 조치를 구현합니다."
 
 #: places/templates/places/legal.html:92
 msgid "Your Rights"
-msgstr ""
+msgstr "귀하의 권리"
 
 #: places/templates/places/legal.html:93
 msgid "You have the right to:"
-msgstr ""
+msgstr "다음과 같은 권리가 있습니다:"
 
 #: places/templates/places/legal.html:95
 msgid "Access and update your personal information"
-msgstr ""
+msgstr "개인정보 접근 및 업데이트"
 
 #: places/templates/places/legal.html:96
 msgid "Delete your account and associated data"
-msgstr ""
+msgstr "계정 및 관련 데이터 삭제"
 
 #: places/templates/places/legal.html:97
 msgid "Opt out of non-essential communications"
-msgstr ""
+msgstr "비필수 커뮤니케이션 거부"
 
 #: places/templates/places/legal.html:98
 msgid "Request a copy of your data"
-msgstr ""
+msgstr "데이터 사본 요청"
 
 #: places/templates/places/legal.html:116
 msgid "Acceptance of Terms"
-msgstr ""
+msgstr "약관 동의"
 
 #: places/templates/places/legal.html:117
 #, python-format
 msgid ""
 "By accessing and using %(STATIC_INFO.site_name)s, you accept and agree to be "
 "bound by the terms and provision of this agreement."
-msgstr ""
+msgstr "%(STATIC_INFO.site_name)s에 접근하고 사용함으로써 이 계약의 약관 및 조항에 구속되는 것에 동의하고 수락합니다."
 
 #: places/templates/places/legal.html:121
 msgid "Use License"
-msgstr ""
+msgstr "사용 라이선스"
 
 #: places/templates/places/legal.html:122
 msgid ""
 "Permission is granted to temporarily use our service for personal, non-"
 "commercial transitory viewing only. This is the grant of a license, not a "
 "transfer of title, and under this license you may not:"
-msgstr ""
+msgstr "개인적이고 비상업적인 일시적 보기 목적으로만 저희 서비스를 임시로 사용할 수 있는 권한이 부여됩니다. 이는 소유권 이전이 아닌 라이선스 부여이며, 이 라이선스 하에서 다음을 할 수 없습니다:"
 
 #: places/templates/places/legal.html:124
 msgid "Modify or copy the materials"
-msgstr ""
+msgstr "자료 수정 또는 복사"
 
 #: places/templates/places/legal.html:125
 msgid "Use the materials for any commercial purpose"
-msgstr ""
+msgstr "상업적 목적으로 자료 사용"
 
 #: places/templates/places/legal.html:126
 msgid "Attempt to decompile or reverse engineer any software"
-msgstr ""
+msgstr "소프트웨어 역컴파일 또는 리버스 엔지니어링 시도"
 
 #: places/templates/places/legal.html:127
 msgid "Remove any copyright or other proprietary notations"
-msgstr ""
+msgstr "저작권 또는 기타 소유권 표기 제거"
 
 #: places/templates/places/legal.html:132
 msgid "User Content"
-msgstr ""
+msgstr "사용자 콘텐츠"
 
 #: places/templates/places/legal.html:133
 msgid "When you submit content (places, reviews, photos), you:"
-msgstr ""
+msgstr "콘텐츠(장소, 리뷰, 사진)를 제출할 때:"
 
 #: places/templates/places/legal.html:135
 msgid ""
 "Grant us a non-exclusive license to use, display, and distribute your content"
-msgstr ""
+msgstr "콘텐츠를 사용, 표시 및 배포할 수 있는 비독점 라이선스를 저희에게 부여"
 
 #: places/templates/places/legal.html:136
 msgid "Confirm that you have the right to submit such content"
-msgstr ""
+msgstr "해당 콘텐츠를 제출할 권리가 있음을 확인"
 
 #: places/templates/places/legal.html:137
 msgid "Agree not to submit false, misleading, or harmful content"
-msgstr ""
+msgstr "거짓, 오해의 소지가 있거나 유해한 콘텐츠를 제출하지 않기로 동의"
 
 #: places/templates/places/legal.html:138
 msgid "Understand that we may moderate and remove content at our discretion"
-msgstr ""
+msgstr "저희가 재량에 따라 콘텐츠를 중재하고 제거할 수 있음을 이해"
 
 #: places/templates/places/legal.html:143
 msgid "Prohibited Uses"
-msgstr ""
+msgstr "금지된 사용"
 
 #: places/templates/places/legal.html:144
 msgid "You may not use our service:"
-msgstr ""
+msgstr "다음과 같이 저희 서비스를 사용할 수 없습니다:"
 
 #: places/templates/places/legal.html:146
 msgid "For any unlawful purpose or to solicit others to unlawful acts"
-msgstr ""
+msgstr "불법적인 목적이나 다른 사람들에게 불법 행위를 권유하기 위해"
 
 #: places/templates/places/legal.html:147
 msgid ""
 "To violate any international, federal, provincial, or state regulations or "
 "laws"
-msgstr ""
+msgstr "국제, 연방, 지방 또는 주 규정이나 법률을 위반하기 위해"
 
 #: places/templates/places/legal.html:148
 msgid ""
 "To transmit or procure the sending of any advertising or promotional material"
-msgstr ""
+msgstr "광고나 홍보 자료를 전송하거나 전송을 요청하기 위해"
 
 #: places/templates/places/legal.html:149
 msgid "To impersonate or attempt to impersonate another user"
-msgstr ""
+msgstr "다른 사용자를 사칭하거나 사칭하려고 시도하기 위해"
 
 #: places/templates/places/legal.html:154
 msgid "Disclaimer"
-msgstr ""
+msgstr "면책 조항"
 
 #: places/templates/places/legal.html:155
 #, python-format
@@ -1319,11 +1319,11 @@ msgid ""
 "basis. We make no representations or warranties of any kind regarding the "
 "halal status of establishments listed on our platform. Users are strongly "
 "advised to verify halal certification independently."
-msgstr ""
+msgstr "%(STATIC_INFO.site_name)s의 정보는 '있는 그대로' 제공됩니다. 저희는 플랫폼에 등록된 시설의 할랄 상태에 대해 어떠한 진술이나 보증도 하지 않습니다. 사용자는 할랄 인증을 독립적으로 확인하는 것을 강력히 권장받습니다."
 
 #: places/templates/places/legal.html:159
 msgid "Limitations"
-msgstr ""
+msgstr "제한 사항"
 
 #: places/templates/places/legal.html:160
 #, python-format
@@ -1331,11 +1331,11 @@ msgid ""
 "%(STATIC_INFO.site_name)s or its suppliers will not be held liable for any "
 "damages that will arise with the use or inability to use the materials on "
 "our website."
-msgstr ""
+msgstr "%(STATIC_INFO.site_name)s 또는 그 공급업체는 저희 웹사이트의 자료 사용 또는 사용 불가능으로 인해 발생하는 모든 손해에 대해 책임을 지지 않습니다."
 
 #: places/templates/places/legal.html:177
 msgid "What Are Cookies"
-msgstr ""
+msgstr "쿠키란 무엇인가요"
 
 #: places/templates/places/legal.html:178
 msgid ""
@@ -1343,705 +1343,705 @@ msgid ""
 "device when you visit our website. They help us provide you with a better "
 "experience by remembering your preferences and understanding how you use our "
 "site."
-msgstr ""
+msgstr "쿠키는 저희 웹사이트를 방문할 때 컴퓨터나 모바일 기기에 저장되는 작은 텍스트 파일입니다. 선호도를 기억하고 사이트 사용 방법을 이해하여 더 나은 경험을 제공하는 데 도움이 됩니다."
 
 #: places/templates/places/legal.html:182
 msgid "How We Use Cookies"
-msgstr ""
+msgstr "쿠키 사용 방법"
 
 #: places/templates/places/legal.html:183
 #, python-format
 msgid "%(STATIC_INFO.site_name)s uses cookies for several purposes:"
-msgstr ""
+msgstr "%(STATIC_INFO.site_name)s는 여러 목적으로 쿠키를 사용합니다:"
 
 #: places/templates/places/legal.html:185
 msgid "Essential cookies: Required for the website to function properly"
-msgstr ""
+msgstr "필수 쿠키: 웹사이트가 제대로 작동하는 데 필요"
 
 #: places/templates/places/legal.html:186
 msgid "Preference cookies: Remember your settings and language preferences"
-msgstr ""
+msgstr "선호도 쿠키: 설정과 언어 선호도 기억"
 
 #: places/templates/places/legal.html:187
 msgid ""
 "Analytics cookies: Help us understand how visitors interact with our website"
-msgstr ""
+msgstr "분석 쿠키: 방문자가 저희 웹사이트와 상호작용하는 방법을 이해하는 데 도움"
 
 #: places/templates/places/legal.html:188
 msgid "Functionality cookies: Enable enhanced features and personalization"
-msgstr ""
+msgstr "기능 쿠키: 향상된 기능과 개인화 활성화"
 
 #: places/templates/places/legal.html:193
 msgid "Types of Cookies We Use"
-msgstr ""
+msgstr "저희가 사용하는 쿠키 유형"
 
 #: places/templates/places/legal.html:198
 msgid "Session Cookies"
-msgstr ""
+msgstr "세션 쿠키"
 
 #: places/templates/places/legal.html:199
 msgid "Temporary cookies that expire when you close your browser"
-msgstr ""
+msgstr "브라우저를 닫으면 만료되는 임시 쿠키"
 
 #: places/templates/places/legal.html:205
 msgid "Persistent Cookies"
-msgstr ""
+msgstr "지속 쿠키"
 
 #: places/templates/places/legal.html:206
 msgid "Remain on your device until they expire or you delete them"
-msgstr ""
+msgstr "만료되거나 삭제할 때까지 기기에 남아있음"
 
 #: places/templates/places/legal.html:212
 msgid "First-party Cookies"
-msgstr ""
+msgstr "1자 쿠키"
 
 #: places/templates/places/legal.html:213
 msgid "Set directly by our website"
-msgstr ""
+msgstr "저희 웹사이트에서 직접 설정"
 
 #: places/templates/places/legal.html:219
 msgid "Third-party Cookies"
-msgstr ""
+msgstr "3자 쿠키"
 
 #: places/templates/places/legal.html:220
 msgid "Set by external services like Google Analytics"
-msgstr ""
+msgstr "Google Analytics와 같은 외부 서비스에서 설정"
 
 #: places/templates/places/legal.html:227
 msgid "Third-Party Services"
-msgstr ""
+msgstr "3자 서비스"
 
 #: places/templates/places/legal.html:228
 msgid "We use the following third-party services that may set cookies:"
-msgstr ""
+msgstr "쿠키를 설정할 수 있는 다음 3자 서비스를 사용합니다:"
 
 #: places/templates/places/legal.html:230
 msgid "To analyze website traffic and user behavior"
-msgstr ""
+msgstr "웹사이트 트래픽과 사용자 행동 분석"
 
 #: places/templates/places/legal.html:231
 msgid "To provide location-based services and mapping functionality"
-msgstr ""
+msgstr "위치 기반 서비스와 지도 기능 제공"
 
 #: places/templates/places/legal.html:236
 msgid "Managing Cookies"
-msgstr ""
+msgstr "쿠키 관리"
 
 #: places/templates/places/legal.html:237
 msgid "You can control and manage cookies in several ways:"
-msgstr ""
+msgstr "다음과 같은 방법으로 쿠키를 제어하고 관리할 수 있습니다:"
 
 #: places/templates/places/legal.html:239
 msgid "Browser settings: Most browsers allow you to refuse or delete cookies"
-msgstr ""
+msgstr "브라우저 설정: 대부분의 브라우저에서 쿠키 거부 또는 삭제 가능"
 
 #: places/templates/places/legal.html:240
 msgid "Opt-out tools: Use tools provided by advertising networks"
-msgstr ""
+msgstr "옵트아웃 도구: 광고 네트워크에서 제공하는 도구 사용"
 
 #: places/templates/places/legal.html:241
 msgid "Mobile settings: Adjust settings on your mobile device"
-msgstr ""
+msgstr "모바일 설정: 모바일 기기에서 설정 조정"
 
 #: places/templates/places/legal.html:247
 msgid ""
 "Please note that disabling certain cookies may affect the functionality of "
 "our website and your user experience."
-msgstr ""
+msgstr "특정 쿠키를 비활성화하면 저희 웹사이트의 기능과 사용자 경험에 영향을 줄 수 있습니다."
 
 #: places/templates/places/legal.html:253
 msgid "Updates to This Policy"
-msgstr ""
+msgstr "이 정책의 업데이트"
 
 #: places/templates/places/legal.html:254
 msgid ""
 "We may update this Cookie Policy from time to time. We will notify you of "
 "any changes by posting the new policy on this page with an updated revision "
 "date."
-msgstr ""
+msgstr "이 쿠키 정책을 때때로 업데이트할 수 있습니다. 업데이트된 수정 날짜와 함께 이 페이지에 새 정책을 게시하여 변경 사항을 알려드립니다."
 
 #: places/templates/places/legal.html:264
 msgid "Questions About Our Legal Policies?"
-msgstr ""
+msgstr "저희 법적 정책에 대한 질문이 있으신가요?"
 
 #: places/templates/places/legal.html:267
 msgid ""
 "If you have any questions about our Privacy Policy, Terms of Service, or "
 "Cookie Policy, please don't hesitate to contact us."
-msgstr ""
+msgstr "개인정보 처리방침, 서비스 이용약관 또는 쿠키 정책에 대한 질문이 있으시면 언제든지 저희에게 연락해주세요."
 
 #: places/templates/places/my_contributions.html:5
 #: places/templates/places/my_contributions.html:37
 #: users/templates/users/profile.html:107
 #: users/templates/users/profile.html:109
 msgid "My Contributions"
-msgstr ""
+msgstr "내 기여"
 
 #: places/templates/places/my_contributions.html:33
 msgid "Back to Profile"
-msgstr ""
+msgstr "프로필로 돌아가기"
 
 #: places/templates/places/my_contributions.html:34
 #: places/templates/places/suggest_edit.html:79
 msgid "Back"
-msgstr ""
+msgstr "돌아가기"
 
 #: places/templates/places/my_contributions.html:39
 msgid ""
 "Your submitted places and edit suggestions that help build our community"
-msgstr ""
+msgstr "커뮤니티 구축에 도움이 되는 제출한 장소와 편집 제안"
 
 #: places/templates/places/my_contributions.html:53
 #: places/templates/places/my_contributions.html:95
 #: places/templates/places/my_contributions.html:137
 msgid "total"
-msgstr ""
+msgstr "총"
 
 #: places/templates/places/my_contributions.html:57
 msgid "Places Submitted"
-msgstr ""
+msgstr "제출한 장소"
 
 #: places/templates/places/my_contributions.html:58
 msgid "Places you've added to our community"
-msgstr ""
+msgstr "커뮤니티에 추가한 장소"
 
 #: places/templates/places/my_contributions.html:64
 #: places/templates/places/my_contributions.html:106
 #: places/templates/places/my_contributions.html:148
 #: places/templates/places/my_contributions.html:434
 msgid "Approved"
-msgstr ""
+msgstr "승인됨"
 
 #: places/templates/places/my_contributions.html:73
 #: places/templates/places/my_contributions.html:115
 #: places/templates/places/my_contributions.html:157
 msgid "approval rate"
-msgstr ""
+msgstr "승인률"
 
 #: places/templates/places/my_contributions.html:78
 #: places/templates/places/my_contributions.html:364
 msgid "No places submitted yet"
-msgstr ""
+msgstr "아직 제출한 장소가 없습니다"
 
 #: places/templates/places/my_contributions.html:81
 msgid "Submit your first place"
-msgstr ""
+msgstr "첫 번째 장소 제출하기"
 
 #: places/templates/places/my_contributions.html:99
 #: places/templates/places/my_contributions.html:263
 msgid "Field Edits"
-msgstr ""
+msgstr "필드 편집"
 
 #: places/templates/places/my_contributions.html:100
 msgid "Improvements to place information"
-msgstr ""
+msgstr "장소 정보 개선"
 
 #: places/templates/places/my_contributions.html:120
 msgid "No field edits yet"
-msgstr ""
+msgstr "아직 필드 편집이 없습니다"
 
 #: places/templates/places/my_contributions.html:123
 msgid "Find places to improve"
-msgstr ""
+msgstr "개선할 장소 찾기"
 
 #: places/templates/places/my_contributions.html:141
 msgid "Images Uploaded"
-msgstr ""
+msgstr "업로드된 이미지"
 
 #: places/templates/places/my_contributions.html:142
 msgid "Photos you've shared with the community"
-msgstr ""
+msgstr "커뮤니티와 공유한 사진"
 
 #: places/templates/places/my_contributions.html:162
 msgid "No images uploaded yet"
-msgstr ""
+msgstr "아직 업로드된 이미지가 없습니다"
 
 #: places/templates/places/my_contributions.html:165
 msgid "Add photos to places"
-msgstr ""
+msgstr "장소에 사진 추가하기"
 
 #: places/templates/places/my_contributions.html:181
 msgid "Community Impact"
-msgstr ""
+msgstr "커뮤니티 영향"
 
 #: places/templates/places/my_contributions.html:182
 msgid "Your total contributions to the community"
-msgstr ""
+msgstr "커뮤니티에 대한 총 기여"
 
 #: places/templates/places/my_contributions.html:189
 msgid "approved contributions"
-msgstr ""
+msgstr "승인된 기여"
 
 #: places/templates/places/my_contributions.html:196
 #: places/templates/places/my_contributions.html:220
 msgid "Places"
-msgstr ""
+msgstr "장소"
 
 #: places/templates/places/my_contributions.html:200
 #: places/templates/places/my_contributions.html:230
 #: places/templates/places/suggest_edit.html:101
 msgid "Edits"
-msgstr ""
+msgstr "편집"
 
 #: places/templates/places/my_contributions.html:204
 #: places/templates/places/my_contributions.html:240
 #: places/templates/places/suggest_edit.html:105
 msgid "Images"
-msgstr ""
+msgstr "이미지"
 
 #: places/templates/places/my_contributions.html:256
 msgid "Submitted Places"
-msgstr ""
+msgstr "제출된 장소"
 
 #: places/templates/places/my_contributions.html:270
 msgid "Image Uploads"
-msgstr ""
+msgstr "이미지 업로드"
 
 #: places/templates/places/my_contributions.html:284
 msgid "Places You've Submitted"
-msgstr ""
+msgstr "제출한 장소"
 
 #: places/templates/places/my_contributions.html:287
 msgid "Places you've added to help grow our community"
-msgstr ""
+msgstr "커뮤니티 성장에 도움이 되는 추가한 장소"
 
 #: places/templates/places/my_contributions.html:344
 #: places/templates/places/my_contributions.html:537
 #: places/templates/places/my_contributions.html:637
 msgid "Previous"
-msgstr ""
+msgstr "이전"
 
 #: places/templates/places/my_contributions.html:349
 #: places/templates/places/my_contributions.html:542
 #: places/templates/places/my_contributions.html:642
 #, python-format
 msgid "Page %(current)s of %(total)s"
-msgstr ""
+msgstr "%(total)s개 중 %(current)s페이지"
 
 #: places/templates/places/my_contributions.html:355
 #: places/templates/places/my_contributions.html:548
 #: places/templates/places/my_contributions.html:648
 msgid "Next"
-msgstr ""
+msgstr "다음"
 
 #: places/templates/places/my_contributions.html:366
 msgid ""
 "You haven't submitted any places yet. Help grow our community by adding "
 "places you know!"
-msgstr ""
+msgstr "아직 장소를 제출하지 않았습니다. 알고 있는 장소를 추가하여 저희 커뮤니티 성장에 도움을 주세요!"
 
 #: places/templates/places/my_contributions.html:380
 msgid "Field Edit Suggestions"
-msgstr ""
+msgstr "필드 편집 제안"
 
 #: places/templates/places/my_contributions.html:383
 msgid "Your suggestions for updating place information"
-msgstr ""
+msgstr "장소 정보 업데이트에 대한 제안"
 
 #: places/templates/places/my_contributions.html:432
 msgid "Pending"
-msgstr ""
+msgstr "대기 중"
 
 #: places/templates/places/my_contributions.html:436
 msgid "Rejected"
-msgstr ""
+msgstr "거부됨"
 
 #: places/templates/places/my_contributions.html:450
 msgid "From"
-msgstr ""
+msgstr "이전"
 
 #: places/templates/places/my_contributions.html:458
 msgid "No current value"
-msgstr ""
+msgstr "현재 값 없음"
 
 #: places/templates/places/my_contributions.html:475
 msgid "To"
-msgstr ""
+msgstr "변경 후"
 
 #: places/templates/places/my_contributions.html:493
 msgid "Reason"
-msgstr ""
+msgstr "이유"
 
 #: places/templates/places/my_contributions.html:506
 msgid "Admin Notes"
-msgstr ""
+msgstr "관리자 메모"
 
 #: places/templates/places/my_contributions.html:518
 msgid "Reviewed on"
-msgstr ""
+msgstr "검토일"
 
 #: places/templates/places/my_contributions.html:520
 msgid "by"
-msgstr ""
+msgstr "검토자"
 
 #: places/templates/places/my_contributions.html:557
 msgid "No field suggestions yet"
-msgstr ""
+msgstr "아직 필드 제안이 없습니다"
 
 #: places/templates/places/my_contributions.html:559
 msgid ""
 "You haven't suggested any field edits yet. Visit a place page and click "
 "'Suggest Edit' to get started!"
-msgstr ""
+msgstr "아직 필드 편집을 제안하지 않았습니다. 장소 페이지를 방문하고 '편집 제안'을 클릭하여 시작하세요!"
 
 #: places/templates/places/my_contributions.html:573
 msgid "Image Upload Suggestions"
-msgstr ""
+msgstr "이미지 업로드 제안"
 
 #: places/templates/places/my_contributions.html:576
 msgid "Your uploaded images for places"
-msgstr ""
+msgstr "장소에 대한 업로드한 이미지"
 
 #: places/templates/places/my_contributions.html:586
 msgid "Suggested image for"
-msgstr ""
+msgstr "제안된 이미지"
 
 #: places/templates/places/my_contributions.html:615
 msgid "Reviewed:"
-msgstr ""
+msgstr "검토됨:"
 
 #: places/templates/places/my_contributions.html:621
 msgid "Admin Notes:"
-msgstr ""
+msgstr "관리자 메모:"
 
 #: places/templates/places/my_contributions.html:657
 msgid "No image suggestions yet"
-msgstr ""
+msgstr "아직 이미지 제안이 없습니다"
 
 #: places/templates/places/my_contributions.html:659
 msgid ""
 "You haven't uploaded any images yet. Visit a place page and click 'Suggest "
 "Edit' to upload photos!"
-msgstr ""
+msgstr "아직 이미지를 업로드하지 않았습니다. 장소 페이지를 방문하고 '편집 제안'을 클릭하여 사진을 업로드하세요!"
 
 #: places/templates/places/partials/place_list.html:62
 #: places/templates/places/place_detail.html:231
 msgid "Open in Google Maps"
-msgstr ""
+msgstr "Google 지도에서 열기"
 
 #: places/templates/places/partials/place_list.html:87
 #: places/templates/places/place_detail.html:255
 msgid "Korean maps:"
-msgstr ""
+msgstr "한국 지도:"
 
 #: places/templates/places/partials/place_list.html:92
 #: places/templates/places/partials/place_list.html:100
 #: places/templates/places/place_detail.html:259
 #: places/templates/places/place_detail.html:266
 msgid "Korean navigation app"
-msgstr ""
+msgstr "한국 내비게이션 앱"
 
 #: places/templates/places/place_detail.html:65
 msgid "Breadcrumb"
-msgstr ""
+msgstr "경로"
 
 #: places/templates/places/place_detail.html:134
 msgid "Suggest edits or upload images for this place"
-msgstr ""
+msgstr "이 장소에 대한 편집 제안 또는 이미지 업로드"
 
 #: places/templates/places/place_detail.html:136
 #: places/templates/places/suggest_edit.html:5
 msgid "Suggest Edit"
-msgstr ""
+msgstr "편집 제안"
 
 #: places/templates/places/place_detail.html:164
 msgid "Important Notice:"
-msgstr ""
+msgstr "중요한 안내:"
 
 #: places/templates/places/place_detail.html:164
 msgid ""
 "This place has been added by our community. While we strive to maintain "
 "accurate information, we recommend verifying the halal status directly with "
 "the establishment before visiting."
-msgstr ""
+msgstr "이 장소는 저희 커뮤니티가 추가한 것입니다. 정확한 정보를 유지하기 위해 최선을 다하고 있지만, 방문하기 전에 시설에서 직접 할랄 상태를 확인하는 것을 권장합니다."
 
 #: places/templates/places/place_detail.html:183
 msgid "No ratings yet"
-msgstr ""
+msgstr "아직 평점이 없습니다"
 
 #: places/templates/places/place_detail.html:183
 msgid "reviews"
-msgstr ""
+msgstr "리뷰"
 
 #: places/templates/places/place_detail.html:194
 msgid "Last updated:"
-msgstr ""
+msgstr "최종 업데이트:"
 
 #: places/templates/places/place_detail.html:204
 msgid "Copy address"
-msgstr ""
+msgstr "주소 복사"
 
 #: places/templates/places/place_detail.html:220
 msgid "Visit Website"
-msgstr ""
+msgstr "웹사이트 방문"
 
 #: places/templates/places/place_detail.html:285
 #: users/templates/users/profile.html:70
 msgid "Reviews"
-msgstr ""
+msgstr "리뷰"
 
 #: places/templates/places/place_detail.html:293
 #: places/templates/places/place_detail.html:354
 #: places/templates/places/place_detail.html:397
 msgid "Your Review"
-msgstr ""
+msgstr "내 리뷰"
 
 #: places/templates/places/place_detail.html:302
 msgid "Are you sure you want to delete your review?"
-msgstr ""
+msgstr "리뷰를 삭제하시겠습니까?"
 
 #: places/templates/places/place_detail.html:333
 msgid "Rating"
-msgstr ""
+msgstr "평점"
 
 #: places/templates/places/place_detail.html:363
 msgid "Update Review"
-msgstr ""
+msgstr "리뷰 업데이트"
 
 #: places/templates/places/place_detail.html:368
 #: places/templates/places/suggest_edit.html:598
 #: places/templates/places/suggest_edit.html:669
 #: users/templates/users/edit_profile.html:121
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 #: places/templates/places/place_detail.html:382
 msgid "Your Rating"
-msgstr ""
+msgstr "내 평점"
 
 #: places/templates/places/place_detail.html:401
 msgid "Share your experience..."
-msgstr ""
+msgstr "경험을 공유하세요..."
 
 #: places/templates/places/place_detail.html:405
 msgid "Submit Review"
-msgstr ""
+msgstr "리뷰 제출"
 
 #: places/templates/places/place_detail.html:437
 msgid "No reviews yet. Be the first to review!"
-msgstr ""
+msgstr "아직 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!"
 
 #: places/templates/places/place_detail.html:589
 msgid "Network response was not ok"
-msgstr ""
+msgstr "네트워크 응답이 정상이 아닙니다"
 
 #: places/templates/places/place_detail.html:602
 msgid "Added to favorites"
-msgstr ""
+msgstr "즐겨찾기에 추가됨"
 
 #: places/templates/places/place_detail.html:602
 msgid "Removed from favorites"
-msgstr ""
+msgstr "즐겨찾기에서 제거됨"
 
 #: places/templates/places/place_detail.html:615
 msgid "Error toggling favorite:"
-msgstr ""
+msgstr "즐겨찾기 토글 오류:"
 
 #: places/templates/places/place_detail.html:622
 msgid "Could not update favorite status. Please try again."
-msgstr ""
+msgstr "즐겨찾기 상태를 업데이트할 수 없습니다. 다시 시도해주세요."
 
 #: places/templates/places/place_detail.html:640
 #, python-format
 msgid "Check out %(place_name)s on %(site_name)s!"
-msgstr ""
+msgstr "%(site_name)s에서 %(place_name)s를 확인해보세요!"
 
 #: places/templates/places/place_detail.html:651
 msgid "Link copied to clipboard!"
-msgstr ""
+msgstr "링크가 클립보드에 복사되었습니다!"
 
 #: places/templates/places/place_detail.html:661
 msgid "Error sharing:"
-msgstr ""
+msgstr "공유 오류:"
 
 #: places/templates/places/place_detail.html:663
 msgid "Failed to share. Please try again."
-msgstr ""
+msgstr "공유에 실패했습니다. 다시 시도해주세요."
 
 #: places/templates/places/place_detail.html:726
 msgid "Address copied to clipboard!"
-msgstr ""
+msgstr "주소가 클립보드에 복사되었습니다!"
 
 #: places/templates/places/place_detail.html:735
 msgid "Failed to copy address:"
-msgstr ""
+msgstr "주소 복사 실패:"
 
 #: places/templates/places/place_detail.html:737
 msgid "Failed to copy address. Please try again."
-msgstr ""
+msgstr "주소를 복사할 수 없습니다. 다시 시도해주세요."
 
 #: places/templates/places/submit_place.html:36
 #: places/templates/places/submit_place.html:81
 msgid "Geocoding error:"
-msgstr ""
+msgstr "지오코딩 오류:"
 
 #: places/templates/places/submit_place.html:147
 msgid "Submit a New Place"
-msgstr ""
+msgstr "새 장소 제출"
 
 #: places/templates/places/submit_place.html:148
 msgid "Help others find halal places by submitting a new location"
-msgstr ""
+msgstr "새로운 위치를 제출하여 다른 사람들이 할랄 장소를 찾는 데 도움을 주세요"
 
 #: places/templates/places/submit_place.html:160
 msgid "Place Name"
-msgstr ""
+msgstr "장소 이름"
 
 #: places/templates/places/submit_place.html:170
 msgid "Enter place name"
-msgstr ""
+msgstr "장소 이름 입력"
 
 #: places/templates/places/submit_place.html:177
 #: places/templates/places/suggest_edit.html:166
 msgid "Category"
-msgstr ""
+msgstr "카테고리"
 
 #: places/templates/places/submit_place.html:187
 msgid "Select a category"
-msgstr ""
+msgstr "카테고리 선택"
 
 #: places/templates/places/submit_place.html:188
 msgid "Restaurant"
-msgstr ""
+msgstr "레스토랑"
 
 #: places/templates/places/submit_place.html:189
 msgid "Market"
-msgstr ""
+msgstr "시장"
 
 #: places/templates/places/submit_place.html:190
 msgid "Mosque"
-msgstr ""
+msgstr "모스크"
 
 #: places/templates/places/submit_place.html:191
 msgid "Prayer Room"
-msgstr ""
+msgstr "기도실"
 
 #: places/templates/places/submit_place.html:200
 #: places/templates/places/suggest_edit.html:195
 msgid "Description"
-msgstr ""
+msgstr "설명"
 
 #: places/templates/places/submit_place.html:207
 msgid "Describe the place..."
-msgstr ""
+msgstr "장소를 설명하세요..."
 
 #: places/templates/places/submit_place.html:224
 msgid "Click on the map to set the location"
-msgstr ""
+msgstr "지도를 클릭하여 위치 설정"
 
 #: places/templates/places/submit_place.html:234
 #: places/templates/places/suggest_edit.html:227
 msgid "Address"
-msgstr ""
+msgstr "주소"
 
 #: places/templates/places/submit_place.html:244
 msgid "Enter address"
-msgstr ""
+msgstr "주소 입력"
 
 #: places/templates/places/submit_place.html:253
 #: places/templates/places/suggest_edit.html:263
 msgid "Phone Number"
-msgstr ""
+msgstr "전화번호"
 
 #: places/templates/places/submit_place.html:262
 msgid "Enter phone number"
-msgstr ""
+msgstr "전화번호 입력"
 
 #: places/templates/places/submit_place.html:273
 #: places/templates/places/suggest_edit.html:282
 msgid "Website"
-msgstr ""
+msgstr "웹사이트"
 
 #: places/templates/places/submit_place.html:282
 msgid "Enter website URL"
-msgstr ""
+msgstr "웹사이트 URL 입력"
 
 #: places/templates/places/submit_place.html:290
 msgid "Additional Map Links"
-msgstr ""
+msgstr "추가 지도 링크"
 
 #: places/templates/places/submit_place.html:295
 msgid "Naver Maps Link"
-msgstr ""
+msgstr "네이버 지도 링크"
 
 #: places/templates/places/submit_place.html:304
 msgid "Enter Naver Maps link"
-msgstr ""
+msgstr "네이버 지도 링크 입력"
 
 #: places/templates/places/submit_place.html:312
 msgid "Kakao Maps Link"
-msgstr ""
+msgstr "카카오맵 링크"
 
 #: places/templates/places/submit_place.html:321
 msgid "Enter Kakao Maps link"
-msgstr ""
+msgstr "카카오맵 링크 입력"
 
 #: places/templates/places/submit_place.html:331
 msgid "Photos"
-msgstr ""
+msgstr "사진"
 
 #: places/templates/places/submit_place.html:338
 msgid "Upload photos"
-msgstr ""
+msgstr "사진 업로드"
 
 #: places/templates/places/submit_place.html:346
 msgid "or drag and drop"
-msgstr ""
+msgstr "또는 드래그 앤 드롭"
 
 #: places/templates/places/submit_place.html:349
 msgid "PNG, JPG, GIF up to 10MB each"
-msgstr ""
+msgstr "PNG, JPG, GIF 각각 최대 10MB"
 
 #: places/templates/places/submit_place.html:380
 msgid ""
 "Note: <strong>Mosque</strong> is for dedicated Islamic centers, while "
 "<strong>Prayer Room</strong> is for designated prayer spaces in other "
 "locations."
-msgstr ""
+msgstr "참고: <strong>모스크</strong>는 전용 이슬람 센터용이고, <strong>기도실</strong>은 다른 장소의 지정된 기도 공간용입니다."
 
 #: places/templates/places/submit_place.html:463
 msgid "Preview"
-msgstr ""
+msgstr "미리보기"
 
 #: places/templates/places/submit_place.html:514
 msgid "Please select a location on the map"
-msgstr ""
+msgstr "지도에서 위치를 선택해주세요"
 
 #: places/templates/places/suggest_edit.html:78
 msgid "Back to place"
-msgstr ""
+msgstr "장소로 돌아가기"
 
 #: places/templates/places/suggest_edit.html:82
 msgid "Editing"
-msgstr ""
+msgstr "편집 중"
 
 #: places/templates/places/suggest_edit.html:89
 msgid "Suggest Improvements"
-msgstr ""
+msgstr "개선 사항 제안"
 
 #: places/templates/places/suggest_edit.html:92
 msgid "Help our community by suggesting better information or adding photos"
-msgstr ""
+msgstr "더 나은 정보를 제안하거나 사진을 추가하여 저희 커뮤니티에 도움을 주세요"
 
 #: places/templates/places/suggest_edit.html:109
 msgid "Min Impact"
-msgstr ""
+msgstr "최소 영향"
 
 #: places/templates/places/suggest_edit.html:113
 msgid "Quality"
-msgstr ""
+msgstr "품질"
 
 #: places/templates/places/suggest_edit.html:126
 msgid "Edit Information"
-msgstr ""
+msgstr "정보 편집"
 
 #: places/templates/places/suggest_edit.html:129
 msgid "Click to edit any field"
-msgstr ""
+msgstr "필드를 편집하려면 클릭하세요"
 
 #: places/templates/places/suggest_edit.html:140
 msgid "Name"
-msgstr ""
+msgstr "이름"
 
 #: places/templates/places/suggest_edit.html:144
 #: places/templates/places/suggest_edit.html:170
@@ -2054,7 +2054,7 @@ msgstr ""
 #: places/templates/places/suggest_edit.html:367
 #: places/templates/places/suggest_edit.html:660
 msgid "Edit"
-msgstr ""
+msgstr "편집"
 
 #: places/templates/places/suggest_edit.html:148
 #: places/templates/places/suggest_edit.html:174
@@ -2063,851 +2063,851 @@ msgstr ""
 #: places/templates/places/suggest_edit.html:270
 #: places/templates/places/suggest_edit.html:289
 msgid "Current:"
-msgstr ""
+msgstr "현재:"
 
 #: places/templates/places/suggest_edit.html:153
 #: places/templates/places/suggest_edit.html:182
 #: places/templates/places/suggest_edit.html:214
 #: places/templates/places/suggest_edit.html:240
 msgid "Your suggestion:"
-msgstr ""
+msgstr "제안사항:"
 
 #: places/templates/places/suggest_edit.html:208
 msgid "No description available"
-msgstr ""
+msgstr "설명 없음"
 
 #: places/templates/places/suggest_edit.html:254
 #: places/templates/places/suggest_edit.html:313
 msgid "(Optional)"
-msgstr ""
+msgstr "(선택사항)"
 
 #: places/templates/places/suggest_edit.html:294
 msgid "Not specified"
-msgstr ""
+msgstr "지정되지 않음"
 
 #: places/templates/places/suggest_edit.html:312
 msgid "Map Links"
-msgstr ""
+msgstr "지도 링크"
 
 #: places/templates/places/suggest_edit.html:323
 msgid "Google Maps"
-msgstr ""
+msgstr "Google 지도"
 
 #: places/templates/places/suggest_edit.html:343
 msgid "Kakao Maps"
-msgstr ""
+msgstr "카카오맵"
 
 #: places/templates/places/suggest_edit.html:363
 msgid "Naver Maps"
-msgstr ""
+msgstr "네이버 지도"
 
 #: places/templates/places/suggest_edit.html:388
 msgid "Add Photos"
-msgstr ""
+msgstr "사진 추가"
 
 #: places/templates/places/suggest_edit.html:391
 msgid "Drag & drop or click to upload"
-msgstr ""
+msgstr "드래그 앤 드롭하거나 클릭하여 업로드"
 
 #: places/templates/places/suggest_edit.html:400
 msgid "Current Photos"
-msgstr ""
+msgstr "현재 사진"
 
 #: places/templates/places/suggest_edit.html:435
 msgid "Upload Images"
-msgstr ""
+msgstr "이미지 업로드"
 
 #: places/templates/places/suggest_edit.html:437
 msgid "Drag and drop your images here, or"
-msgstr ""
+msgstr "이미지를 여기에 드래그 앤 드롭하거나"
 
 #: places/templates/places/suggest_edit.html:439
 msgid "browse files"
-msgstr ""
+msgstr "파일 찾기"
 
 #: places/templates/places/suggest_edit.html:456
 msgid "Images to Upload"
-msgstr ""
+msgstr "업로드할 이미지"
 
 #: places/templates/places/suggest_edit.html:471
 msgid "Why These Changes?"
-msgstr ""
+msgstr "왜 이러한 변경사항인가요?"
 
 #: places/templates/places/suggest_edit.html:474
 msgid "Help reviewers understand your suggestions"
-msgstr ""
+msgstr "검토자가 제안사항을 이해할 수 있도록 도움"
 
 #: places/templates/places/suggest_edit.html:478
 msgid "Required"
-msgstr ""
+msgstr "필수"
 
 #: places/templates/places/suggest_edit.html:487
 msgid "Tips for a good explanation:"
-msgstr ""
+msgstr "좋은 설명을 위한 팁:"
 
 #: places/templates/places/suggest_edit.html:489
 msgid "Mention what's incorrect or missing"
-msgstr ""
+msgstr "무엇이 잘못되었거나 누락되었는지 언급"
 
 #: places/templates/places/suggest_edit.html:490
 msgid "Provide source if possible (website, local knowledge, etc.)"
-msgstr ""
+msgstr "가능하면 출처 제공 (웹사이트, 현지 지식 등)"
 
 #: places/templates/places/suggest_edit.html:491
 msgid "Be specific about why the change improves accuracy"
-msgstr ""
+msgstr "변경이 정확성을 향상시키는 이유를 구체적으로 설명"
 
 #: places/templates/places/suggest_edit.html:492
 msgid "One explanation covers all your changes and images"
-msgstr ""
+msgstr "하나의 설명이 모든 변경사항과 이미지를 포함"
 
 #: places/templates/places/suggest_edit.html:500
 msgid "Explain your changes"
-msgstr ""
+msgstr "변경사항 설명"
 
 #: places/templates/places/suggest_edit.html:510
 msgid ""
 "This explanation will apply to all your field changes and image uploads."
-msgstr ""
+msgstr "이 설명은 모든 필드 변경사항과 이미지 업로드에 적용됩니다."
 
 #: places/templates/places/suggest_edit.html:529
 msgid "Please fix these issues:"
-msgstr ""
+msgstr "다음 문제들을 수정해주세요:"
 
 #: places/templates/places/suggest_edit.html:550
 #: places/templates/places/suggest_edit.html:573
 msgid "changes"
-msgstr ""
+msgstr "변경사항"
 
 #: places/templates/places/suggest_edit.html:560
 #: places/templates/places/suggest_edit.html:579
 #: places/templates/places/suggest_edit.html:866
 #: places/templates/places/suggest_edit.html:872
 msgid "Select fields to edit or upload images to create suggestions."
-msgstr ""
+msgstr "편집할 필드를 선택하거나 이미지를 업로드하여 제안을 만드세요."
 
 #: places/templates/places/suggest_edit.html:569
 msgid "Suggestion Summary"
-msgstr ""
+msgstr "제안 요약"
 
 #: places/templates/places/suggest_edit.html:591
 msgid "Your suggestions will be reviewed by moderators"
-msgstr ""
+msgstr "제안사항은 관리자가 검토합니다"
 
 #: places/templates/places/suggest_edit.html:603
 msgid "Submit"
-msgstr ""
+msgstr "제출"
 
 #: places/templates/places/suggest_edit.html:603
 msgid "Suggestions"
-msgstr ""
+msgstr "제안"
 
 #: places/templates/places/suggest_edit.html:920
 msgid "Submitting..."
-msgstr ""
+msgstr "제출 중..."
 
 #: prayer_times/templates/prayer_times/error.html:4
 msgid "Error"
-msgstr ""
+msgstr "오류"
 
 #: prayer_times/templates/prayer_times/error.html:11
 msgid "Error Loading Prayer Times"
-msgstr ""
+msgstr "기도 시간 로딩 오류"
 
 #: prayer_times/templates/prayer_times/error.html:22
 #: prayer_times/templates/prayer_times/prayer_times.html:174
 msgid "Try Again"
-msgstr ""
+msgstr "다시 시도"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:11
 msgid "Stay updated with the prayer times for your location."
-msgstr ""
+msgstr "귀하의 위치에 대한 기도 시간으로 최신 정보를 유지하세요."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:14
 msgid "Prayer times for your current location and Korea"
-msgstr ""
+msgstr "현재 위치와 한국의 기도 시간"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:22
 msgid "We show your local prayer times and Korea times for trip planning."
-msgstr ""
+msgstr "여행 계획을 위해 현지 기도 시간과 한국 시간을 보여드립니다."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:68
 msgid "Search city..."
-msgstr ""
+msgstr "도시 검색..."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:78
 msgid "Use Current Location"
-msgstr ""
+msgstr "현재 위치 사용"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:113
 msgid "Prayer Calculation Settings"
-msgstr ""
+msgstr "기도 계산 설정"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:117
 msgid "Calculation Method"
-msgstr ""
+msgstr "계산 방법"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:121
 msgid "Jafari / Shia Ithna-Ashari"
-msgstr ""
+msgstr "자파리 / 시아 이스나 아샤리"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:122
 msgid "University of Islamic Sciences, Karachi"
-msgstr ""
+msgstr "카라치 이슬람 과학 대학교"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:123
 msgid "Islamic Society of North America"
-msgstr ""
+msgstr "북미 이슬람 협회"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:124
 msgid "Muslim World League"
-msgstr ""
+msgstr "무슬림 세계 연맹"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:125
 msgid "Umm Al-Qura University, Makkah"
-msgstr ""
+msgstr "우므 알쿠라 대학교, 메카"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:126
 msgid "Egyptian General Authority of Survey"
-msgstr ""
+msgstr "이집트 측량 총청"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:127
 msgid "Institute of Geophysics, University of Tehran"
-msgstr ""
+msgstr "테헤란 대학교 지구물리학 연구소"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:128
 msgid "Gulf Region"
-msgstr ""
+msgstr "걸프 지역"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:129
 msgid "Kuwait"
-msgstr ""
+msgstr "쿠웨이트"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:130
 msgid "Qatar"
-msgstr ""
+msgstr "카타르"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:131
 msgid "Majlis Ugama Islam Singapura, Singapore"
-msgstr ""
+msgstr "싱가포르 이슬람 종교위원회"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:132
 msgid "Union Organization islamic de France"
-msgstr ""
+msgstr "프랑스 이슬람 연합 기구"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:133
 msgid "Diyanet İşleri Başkanlığı, Turkey"
-msgstr ""
+msgstr "터키 종교청"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:134
 msgid "Spiritual Administration of Muslims of Russia"
-msgstr ""
+msgstr "러시아 무슬림 영적 관리청"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:135
 msgid "Moonsighting Committee Worldwide"
-msgstr ""
+msgstr "세계 초승달 관측 위원회"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:136
 msgid "Dubai (experimental)"
-msgstr ""
+msgstr "두바이 (실험적)"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:137
 msgid "Jabatan Kemajuan Islam Malaysia (JAKIM)"
-msgstr ""
+msgstr "말레이시아 이슬람 발전청 (JAKIM)"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:138
 msgid "Tunisia"
-msgstr ""
+msgstr "튀니지"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:139
 msgid "Algeria"
-msgstr ""
+msgstr "알제리"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:140
 msgid "KEMENAG - Kementerian Agama Republik Indonesia"
-msgstr ""
+msgstr "KEMENAG - 인도네시아 종교부"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:141
 msgid "Morocco"
-msgstr ""
+msgstr "모로코"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:142
 msgid "Comunidade Islamica de Lisboa"
-msgstr ""
+msgstr "리스본 이슬람 공동체"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:143
 msgid "Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan"
-msgstr ""
+msgstr "요르단 자크프, 이슬람 사무 및 성지부"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:149
 msgid "Asr Calculation"
-msgstr ""
+msgstr "아스르 계산"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:153
 msgid "Standard (Shafi)"
-msgstr ""
+msgstr "표준 (샤피이)"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:154
 msgid "Hanafi"
-msgstr ""
+msgstr "하나피"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:165
 msgid "Loading prayer times..."
-msgstr ""
+msgstr "기도 시간 로딩 중..."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:172
 #: prayer_times/templates/prayer_times/prayer_times.html:390
 msgid "Failed to load prayer times"
-msgstr ""
+msgstr "기도 시간 로드 실패"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:186
 msgid "Gregorian Date"
-msgstr ""
+msgstr "그레고리안 날짜"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:191
 msgid "Current Time"
-msgstr ""
+msgstr "현재 시간"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:195
 msgid "Hijri Date"
-msgstr ""
+msgstr "히즈리 날짜"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:208
 msgid "Prayer"
-msgstr ""
+msgstr "기도"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:209
 msgid "Time"
-msgstr ""
+msgstr "시간"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:217
 msgid "Next Prayer"
-msgstr ""
+msgstr "다음 기도"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:218
 msgid "Calculating..."
-msgstr ""
+msgstr "계산 중..."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:227
 msgid ""
 "Prayer times are provided by <a href=\"https://aladhan.com/\" "
 "target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 "
 "dark:hover:text-primary-400\">aladhan.com</a>"
-msgstr ""
+msgstr "기도 시간은 <a href=\"https://aladhan.com/\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 dark:hover:text-primary-400\">aladhan.com</a>에서 제공됩니다"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:286
 msgid "Fajr (Tomorrow)"
-msgstr ""
+msgstr "파즈르 (내일)"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:310
 msgid "All prayer times have passed."
-msgstr ""
+msgstr "모든 기도 시간이 지났습니다."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:367
 msgid "Fajr"
-msgstr ""
+msgstr "파즈르"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:368
 msgid "Sunrise"
-msgstr ""
+msgstr "일출"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:369
 msgid "Dhuhr"
-msgstr ""
+msgstr "두흐르"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:370
 msgid "Asr"
-msgstr ""
+msgstr "아스르"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:371
 msgid "Maghrib"
-msgstr ""
+msgstr "마그리브"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:372
 msgid "Isha"
-msgstr ""
+msgstr "이샤"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:393
 msgid "Error loading prayer times:"
-msgstr ""
+msgstr "기도 시간 로딩 오류:"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:415
 msgid "Failed to update location:"
-msgstr ""
+msgstr "위치 업데이트 실패:"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:419
 msgid "Error updating location:"
-msgstr ""
+msgstr "위치 업데이트 오류:"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:443
 msgid "Could not determine location. Please select a city manually."
-msgstr ""
+msgstr "위치를 확인할 수 없습니다. 수동으로 도시를 선택해주세요."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:447
 #: prayer_times/templates/prayer_times/prayer_times.html:452
 msgid "Error getting location:"
-msgstr ""
+msgstr "위치 가져오기 오류:"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:448
 #: prayer_times/templates/prayer_times/prayer_times.html:453
 msgid "Error getting your location. Please select a city manually."
-msgstr ""
+msgstr "위치를 가져오는 중 오류가 발생했습니다. 수동으로 도시를 선택해주세요."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:457
 msgid ""
 "Geolocation is not supported by your browser. Please select a city manually."
-msgstr ""
+msgstr "브라우저에서 지리적 위치를 지원하지 않습니다. 수동으로 도시를 선택해주세요."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:477
 #: prayer_times/templates/prayer_times/prayer_times.html:501
 msgid "Failed to update settings:"
-msgstr ""
+msgstr "설정 업데이트 실패:"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:481
 #: prayer_times/templates/prayer_times/prayer_times.html:505
 msgid "Error updating settings:"
-msgstr ""
+msgstr "설정 업데이트 오류:"
 
 #: users/decorators.py:16
 msgid ""
 "Please verify your email address to access this feature. Check your inbox "
 "for the verification email."
-msgstr ""
+msgstr "이 기능에 접근하려면 이메일 주소를 인증해주세요. 인증 이메일을 받은 편지함을 확인하세요."
 
 #: users/templates/users/activation_result.html:4
 #: users/templates/users/activation_result.html:12
 msgid "Email Activation"
-msgstr ""
+msgstr "이메일 인증"
 
 #: users/templates/users/activation_result.html:25
 msgid "Email Verified Successfully!"
-msgstr ""
+msgstr "이메일 인증 성공!"
 
 #: users/templates/users/activation_result.html:28
 msgid ""
 "Your email has been verified successfully! You can now submit places, write "
 "reviews, and make suggestions."
-msgstr ""
+msgstr "이메일이 성공적으로 인증되었습니다! 이제 장소를 제출하고, 리뷰를 작성하고, 제안을 할 수 있습니다."
 
 #: users/templates/users/activation_result.html:33
 #: users/templates/users/check_email.html:58
 #: users/templates/users/resend_activation.html:128
 msgid "Go to Homepage"
-msgstr ""
+msgstr "홈페이지로 가기"
 
 #: users/templates/users/activation_result.html:42
 msgid "Activation Failed"
-msgstr ""
+msgstr "인증 실패"
 
 #: users/templates/users/activation_result.html:51
 #: users/templates/users/resend_activation.html:5
 #: users/templates/users/resend_activation.html:13
 #: users/templates/users/resend_activation.html:104
 msgid "Resend Activation Email"
-msgstr ""
+msgstr "인증 이메일 재전송"
 
 #: users/templates/users/activation_result.html:56
 msgid "Register Again"
-msgstr ""
+msgstr "다시 가입하기"
 
 #: users/templates/users/check_email.html:5
 #: users/templates/users/check_email.html:13
 msgid "Check Your Email"
-msgstr ""
+msgstr "이메일 확인"
 
 #: users/templates/users/check_email.html:25
 msgid "Activation Email Sent"
-msgstr ""
+msgstr "인증 이메일 전송됨"
 
 #: users/templates/users/check_email.html:28
 msgid "We've sent an activation email to"
-msgstr ""
+msgstr "다음 주소로 인증 이메일을 보냈습니다"
 
 #: users/templates/users/check_email.html:34
 msgid ""
 "Please check your email and click the activation link to complete your "
 "registration."
-msgstr ""
+msgstr "이메일을 확인하고 인증 링크를 클릭하여 가입을 완료해주세요."
 
 #: users/templates/users/check_email.html:43
 msgid ""
 "The activation link will expire in 24 hours. Don't forget to check your spam "
 "folder!"
-msgstr ""
+msgstr "인증 링크는 24시간 후 만료됩니다. 스팸 폴더도 확인하는 것을 잊지 마세요!"
 
 #: users/templates/users/check_email.html:53
 msgid "Resend Email"
-msgstr ""
+msgstr "이메일 재전송"
 
 #: users/templates/users/edit_profile.html:5
 #: users/templates/users/edit_profile.html:12
 #: users/templates/users/profile.html:80
 msgid "Edit Profile"
-msgstr ""
+msgstr "프로필 편집"
 
 #: users/templates/users/edit_profile.html:13
 msgid "Update your profile information"
-msgstr ""
+msgstr "프로필 정보 업데이트"
 
 #: users/templates/users/edit_profile.html:24
 #: users/templates/users/register.html:46
 msgid "First Name"
-msgstr ""
+msgstr "이름"
 
 #: users/templates/users/edit_profile.html:30
 msgid "Enter your first name"
-msgstr ""
+msgstr "이름을 입력하세요"
 
 #: users/templates/users/edit_profile.html:40
 #: users/templates/users/register.html:67
 msgid "Last Name"
-msgstr ""
+msgstr "성"
 
 #: users/templates/users/edit_profile.html:46
 msgid "Enter your last name"
-msgstr ""
+msgstr "성을 입력하세요"
 
 #: users/templates/users/edit_profile.html:56
 #: users/templates/users/login.html:24 users/templates/users/register.html:89
 msgid "Username"
-msgstr ""
+msgstr "사용자명"
 
 #: users/templates/users/edit_profile.html:72
 #: users/templates/users/register.html:111
 msgid "Email"
-msgstr ""
+msgstr "이메일"
 
 #: users/templates/users/edit_profile.html:88
 msgid "Current Password"
-msgstr ""
+msgstr "현재 비밀번호"
 
 #: users/templates/users/edit_profile.html:103
 msgid "New Password"
-msgstr ""
+msgstr "새 비밀번호"
 
 #: users/templates/users/edit_profile.html:110
 msgid "Leave blank to keep current password"
-msgstr ""
+msgstr "현재 비밀번호를 유지하려면 비워두세요"
 
 #: users/templates/users/edit_profile.html:125
 msgid "Save Changes"
-msgstr ""
+msgstr "변경사항 저장"
 
 #: users/templates/users/email/activation_email.html:9
 msgid "Activate Your Account"
-msgstr ""
+msgstr "계정 활성화"
 
 #: users/templates/users/email/activation_email.html:35
 msgid "Welcome to Halal Korea!"
-msgstr ""
+msgstr "할랄 코리아에 오신 것을 환영합니다!"
 
 #: users/templates/users/email/activation_email.html:38
 msgid "Discover halal places across Korea"
-msgstr ""
+msgstr "한국 전역의 할랄 장소를 발견하세요"
 
 #: users/templates/users/email/activation_email.html:54
 #: users/templates/users/email/activation_email.txt:6
 msgid "Hi"
-msgstr ""
+msgstr "안녕하세요"
 
 #: users/templates/users/email/activation_email.html:63
 msgid ""
 "Thank you for joining our community! To complete your registration and start "
 "exploring halal places in Korea, please verify your email address."
-msgstr ""
+msgstr "저희 커뮤니티에 가입해주셔서 감사합니다! 가입을 완료하고 한국의 할랄 장소를 탐색하기 시작하려면 이메일 주소를 인증해주세요."
 
 #: users/templates/users/email/activation_email.html:75
 msgid "Verify My Email"
-msgstr ""
+msgstr "내 이메일 인증하기"
 
 #: users/templates/users/email/activation_email.html:87
 msgid "Can't click the button?"
-msgstr ""
+msgstr "버튼을 클릭할 수 없나요?"
 
 #: users/templates/users/email/activation_email.html:90
 msgid "Copy and paste this link into your browser:"
-msgstr ""
+msgstr "이 링크를 브라우저에 복사하여 붙여넣으세요:"
 
 #: users/templates/users/email/activation_email.html:111
 msgid "Important:"
-msgstr ""
+msgstr "중요:"
 
 #: users/templates/users/email/activation_email.html:112
 msgid "This link expires in 24 hours"
-msgstr ""
+msgstr "이 링크는 24시간 후 만료됩니다"
 
 #: users/templates/users/email/activation_email.html:113
 msgid "One-time use only"
-msgstr ""
+msgstr "1회 사용만 가능"
 
 #: users/templates/users/email/activation_email.html:114
 msgid "If you didn't create this account, please ignore this email"
-msgstr ""
+msgstr "이 계정을 만드신 것이 아니라면 이 이메일을 무시해주세요"
 
 #: users/templates/users/email/activation_email.html:129
 msgid "What's next?"
-msgstr ""
+msgstr "다음은 무엇인가요?"
 
 #: users/templates/users/email/activation_email.html:132
 msgid "Discover halal restaurants near you"
-msgstr ""
+msgstr "주변의 할랄 레스토랑 발견하기"
 
 #: users/templates/users/email/activation_email.html:133
 msgid "Read and write reviews"
-msgstr ""
+msgstr "리뷰 읽기 및 작성하기"
 
 #: users/templates/users/email/activation_email.html:134
 msgid "Submit new halal places"
-msgstr ""
+msgstr "새로운 할랄 장소 제출하기"
 
 #: users/templates/users/email/activation_email.html:135
 msgid "Join our growing community"
-msgstr ""
+msgstr "성장하는 저희 커뮤니티에 참여하기"
 
 #: users/templates/users/email/activation_email.html:151
 #: users/templates/users/email/activation_email.txt:28
 msgid "Best regards,"
-msgstr ""
+msgstr "감사합니다,"
 
 #: users/templates/users/email/activation_email.html:152
 #: users/templates/users/email/activation_email.txt:29
 msgid "The Halal Korea Team"
-msgstr ""
+msgstr "할랄 코리아 팀"
 
 #: users/templates/users/email/activation_email.html:161
 msgid "This email was sent to"
-msgstr ""
+msgstr "이 이메일은 다음 주소로 전송되었습니다"
 
 #: users/templates/users/email/activation_email.html:164
 msgid "Need help? Contact our support team"
-msgstr ""
+msgstr "도움이 필요하신가요? 지원팀에 문의하세요"
 
 #: users/templates/users/email/activation_email.txt:3
 msgid "WELCOME TO HALAL KOREA!"
-msgstr ""
+msgstr "할랄 코리아에 오신 것을 환영합니다!"
 
 #: users/templates/users/email/activation_email.txt:8
 msgid ""
 "Thank you for registering an account with Halal Korea. To complete your "
 "registration and start exploring halal places in Korea, please verify your "
 "email address by clicking the link below:"
-msgstr ""
+msgstr "할랄 코리아에 계정을 등록해주셔서 감사합니다. 가입을 완료하고 한국의 할랄 장소를 탐색하기 시작하려면 아래 링크를 클릭하여 이메일 주소를 인증해주세요:"
 
 #: users/templates/users/email/activation_email.txt:10
 msgid "ACTIVATION LINK:"
-msgstr ""
+msgstr "인증 링크:"
 
 #: users/templates/users/email/activation_email.txt:13
 msgid "IMPORTANT INFORMATION:"
-msgstr ""
+msgstr "중요한 정보:"
 
 #: users/templates/users/email/activation_email.txt:14
 msgid "This activation link will expire in 24 hours"
-msgstr ""
+msgstr "이 인증 링크는 24시간 후 만료됩니다"
 
 #: users/templates/users/email/activation_email.txt:15
 msgid "If you did not create an account, please ignore this email"
-msgstr ""
+msgstr "계정을 만드신 것이 아니라면 이 이메일을 무시해주세요"
 
 #: users/templates/users/email/activation_email.txt:16
 msgid "For security reasons, this link can only be used once"
-msgstr ""
+msgstr "보안상의 이유로 이 링크는 1회만 사용할 수 있습니다"
 
 #: users/templates/users/email/activation_email.txt:20
 msgid "Need help?"
-msgstr ""
+msgstr "도움이 필요하신가요?"
 
 #: users/templates/users/email/activation_email.txt:21
 msgid "If you're having trouble with the activation process, you can:"
-msgstr ""
+msgstr "인증 과정에 문제가 있으시면 다음을 시도해보세요:"
 
 #: users/templates/users/email/activation_email.txt:22
 msgid "Copy and paste the full activation link into your browser"
-msgstr ""
+msgstr "전체 인증 링크를 브라우저에 복사하여 붙여넣기"
 
 #: users/templates/users/email/activation_email.txt:23
 msgid "Request a new activation email if this one has expired"
-msgstr ""
+msgstr "이 링크가 만료되었다면 새로운 인증 이메일 요청"
 
 #: users/templates/users/email/activation_email.txt:24
 msgid "Contact our support team for assistance"
-msgstr ""
+msgstr "도움을 위해 지원팀에 문의"
 
 #: users/templates/users/email/activation_email.txt:31
 msgid "This email was sent to:"
-msgstr ""
+msgstr "이 이메일은 다음 주소로 전송되었습니다:"
 
 #: users/templates/users/email/activation_email.txt:32
 msgid "Questions? Contact our support team"
-msgstr ""
+msgstr "질문이 있으신가요? 지원팀에 문의하세요"
 
 #: users/templates/users/login.html:8
 msgid "Welcome Back"
-msgstr ""
+msgstr "다시 오신 것을 환영합니다"
 
 #: users/templates/users/login.html:35
 msgid "Enter your username"
-msgstr ""
+msgstr "사용자명을 입력하세요"
 
 #: users/templates/users/login.html:45 users/templates/users/register.html:133
 msgid "Password"
-msgstr ""
+msgstr "비밀번호"
 
 #: users/templates/users/login.html:56
 msgid "Enter your password"
-msgstr ""
+msgstr "비밀번호를 입력하세요"
 
 #: users/templates/users/login.html:73
 msgid "Remember me"
-msgstr ""
+msgstr "로그인 상태 유지"
 
 #: users/templates/users/login.html:79
 msgid "Forgot your password?"
-msgstr ""
+msgstr "비밀번호를 잊으셨나요?"
 
 #: users/templates/users/login.html:99
 msgid "Don't have an account?"
-msgstr ""
+msgstr "계정이 없으신가요?"
 
 #: users/templates/users/profile.html:5
 msgid "My Profile"
-msgstr ""
+msgstr "내 프로필"
 
 #: users/templates/users/profile.html:62
 msgid "Favorites"
-msgstr ""
+msgstr "즐겨찾기"
 
 #: users/templates/users/profile.html:93 users/templates/users/profile.html:95
 msgid "Favorite Places"
-msgstr ""
+msgstr "즐겨찾기한 장소"
 
 #: users/templates/users/profile.html:100
 #: users/templates/users/profile.html:102
 msgid "My Reviews"
-msgstr ""
+msgstr "내 리뷰"
 
 #: users/templates/users/profile.html:154
 msgid "You haven't favorited any places yet."
-msgstr ""
+msgstr "아직 즐겨찾기한 장소가 없습니다."
 
 #: users/templates/users/profile.html:195
 msgid "You haven't written any reviews yet."
-msgstr ""
+msgstr "아직 작성한 리뷰가 없습니다."
 
 #: users/templates/users/rate_limited.html:19
 msgid "Rate Limit Exceeded"
-msgstr ""
+msgstr "요청 제한 초과"
 
 #: users/templates/users/rate_limited.html:25
 msgid ""
 "You've exceeded the maximum number of allowed requests. This is a security "
 "measure to protect our service."
-msgstr ""
+msgstr "허용된 최대 요청 수를 초과했습니다. 이는 저희 서비스를 보호하기 위한 보안 조치입니다."
 
 #: users/templates/users/rate_limited.html:40
 msgid "What you can do:"
-msgstr ""
+msgstr "할 수 있는 일:"
 
 #: users/templates/users/rate_limited.html:43
 msgid "Wait for the time limit to reset"
-msgstr ""
+msgstr "시간 제한이 재설정될 때까지 기다리기"
 
 #: users/templates/users/rate_limited.html:44
 msgid "Try again in a few minutes"
-msgstr ""
+msgstr "몇 분 후 다시 시도하기"
 
 #: users/templates/users/rate_limited.html:45
 msgid "Contact support if you believe this is an error"
-msgstr ""
+msgstr "이것이 오류라고 생각되면 지원팀에 문의하세요"
 
 #: users/templates/users/rate_limited.html:53
 msgid "Return to Home"
-msgstr ""
+msgstr "홈으로 돌아가기"
 
 #: users/templates/users/rate_limited.html:64
 msgid "This page will automatically refresh in"
-msgstr ""
+msgstr "이 페이지는 다음 시간 후 자동으로 새로고침됩니다"
 
 #: users/templates/users/rate_limited.html:64
 msgid "seconds"
-msgstr ""
+msgstr "초"
 
 #: users/templates/users/register.html:14
 msgid "Create an Account"
-msgstr ""
+msgstr "계정 만들기"
 
 #: users/templates/users/register.html:16
 msgid "Join our community and discover halal places"
-msgstr ""
+msgstr "저희 커뮤니티에 참여하고 할랄 장소를 발견하세요"
 
 #: users/templates/users/register.html:56
 msgid "John"
-msgstr ""
+msgstr "홍"
 
 #: users/templates/users/register.html:77
 msgid "Doe"
-msgstr ""
+msgstr "길동"
 
 #: users/templates/users/register.html:100
 msgid "johndoe123"
-msgstr ""
+msgstr "honggildong123"
 
 #: users/templates/users/register.html:122
 msgid "john@example.com"
-msgstr ""
+msgstr "hong@example.com"
 
 #: users/templates/users/register.html:144
 msgid "Create a strong password"
-msgstr ""
+msgstr "강력한 비밀번호 만들기"
 
 #: users/templates/users/register.html:156
 msgid "Password must be at least 8 characters with letters and numbers"
-msgstr ""
+msgstr "비밀번호는 문자와 숫자를 포함하여 최소 8자 이상이어야 합니다"
 
 #: users/templates/users/register.html:168
 msgid "Confirm Password"
-msgstr ""
+msgstr "비밀번호 확인"
 
 #: users/templates/users/register.html:179
 msgid "Confirm your password"
-msgstr ""
+msgstr "비밀번호를 확인하세요"
 
 #: users/templates/users/register.html:199
 msgid "Create Account"
-msgstr ""
+msgstr "계정 만들기"
 
 #: users/templates/users/register.html:213
 msgid "Already have an account?"
-msgstr ""
+msgstr "이미 계정이 있으신가요?"
 
 #: users/templates/users/register.html:224
 msgid "Sign In"
-msgstr ""
+msgstr "로그인"
 
 #: users/templates/users/resend_activation.html:17
 msgid "We'll send a new verification email to your registered email address."
-msgstr ""
+msgstr "등록된 이메일 주소로 새로운 인증 이메일을 보내드리겠습니다."
 
 #: users/templates/users/resend_activation.html:21
 msgid "Enter your email address and we'll send you a new activation link."
-msgstr ""
+msgstr "이메일 주소를 입력하시면 새로운 인증 링크를 보내드리겠습니다."
 
 #: users/templates/users/resend_activation.html:62
 msgid "Resend Verification Email"
-msgstr ""
+msgstr "인증 이메일 재전송"
 
 #: users/templates/users/resend_activation.html:65
 msgid "We'll send a verification email to:"
-msgstr ""
+msgstr "다음 주소로 인증 이메일을 보내드리겠습니다:"
 
 #: users/templates/users/resend_activation.html:75
 msgid "Send Verification Email"
-msgstr ""
+msgstr "인증 이메일 보내기"
 
 #: users/templates/users/resend_activation.html:95
 msgid "Enter your email address"
-msgstr ""
+msgstr "이메일 주소를 입력하세요"
 
 #: users/templates/users/resend_activation.html:134
 msgid "Back to Login"
-msgstr ""
+msgstr "로그인으로 돌아가기"
