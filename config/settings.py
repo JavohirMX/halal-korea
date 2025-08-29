@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'tinymce',
+    'rosetta',  # Web-based translation management
     'places',
     'reviews',
     'users',
@@ -358,6 +359,28 @@ LANGUAGES = [
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
+
+# Rosetta Translation Management Configuration
+ROSETTA_ENABLE_TRANSLATION_SUGGESTIONS = True
+ROSETTA_GOOGLE_TRANSLATE = True
+ROSETTA_AZURE_TRANSLATE = False
+ROSETTA_SHOW_AT_ADMIN_PANEL = True
+ROSETTA_REQUIRES_AUTH = True
+
+# Rosetta Access Control (only superusers by default)
+ROSETTA_ACCESS_CONTROL_FUNCTION = 'config.rosetta_permissions.has_rosetta_access'
+
+# Rosetta Storage Settings
+ROSETTA_WSGI_AUTO_RELOAD = True
+ROSETTA_EXCLUDED_APPLICATIONS = ['rosetta']
+
+# Custom Rosetta Configuration for Halal Korea
+ROSETTA_LANGUAGE_GROUPS = {
+    'Main Languages': ['ko', 'uz'],
+    'Source': ['en'],
+}
+
+ROSETTA_POFILE_WRAP_WIDTH = 78
 
 TIME_ZONE = 'Asia/Seoul'
 

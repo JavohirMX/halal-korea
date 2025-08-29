@@ -22,15 +22,24 @@ from blog.upload_views import tinymce_upload_view
 from utils.language_views import set_language, set_language_ajax, get_user_language_preferences
 
 urlpatterns = [
+    # --- Admin URLs ---
     path('admin/', admin.site.urls),
+
+    # --- Translation & Internationalization ---
+    # Translation management (admin access required)
+    path('rosetta/', include('rosetta.urls')),
     # Enhanced language switching with user preference updates
     path('i18n/setlang/', set_language, name='set_language'),
     path('i18n/setlang-ajax/', set_language_ajax, name='set_language_ajax'),
     path('i18n/preferences/', get_user_language_preferences, name='user_language_preferences'),
     path('i18n/', include('django.conf.urls.i18n')),  # Keep for compatibility
+
+    # --- Rich Text Editor (TinyMCE) ---
     path('tinymce/', include('tinymce.urls')),
     path('tinymce/upload/', tinymce_upload_view, name='tinymce_upload'),
-    path('', include('places.urls')),
+
+    # --- App-specific URLs ---
+    path('', include('places.urls')),  # Home/Places as root
     path('users/', include('users.urls')),
     path('reviews/', include('reviews.urls')),
     path('prayer/', include('prayer_times.urls')),
