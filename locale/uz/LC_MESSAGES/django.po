@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 03:25+0900\n"
+"POT-Creation-Date: 2025-08-29 16:13+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,471 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#: blog/templates/blog/archive.html:12 blog/templates/blog/category.html:16
+#: blog/templates/blog/detail.html:138 blog/templates/blog/search.html:12
+#: blog/templates/blog/tag.html:16 places/templates/places/place_detail.html:67
+msgid "Home"
+msgstr ""
+
+#: blog/templates/blog/archive.html:14 blog/templates/blog/category.html:4
+#: blog/templates/blog/category.html:18 blog/templates/blog/detail.html:140
+#: blog/templates/blog/home.html:79 blog/templates/blog/search.html:14
+#: blog/templates/blog/tag.html:4 blog/templates/blog/tag.html:18
+#: places/templates/places/base.html:303 places/templates/places/base.html:333
+#: places/templates/places/base.html:561 places/templates/places/base.html:795
+msgid "Blog"
+msgstr "Blog"
+
+#: blog/templates/blog/archive.html:18 blog/templates/blog/archive.html:20
+#: blog/templates/blog/archive.html:22 blog/templates/blog/archive.html:32
+msgid "Archive"
+msgstr ""
+
+#: blog/templates/blog/archive.html:41
+msgid "Blog Archive"
+msgstr ""
+
+#: blog/templates/blog/archive.html:47 blog/templates/blog/category.html:35
+#: blog/templates/blog/tag.html:39
+#, python-format
+msgid "%(counter)s article"
+msgid_plural "%(counter)s articles"
+msgstr[0] ""
+
+#: blog/templates/blog/archive.html:49
+msgid "in this month"
+msgstr ""
+
+#: blog/templates/blog/archive.html:51
+msgid "in this year"
+msgstr ""
+
+#: blog/templates/blog/archive.html:61
+msgid "Browse by Year"
+msgstr ""
+
+#: blog/templates/blog/archive.html:180
+msgid "No articles published in this month"
+msgstr ""
+
+#: blog/templates/blog/archive.html:182
+msgid "No articles published in this year"
+msgstr ""
+
+#: blog/templates/blog/archive.html:184
+msgid "No archived articles"
+msgstr ""
+
+#: blog/templates/blog/archive.html:188
+msgid "Check out our latest articles or browse other time periods"
+msgstr ""
+
+#: blog/templates/blog/archive.html:194 blog/templates/blog/category.html:146
+#: blog/templates/blog/search.html:180 blog/templates/blog/tag.html:156
+msgid "Back to Blog"
+msgstr ""
+
+#: blog/templates/blog/archive.html:200
+msgid "Browse All Years"
+msgstr ""
+
+#: blog/templates/blog/category.html:7
+#, python-format
+msgid ""
+"Explore articles in %(category_name)s category. Discover insights about "
+"halal lifestyle in Korea."
+msgstr ""
+
+#: blog/templates/blog/category.html:138
+msgid "No articles in this category yet"
+msgstr ""
+
+#: blog/templates/blog/category.html:141 blog/templates/blog/tag.html:151
+msgid "Check back soon for new content!"
+msgstr ""
+
+#: blog/templates/blog/detail.html:176
+msgid "views"
+msgstr ""
+
+#: blog/templates/blog/detail.html:181
+msgid "Updated"
+msgstr ""
+
+#: blog/templates/blog/detail.html:248
+msgid "Related Places"
+msgstr ""
+
+#: blog/templates/blog/detail.html:277
+msgid "Share this article"
+msgstr ""
+
+#: blog/templates/blog/detail.html:284
+msgid "Twitter"
+msgstr ""
+
+#: blog/templates/blog/detail.html:290
+msgid "Facebook"
+msgstr ""
+
+#: blog/templates/blog/detail.html:295
+msgid "Copy Link"
+msgstr ""
+
+#: blog/templates/blog/detail.html:305
+msgid "Related Articles"
+msgstr ""
+
+#: blog/templates/blog/detail.html:349
+msgid "Copied!"
+msgstr ""
+
+#: blog/templates/blog/home.html:30
+msgid "Featured Post"
+msgstr ""
+
+#: blog/templates/blog/home.html:62
+msgid "Read More"
+msgstr ""
+
+#: blog/templates/blog/home.html:82
+msgid "Discover the latest articles about halal lifestyle in Korea"
+msgstr ""
+
+#: blog/templates/blog/home.html:170
+msgid "No blog posts yet"
+msgstr ""
+
+#: blog/templates/blog/home.html:173
+msgid "Check back soon for new articles!"
+msgstr ""
+
+#: blog/templates/blog/home.html:185
+msgid "Categories"
+msgstr ""
+
+#: blog/templates/blog/home.html:206 blog/templates/blog/search.html:29
+msgid "Search Blog"
+msgstr ""
+
+#: blog/templates/blog/home.html:212
+msgid "Search articles..."
+msgstr ""
+
+#: blog/templates/blog/home.html:220 blog/templates/blog/search.html:18
+#: blog/templates/blog/search.html:20 blog/templates/blog/search.html:47
+#: places/templates/places/home.html:52
+msgid "Search"
+msgstr ""
+
+#: blog/templates/blog/search.html:39
+msgid "Search articles, categories, tags..."
+msgstr ""
+
+#: blog/templates/blog/search.html:58
+#, python-format
+msgid "%(counter)s result for \"%(query)s\""
+msgid_plural "%(counter)s results for \"%(query)s\""
+msgstr[0] ""
+
+#: blog/templates/blog/search.html:60
+#, python-format
+msgid "No results for \"%(query)s\""
+msgstr ""
+
+#: blog/templates/blog/search.html:171
+msgid "No articles found"
+msgstr ""
+
+#: blog/templates/blog/search.html:174
+msgid "Try adjusting your search terms or browse our categories"
+msgstr ""
+
+#: blog/templates/blog/search.html:185
+msgid "Clear Search"
+msgstr ""
+
+#: blog/templates/blog/search.html:194
+msgid "Search Tips"
+msgstr ""
+
+#: blog/templates/blog/search.html:199
+msgid "Search by keywords, titles, or content"
+msgstr ""
+
+#: blog/templates/blog/search.html:203
+msgid "Use category names to find related articles"
+msgstr ""
+
+#: blog/templates/blog/search.html:207
+msgid "Search for specific tags to narrow results"
+msgstr ""
+
+#: blog/templates/blog/search.html:211
+msgid "Try different spelling variations"
+msgstr ""
+
+#: blog/templates/blog/tag.html:7
+#, python-format
+msgid ""
+"Articles tagged with %(tag_name)s. Discover insights about halal lifestyle "
+"in Korea."
+msgstr ""
+
+#: blog/templates/blog/tag.html:31
+msgid "Tag"
+msgstr ""
+
+#: blog/templates/blog/tag.html:40
+msgid "with this tag"
+msgstr ""
+
+#: blog/templates/blog/tag.html:148
+msgid "No articles with this tag yet"
+msgstr ""
+
+#: contact/admin.py:17 places/templates/places/suggest_edit.html:253
+msgid "Contact Information"
+msgstr ""
+
+#: contact/admin.py:20 contact/forms.py:37
+msgid "Message"
+msgstr ""
+
+#: contact/admin.py:23
+msgid "Metadata"
+msgstr ""
+
+#: contact/admin.py:27 contact/admin.py:68
+msgid "Status"
+msgstr ""
+
+#: contact/admin.py:36
+msgid "(No subject)"
+msgstr ""
+
+#: contact/admin.py:37 contact/forms.py:36
+msgid "Subject"
+msgstr ""
+
+#: contact/admin.py:44
+msgid "Registered User"
+msgstr ""
+
+#: contact/admin.py:48
+msgid "Anonymous"
+msgstr ""
+
+#: contact/admin.py:50
+msgid "User Type"
+msgstr ""
+
+#: contact/admin.py:57
+msgid "Responded"
+msgstr ""
+
+#: contact/admin.py:62
+msgid "Read"
+msgstr ""
+
+#: contact/admin.py:66
+msgid "Unread"
+msgstr ""
+
+#: contact/admin.py:80
+#, python-brace-format
+msgid "{updated} message(s) marked as read."
+msgstr ""
+
+#: contact/admin.py:82
+msgid "Mark selected messages as read"
+msgstr ""
+
+#: contact/admin.py:93
+#, python-brace-format
+msgid "{updated} message(s) marked as responded."
+msgstr ""
+
+#: contact/admin.py:95
+msgid "Mark selected messages as responded"
+msgstr ""
+
+#: contact/forms.py:15
+msgid "Your full name"
+msgstr ""
+
+#: contact/forms.py:20
+msgid "your.email@example.com"
+msgstr ""
+
+#: contact/forms.py:24
+msgid "What is this about? (optional)"
+msgstr ""
+
+#: contact/forms.py:29
+msgid "Tell us what's on your mind..."
+msgstr ""
+
+#: contact/forms.py:34
+msgid "Full Name"
+msgstr ""
+
+#: contact/forms.py:35 users/templates/users/resend_activation.html:84
+msgid "Email Address"
+msgstr ""
+
+#: contact/forms.py:40
+msgid "Helps us categorize your message"
+msgstr ""
+
+#: contact/forms.py:41
+msgid "Share your thoughts, questions, or feedback"
+msgstr ""
+
+#: contact/forms.py:57
+msgid "Please enter a message."
+msgstr ""
+
+#: contact/forms.py:63
+msgid "Please enter a valid name."
+msgstr ""
+
+#: contact/templates/contact/form.html:9
+msgid "Have an account? "
+msgstr ""
+
+#: contact/templates/contact/form.html:9 places/templates/places/base.html:514
+#: places/templates/places/base.html:660 users/templates/users/login.html:4
+#: users/templates/users/login.html:87
+msgid "Log in"
+msgstr ""
+
+#: contact/templates/contact/form.html:9
+msgid "to pre-fill your information."
+msgstr ""
+
+#: contact/templates/contact/form.html:69
+msgid "Send Message"
+msgstr ""
+
+#: contact/templates/contact/form.html:73
+msgid "Sending..."
+msgstr ""
+
+#: contact/templates/contact/form.html:83 contact/views.py:66
+msgid "Thank you for your message! We'll get back to you soon."
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:14 contact/views.py:107
+#: users/templates/users/rate_limited.html:4
+msgid "Rate Limited"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:27
+msgid "Rate Limits"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:30
+msgid "1 message per 5 minutes"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:31
+msgid "3 messages per hour (anonymous users)"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:32
+msgid "5 messages per hour (registered users)"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:41
+msgid "What you can do"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:44
+msgid "Wait a few minutes and try again"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:45
+msgid "Check if you already sent a similar message"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:47
+msgid "Create an account"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:47
+msgid "for higher limits"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:59
+msgid "Go Home"
+msgstr ""
+
+#: contact/templates/contact/rate_limited.html:66
+#: users/templates/users/rate_limited.html:58
+msgid "Go Back"
+msgstr ""
+
+#: contact/templates/contact/section.html:11
+msgid "Get in Touch"
+msgstr ""
+
+#: contact/templates/contact/section.html:14
+msgid ""
+"Have questions, suggestions, or feedback? We'd love to hear from you. Our "
+"team is here to help and improve your halal food experience in Korea."
+msgstr ""
+
+#: contact/templates/contact/section.html:27
+msgid "Email Us"
+msgstr ""
+
+#: contact/templates/contact/section.html:30
+msgid "Send us an email and we'll respond within 24 hours."
+msgstr ""
+
+#: contact/templates/contact/section.html:49
+msgid "Quick Response"
+msgstr ""
+
+#: contact/templates/contact/section.html:52
+msgid "We typically respond to messages within 24 hours during business days."
+msgstr ""
+
+#: contact/templates/contact/section.html:66
+msgid "Community Driven"
+msgstr ""
+
+#: contact/templates/contact/section.html:69
+msgid ""
+"Your feedback helps us improve our platform and serve the halal community "
+"better."
+msgstr ""
+
+#: contact/templates/contact/section.html:81
+msgid "Send us a message"
+msgstr ""
+
+#: contact/templates/contact/section.html:89
+msgid "Loading contact form..."
+msgstr ""
+
+#: contact/templates/contact/section.html:116
+msgid "Error loading contact form. Please refresh the page."
+msgstr ""
+
+#: contact/templates/contact/section.html:182 contact/views.py:85
+msgid "An unexpected error occurred. Please try again later."
+msgstr ""
+
+#: contact/views.py:77
+msgid "Please check the form for errors."
+msgstr ""
+
+#: contact/views.py:104
+msgid "You have exceeded the rate limit for contact messages."
+msgstr ""
 
 #: places/templates/places/404.html:5
 msgid "404 - Page Not Found"
@@ -35,7 +500,7 @@ msgid "Return Home"
 msgstr ""
 
 #: places/templates/places/about.html:5 places/templates/places/about.html:14
-#: places/templates/places/base.html:281 places/templates/places/base.html:440
+#: places/templates/places/base.html:307 places/templates/places/base.html:565
 msgid "About"
 msgstr ""
 
@@ -113,107 +578,127 @@ msgid ""
 "Your diligence helps maintain the integrity of our community."
 msgstr ""
 
-#: places/templates/places/about.html:156
-msgid "Get in Touch"
+#: places/templates/places/base.html:19 places/templates/places/base.html:23
+msgid ""
+"Discover halal restaurants, markets, and prayer spaces across South Korea. "
+"Your comprehensive guide to halal dining and Islamic facilities in Korea."
 msgstr ""
 
-#: places/templates/places/about.html:158
-msgid "Have questions or suggestions? We'd love to hear from you."
+#: places/templates/places/base.html:22 places/templates/places/base.html:27
+#: places/templates/places/home.html:5
+msgid "Halal Korea"
 msgstr ""
 
-#: places/templates/places/base.html:273 places/templates/places/base.html:432
-#: places/templates/places/place_detail.html:68
+#: places/templates/places/base.html:22 places/templates/places/base.html:27
+#: places/templates/places/home.html:5 places/templates/places/home.html:23
+msgid "Find Halal Places in Korea"
+msgstr ""
+
+#: places/templates/places/base.html:295 places/templates/places/base.html:323
+#: places/templates/places/base.html:553
+#: places/templates/places/place_detail.html:69
 msgid "Explore"
 msgstr ""
 
-#: places/templates/places/base.html:277 places/templates/places/base.html:436
+#: places/templates/places/base.html:299 places/templates/places/base.html:328
+#: places/templates/places/base.html:557
 #: places/templates/places/submit_place.html:360
 msgid "Submit Place"
 msgstr ""
 
-#: places/templates/places/base.html:285 places/templates/places/base.html:444
+#: places/templates/places/base.html:311 places/templates/places/base.html:569
 #: places/templates/places/donate.html:4
 msgid "Donate"
 msgstr ""
 
-#: places/templates/places/base.html:289 places/templates/places/base.html:448
+#: places/templates/places/base.html:315 places/templates/places/base.html:338
+#: places/templates/places/base.html:573
 #: prayer_times/templates/prayer_times/error.html:4
 #: prayer_times/templates/prayer_times/prayer_times.html:4
-#: prayer_times/templates/prayer_times/prayer_times.html:9
+#: prayer_times/templates/prayer_times/prayer_times.html:10
+#: prayer_times/templates/prayer_times/prayer_times.html:13
 msgid "Prayer Times"
 msgstr ""
 
-#: places/templates/places/base.html:373 places/templates/places/base.html:510
+#: places/templates/places/base.html:494 places/templates/places/base.html:645
 msgid "Profile"
 msgstr ""
 
-#: places/templates/places/base.html:377 places/templates/places/base.html:513
+#: places/templates/places/base.html:498 places/templates/places/base.html:648
 msgid "Settings"
 msgstr ""
 
-#: places/templates/places/base.html:383
+#: places/templates/places/base.html:504
 msgid "Log out"
 msgstr ""
 
-#: places/templates/places/base.html:393 places/templates/places/base.html:525
-#: users/templates/users/login.html:4 users/templates/users/login.html:87
-#: users/templates/users/register.html:135
-msgid "Log in"
-msgstr ""
-
-#: places/templates/places/base.html:397 places/templates/places/base.html:528
+#: places/templates/places/base.html:518 places/templates/places/base.html:663
 #: users/templates/users/login.html:107 users/templates/users/register.html:4
-#: users/templates/users/register.html:115
 msgid "Sign up"
 msgstr ""
 
-#: places/templates/places/base.html:507
+#: places/templates/places/base.html:642
 #, python-format
 msgid ""
 "Signed in as <span class=\"font-bold text-gray-700 dark:text-"
 "white\">%(username)s</span>"
 msgstr ""
 
-#: places/templates/places/base.html:518
+#: places/templates/places/base.html:653
 msgid "Logout"
 msgstr ""
 
-#: places/templates/places/base.html:619
+#: places/templates/places/base.html:729
+msgid "Email verification required"
+msgstr ""
+
+#: places/templates/places/base.html:730
+msgid ""
+"Please verify your email address to submit places, reviews, and suggestions."
+msgstr ""
+
+#: places/templates/places/base.html:732
+msgid "Send verification email"
+msgstr ""
+
+#: places/templates/places/base.html:781
 msgid "Quick Links"
 msgstr ""
 
-#: places/templates/places/base.html:623 users/templates/users/profile.html:96
-#: users/templates/users/profile.html:137
+#: places/templates/places/base.html:785
+#: places/templates/places/my_contributions.html:563
+#: places/templates/places/my_contributions.html:663
+#: users/templates/users/profile.html:157
+#: users/templates/users/profile.html:198
 msgid "Explore Places"
 msgstr ""
 
-#: places/templates/places/base.html:628 places/templates/places/home.html:178
+#: places/templates/places/base.html:790 places/templates/places/home.html:242
+#: places/templates/places/my_contributions.html:370
 #: places/templates/places/submit_place.html:4
-#: users/templates/users/profile.html:176
 msgid "Submit a Place"
 msgstr ""
 
-#: places/templates/places/base.html:632
-msgid "Blog"
-msgstr "Blog"
-
-#: places/templates/places/base.html:637
+#: places/templates/places/base.html:800
 msgid "About Us"
 msgstr ""
 
-#: places/templates/places/base.html:641
+#: places/templates/places/base.html:808
 msgid "Contact"
 msgstr ""
 
-#: places/templates/places/base.html:671
+#: places/templates/places/base.html:839 places/templates/places/legal.html:28
+#: places/templates/places/legal.html:48
 msgid "Privacy Policy"
 msgstr ""
 
-#: places/templates/places/base.html:674
+#: places/templates/places/base.html:842 places/templates/places/legal.html:31
+#: places/templates/places/legal.html:110
 msgid "Terms of Service"
 msgstr ""
 
-#: places/templates/places/base.html:677
+#: places/templates/places/base.html:845 places/templates/places/legal.html:34
+#: places/templates/places/legal.html:171
 msgid "Cookie Policy"
 msgstr ""
 
@@ -261,6 +746,7 @@ msgid "Partner with us as a corporate sponsor"
 msgstr ""
 
 #: places/templates/places/donate.html:68
+#: places/templates/places/legal.html:272
 msgid "Contact Us"
 msgstr ""
 
@@ -333,309 +819,1054 @@ msgstr ""
 msgid "Yes! We accept international donations through various payment methods."
 msgstr ""
 
-#: places/templates/places/explore.html:18
-#: places/templates/places/explore.html:24
+#: places/templates/places/explore.html:19
+#: places/templates/places/explore.html:32
 msgid "Explore Halal Places"
 msgstr ""
 
-#: places/templates/places/explore.html:25
-msgid ""
-"Discover halal restaurants, markets, and prayer spaces across South Korea"
+#: places/templates/places/explore.html:33
+msgid "Discover halal restaurants, markets, and prayer spaces near you"
 msgstr ""
 
-#: places/templates/places/explore.html:31
-msgid "Update My Location"
+#: places/templates/places/explore.html:35
+msgid "Halal Places in Korea"
 msgstr ""
 
 #: places/templates/places/explore.html:36
+msgid "Plan your halal journey across South Korea - browse by city and region"
+msgstr ""
+
+#: places/templates/places/explore.html:50
+#: places/templates/places/explore.html:84
+msgid "Update My Location"
+msgstr ""
+
+#: places/templates/places/explore.html:57
+#: places/templates/places/explore.html:91
+msgid "Your location:"
+msgstr ""
+
+#: places/templates/places/explore.html:61
+#: places/templates/places/explore.html:96
+msgid "Update"
+msgstr ""
+
+#: places/templates/places/explore.html:66
+#: places/templates/places/explore.html:102
+msgid "Set location to Seoul"
+msgstr ""
+
+#: places/templates/places/explore.html:85
+#: places/templates/places/submit_place.html:218
+msgid "Location"
+msgstr ""
+
+#: places/templates/places/explore.html:92
+msgid "Location:"
+msgstr ""
+
+#: places/templates/places/explore.html:118
 msgid "View Map"
 msgstr ""
 
-#: places/templates/places/explore.html:53
-msgid "Search by name or location..."
+#: places/templates/places/explore.html:119
+msgid "Map"
 msgstr ""
 
-#: places/templates/places/explore.html:70
-#: places/templates/places/explore.html:105
-msgid "All Categories"
-msgstr ""
-
-#: places/templates/places/explore.html:71
-#: places/templates/places/explore.html:106
-#: places/templates/places/home.html:57
-msgid "Restaurants"
-msgstr ""
-
-#: places/templates/places/explore.html:72
-#: places/templates/places/explore.html:107
-#: places/templates/places/home.html:71
-msgid "Markets"
-msgstr ""
-
-#: places/templates/places/explore.html:73
-#: places/templates/places/explore.html:108
-#: places/templates/places/home.html:85
-msgid "Mosques & Prayer Rooms"
-msgstr ""
-
-#: places/templates/places/explore.html:88
-#: places/templates/places/explore.html:122
-msgid "Sort by Distance"
-msgstr ""
-
-#: places/templates/places/explore.html:89
-#: places/templates/places/explore.html:123
-msgid "Sort by Rating"
-msgstr ""
-
-#: places/templates/places/explore.html:145
-#: places/templates/places/explore.html:360
-#: places/templates/places/explore.html:460
-msgid "Loading more places..."
-msgstr ""
-
-#: places/templates/places/explore.html:175
-msgid "Your Location"
-msgstr ""
-
-#: places/templates/places/explore.html:229
-msgid "Error loading places:"
-msgstr ""
-
-#: places/templates/places/explore.html:271
-msgid "Prayer Space"
-msgstr ""
-
-#: places/templates/places/explore.html:274
-#: users/templates/users/profile.html:84 users/templates/users/profile.html:163
-msgid "View Details"
-msgstr ""
-
-#: places/templates/places/explore.html:388
-msgid "Error loading more places:"
-msgstr ""
-
-#: places/templates/places/explore.html:482
-msgid "Error applying filters:"
-msgstr ""
-
-#: places/templates/places/explore.html:591
-#: places/templates/places/explore.html:594
-#: places/templates/places/home.html:202 places/templates/places/home.html:205
-msgid "Failed to update location: "
-msgstr ""
-
-#: places/templates/places/explore.html:591
-#: places/templates/places/home.html:202
-msgid "Unknown error"
-msgstr ""
-
-#: places/templates/places/explore.html:597
-#: places/templates/places/home.html:208
-msgid "Could not get your location: "
-msgstr ""
-
-#: places/templates/places/explore.html:600
-#: places/templates/places/home.html:211
-msgid "Geolocation is not supported by your browser."
-msgstr ""
-
-#: places/templates/places/home.html:17
-msgid "Find Halal Places in Korea"
-msgstr ""
-
-#: places/templates/places/home.html:20
-msgid ""
-"Discover halal restaurants, markets, and prayer spaces across South Korea."
-msgstr ""
-
-#: places/templates/places/home.html:29
+#: places/templates/places/explore.html:136
+#: places/templates/places/home.html:50
 msgid "Search places..."
 msgstr ""
 
-#: places/templates/places/home.html:31
-msgid "Search"
+#: places/templates/places/explore.html:153
+#: places/templates/places/explore.html:222
+msgid "All Categories"
 msgstr ""
 
-#: places/templates/places/home.html:38
-msgid "Find Nearest Places"
+#: places/templates/places/explore.html:154
+#: places/templates/places/explore.html:223
+#: places/templates/places/home.html:97
+msgid "Restaurants"
 msgstr ""
 
-#: places/templates/places/home.html:58
-msgid "Find halal restaurants near you"
+#: places/templates/places/explore.html:155
+#: places/templates/places/explore.html:224
+#: places/templates/places/home.html:117
+msgid "Markets"
 msgstr ""
 
-#: places/templates/places/home.html:72
-msgid "Discover halal grocery stores"
+#: places/templates/places/explore.html:156
+#: places/templates/places/explore.html:225
+#: places/templates/places/home.html:137
+msgid "Mosques & Prayer Rooms"
 msgstr ""
 
-#: places/templates/places/home.html:86
-msgid "Find nearby prayer spaces"
+#: places/templates/places/explore.html:172
+msgid "All Cities"
 msgstr ""
 
-#: places/templates/places/home.html:99
-msgid "Explore All"
+#: places/templates/places/explore.html:201
+#: places/templates/places/explore.html:240
+msgid "Sort by Distance"
+msgstr ""
+
+#: places/templates/places/explore.html:202
+#: places/templates/places/explore.html:241
+msgid "Sort by Rating"
+msgstr ""
+
+#: places/templates/places/explore.html:204
+#: places/templates/places/explore.html:243
+msgid "Most Popular"
+msgstr ""
+
+#: places/templates/places/explore.html:205
+#: places/templates/places/explore.html:244
+msgid "By Location"
+msgstr ""
+
+#: places/templates/places/explore.html:267
+#: places/templates/places/explore.html:482
+#: places/templates/places/explore.html:582
+msgid "Loading more places..."
+msgstr ""
+
+#: places/templates/places/explore.html:297
+msgid "Your Location"
+msgstr ""
+
+#: places/templates/places/explore.html:351
+msgid "Error loading places:"
+msgstr ""
+
+#: places/templates/places/explore.html:393
+msgid "Prayer Space"
+msgstr ""
+
+#: places/templates/places/explore.html:396
+#: users/templates/users/profile.html:145
+msgid "View Details"
+msgstr ""
+
+#: places/templates/places/explore.html:510
+msgid "Error loading more places:"
+msgstr ""
+
+#: places/templates/places/explore.html:604
+msgid "Error applying filters:"
+msgstr ""
+
+#: places/templates/places/explore.html:730
+msgid "Failed to set location to Seoul"
+msgstr ""
+
+#: places/templates/places/explore.html:734
+msgid "Error setting location to Seoul"
+msgstr ""
+
+#: places/templates/places/explore.html:770
+#: places/templates/places/explore.html:773
+#: places/templates/places/home.html:273 places/templates/places/home.html:276
+msgid "Failed to update location: "
+msgstr ""
+
+#: places/templates/places/explore.html:770
+#: places/templates/places/home.html:273
+msgid "Unknown error"
+msgstr ""
+
+#: places/templates/places/explore.html:776
+#: places/templates/places/home.html:279
+msgid "Could not get your location: "
+msgstr ""
+
+#: places/templates/places/explore.html:779
+#: places/templates/places/home.html:282
+msgid "Geolocation is not supported by your browser."
+msgstr ""
+
+#: places/templates/places/home.html:26
+msgid "Discover halal restaurants, markets, and prayer spaces near you."
+msgstr ""
+
+#: places/templates/places/home.html:30
+msgid "Planning Your Halal Journey to Korea?"
+msgstr ""
+
+#: places/templates/places/home.html:33
+msgid ""
+"Discover verified halal restaurants, markets, and prayer spaces across South "
+"Korea for your trip."
+msgstr ""
+
+#: places/templates/places/home.html:39
+msgid "Planning a trip to Korea? We'll help you find the best halal options!"
+msgstr ""
+
+#: places/templates/places/home.html:50
+msgid "Search places in Korea..."
+msgstr ""
+
+#: places/templates/places/home.html:60
+#: users/templates/users/resend_activation.html:117
+msgid "or"
+msgstr ""
+
+#: places/templates/places/home.html:70
+msgid "Find Places Near Me"
+msgstr ""
+
+#: places/templates/places/home.html:78
+msgid "Browse All Places"
 msgstr ""
 
 #: places/templates/places/home.html:100
-msgid "Discover all halal places in Korea"
+msgid "Find halal restaurants near you"
 msgstr ""
 
-#: places/templates/places/home.html:111
-msgid "Featured Places"
+#: places/templates/places/home.html:102
+msgid "Find halal restaurants in Korea"
+msgstr ""
+
+#: places/templates/places/home.html:120
+msgid "Discover halal grocery stores"
+msgstr ""
+
+#: places/templates/places/home.html:122
+msgid "Find halal markets for your trip"
 msgstr ""
 
 #: places/templates/places/home.html:140
+msgid "Find nearby prayer spaces"
+msgstr ""
+
+#: places/templates/places/home.html:142
+msgid "Prayer spaces for your journey"
+msgstr ""
+
+#: places/templates/places/home.html:157
+msgid "Explore All"
+msgstr ""
+
+#: places/templates/places/home.html:158
+msgid "Discover all halal places in Korea"
+msgstr ""
+
+#: places/templates/places/home.html:170
+msgid "Featured Places"
+msgstr ""
+
+#: places/templates/places/home.html:172
+msgid "Popular Places to Visit"
+msgstr ""
+
+#: places/templates/places/home.html:203
 #, python-format
 msgid "(%(review_count)s review)"
 msgid_plural "(%(review_count)s reviews)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: places/templates/places/home.html:155
+#: places/templates/places/home.html:219
 msgid "Stay Updated with Prayer Times"
 msgstr ""
 
-#: places/templates/places/home.html:158
+#: places/templates/places/home.html:222
 msgid "Check the latest prayer times for your location."
 msgstr ""
 
-#: places/templates/places/home.html:162
+#: places/templates/places/home.html:226
 msgid "View Prayer Times"
 msgstr ""
 
-#: places/templates/places/home.html:171
+#: places/templates/places/home.html:235
 msgid "Know a Halal Spot? Share It!"
 msgstr ""
 
-#: places/templates/places/home.html:174
+#: places/templates/places/home.html:238
 msgid "Help us grow our community by submitting halal places you know!"
 msgstr ""
 
-#: places/templates/places/place_detail.html:64
+#: places/templates/places/legal.html:5
+msgid "Legal"
+msgstr ""
+
+#: places/templates/places/legal.html:14
+msgid "Legal Information"
+msgstr ""
+
+#: places/templates/places/legal.html:17
+msgid "Privacy Policy, Terms of Service, and Cookie Policy"
+msgstr ""
+
+#: places/templates/places/legal.html:50 places/templates/places/legal.html:112
+#: places/templates/places/legal.html:173
+msgid "Last updated: January 2024"
+msgstr ""
+
+#: places/templates/places/legal.html:54
+msgid "Information We Collect"
+msgstr ""
+
+#: places/templates/places/legal.html:55
+#, python-format
+msgid ""
+"When you use %(STATIC_INFO.site_name)s, we may collect the following types "
+"of information:"
+msgstr ""
+
+#: places/templates/places/legal.html:57
+msgid ""
+"Personal information you provide when creating an account (name, email "
+"address)"
+msgstr ""
+
+#: places/templates/places/legal.html:58
+msgid "Location data when you use our location-based services"
+msgstr ""
+
+#: places/templates/places/legal.html:59
+msgid "Information you provide when submitting places or reviews"
+msgstr ""
+
+#: places/templates/places/legal.html:60
+msgid "Usage data and analytics to improve our service"
+msgstr ""
+
+#: places/templates/places/legal.html:65
+msgid "How We Use Your Information"
+msgstr ""
+
+#: places/templates/places/legal.html:66
+msgid "We use the information we collect to:"
+msgstr ""
+
+#: places/templates/places/legal.html:68
+msgid "Provide and maintain our services"
+msgstr ""
+
+#: places/templates/places/legal.html:69
+msgid "Show you relevant halal places near your location"
+msgstr ""
+
+#: places/templates/places/legal.html:70
+msgid "Enable you to submit and review places"
+msgstr ""
+
+#: places/templates/places/legal.html:71
+msgid "Communicate with you about our services"
+msgstr ""
+
+#: places/templates/places/legal.html:72
+msgid "Improve our platform and user experience"
+msgstr ""
+
+#: places/templates/places/legal.html:77
+msgid "Information Sharing"
+msgstr ""
+
+#: places/templates/places/legal.html:78
+msgid ""
+"We do not sell, trade, or otherwise transfer your personal information to "
+"third parties without your consent, except:"
+msgstr ""
+
+#: places/templates/places/legal.html:80
+msgid "When required by law or to comply with legal processes"
+msgstr ""
+
+#: places/templates/places/legal.html:81
+msgid "To protect our rights, property, or safety"
+msgstr ""
+
+#: places/templates/places/legal.html:82
+msgid "With trusted service providers who assist in operating our website"
+msgstr ""
+
+#: places/templates/places/legal.html:87
+msgid "Data Security"
+msgstr ""
+
+#: places/templates/places/legal.html:88
+msgid ""
+"We implement appropriate security measures to protect your personal "
+"information against unauthorized access, alteration, disclosure, or "
+"destruction."
+msgstr ""
+
+#: places/templates/places/legal.html:92
+msgid "Your Rights"
+msgstr ""
+
+#: places/templates/places/legal.html:93
+msgid "You have the right to:"
+msgstr ""
+
+#: places/templates/places/legal.html:95
+msgid "Access and update your personal information"
+msgstr ""
+
+#: places/templates/places/legal.html:96
+msgid "Delete your account and associated data"
+msgstr ""
+
+#: places/templates/places/legal.html:97
+msgid "Opt out of non-essential communications"
+msgstr ""
+
+#: places/templates/places/legal.html:98
+msgid "Request a copy of your data"
+msgstr ""
+
+#: places/templates/places/legal.html:116
+msgid "Acceptance of Terms"
+msgstr ""
+
+#: places/templates/places/legal.html:117
+#, python-format
+msgid ""
+"By accessing and using %(STATIC_INFO.site_name)s, you accept and agree to be "
+"bound by the terms and provision of this agreement."
+msgstr ""
+
+#: places/templates/places/legal.html:121
+msgid "Use License"
+msgstr ""
+
+#: places/templates/places/legal.html:122
+msgid ""
+"Permission is granted to temporarily use our service for personal, non-"
+"commercial transitory viewing only. This is the grant of a license, not a "
+"transfer of title, and under this license you may not:"
+msgstr ""
+
+#: places/templates/places/legal.html:124
+msgid "Modify or copy the materials"
+msgstr ""
+
+#: places/templates/places/legal.html:125
+msgid "Use the materials for any commercial purpose"
+msgstr ""
+
+#: places/templates/places/legal.html:126
+msgid "Attempt to decompile or reverse engineer any software"
+msgstr ""
+
+#: places/templates/places/legal.html:127
+msgid "Remove any copyright or other proprietary notations"
+msgstr ""
+
+#: places/templates/places/legal.html:132
+msgid "User Content"
+msgstr ""
+
+#: places/templates/places/legal.html:133
+msgid "When you submit content (places, reviews, photos), you:"
+msgstr ""
+
+#: places/templates/places/legal.html:135
+msgid ""
+"Grant us a non-exclusive license to use, display, and distribute your content"
+msgstr ""
+
+#: places/templates/places/legal.html:136
+msgid "Confirm that you have the right to submit such content"
+msgstr ""
+
+#: places/templates/places/legal.html:137
+msgid "Agree not to submit false, misleading, or harmful content"
+msgstr ""
+
+#: places/templates/places/legal.html:138
+msgid "Understand that we may moderate and remove content at our discretion"
+msgstr ""
+
+#: places/templates/places/legal.html:143
+msgid "Prohibited Uses"
+msgstr ""
+
+#: places/templates/places/legal.html:144
+msgid "You may not use our service:"
+msgstr ""
+
+#: places/templates/places/legal.html:146
+msgid "For any unlawful purpose or to solicit others to unlawful acts"
+msgstr ""
+
+#: places/templates/places/legal.html:147
+msgid ""
+"To violate any international, federal, provincial, or state regulations or "
+"laws"
+msgstr ""
+
+#: places/templates/places/legal.html:148
+msgid ""
+"To transmit or procure the sending of any advertising or promotional material"
+msgstr ""
+
+#: places/templates/places/legal.html:149
+msgid "To impersonate or attempt to impersonate another user"
+msgstr ""
+
+#: places/templates/places/legal.html:154
+msgid "Disclaimer"
+msgstr ""
+
+#: places/templates/places/legal.html:155
+#, python-format
+msgid ""
+"The information on %(STATIC_INFO.site_name)s is provided on an 'as is' "
+"basis. We make no representations or warranties of any kind regarding the "
+"halal status of establishments listed on our platform. Users are strongly "
+"advised to verify halal certification independently."
+msgstr ""
+
+#: places/templates/places/legal.html:159
+msgid "Limitations"
+msgstr ""
+
+#: places/templates/places/legal.html:160
+#, python-format
+msgid ""
+"%(STATIC_INFO.site_name)s or its suppliers will not be held liable for any "
+"damages that will arise with the use or inability to use the materials on "
+"our website."
+msgstr ""
+
+#: places/templates/places/legal.html:177
+msgid "What Are Cookies"
+msgstr ""
+
+#: places/templates/places/legal.html:178
+msgid ""
+"Cookies are small text files that are placed on your computer or mobile "
+"device when you visit our website. They help us provide you with a better "
+"experience by remembering your preferences and understanding how you use our "
+"site."
+msgstr ""
+
+#: places/templates/places/legal.html:182
+msgid "How We Use Cookies"
+msgstr ""
+
+#: places/templates/places/legal.html:183
+#, python-format
+msgid "%(STATIC_INFO.site_name)s uses cookies for several purposes:"
+msgstr ""
+
+#: places/templates/places/legal.html:185
+msgid "Essential cookies: Required for the website to function properly"
+msgstr ""
+
+#: places/templates/places/legal.html:186
+msgid "Preference cookies: Remember your settings and language preferences"
+msgstr ""
+
+#: places/templates/places/legal.html:187
+msgid ""
+"Analytics cookies: Help us understand how visitors interact with our website"
+msgstr ""
+
+#: places/templates/places/legal.html:188
+msgid "Functionality cookies: Enable enhanced features and personalization"
+msgstr ""
+
+#: places/templates/places/legal.html:193
+msgid "Types of Cookies We Use"
+msgstr ""
+
+#: places/templates/places/legal.html:198
+msgid "Session Cookies"
+msgstr ""
+
+#: places/templates/places/legal.html:199
+msgid "Temporary cookies that expire when you close your browser"
+msgstr ""
+
+#: places/templates/places/legal.html:205
+msgid "Persistent Cookies"
+msgstr ""
+
+#: places/templates/places/legal.html:206
+msgid "Remain on your device until they expire or you delete them"
+msgstr ""
+
+#: places/templates/places/legal.html:212
+msgid "First-party Cookies"
+msgstr ""
+
+#: places/templates/places/legal.html:213
+msgid "Set directly by our website"
+msgstr ""
+
+#: places/templates/places/legal.html:219
+msgid "Third-party Cookies"
+msgstr ""
+
+#: places/templates/places/legal.html:220
+msgid "Set by external services like Google Analytics"
+msgstr ""
+
+#: places/templates/places/legal.html:227
+msgid "Third-Party Services"
+msgstr ""
+
+#: places/templates/places/legal.html:228
+msgid "We use the following third-party services that may set cookies:"
+msgstr ""
+
+#: places/templates/places/legal.html:230
+msgid "To analyze website traffic and user behavior"
+msgstr ""
+
+#: places/templates/places/legal.html:231
+msgid "To provide location-based services and mapping functionality"
+msgstr ""
+
+#: places/templates/places/legal.html:236
+msgid "Managing Cookies"
+msgstr ""
+
+#: places/templates/places/legal.html:237
+msgid "You can control and manage cookies in several ways:"
+msgstr ""
+
+#: places/templates/places/legal.html:239
+msgid "Browser settings: Most browsers allow you to refuse or delete cookies"
+msgstr ""
+
+#: places/templates/places/legal.html:240
+msgid "Opt-out tools: Use tools provided by advertising networks"
+msgstr ""
+
+#: places/templates/places/legal.html:241
+msgid "Mobile settings: Adjust settings on your mobile device"
+msgstr ""
+
+#: places/templates/places/legal.html:247
+msgid ""
+"Please note that disabling certain cookies may affect the functionality of "
+"our website and your user experience."
+msgstr ""
+
+#: places/templates/places/legal.html:253
+msgid "Updates to This Policy"
+msgstr ""
+
+#: places/templates/places/legal.html:254
+msgid ""
+"We may update this Cookie Policy from time to time. We will notify you of "
+"any changes by posting the new policy on this page with an updated revision "
+"date."
+msgstr ""
+
+#: places/templates/places/legal.html:264
+msgid "Questions About Our Legal Policies?"
+msgstr ""
+
+#: places/templates/places/legal.html:267
+msgid ""
+"If you have any questions about our Privacy Policy, Terms of Service, or "
+"Cookie Policy, please don't hesitate to contact us."
+msgstr ""
+
+#: places/templates/places/my_contributions.html:5
+#: places/templates/places/my_contributions.html:37
+#: users/templates/users/profile.html:107
+#: users/templates/users/profile.html:109
+msgid "My Contributions"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:33
+msgid "Back to Profile"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:34
+#: places/templates/places/suggest_edit.html:79
+msgid "Back"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:39
+msgid ""
+"Your submitted places and edit suggestions that help build our community"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:53
+#: places/templates/places/my_contributions.html:95
+#: places/templates/places/my_contributions.html:137
+msgid "total"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:57
+msgid "Places Submitted"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:58
+msgid "Places you've added to our community"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:64
+#: places/templates/places/my_contributions.html:106
+#: places/templates/places/my_contributions.html:148
+#: places/templates/places/my_contributions.html:434
+msgid "Approved"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:73
+#: places/templates/places/my_contributions.html:115
+#: places/templates/places/my_contributions.html:157
+msgid "approval rate"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:78
+#: places/templates/places/my_contributions.html:364
+msgid "No places submitted yet"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:81
+msgid "Submit your first place"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:99
+#: places/templates/places/my_contributions.html:263
+msgid "Field Edits"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:100
+msgid "Improvements to place information"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:120
+msgid "No field edits yet"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:123
+msgid "Find places to improve"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:141
+msgid "Images Uploaded"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:142
+msgid "Photos you've shared with the community"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:162
+msgid "No images uploaded yet"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:165
+msgid "Add photos to places"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:181
+msgid "Community Impact"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:182
+msgid "Your total contributions to the community"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:189
+msgid "approved contributions"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:196
+#: places/templates/places/my_contributions.html:220
+msgid "Places"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:200
+#: places/templates/places/my_contributions.html:230
+#: places/templates/places/suggest_edit.html:101
+msgid "Edits"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:204
+#: places/templates/places/my_contributions.html:240
+#: places/templates/places/suggest_edit.html:105
+msgid "Images"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:256
+msgid "Submitted Places"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:270
+msgid "Image Uploads"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:284
+msgid "Places You've Submitted"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:287
+msgid "Places you've added to help grow our community"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:344
+#: places/templates/places/my_contributions.html:537
+#: places/templates/places/my_contributions.html:637
+msgid "Previous"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:349
+#: places/templates/places/my_contributions.html:542
+#: places/templates/places/my_contributions.html:642
+#, python-format
+msgid "Page %(current)s of %(total)s"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:355
+#: places/templates/places/my_contributions.html:548
+#: places/templates/places/my_contributions.html:648
+msgid "Next"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:366
+msgid ""
+"You haven't submitted any places yet. Help grow our community by adding "
+"places you know!"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:380
+msgid "Field Edit Suggestions"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:383
+msgid "Your suggestions for updating place information"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:432
+msgid "Pending"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:436
+msgid "Rejected"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:450
+msgid "From"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:458
+msgid "No current value"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:475
+msgid "To"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:493
+msgid "Reason"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:506
+msgid "Admin Notes"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:518
+msgid "Reviewed on"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:520
+msgid "by"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:557
+msgid "No field suggestions yet"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:559
+msgid ""
+"You haven't suggested any field edits yet. Visit a place page and click "
+"'Suggest Edit' to get started!"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:573
+msgid "Image Upload Suggestions"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:576
+msgid "Your uploaded images for places"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:586
+msgid "Suggested image for"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:615
+msgid "Reviewed:"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:621
+msgid "Admin Notes:"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:657
+msgid "No image suggestions yet"
+msgstr ""
+
+#: places/templates/places/my_contributions.html:659
+msgid ""
+"You haven't uploaded any images yet. Visit a place page and click 'Suggest "
+"Edit' to upload photos!"
+msgstr ""
+
+#: places/templates/places/partials/place_list.html:62
+#: places/templates/places/place_detail.html:231
+msgid "Open in Google Maps"
+msgstr ""
+
+#: places/templates/places/partials/place_list.html:87
+#: places/templates/places/place_detail.html:255
+msgid "Korean maps:"
+msgstr ""
+
+#: places/templates/places/partials/place_list.html:92
+#: places/templates/places/partials/place_list.html:100
+#: places/templates/places/place_detail.html:259
+#: places/templates/places/place_detail.html:266
+msgid "Korean navigation app"
+msgstr ""
+
+#: places/templates/places/place_detail.html:65
 msgid "Breadcrumb"
 msgstr ""
 
-#: places/templates/places/place_detail.html:66
-msgid "Home"
+#: places/templates/places/place_detail.html:134
+msgid "Suggest edits or upload images for this place"
 msgstr ""
 
-#: places/templates/places/place_detail.html:155
+#: places/templates/places/place_detail.html:136
+#: places/templates/places/suggest_edit.html:5
+msgid "Suggest Edit"
+msgstr ""
+
+#: places/templates/places/place_detail.html:164
 msgid "Important Notice:"
 msgstr ""
 
-#: places/templates/places/place_detail.html:155
+#: places/templates/places/place_detail.html:164
 msgid ""
 "This place has been added by our community. While we strive to maintain "
 "accurate information, we recommend verifying the halal status directly with "
 "the establishment before visiting."
 msgstr ""
 
-#: places/templates/places/place_detail.html:174
+#: places/templates/places/place_detail.html:183
 msgid "No ratings yet"
 msgstr ""
 
-#: places/templates/places/place_detail.html:174
+#: places/templates/places/place_detail.html:183
 msgid "reviews"
 msgstr ""
 
-#: places/templates/places/place_detail.html:189
+#: places/templates/places/place_detail.html:194
+msgid "Last updated:"
+msgstr ""
+
+#: places/templates/places/place_detail.html:204
 msgid "Copy address"
 msgstr ""
 
-#: places/templates/places/place_detail.html:205
+#: places/templates/places/place_detail.html:220
 msgid "Visit Website"
 msgstr ""
 
-#: places/templates/places/place_detail.html:246
+#: places/templates/places/place_detail.html:285
+#: users/templates/users/profile.html:70
 msgid "Reviews"
 msgstr ""
 
-#: places/templates/places/place_detail.html:254
-#: places/templates/places/place_detail.html:315
-#: places/templates/places/place_detail.html:358
+#: places/templates/places/place_detail.html:293
+#: places/templates/places/place_detail.html:354
+#: places/templates/places/place_detail.html:397
 msgid "Your Review"
 msgstr ""
 
-#: places/templates/places/place_detail.html:263
+#: places/templates/places/place_detail.html:302
 msgid "Are you sure you want to delete your review?"
 msgstr ""
 
-#: places/templates/places/place_detail.html:294
+#: places/templates/places/place_detail.html:333
 msgid "Rating"
 msgstr ""
 
-#: places/templates/places/place_detail.html:324
+#: places/templates/places/place_detail.html:363
 msgid "Update Review"
 msgstr ""
 
-#: places/templates/places/place_detail.html:329
-#: users/templates/users/edit_profile.html:89
+#: places/templates/places/place_detail.html:368
+#: places/templates/places/suggest_edit.html:598
+#: places/templates/places/suggest_edit.html:669
+#: users/templates/users/edit_profile.html:121
 msgid "Cancel"
 msgstr ""
 
-#: places/templates/places/place_detail.html:343
+#: places/templates/places/place_detail.html:382
 msgid "Your Rating"
 msgstr ""
 
-#: places/templates/places/place_detail.html:362
+#: places/templates/places/place_detail.html:401
 msgid "Share your experience..."
 msgstr ""
 
-#: places/templates/places/place_detail.html:366
+#: places/templates/places/place_detail.html:405
 msgid "Submit Review"
 msgstr ""
 
-#: places/templates/places/place_detail.html:398
+#: places/templates/places/place_detail.html:437
 msgid "No reviews yet. Be the first to review!"
 msgstr ""
 
-#: places/templates/places/place_detail.html:550
+#: places/templates/places/place_detail.html:589
 msgid "Network response was not ok"
 msgstr ""
 
-#: places/templates/places/place_detail.html:563
+#: places/templates/places/place_detail.html:602
 msgid "Added to favorites"
 msgstr ""
 
-#: places/templates/places/place_detail.html:563
+#: places/templates/places/place_detail.html:602
 msgid "Removed from favorites"
 msgstr ""
 
-#: places/templates/places/place_detail.html:576
+#: places/templates/places/place_detail.html:615
 msgid "Error toggling favorite:"
 msgstr ""
 
-#: places/templates/places/place_detail.html:583
+#: places/templates/places/place_detail.html:622
 msgid "Could not update favorite status. Please try again."
 msgstr ""
 
-#: places/templates/places/place_detail.html:601
+#: places/templates/places/place_detail.html:640
 #, python-format
 msgid "Check out %(place_name)s on %(site_name)s!"
 msgstr ""
 
-#: places/templates/places/place_detail.html:612
+#: places/templates/places/place_detail.html:651
 msgid "Link copied to clipboard!"
 msgstr ""
 
-#: places/templates/places/place_detail.html:622
+#: places/templates/places/place_detail.html:661
 msgid "Error sharing:"
 msgstr ""
 
-#: places/templates/places/place_detail.html:624
+#: places/templates/places/place_detail.html:663
 msgid "Failed to share. Please try again."
 msgstr ""
 
-#: places/templates/places/place_detail.html:687
+#: places/templates/places/place_detail.html:726
 msgid "Address copied to clipboard!"
 msgstr ""
 
-#: places/templates/places/place_detail.html:696
+#: places/templates/places/place_detail.html:735
 msgid "Failed to copy address:"
 msgstr ""
 
-#: places/templates/places/place_detail.html:698
+#: places/templates/places/place_detail.html:737
 msgid "Failed to copy address. Please try again."
 msgstr ""
 
@@ -661,6 +1892,7 @@ msgid "Enter place name"
 msgstr ""
 
 #: places/templates/places/submit_place.html:177
+#: places/templates/places/suggest_edit.html:166
 msgid "Category"
 msgstr ""
 
@@ -685,6 +1917,7 @@ msgid "Prayer Room"
 msgstr ""
 
 #: places/templates/places/submit_place.html:200
+#: places/templates/places/suggest_edit.html:195
 msgid "Description"
 msgstr ""
 
@@ -692,15 +1925,12 @@ msgstr ""
 msgid "Describe the place..."
 msgstr ""
 
-#: places/templates/places/submit_place.html:218
-msgid "Location"
-msgstr ""
-
 #: places/templates/places/submit_place.html:224
 msgid "Click on the map to set the location"
 msgstr ""
 
 #: places/templates/places/submit_place.html:234
+#: places/templates/places/suggest_edit.html:227
 msgid "Address"
 msgstr ""
 
@@ -709,6 +1939,7 @@ msgid "Enter address"
 msgstr ""
 
 #: places/templates/places/submit_place.html:253
+#: places/templates/places/suggest_edit.html:263
 msgid "Phone Number"
 msgstr ""
 
@@ -717,6 +1948,7 @@ msgid "Enter phone number"
 msgstr ""
 
 #: places/templates/places/submit_place.html:273
+#: places/templates/places/suggest_edit.html:282
 msgid "Website"
 msgstr ""
 
@@ -775,6 +2007,205 @@ msgstr ""
 msgid "Please select a location on the map"
 msgstr ""
 
+#: places/templates/places/suggest_edit.html:78
+msgid "Back to place"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:82
+msgid "Editing"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:89
+msgid "Suggest Improvements"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:92
+msgid "Help our community by suggesting better information or adding photos"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:109
+msgid "Min Impact"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:113
+msgid "Quality"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:126
+msgid "Edit Information"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:129
+msgid "Click to edit any field"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:140
+msgid "Name"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:144
+#: places/templates/places/suggest_edit.html:170
+#: places/templates/places/suggest_edit.html:199
+#: places/templates/places/suggest_edit.html:231
+#: places/templates/places/suggest_edit.html:266
+#: places/templates/places/suggest_edit.html:285
+#: places/templates/places/suggest_edit.html:327
+#: places/templates/places/suggest_edit.html:347
+#: places/templates/places/suggest_edit.html:367
+#: places/templates/places/suggest_edit.html:660
+msgid "Edit"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:148
+#: places/templates/places/suggest_edit.html:174
+#: places/templates/places/suggest_edit.html:203
+#: places/templates/places/suggest_edit.html:235
+#: places/templates/places/suggest_edit.html:270
+#: places/templates/places/suggest_edit.html:289
+msgid "Current:"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:153
+#: places/templates/places/suggest_edit.html:182
+#: places/templates/places/suggest_edit.html:214
+#: places/templates/places/suggest_edit.html:240
+msgid "Your suggestion:"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:208
+msgid "No description available"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:254
+#: places/templates/places/suggest_edit.html:313
+msgid "(Optional)"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:294
+msgid "Not specified"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:312
+msgid "Map Links"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:323
+msgid "Google Maps"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:343
+msgid "Kakao Maps"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:363
+msgid "Naver Maps"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:388
+msgid "Add Photos"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:391
+msgid "Drag & drop or click to upload"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:400
+msgid "Current Photos"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:435
+msgid "Upload Images"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:437
+msgid "Drag and drop your images here, or"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:439
+msgid "browse files"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:456
+msgid "Images to Upload"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:471
+msgid "Why These Changes?"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:474
+msgid "Help reviewers understand your suggestions"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:478
+msgid "Required"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:487
+msgid "Tips for a good explanation:"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:489
+msgid "Mention what's incorrect or missing"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:490
+msgid "Provide source if possible (website, local knowledge, etc.)"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:491
+msgid "Be specific about why the change improves accuracy"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:492
+msgid "One explanation covers all your changes and images"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:500
+msgid "Explain your changes"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:510
+msgid ""
+"This explanation will apply to all your field changes and image uploads."
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:529
+msgid "Please fix these issues:"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:550
+#: places/templates/places/suggest_edit.html:573
+msgid "changes"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:560
+#: places/templates/places/suggest_edit.html:579
+#: places/templates/places/suggest_edit.html:866
+#: places/templates/places/suggest_edit.html:872
+msgid "Select fields to edit or upload images to create suggestions."
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:569
+msgid "Suggestion Summary"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:591
+msgid "Your suggestions will be reviewed by moderators"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:603
+msgid "Submit"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:603
+msgid "Suggestions"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:920
+msgid "Submitting..."
+msgstr ""
+
 #: prayer_times/templates/prayer_times/error.html:4
 msgid "Error"
 msgstr ""
@@ -784,254 +2215,333 @@ msgid "Error Loading Prayer Times"
 msgstr ""
 
 #: prayer_times/templates/prayer_times/error.html:22
-#: prayer_times/templates/prayer_times/prayer_times.html:157
+#: prayer_times/templates/prayer_times/prayer_times.html:174
 msgid "Try Again"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:10
+#: prayer_times/templates/prayer_times/prayer_times.html:11
 msgid "Stay updated with the prayer times for your location."
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:51
+#: prayer_times/templates/prayer_times/prayer_times.html:14
+msgid "Prayer times for your current location and Korea"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:22
+msgid "We show your local prayer times and Korea times for trip planning."
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:68
 msgid "Search city..."
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:61
+#: prayer_times/templates/prayer_times/prayer_times.html:78
 msgid "Use Current Location"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:96
+#: prayer_times/templates/prayer_times/prayer_times.html:113
 msgid "Prayer Calculation Settings"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:100
+#: prayer_times/templates/prayer_times/prayer_times.html:117
 msgid "Calculation Method"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:104
+#: prayer_times/templates/prayer_times/prayer_times.html:121
 msgid "Jafari / Shia Ithna-Ashari"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:105
+#: prayer_times/templates/prayer_times/prayer_times.html:122
 msgid "University of Islamic Sciences, Karachi"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:106
+#: prayer_times/templates/prayer_times/prayer_times.html:123
 msgid "Islamic Society of North America"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:107
+#: prayer_times/templates/prayer_times/prayer_times.html:124
 msgid "Muslim World League"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:108
+#: prayer_times/templates/prayer_times/prayer_times.html:125
 msgid "Umm Al-Qura University, Makkah"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:109
+#: prayer_times/templates/prayer_times/prayer_times.html:126
 msgid "Egyptian General Authority of Survey"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:110
+#: prayer_times/templates/prayer_times/prayer_times.html:127
 msgid "Institute of Geophysics, University of Tehran"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:111
+#: prayer_times/templates/prayer_times/prayer_times.html:128
 msgid "Gulf Region"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:112
+#: prayer_times/templates/prayer_times/prayer_times.html:129
 msgid "Kuwait"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:113
+#: prayer_times/templates/prayer_times/prayer_times.html:130
 msgid "Qatar"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:114
+#: prayer_times/templates/prayer_times/prayer_times.html:131
 msgid "Majlis Ugama Islam Singapura, Singapore"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:115
+#: prayer_times/templates/prayer_times/prayer_times.html:132
 msgid "Union Organization islamic de France"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:116
+#: prayer_times/templates/prayer_times/prayer_times.html:133
 msgid "Diyanet İşleri Başkanlığı, Turkey"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:117
+#: prayer_times/templates/prayer_times/prayer_times.html:134
 msgid "Spiritual Administration of Muslims of Russia"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:118
+#: prayer_times/templates/prayer_times/prayer_times.html:135
 msgid "Moonsighting Committee Worldwide"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:119
+#: prayer_times/templates/prayer_times/prayer_times.html:136
 msgid "Dubai (experimental)"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:120
+#: prayer_times/templates/prayer_times/prayer_times.html:137
 msgid "Jabatan Kemajuan Islam Malaysia (JAKIM)"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:121
+#: prayer_times/templates/prayer_times/prayer_times.html:138
 msgid "Tunisia"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:122
+#: prayer_times/templates/prayer_times/prayer_times.html:139
 msgid "Algeria"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:123
+#: prayer_times/templates/prayer_times/prayer_times.html:140
 msgid "KEMENAG - Kementerian Agama Republik Indonesia"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:124
+#: prayer_times/templates/prayer_times/prayer_times.html:141
 msgid "Morocco"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:125
+#: prayer_times/templates/prayer_times/prayer_times.html:142
 msgid "Comunidade Islamica de Lisboa"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:126
+#: prayer_times/templates/prayer_times/prayer_times.html:143
 msgid "Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:132
+#: prayer_times/templates/prayer_times/prayer_times.html:149
 msgid "Asr Calculation"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:136
+#: prayer_times/templates/prayer_times/prayer_times.html:153
 msgid "Standard (Shafi)"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:137
+#: prayer_times/templates/prayer_times/prayer_times.html:154
 msgid "Hanafi"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:148
+#: prayer_times/templates/prayer_times/prayer_times.html:165
 msgid "Loading prayer times..."
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:155
-#: prayer_times/templates/prayer_times/prayer_times.html:373
+#: prayer_times/templates/prayer_times/prayer_times.html:172
+#: prayer_times/templates/prayer_times/prayer_times.html:390
 msgid "Failed to load prayer times"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:169
+#: prayer_times/templates/prayer_times/prayer_times.html:186
 msgid "Gregorian Date"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:174
+#: prayer_times/templates/prayer_times/prayer_times.html:191
 msgid "Current Time"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:178
+#: prayer_times/templates/prayer_times/prayer_times.html:195
 msgid "Hijri Date"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:191
+#: prayer_times/templates/prayer_times/prayer_times.html:208
 msgid "Prayer"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:192
+#: prayer_times/templates/prayer_times/prayer_times.html:209
 msgid "Time"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:200
+#: prayer_times/templates/prayer_times/prayer_times.html:217
 msgid "Next Prayer"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:201
+#: prayer_times/templates/prayer_times/prayer_times.html:218
 msgid "Calculating..."
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:210
+#: prayer_times/templates/prayer_times/prayer_times.html:227
 msgid ""
 "Prayer times are provided by <a href=\"https://aladhan.com/\" "
 "target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 "
 "dark:hover:text-primary-400\">aladhan.com</a>"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:269
+#: prayer_times/templates/prayer_times/prayer_times.html:286
 msgid "Fajr (Tomorrow)"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:293
+#: prayer_times/templates/prayer_times/prayer_times.html:310
 msgid "All prayer times have passed."
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:350
+#: prayer_times/templates/prayer_times/prayer_times.html:367
 msgid "Fajr"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:351
+#: prayer_times/templates/prayer_times/prayer_times.html:368
 msgid "Sunrise"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:352
+#: prayer_times/templates/prayer_times/prayer_times.html:369
 msgid "Dhuhr"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:353
+#: prayer_times/templates/prayer_times/prayer_times.html:370
 msgid "Asr"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:354
+#: prayer_times/templates/prayer_times/prayer_times.html:371
 msgid "Maghrib"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:355
+#: prayer_times/templates/prayer_times/prayer_times.html:372
 msgid "Isha"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:376
+#: prayer_times/templates/prayer_times/prayer_times.html:393
 msgid "Error loading prayer times:"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:398
+#: prayer_times/templates/prayer_times/prayer_times.html:415
 msgid "Failed to update location:"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:402
+#: prayer_times/templates/prayer_times/prayer_times.html:419
 msgid "Error updating location:"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:426
+#: prayer_times/templates/prayer_times/prayer_times.html:443
 msgid "Could not determine location. Please select a city manually."
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:430
-#: prayer_times/templates/prayer_times/prayer_times.html:435
+#: prayer_times/templates/prayer_times/prayer_times.html:447
+#: prayer_times/templates/prayer_times/prayer_times.html:452
 msgid "Error getting location:"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:431
-#: prayer_times/templates/prayer_times/prayer_times.html:436
+#: prayer_times/templates/prayer_times/prayer_times.html:448
+#: prayer_times/templates/prayer_times/prayer_times.html:453
 msgid "Error getting your location. Please select a city manually."
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:440
+#: prayer_times/templates/prayer_times/prayer_times.html:457
 msgid ""
 "Geolocation is not supported by your browser. Please select a city manually."
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:460
-#: prayer_times/templates/prayer_times/prayer_times.html:484
+#: prayer_times/templates/prayer_times/prayer_times.html:477
+#: prayer_times/templates/prayer_times/prayer_times.html:501
 msgid "Failed to update settings:"
 msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:464
-#: prayer_times/templates/prayer_times/prayer_times.html:488
+#: prayer_times/templates/prayer_times/prayer_times.html:481
+#: prayer_times/templates/prayer_times/prayer_times.html:505
 msgid "Error updating settings:"
+msgstr ""
+
+#: users/decorators.py:16
+msgid ""
+"Please verify your email address to access this feature. Check your inbox "
+"for the verification email."
+msgstr ""
+
+#: users/templates/users/activation_result.html:4
+#: users/templates/users/activation_result.html:12
+msgid "Email Activation"
+msgstr ""
+
+#: users/templates/users/activation_result.html:25
+msgid "Email Verified Successfully!"
+msgstr ""
+
+#: users/templates/users/activation_result.html:28
+msgid ""
+"Your email has been verified successfully! You can now submit places, write "
+"reviews, and make suggestions."
+msgstr ""
+
+#: users/templates/users/activation_result.html:33
+#: users/templates/users/check_email.html:58
+#: users/templates/users/resend_activation.html:128
+msgid "Go to Homepage"
+msgstr ""
+
+#: users/templates/users/activation_result.html:42
+msgid "Activation Failed"
+msgstr ""
+
+#: users/templates/users/activation_result.html:51
+#: users/templates/users/resend_activation.html:5
+#: users/templates/users/resend_activation.html:13
+#: users/templates/users/resend_activation.html:104
+msgid "Resend Activation Email"
+msgstr ""
+
+#: users/templates/users/activation_result.html:56
+msgid "Register Again"
+msgstr ""
+
+#: users/templates/users/check_email.html:5
+#: users/templates/users/check_email.html:13
+msgid "Check Your Email"
+msgstr ""
+
+#: users/templates/users/check_email.html:25
+msgid "Activation Email Sent"
+msgstr ""
+
+#: users/templates/users/check_email.html:28
+msgid "We've sent an activation email to"
+msgstr ""
+
+#: users/templates/users/check_email.html:34
+msgid ""
+"Please check your email and click the activation link to complete your "
+"registration."
+msgstr ""
+
+#: users/templates/users/check_email.html:43
+msgid ""
+"The activation link will expire in 24 hours. Don't forget to check your spam "
+"folder!"
+msgstr ""
+
+#: users/templates/users/check_email.html:53
+msgid "Resend Email"
 msgstr ""
 
 #: users/templates/users/edit_profile.html:5
 #: users/templates/users/edit_profile.html:12
-#: users/templates/users/profile.html:30
+#: users/templates/users/profile.html:80
 msgid "Edit Profile"
 msgstr ""
 
@@ -1040,40 +2550,206 @@ msgid "Update your profile information"
 msgstr ""
 
 #: users/templates/users/edit_profile.html:24
-#: users/templates/users/login.html:24 users/templates/users/register.html:26
-msgid "Username"
+#: users/templates/users/register.html:46
+msgid "First Name"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:30
+msgid "Enter your first name"
 msgstr ""
 
 #: users/templates/users/edit_profile.html:40
-#: users/templates/users/register.html:48
-msgid "Email"
+#: users/templates/users/register.html:67
+msgid "Last Name"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:46
+msgid "Enter your last name"
 msgstr ""
 
 #: users/templates/users/edit_profile.html:56
+#: users/templates/users/login.html:24 users/templates/users/register.html:89
+msgid "Username"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:72
+#: users/templates/users/register.html:111
+msgid "Email"
+msgstr ""
+
+#: users/templates/users/edit_profile.html:88
 msgid "Current Password"
 msgstr ""
 
-#: users/templates/users/edit_profile.html:71
+#: users/templates/users/edit_profile.html:103
 msgid "New Password"
 msgstr ""
 
-#: users/templates/users/edit_profile.html:78
+#: users/templates/users/edit_profile.html:110
 msgid "Leave blank to keep current password"
 msgstr ""
 
-#: users/templates/users/edit_profile.html:93
+#: users/templates/users/edit_profile.html:125
 msgid "Save Changes"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:9
+msgid "Activate Your Account"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:35
+msgid "Welcome to Halal Korea!"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:38
+msgid "Discover halal places across Korea"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:54
+#: users/templates/users/email/activation_email.txt:6
+msgid "Hi"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:63
+msgid ""
+"Thank you for joining our community! To complete your registration and start "
+"exploring halal places in Korea, please verify your email address."
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:75
+msgid "Verify My Email"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:87
+msgid "Can't click the button?"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:90
+msgid "Copy and paste this link into your browser:"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:111
+msgid "Important:"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:112
+msgid "This link expires in 24 hours"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:113
+msgid "One-time use only"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:114
+msgid "If you didn't create this account, please ignore this email"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:129
+msgid "What's next?"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:132
+msgid "Discover halal restaurants near you"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:133
+msgid "Read and write reviews"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:134
+msgid "Submit new halal places"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:135
+msgid "Join our growing community"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:151
+#: users/templates/users/email/activation_email.txt:28
+msgid "Best regards,"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:152
+#: users/templates/users/email/activation_email.txt:29
+msgid "The Halal Korea Team"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:161
+msgid "This email was sent to"
+msgstr ""
+
+#: users/templates/users/email/activation_email.html:164
+msgid "Need help? Contact our support team"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:3
+msgid "WELCOME TO HALAL KOREA!"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:8
+msgid ""
+"Thank you for registering an account with Halal Korea. To complete your "
+"registration and start exploring halal places in Korea, please verify your "
+"email address by clicking the link below:"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:10
+msgid "ACTIVATION LINK:"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:13
+msgid "IMPORTANT INFORMATION:"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:14
+msgid "This activation link will expire in 24 hours"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:15
+msgid "If you did not create an account, please ignore this email"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:16
+msgid "For security reasons, this link can only be used once"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:20
+msgid "Need help?"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:21
+msgid "If you're having trouble with the activation process, you can:"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:22
+msgid "Copy and paste the full activation link into your browser"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:23
+msgid "Request a new activation email if this one has expired"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:24
+msgid "Contact our support team for assistance"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:31
+msgid "This email was sent to:"
+msgstr ""
+
+#: users/templates/users/email/activation_email.txt:32
+msgid "Questions? Contact our support team"
 msgstr ""
 
 #: users/templates/users/login.html:8
 msgid "Welcome Back"
 msgstr ""
 
-#: users/templates/users/login.html:35 users/templates/users/register.html:37
+#: users/templates/users/login.html:35
 msgid "Enter your username"
 msgstr ""
 
-#: users/templates/users/login.html:45 users/templates/users/register.html:70
+#: users/templates/users/login.html:45 users/templates/users/register.html:133
 msgid "Password"
 msgstr ""
 
@@ -1097,54 +2773,141 @@ msgstr ""
 msgid "My Profile"
 msgstr ""
 
-#: users/templates/users/profile.html:42
+#: users/templates/users/profile.html:62
+msgid "Favorites"
+msgstr ""
+
+#: users/templates/users/profile.html:93 users/templates/users/profile.html:95
 msgid "Favorite Places"
 msgstr ""
 
-#: users/templates/users/profile.html:46
+#: users/templates/users/profile.html:100
+#: users/templates/users/profile.html:102
 msgid "My Reviews"
 msgstr ""
 
-#: users/templates/users/profile.html:50
-msgid "Submitted Places"
-msgstr ""
-
-#: users/templates/users/profile.html:93
+#: users/templates/users/profile.html:154
 msgid "You haven't favorited any places yet."
 msgstr ""
 
-#: users/templates/users/profile.html:134
+#: users/templates/users/profile.html:195
 msgid "You haven't written any reviews yet."
 msgstr ""
 
-#: users/templates/users/profile.html:158
-msgid "Status:"
+#: users/templates/users/rate_limited.html:19
+msgid "Rate Limit Exceeded"
 msgstr ""
 
-#: users/templates/users/profile.html:173
-msgid "You haven't submitted any places yet."
+#: users/templates/users/rate_limited.html:25
+msgid ""
+"You've exceeded the maximum number of allowed requests. This is a security "
+"measure to protect our service."
 msgstr ""
 
-#: users/templates/users/register.html:8
+#: users/templates/users/rate_limited.html:40
+msgid "What you can do:"
+msgstr ""
+
+#: users/templates/users/rate_limited.html:43
+msgid "Wait for the time limit to reset"
+msgstr ""
+
+#: users/templates/users/rate_limited.html:44
+msgid "Try again in a few minutes"
+msgstr ""
+
+#: users/templates/users/rate_limited.html:45
+msgid "Contact support if you believe this is an error"
+msgstr ""
+
+#: users/templates/users/rate_limited.html:53
+msgid "Return to Home"
+msgstr ""
+
+#: users/templates/users/rate_limited.html:64
+msgid "This page will automatically refresh in"
+msgstr ""
+
+#: users/templates/users/rate_limited.html:64
+msgid "seconds"
+msgstr ""
+
+#: users/templates/users/register.html:14
 msgid "Create an Account"
 msgstr ""
 
-#: users/templates/users/register.html:59
-msgid "Enter your email"
+#: users/templates/users/register.html:16
+msgid "Join our community and discover halal places"
 msgstr ""
 
-#: users/templates/users/register.html:81
-msgid "Create a password"
+#: users/templates/users/register.html:56
+msgid "John"
 msgstr ""
 
-#: users/templates/users/register.html:90
-msgid "Password must be at least 8 characters and contain letters and numbers"
+#: users/templates/users/register.html:77
+msgid "Doe"
 msgstr ""
 
 #: users/templates/users/register.html:100
+msgid "johndoe123"
+msgstr ""
+
+#: users/templates/users/register.html:122
+msgid "john@example.com"
+msgstr ""
+
+#: users/templates/users/register.html:144
+msgid "Create a strong password"
+msgstr ""
+
+#: users/templates/users/register.html:156
+msgid "Password must be at least 8 characters with letters and numbers"
+msgstr ""
+
+#: users/templates/users/register.html:168
 msgid "Confirm Password"
 msgstr ""
 
-#: users/templates/users/register.html:127
+#: users/templates/users/register.html:179
+msgid "Confirm your password"
+msgstr ""
+
+#: users/templates/users/register.html:199
+msgid "Create Account"
+msgstr ""
+
+#: users/templates/users/register.html:213
 msgid "Already have an account?"
+msgstr ""
+
+#: users/templates/users/register.html:224
+msgid "Sign In"
+msgstr ""
+
+#: users/templates/users/resend_activation.html:17
+msgid "We'll send a new verification email to your registered email address."
+msgstr ""
+
+#: users/templates/users/resend_activation.html:21
+msgid "Enter your email address and we'll send you a new activation link."
+msgstr ""
+
+#: users/templates/users/resend_activation.html:62
+msgid "Resend Verification Email"
+msgstr ""
+
+#: users/templates/users/resend_activation.html:65
+msgid "We'll send a verification email to:"
+msgstr ""
+
+#: users/templates/users/resend_activation.html:75
+msgid "Send Verification Email"
+msgstr ""
+
+#: users/templates/users/resend_activation.html:95
+msgid "Enter your email address"
+msgstr ""
+
+#: users/templates/users/resend_activation.html:134
+msgid "Back to Login"
 msgstr ""
