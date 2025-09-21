@@ -48,6 +48,7 @@ msgstr "Blog arxivi"
 msgid "%(counter)s article"
 msgid_plural "%(counter)s articles"
 msgstr[0] "%(counter)s maqola"
+msgstr[1] "%(counter)s maqola"
 
 #: blog/templates/blog/archive.html:49
 msgid "in this month"
@@ -187,6 +188,7 @@ msgstr "Maqolalar, toifalar, teglarni qidirish..."
 msgid "%(counter)s result for \"%(query)s\""
 msgid_plural "%(counter)s results for \"%(query)s\""
 msgstr[0] "\"%(query)s\" uchun %(counter)s natija"
+msgstr[1] "\"%(query)s\" uchun %(counter)s natija"
 
 #: blog/templates/blog/search.html:60
 #, python-format
