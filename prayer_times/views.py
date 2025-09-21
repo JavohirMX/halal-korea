@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .utils import get_prayer_times, get_prayer_times_ll, get_fallback_prayer_times
-from utils.location_manager import get_user_location_context, get_default_korea_location, update_user_location
+from utils.location_manager import get_user_location_context, get_default_korea_location, update_user_location, get_korea_location_from_coordinates, clear_user_location
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import json
@@ -164,20 +164,38 @@ def get_location_from_coords(request):
         prayer_data = get_prayer_times_ll(float(lat), float(lng))
         
         if prayer_data and prayer_data.get("data"):
-            # Extract city name from timezone
-            timezone = prayer_data["data"].get("meta", {}).get("timezone", "")
-            city = timezone.split("/")[-1] if timezone else None
+            location_info = {}
             
-            # Update location in session
-            update_user_location(request, {
-                'lat': lat,
-                'lng': lng,
-                'city': city
-            })
+            # Try enhanced reverse geocoding for better location data
+            reverse_geo = get_korea_location_from_coordinates(float(lat), float(lng))
+            
+            if reverse_geo:
+                # Use enhanced geocoding data
+                location_info = {
+                    'lat': lat,
+                    'lng': lng,
+                    'city': reverse_geo.get('city', 'Unknown'),
+                    'country': reverse_geo.get('country', 'Unknown')
+                }
+                logger.info(f"Enhanced location data from reverse geocoding: {location_info}")
+            else:
+                # Fallback to timezone-based city extraction
+                timezone = prayer_data["data"].get("meta", {}).get("timezone", "")
+                city = timezone.split("/")[-1] if timezone else "Unknown"
+                location_info = {
+                    'lat': lat,
+                    'lng': lng,
+                    'city': city
+                }
+                logger.debug(f"Fallback location data from timezone: {location_info}")
+            
+            # Update location in session with enhanced data
+            update_user_location(request, location_info)
             
             return JsonResponse({
                 'success': True,
-                'city': city,
+                'city': location_info.get('city', 'Unknown'),
+                'country': location_info.get('country', 'Unknown'),
                 'latitude': lat,
                 'longitude': lng
             })
@@ -221,6 +239,7 @@ def update_location(request):
     try:
         data = json.loads(request.body)
         city = data.get('city')
+        country = data.get('country')  # Optional country parameter
         
         if not city:
             return JsonResponse({
@@ -228,12 +247,31 @@ def update_location(request):
                 'error': 'Missing city'
             }, status=400)
             
+        # Prepare location data
+        location_data = {'city': city}
+        if country:
+            location_data['country'] = country
+            
         # Update location in session
-        update_user_location(request, {'city': city})
+        update_user_location(request, location_data)
             
         return JsonResponse({'success': True})
     except Exception as e:
         logger.error(f"Error in update_location: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@require_http_methods(["POST"])
+def clear_location(request):
+    """API endpoint to clear user location from session"""
+    try:
+        clear_user_location(request)
+        logger.info("User location cleared from session")
+        return JsonResponse({'success': True, 'message': 'Location cleared successfully'})
+    except Exception as e:
+        logger.error(f"Error in clear_location: {str(e)}")
         return JsonResponse({
             'success': False,
             'error': str(e)

@@ -9,4 +9,5 @@ urlpatterns = [
     path('get-location/', views.get_location_from_coords, name='get_location'),
     path('update-settings/', views.update_prayer_settings, name='update_settings'),
     path('update-location/', views.update_location, name='update_location'),
+    path('clear-location/', views.clear_location, name='clear_location'),
 ]
