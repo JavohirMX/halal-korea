@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',  # Added for SEO sitemap generation
     'django.contrib.gis',
     'tinymce',
     'rosetta',  # Web-based translation management

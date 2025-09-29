@@ -17,20 +17,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{% block meta_description %}{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ STATIC_INFO.meta_keywords }}{% endblock %}">
+    <meta name="author" content="{{ STATIC_INFO.author }}">
     <meta name="theme-color" content="{{ STATIC_INFO.meta_theme_color }}">
     <meta name="robots" content="index, follow">
+    <meta name="language" content="{{ LANGUAGE_CODE }}">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:site_name" content="{{ STATIC_INFO.site_name }}">
     <meta property="og:title" content="{% block og_title %}{% translate 'Halal Korea' %} - {% translate 'Find Halal Places in Korea' %}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}{% endblock %}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
     <meta property="og:locale" content="{{ LANGUAGE_CODE }}_{{ LANGUAGE_CODE|upper }}">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endblock %}">
+    <meta property="og:image:width" content="{% block og_image_width %}{{ STATIC_INFO.default_og_image_width }}{% endblock %}">
+    <meta property="og:image:height" content="{% block og_image_height %}{{ STATIC_INFO.default_og_image_height }}{% endblock %}">
+    <meta property="og:image:alt" content="{% block og_image_alt %}{{ STATIC_INFO.default_og_image_alt }}{% endblock %}">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
+    <meta name="twitter:site" content="@HalalKorea">
+    <meta name="twitter:creator" content="@HalalKorea">
+    <meta name="twitter:title" content="{% block twitter_title %}{% translate 'Halal Korea' %} - {% translate 'Find Halal Places in Korea' %}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endblock %}">
+    <meta name="twitter:image:alt" content="{% block twitter_image_alt %}{{ STATIC_INFO.default_og_image_alt }}{% endblock %}">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="apple-mobile-web-app-title" content="{{ STATIC_INFO.site_name }}">
+    <meta name="application-name" content="{{ STATIC_INFO.site_name }}">
+    <meta name="msapplication-TileColor" content="{{ STATIC_INFO.meta_theme_color }}">
+    
     <title>{% block title %}{% translate "Halal Korea" %} - {% translate "Find Halal Places in Korea" %}{% endblock %}</title>
 
-    <!-- Fonts -->
+    <!-- Preload critical resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap"></noscript>
+    
+    <!-- Favicon and app icons -->
     <link rel="icon" type="image/svg+xml" href="{% static STATIC_INFO.logo_square %}">
+    <link rel="apple-touch-icon" href="{% static STATIC_INFO.logo_square %}">
+    
+    <!-- Preload key static assets -->
+    <link rel="preload" href="{% static STATIC_INFO.logo_marker %}" as="image" type="image/svg+xml">
+
+    <!-- JSON-LD Structured Data -->
+    {% block structured_data %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "{{ STATIC_INFO.site_name }}",
+        "alternateName": "Halal Korea",
+        "url": "{{ request.scheme }}://{{ request.get_host }}",
+        "description": "{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "{{ STATIC_INFO.site_name }}",
+            "url": "{{ request.scheme }}://{{ request.get_host }}",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}",
+                "width": {{ STATIC_INFO.default_og_image_width }},
+                "height": {{ STATIC_INFO.default_og_image_height }}
+            },
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "email": "{{ STATIC_INFO.email }}",
+                "contactType": "customer support"
+            },
+            "sameAs": [
+                "{{ STATIC_INFO.facebook }}",
+                "{{ STATIC_INFO.twitter }}",
+                "{{ STATIC_INFO.instagram }}"
+            ]
+        },
+        "inLanguage": ["en-US", "ko-KR", "uz-UZ"],
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
+        }
+    }
+    </script>
+    {% endblock structured_data %}
 
     <!-- External CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
