@@ -1,9 +1,8 @@
 # config/sitemaps.py
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from django.utils.translation import gettext as _
 from blog.models import BlogPost
-from places.models import Place
+from places.models import HalalPlace
 
 
 class StaticViewSitemap(Sitemap):
@@ -39,7 +38,7 @@ class PlaceSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return Place.objects.filter(status='approved').order_by('-updated_at')
+        return HalalPlace.objects.filter(status='approved').order_by('-updated_at')
 
     def lastmod(self, obj):
         return obj.updated_at
