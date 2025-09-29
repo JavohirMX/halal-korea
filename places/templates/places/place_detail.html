@@ -18,7 +18,7 @@
 
 {% block twitter_title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
 {% block twitter_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_place_type_display|lower }} in {{ place.location }}, South Korea.{% endif %}{% endblock %}
-{% block twitter_image %}{% if place.images.first %}{{ request.scheme }}://{{ request.get_host }}{{ place.images.first.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image }}{% endif %}{% endblock %}
+{% block twitter_image %}{% if place.images.first %}{{ request.scheme }}://{{ request.get_host }}{{ place.images.first.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
 {% block twitter_image_alt %}{% if place.images.first %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
 {% block canonical_url %}{{ request.build_absolute_uri }}{{ place.get_absolute_url }}{% endblock %}
