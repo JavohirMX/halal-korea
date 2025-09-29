@@ -5,6 +5,24 @@
 
 {% block meta_description %}{{ meta_description|default:post.excerpt }}{% endblock %}
 
+{% block extra_head %}
+<!-- Language and SEO Meta Tags -->
+<meta property="og:locale" content="{{ post.language }}_{{ post.language|upper }}">
+<meta name="language" content="{{ post.language }}">
+<link rel="canonical" href="{{ request.build_absolute_uri }}{{ post.get_absolute_url }}">
+
+<!-- Hreflang tags for SEO -->
+{% for code, name in language_choices.items %}
+<link rel="alternate" hreflang="{{ code }}" href="{{ request.build_absolute_uri }}{{ post.get_absolute_url }}">
+{% endfor %}
+<link rel="alternate" hreflang="x-default" href="{{ request.build_absolute_uri }}{{ post.get_absolute_url }}">
+
+<!-- Open Graph Language -->
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="ko_KR">
+<meta property="og:locale:alternate" content="uz_UZ">
+{% endblock %}
+
 {% block extra_css %}
 <style>
 /* Additional TinyMCE content styling */
@@ -182,6 +200,23 @@
                 </div>
                 {% endif %}
             </div>
+
+            <!-- Language Notice -->
+            {% if is_different_language %}
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-language text-blue-600 dark:text-blue-400 mt-0.5"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-800 dark:text-blue-300">
+                            <span class="font-medium">{% translate "Language Notice:" %}</span>
+                            {% blocktranslate with language=post_language_name %}This blog post is only available in {{ language }}.{% endblocktranslate %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Tags -->
             {% if post.tags.exists %}
