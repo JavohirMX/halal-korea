@@ -63,18 +63,7 @@
         "bestRating": 5,
         "worstRating": 1
     },
-    "additionalProperty": [
-        {
-            "@type": "PropertyValue",
-            "name": "Halal Certified",
-            "value": "{% if place.halal_status == 'certified' %}Yes{% else %}Community Verified{% endif %}"
-        },
-        {
-            "@type": "PropertyValue", 
-            "name": "Place Type",
-            "value": "{{ place.get_place_type_display }}"
-        }
-    ]
+    
 }
 </script>
 {% endblock structured_data %}
