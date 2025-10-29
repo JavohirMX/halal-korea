@@ -181,6 +181,12 @@ RATE_LIMIT_SETTINGS = {
     'LOGIN_ATTEMPTS_PER_IP_LIMIT': 10,     # login attempts per 30 min per IP
     'LOGIN_ATTEMPTS_PER_IP_WINDOW': 30,    # minutes
     
+    # Password Reset Rate Limiting (stricter than regular email)
+    'PASSWORD_RESET_PER_IP_LIMIT': 3,      # password reset requests per hour per IP
+    'PASSWORD_RESET_PER_IP_WINDOW': 60,    # minutes
+    'PASSWORD_RESET_PER_EMAIL_LIMIT': 2,   # password reset requests per hour per email
+    'PASSWORD_RESET_PER_EMAIL_WINDOW': 60, # minutes
+    
     # Social Authentication Rate Limiting
     'SOCIAL_AUTH_PER_IP_LIMIT': 20,        # social auth attempts per hour per IP
     'SOCIAL_AUTH_PER_IP_WINDOW': 60,       # minutes

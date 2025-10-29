@@ -15,4 +15,8 @@ urlpatterns = [
     path('favorite/toggle/<int:place_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('toggle-favorite/<int:place_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('rate-limited/', views.rate_limited_view, name='rate_limited'),
+    
+    # Password Reset URLs
+    path('password-reset/', views.password_reset_request, name='password_reset_request'),
+    path('password-reset/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
 ]

@@ -7,13 +7,14 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from .models import User
 from places.models import HalalPlace
-from .forms import UserRegistrationForm, UserUpdateForm
-from .utils import send_activation_email
-from .tokens import email_verification_token
+from .forms import UserRegistrationForm, UserUpdateForm, PasswordResetRequestForm, PasswordResetConfirmForm
+from .utils import send_activation_email, send_password_reset_email
+from .tokens import email_verification_token, password_reset_token
 from .rate_limiting import (
     check_email_rate_limit, record_email_attempt,
     check_registration_rate_limit, record_registration_attempt,
-    check_login_rate_limit, record_login_attempt
+    check_login_rate_limit, record_login_attempt,
+    check_password_reset_rate_limit, record_password_reset_attempt
 )
 from reviews.models import Review
 from django.views.decorators.http import require_POST
@@ -303,3 +304,95 @@ def rate_limited_view(request):
     return render(request, 'users/rate_limited.html', {
         'error_message': error_message
     })
+
+
+def password_reset_request(request):
+    """Password reset request view"""
+    if request.method == 'POST':
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user_ip = request.META.get('REMOTE_ADDR', 'unknown')
+            
+            logger.info(f"Password reset request for email: {email} from IP: {user_ip}")
+            
+            # Check rate limiting
+            allowed, error_msg = check_password_reset_rate_limit(request, email)
+            if not allowed:
+                logger.warning(f"Password reset rate limited for email: {email} from IP: {user_ip}. {error_msg}")
+                return redirect(f"/users/rate-limited/?error={error_msg}")
+            
+            # Record the attempt
+            record_password_reset_attempt(request, email)
+            
+            # Try to find user (but don't reveal if they exist)
+            try:
+                user = User.objects.get(email=email)
+                
+                # Send password reset email
+                if send_password_reset_email(user, request):
+                    logger.info(f"Password reset email sent to {email} from IP: {user_ip}")
+                else:
+                    logger.error(f"Failed to send password reset email to {email}")
+                    
+            except User.DoesNotExist:
+                # Don't reveal that the user doesn't exist for security
+                logger.info(f"Password reset requested for non-existent email: {email} from IP: {user_ip}")
+            
+            # Always show the same success message for security
+            return render(request, 'users/password_reset_sent.html', {'email': email})
+    else:
+        form = PasswordResetRequestForm()
+    
+    return render(request, 'users/password_reset_request.html', {'form': form})
+
+
+def password_reset_confirm(request, uidb64, token):
+    """Password reset confirmation view"""
+    try:
+        # Decode user ID
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        
+        # Check if token is valid
+        if password_reset_token.check_token(user, token):
+            if request.method == 'POST':
+                form = PasswordResetConfirmForm(user, request.POST)
+                if form.is_valid():
+                    # Save new password
+                    form.save()
+                    
+                    user_ip = request.META.get('REMOTE_ADDR', 'unknown')
+                    logger.info(f"Password reset completed for user: {user.username} from IP: {user_ip}")
+                    
+                    # Auto-login the user after password reset
+                    from django.contrib.auth import get_backends
+                    backend = get_backends()[0]
+                    user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
+                    login(request, user)
+                    messages.success(request, 'Your password has been reset successfully!')
+                    
+                    return redirect('places:home')
+            else:
+                form = PasswordResetConfirmForm(user)
+            
+            return render(request, 'users/password_reset_confirm.html', {
+                'form': form,
+                'user': user,
+                'uidb64': uidb64,
+                'token': token,
+            })
+        else:
+            # Invalid or expired token
+            logger.warning(f"Invalid password reset token used for user ID: {uid}")
+            error_message = 'The password reset link is invalid or has expired. Please request a new password reset.'
+            return render(request, 'users/password_reset_invalid.html', {
+                'error_message': error_message
+            })
+            
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+        logger.error(f"Error during password reset confirmation: {str(e)}")
+        error_message = 'Invalid password reset link. Please request a new password reset.'
+        return render(request, 'users/password_reset_invalid.html', {
+            'error_message': error_message
+        })
