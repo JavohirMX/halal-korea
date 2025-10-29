@@ -37,12 +37,42 @@ class User(AbstractUser):
     preferred_language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
     email_verified = models.BooleanField(default=False, help_text="Whether the user has verified their email address")
     
+    # Social authentication fields
+    profile_picture = models.ImageField(
+        upload_to='users/profile_pictures/', 
+        blank=True, 
+        null=True,
+        help_text="User's profile picture from social providers or uploaded manually"
+    )
+    social_avatar_url = models.URLField(
+        blank=True, 
+        null=True,
+        help_text="URL to user's avatar from social providers"
+    )
+    
     updated_at = models.DateTimeField(auto_now=True)
 
     @property
     def full_name(self):
         """Return the user's full name."""
         return f"{self.first_name} {self.last_name}".strip() or self.username
+
+    @property
+    def avatar_url(self):
+        """Return the user's avatar URL (profile picture or social avatar)."""
+        if self.profile_picture:
+            return self.profile_picture.url
+        elif self.social_avatar_url:
+            return self.social_avatar_url
+        return None
+
+    def get_social_accounts(self):
+        """Get all linked social accounts for this user."""
+        try:
+            from allauth.socialaccount.models import SocialAccount
+            return SocialAccount.objects.filter(user=self)
+        except ImportError:
+            return []
 
     class Meta:
         db_table = 'users_user'  # Explicitly set the table name

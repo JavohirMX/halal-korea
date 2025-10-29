@@ -56,10 +56,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Required for django-allauth
     'django.contrib.sitemaps',  # Added for SEO sitemap generation
     'django.contrib.gis',
     'tinymce',
     'rosetta',  # Web-based translation management
+    
+    # Django AllAuth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.apple',
+    
+    # Local apps
     'places',
     'reviews',
     'users',
@@ -74,6 +86,8 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # Required for django-allauth
+    'users.social_rate_limiting.SocialAuthRateLimitMiddleware',  # Social auth rate limiting
     'config.language_middleware.SmartLanguageMiddleware',  # Enhanced language detection (replaces LocaleMiddleware)
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -166,6 +180,18 @@ RATE_LIMIT_SETTINGS = {
     'REGISTRATION_PER_IP_WINDOW': 60,      # minutes
     'LOGIN_ATTEMPTS_PER_IP_LIMIT': 10,     # login attempts per 30 min per IP
     'LOGIN_ATTEMPTS_PER_IP_WINDOW': 30,    # minutes
+    
+    # Social Authentication Rate Limiting
+    'SOCIAL_AUTH_PER_IP_LIMIT': 20,        # social auth attempts per hour per IP
+    'SOCIAL_AUTH_PER_IP_WINDOW': 60,       # minutes
+    'SOCIAL_AUTH_GOOGLE_PER_IP_LIMIT': 15,
+    'SOCIAL_AUTH_GOOGLE_PER_IP_WINDOW': 60,
+    'SOCIAL_AUTH_FACEBOOK_PER_IP_LIMIT': 15,
+    'SOCIAL_AUTH_FACEBOOK_PER_IP_WINDOW': 60,
+    'SOCIAL_AUTH_GITHUB_PER_IP_LIMIT': 10,
+    'SOCIAL_AUTH_GITHUB_PER_IP_WINDOW': 60,
+    'SOCIAL_AUTH_APPLE_PER_IP_LIMIT': 10,
+    'SOCIAL_AUTH_APPLE_PER_IP_WINDOW': 60,
 }
 
 # Logging Configuration
@@ -418,6 +444,15 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 
 AUTH_USER_MODEL = 'users.User'
 
+# Django Sites Framework (required for django-allauth)
+SITE_ID = 1
+
+# Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default Django auth
+    'allauth.account.auth_backends.AuthenticationBackend',  # AllAuth
+]
+
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
 
 LOGIN_URL = 'users:login'  # URL where users will be redirected when login is required
@@ -480,3 +515,109 @@ TINYMCE_DEFAULT_CONFIG = {
     'remove_script_host': False,
     'convert_urls': True,
 }
+
+# ============================================================================
+# DJANGO ALLAUTH CONFIGURATION
+# ============================================================================
+
+# AllAuth Account Configuration
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Use email instead of username
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # We handle verification ourselves
+ACCOUNT_USERNAME_REQUIRED = True  # Keep usernames for our existing system
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email'
+
+# Social Account Configuration - Skip intermediate pages for better UX
+SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip the "Continue" confirmation page
+SOCIALACCOUNT_QUERY_EMAIL = True  # Always request email from providers
+SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens (privacy)
+
+# Login/Logout URLs (integrate with existing system)
+ACCOUNT_LOGIN_URL = '/users/login/'
+ACCOUNT_LOGOUT_URL = '/users/logout/'
+ACCOUNT_LOGIN_REDIRECT_URL = '/places/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/places/'
+
+# Account Management
+ACCOUNT_SIGNUP_REDIRECT_URL = '/places/'
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/places/'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/users/login/'
+
+# Custom Adapters
+ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'users.adapters.CustomSocialAccountAdapter'
+
+# Additional Social Account Configuration
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Auto-create accounts for social logins
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Trust social providers for email verification
+
+# Provider-specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+        'FETCH_USERINFO': True,
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
+        'SCOPE': ['email', 'public_profile'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'first_name',
+            'last_name',
+            'middle_name',
+            'name',
+            'name_format',
+            'picture',
+            'short_name',
+            'email',
+        ],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': lambda request: 'en_US',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v18.0',
+    },
+    'github': {
+        'SCOPE': [
+            'user:email',
+        ],
+    },
+    'apple': {
+        'APP': {
+            'client_id': config('APPLE_CLIENT_ID', default=''),
+            'secret': config('APPLE_SECRET', default=''),
+            'key': config('APPLE_KEY_ID', default=''),
+            'team': config('APPLE_TEAM_ID', default=''),
+        }
+    },
+}
+
+# OAuth Client Credentials (to be set in environment variables)
+# Google OAuth
+SOCIALACCOUNT_PROVIDERS['google']['APP'] = {
+    'client_id': config('GOOGLE_OAUTH_CLIENT_ID', default=''),
+    'secret': config('GOOGLE_OAUTH_CLIENT_SECRET', default=''),
+}
+
+# Facebook OAuth
+SOCIALACCOUNT_PROVIDERS['facebook']['APP'] = {
+    'client_id': config('FACEBOOK_APP_ID', default=''),
+    'secret': config('FACEBOOK_APP_SECRET', default=''),
+}
+
+# GitHub OAuth
+SOCIALACCOUNT_PROVIDERS['github']['APP'] = {
+    'client_id': config('GITHUB_CLIENT_ID', default=''),
+    'secret': config('GITHUB_CLIENT_SECRET', default=''),
+}
+
