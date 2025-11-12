@@ -1,1 +1,1 @@
-# Management commands package
+# Management package for utils app
