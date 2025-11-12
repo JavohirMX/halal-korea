@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Halal Korea Monitoring</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        .stat-card {
+            @apply bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow;
+        }
+        .stat-value {
+            @apply text-3xl font-bold text-gray-900;
+        }
+        .stat-label {
+            @apply text-sm text-gray-600 mt-1;
+        }
+        .nav-link {
+            @apply px-4 py-2 rounded-md text-sm font-medium transition-colors;
+        }
+        .nav-link-active {
+            @apply bg-blue-600 text-white;
+        }
+        .nav-link-inactive {
+            @apply text-gray-700 hover:bg-gray-100;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ title }}</h1>
+                    <p class="text-sm text-gray-600">Halal Korea Monitoring System</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">{{ request.user.username }}</span>
+                    <a href="/admin/" class="text-sm text-blue-600 hover:text-blue-800">← Back to Admin</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex space-x-2 py-3 overflow-x-auto">
+                <a href="{% url 'monitoring_dashboard' %}" class="nav-link {% if request.path == '/admin/monitoring/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    📊 Overview
+                </a>
+                <a href="{% url 'monitoring_performance' %}" class="nav-link {% if 'performance' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    ⚡ Performance
+                </a>
+                <a href="{% url 'monitoring_security' %}" class="nav-link {% if 'security' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    🔒 Security
+                </a>
+                <a href="{% url 'monitoring_content' %}" class="nav-link {% if 'content' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    📝 Content Ops
+                </a>
+                <a href="{% url 'monitoring_analytics' %}" class="nav-link {% if 'analytics' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    📈 Analytics
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-600">
+                Halal Korea Monitoring System &copy; {{ current_year }}
+            </p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

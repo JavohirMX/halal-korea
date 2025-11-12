@@ -1,0 +1,104 @@
+{% extends 'monitoring/base.html' %}
+
+{% block content %}
+<div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">User Engagement (Last {{ days }} Days)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="stat-card">
+            <div class="stat-value text-blue-600">{{ user_engagement.total_users|default:0 }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-green-600">{{ user_engagement.active_users|default:0 }}</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-purple-600">{{ user_engagement.new_users|default:0 }}</div>
+            <div class="stat-label">New Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ user_engagement.dau|default:0 }}</div>
+            <div class="stat-label">Daily Active Users</div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Popular Categories</h2>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        {% if content_usage.popular_categories %}
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Count</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for cat in content_usage.popular_categories %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ cat.category|title }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ cat.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-6 text-center text-gray-500">No data available</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Most Reviewed Places</h2>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        {% if content_usage.most_reviewed %}
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Place</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reviews</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for place in content_usage.most_reviewed %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ place.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ place.review_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-6 text-center text-gray-500">No data available</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Language Preferences</h2>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        {% if language_preferences %}
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Language</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Users</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for lang in language_preferences %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ lang.preferred_language|upper }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ lang.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-6 text-center text-gray-500">No data available</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
