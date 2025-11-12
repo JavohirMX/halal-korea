@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="mb-8">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">User Engagement (Last {{ days }} Days)</h2>
+    <h2 class="section-heading mb-4">User Engagement (Last {{ days }} Days)</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="stat-card">
             <div class="stat-value text-blue-600">{{ user_engagement.total_users|default:0 }}</div>
@@ -24,79 +24,79 @@
 </div>
 
 <div class="mb-8">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Popular Categories</h2>
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <h2 class="section-heading mb-4">Popular Categories</h2>
+    <div class="content-container">
         {% if content_usage.popular_categories %}
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead class="bg-gray-50 dark:bg-dark-bg">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Count</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Category</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Count</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
                 {% for cat in content_usage.popular_categories %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ cat.category|title }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ cat.count }}</td>
+                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">{{ cat.category|title }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ cat.count }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <div class="p-6 text-center text-gray-500">No data available</div>
+        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
         {% endif %}
     </div>
 </div>
 
 <div class="mb-8">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Most Reviewed Places</h2>
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <h2 class="section-heading mb-4">Most Reviewed Places</h2>
+    <div class="content-container">
         {% if content_usage.most_reviewed %}
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead class="bg-gray-50 dark:bg-dark-bg">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Place</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reviews</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Place</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Reviews</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
                 {% for place in content_usage.most_reviewed %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ place.name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ place.review_count }}</td>
+                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">{{ place.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ place.review_count }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <div class="p-6 text-center text-gray-500">No data available</div>
+        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
         {% endif %}
     </div>
 </div>
 
 <div class="mb-8">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Language Preferences</h2>
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <h2 class="section-heading mb-4">Language Preferences</h2>
+    <div class="content-container">
         {% if language_preferences %}
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead class="bg-gray-50 dark:bg-dark-bg">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Language</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Users</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Language</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Users</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
                 {% for lang in language_preferences %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ lang.preferred_language|upper }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ lang.count }}</td>
+                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">{{ lang.preferred_language|upper }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ lang.count }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <div class="p-6 text-center text-gray-500">No data available</div>
+        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
         {% endif %}
     </div>
 </div>
