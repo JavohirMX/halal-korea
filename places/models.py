@@ -120,9 +120,15 @@ class PlaceImageSuggestion(models.Model):
         on_delete=models.CASCADE,
         related_name='image_suggestions'
     )
+    original_image = models.ImageField(
+        upload_to='place_suggestions/originals/',
+        help_text="Original uploaded image (without watermark)",
+        blank=True,
+        null=True
+    )
     image = models.ImageField(
         upload_to='place_suggestions/',
-        help_text="Upload an image for this place"
+        help_text="Watermarked image for display"
     )
     caption = models.CharField(
         max_length=255, 
@@ -151,3 +157,112 @@ class PlaceImageSuggestion(models.Model):
     
     def __str__(self):
         return f"Image for {self.place.name} by {self.suggested_by.username}"
+    
+    def save(self, *args, **kwargs):
+        """Override save to apply watermark automatically"""
+        from django.core.files.base import ContentFile
+        from django.conf import settings
+        from utils.watermark import apply_watermark_to_uploaded_file
+        import io
+        from pathlib import Path
+        
+        # Check if watermarking is enabled
+        watermark_enabled = getattr(settings, 'WATERMARK_ENABLED', True)
+        
+        # If this is a new upload (not yet saved) and watermarking is enabled
+        if not self.pk and self.image and watermark_enabled:
+            # Save original image
+            if not self.original_image:
+                self.original_image = self.image
+            
+            # Apply watermark to the image
+            try:
+                # Get the uploaded file
+                uploaded_file = self.image.file
+                
+                # Apply watermark
+                watermarked_img = apply_watermark_to_uploaded_file(uploaded_file)
+                
+                # Convert PIL image to file
+                img_io = io.BytesIO()
+                
+                # Determine format based on original filename
+                original_ext = Path(self.image.name).suffix.lower()
+                if original_ext in ['.jpg', '.jpeg']:
+                    # Convert to RGB for JPEG
+                    watermarked_img = watermarked_img.convert('RGB')
+                    watermarked_img.save(img_io, format='JPEG', quality=95)
+                else:
+                    # Keep as PNG with transparency
+                    watermarked_img.save(img_io, format='PNG')
+                
+                img_io.seek(0)
+                
+                # Replace the image field with watermarked version
+                watermarked_filename = f"watermarked_{self.image.name}"
+                self.image.save(
+                    watermarked_filename,
+                    ContentFile(img_io.read()),
+                    save=False
+                )
+                
+            except Exception as e:
+                # Log error but don't fail the save
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Error applying watermark to image: {str(e)}", exc_info=True)
+        
+        super().save(*args, **kwargs)
+    
+    def reapply_watermark(self, opacity=None, angle=None, spacing=None):
+        """Reapply watermark with custom settings"""
+        from django.core.files.base import ContentFile
+        from django.conf import settings
+        from utils.watermark import apply_watermark_to_uploaded_file
+        import io
+        from pathlib import Path
+        
+        if not self.original_image:
+            raise ValueError("No original image available to watermark")
+        
+        try:
+            # Open original image
+            original_file = self.original_image.file
+            original_file.seek(0)
+            
+            # Apply watermark with custom settings
+            watermarked_img = apply_watermark_to_uploaded_file(
+                original_file,
+                opacity=opacity,
+                angle=angle,
+                spacing=spacing
+            )
+            
+            # Convert PIL image to file
+            img_io = io.BytesIO()
+            
+            # Determine format
+            original_ext = Path(self.original_image.name).suffix.lower()
+            if original_ext in ['.jpg', '.jpeg']:
+                watermarked_img = watermarked_img.convert('RGB')
+                watermarked_img.save(img_io, format='JPEG', quality=95)
+            else:
+                watermarked_img.save(img_io, format='PNG')
+            
+            img_io.seek(0)
+            
+            # Replace the watermarked image
+            watermarked_filename = f"watermarked_{Path(self.original_image.name).name}"
+            self.image.save(
+                watermarked_filename,
+                ContentFile(img_io.read()),
+                save=True
+            )
+            
+            return True
+            
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error reapplying watermark: {str(e)}", exc_info=True)
+            return False

@@ -601,14 +601,20 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         })
     )
-    actions = ['approve_image_suggestions', 'reject_image_suggestions']
+    actions = ['approve_image_suggestions', 'reject_image_suggestions', 'reapply_watermark_action', 'apply_watermark_to_existing']
 
     def image_preview(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="max-width: 300px; max-height: 200px; border-radius: 4px;">', obj.image.url)
+            return format_html(
+                '<div style="text-align: center;">'
+                '<img src="{}" style="max-width: 300px; max-height: 200px; border-radius: 4px; border: 2px solid #ddd;">'
+                '<br/><small style="color: #666;">Watermarked Version</small>'
+                '</div>',
+                obj.image.url
+            )
         return "No image"
-    image_preview.short_description = "Image Preview"
-
+    image_preview.short_description = "Watermarked Image"
+    
     def approve_image_suggestions(self, request, queryset):
         approved_count = 0
         failed_count = 0
@@ -644,6 +650,99 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
         if rejected_count:
             messages.success(request, f'Successfully rejected {rejected_count} image suggestion(s)')
     reject_image_suggestions.short_description = "Reject selected image suggestions"
+    
+    def reapply_watermark_action(self, request, queryset):
+        """Reapply watermark to selected images with current settings"""
+        success_count = 0
+        failed_count = 0
+        
+        for suggestion in queryset:
+            if not suggestion.original_image:
+                failed_count += 1
+                messages.warning(request, f'Skipped {suggestion}: No original image available')
+                continue
+            
+            try:
+                if suggestion.reapply_watermark():
+                    success_count += 1
+                else:
+                    failed_count += 1
+            except Exception as e:
+                failed_count += 1
+                logger.error(f"Error reapplying watermark to {suggestion.pk}: {str(e)}")
+        
+        if success_count:
+            messages.success(request, f'Successfully reapplied watermark to {success_count} image(s)')
+        if failed_count:
+            messages.error(request, f'Failed to reapply watermark to {failed_count} image(s)')
+    reapply_watermark_action.short_description = "🔄 Reapply watermark with current settings"
+    
+    def apply_watermark_to_existing(self, request, queryset):
+        """Apply watermark to images that don't have one yet"""
+        from django.conf import settings
+        from utils.watermark import apply_watermark_to_uploaded_file
+        from django.core.files.base import ContentFile
+        import io
+        from pathlib import Path
+        
+        success_count = 0
+        failed_count = 0
+        skipped_count = 0
+        
+        for suggestion in queryset:
+            # Skip if already has watermark (has original_image)
+            if suggestion.original_image:
+                skipped_count += 1
+                continue
+            
+            if not suggestion.image:
+                failed_count += 1
+                continue
+            
+            try:
+                # Save current image as original
+                suggestion.original_image = suggestion.image
+                suggestion.save(update_fields=['original_image'])
+                
+                # Apply watermark to the image
+                image_file = suggestion.original_image.file
+                image_file.seek(0)
+                
+                watermarked_img = apply_watermark_to_uploaded_file(image_file)
+                
+                # Convert PIL image to file
+                img_io = io.BytesIO()
+                original_ext = Path(suggestion.original_image.name).suffix.lower()
+                
+                if original_ext in ['.jpg', '.jpeg']:
+                    watermarked_img = watermarked_img.convert('RGB')
+                    watermarked_img.save(img_io, format='JPEG', quality=95)
+                else:
+                    watermarked_img.save(img_io, format='PNG')
+                
+                img_io.seek(0)
+                
+                # Save watermarked version
+                watermarked_filename = f"watermarked_{Path(suggestion.original_image.name).name}"
+                suggestion.image.save(
+                    watermarked_filename,
+                    ContentFile(img_io.read()),
+                    save=True
+                )
+                
+                success_count += 1
+                
+            except Exception as e:
+                failed_count += 1
+                logger.error(f"Error applying watermark to {suggestion.pk}: {str(e)}", exc_info=True)
+        
+        if success_count:
+            messages.success(request, f'Successfully applied watermark to {success_count} image(s)')
+        if skipped_count:
+            messages.info(request, f'Skipped {skipped_count} image(s) that already have watermarks')
+        if failed_count:
+            messages.error(request, f'Failed to apply watermark to {failed_count} image(s)')
+    apply_watermark_to_existing.short_description = "💧 Apply watermark to selected images"
 
     def _apply_image_suggestion(self, suggestion, reviewer):
         """Apply an approved image suggestion to the place"""

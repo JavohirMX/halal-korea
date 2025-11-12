@@ -664,3 +664,21 @@ ALERT_TELEGRAM_ENABLED = config('ALERT_TELEGRAM_ENABLED', default=True, cast=boo
 ALERT_EMAIL_ENABLED = config('ALERT_EMAIL_ENABLED', default=True, cast=bool)
 ALERT_EMAIL_RECIPIENTS = config('ALERT_EMAIL_RECIPIENTS', default='').split(',') if config('ALERT_EMAIL_RECIPIENTS', default='') else []
 
+# ============================================================================
+# WATERMARK CONFIGURATION
+# ============================================================================
+
+# Enable/disable watermarking feature
+WATERMARK_ENABLED = config('WATERMARK_ENABLED', default=True, cast=bool)
+
+# Watermark appearance settings
+WATERMARK_OPACITY = config('WATERMARK_OPACITY', default=0.25, cast=float)  # 0.0 to 1.0
+WATERMARK_ANGLE = config('WATERMARK_ANGLE', default=-45, cast=int)  # Rotation angle in degrees
+WATERMARK_SPACING = config('WATERMARK_SPACING', default=50, cast=int)  # Pixels between tiles
+WATERMARK_SIZE = config('WATERMARK_SIZE', default=200, cast=int)  # Width of watermark in pixels (height auto-scales)
+
+# Watermark text settings (used only if watermark.png not found)
+WATERMARK_TEXT = config('WATERMARK_TEXT', default='Halal Korea')
+WATERMARK_TEXT_SIZE = config('WATERMARK_TEXT_SIZE', default=32, cast=int)
+WATERMARK_TILE_SIZE = (300, 100)  # Width, height for generated watermark tile (fallback)
+

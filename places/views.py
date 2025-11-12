@@ -20,6 +20,8 @@ from django.template.loader import render_to_string
 import json
 import logging
 from utils.telegram_notifications import send_new_place_notification
+from utils.watermark import apply_watermark_to_uploaded_file
+import io
 from users.decorators import email_verification_required
 
 User = get_user_model()
@@ -322,11 +324,49 @@ def place_detail(request, pk):
 def upload_photo(photo):
     # Generate unique filename
     file_ext = photo.name.split('.')[-1]
-    filename = f'places/photos/{uuid.uuid4()}.{file_ext}'
-    
-    # Save file and return path
-    path = default_storage.save(filename, ContentFile(photo.read()))
-    return path  # Return just the path, not the full URL
+    file_ext_lower = file_ext.lower()
+    unique_id = uuid.uuid4()
+    is_jpeg = file_ext_lower in ['jpg', 'jpeg']
+    storage_ext = file_ext_lower if is_jpeg else 'png'
+    filename = f'places/photos/{unique_id}.{storage_ext}'
+
+    # Ensure stream is at the beginning
+    if hasattr(photo, 'seek'):
+        try:
+            photo.seek(0)
+        except (OSError, ValueError):
+            pass
+
+    # Attempt to apply watermark
+    try:
+        watermarked_img = apply_watermark_to_uploaded_file(photo)
+
+        img_io = io.BytesIO()
+        if file_ext_lower in ['jpg', 'jpeg']:
+            watermarked_img = watermarked_img.convert('RGB')
+            watermarked_img.save(img_io, format='JPEG', quality=95)
+        else:
+            # Default to PNG for other formats to preserve transparency when needed
+            watermarked_img.save(img_io, format='PNG')
+
+        img_content = ContentFile(img_io.getvalue())
+        path = default_storage.save(filename, img_content)
+        return path  # Return just the path, not the full URL
+
+    except Exception as e:
+        logger.error(f"Failed to watermark uploaded photo '{photo.name}': {str(e)}", exc_info=True)
+
+        # Reset stream before saving original
+        if hasattr(photo, 'seek'):
+            try:
+                photo.seek(0)
+            except (OSError, ValueError):
+                pass
+
+        # Use original extension when saving fallback to preserve format
+        fallback_filename = f'places/photos/{uuid.uuid4()}.{file_ext_lower}'
+        path = default_storage.save(fallback_filename, ContentFile(photo.read()))
+        return path  # Return just the path, not the full URL
 
 @login_required
 @email_verification_required
