@@ -92,6 +92,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'config.middleware.AdminAccessMiddleware',  # Custom admin access control
+    'utils.monitoring_middleware.MonitoringMiddleware',  # Request monitoring
+    'utils.monitoring_middleware.AdminActionMiddleware',  # Admin action tracking
+    'utils.monitoring_middleware.CacheStatsMiddleware',  # Cache statistics
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -626,4 +629,24 @@ SOCIALACCOUNT_PROVIDERS['github']['APP'] = {
     'client_id': config('GITHUB_CLIENT_ID', default=''),
     'secret': config('GITHUB_CLIENT_SECRET', default=''),
 }
+
+# ============================================================================
+# MONITORING CONFIGURATION
+# ============================================================================
+
+# Monitoring System
+MONITORING_ENABLED = config('MONITORING_ENABLED', default=True, cast=bool)
+MONITORING_SAMPLE_RATE = config('MONITORING_SAMPLE_RATE', default=0.01, cast=float)  # 1% sampling
+MONITORING_SLOW_THRESHOLD_MS = config('MONITORING_SLOW_THRESHOLD_MS', default=1000, cast=int)  # 1 second
+MONITORING_RETENTION_DAYS = config('MONITORING_RETENTION_DAYS', default=30, cast=int)
+
+# Sentry Error Tracking (to be configured in Phase 1.3)
+SENTRY_DSN = config('SENTRY_DSN', default='')
+SENTRY_ENVIRONMENT = config('SENTRY_ENVIRONMENT', default='production')
+SENTRY_TRACES_SAMPLE_RATE = config('SENTRY_TRACES_SAMPLE_RATE', default=0.1, cast=float)
+
+# Alert Configuration
+ALERT_TELEGRAM_ENABLED = config('ALERT_TELEGRAM_ENABLED', default=True, cast=bool)
+ALERT_EMAIL_ENABLED = config('ALERT_EMAIL_ENABLED', default=True, cast=bool)
+ALERT_EMAIL_RECIPIENTS = config('ALERT_EMAIL_RECIPIENTS', default='').split(',') if config('ALERT_EMAIL_RECIPIENTS', default='') else []
 
