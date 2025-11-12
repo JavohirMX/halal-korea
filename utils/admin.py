@@ -180,7 +180,7 @@ class AdminNotificationAdmin(admin.ModelAdmin):
 
 @admin.register(AlertRule)
 class AlertRuleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'condition', 'threshold', 'enabled_badge', 'last_triggered', 'trigger_count')
+    list_display = ('name', 'condition', 'threshold', 'enabled', 'enabled_badge', 'last_triggered', 'trigger_count')
     list_filter = ('enabled', 'condition')
     search_fields = ('name', 'description')
     list_editable = ('enabled',)

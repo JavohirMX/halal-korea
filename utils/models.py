@@ -19,7 +19,7 @@ def hash_ip(ip_address):
 def hash_user_agent(user_agent):
     """Hash user agent for privacy."""
     if not user_agent:
-        return None
+        return ''  # Return empty string instead of None
     salt = settings.SECRET_KEY[:16]
     return hashlib.sha256(f"{salt}{user_agent}".encode()).hexdigest()[:16]
 
