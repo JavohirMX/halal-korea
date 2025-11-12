@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +32,18 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS").split() # type: ignore
+
+# Sentry Integration for Error Tracking
+if not DEBUG and config('SENTRY_DSN', default=''):
+    sentry_sdk.init(
+        dsn=config('SENTRY_DSN'),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=config('SENTRY_TRACES_SAMPLE_RATE', default=0.1, cast=float),
+        send_default_pii=False,  # Privacy: don't send personally identifiable information
+        environment=config('SENTRY_ENVIRONMENT', default='production'),
+        # Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+    )
 
 # CSRF Settings for production
 # Add your production domain(s) to CSRF_TRUSTED_ORIGINS environment variable
