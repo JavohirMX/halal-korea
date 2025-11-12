@@ -1,36 +1,38 @@
 """
-Management command to send daily monitoring digest email.
-Should be run once per day via cron (e.g., at 8 AM).
+Management command to send daily digest email to admins.
 """
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from utils.monitoring_emails import send_daily_digest
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     help = 'Send daily monitoring digest email to admins'
     
     def handle(self, *args, **options):
-        self.stdout.write(self.style.SUCCESS('Sending daily digest email...'))
+        """Execute the command."""
+        self.stdout.write(self.style.WARNING('Preparing daily digest...'))
         
-        try:
-            success = send_daily_digest()
-            
-            if success:
-                self.stdout.write(
-                    self.style.SUCCESS('✓ Daily digest email sent successfully')
-                )
-            else:
-                self.stdout.write(
-                    self.style.WARNING('⚠️  Daily digest email not sent (disabled or no recipients)')
-                )
+        # Check if email alerts are enabled
+        if not getattr(settings, 'ALERT_EMAIL_ENABLED', False):
+            self.stdout.write(self.style.ERROR('Email alerts are disabled in settings'))
+            self.stdout.write('Set ALERT_EMAIL_ENABLED=True to enable')
+            return
         
-        except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f'❌ Error sending daily digest: {e}')
-            )
-            logger.error(f"Error in send_daily_digest command: {e}", exc_info=True)
-            raise
-
+        # Check if recipients are configured
+        recipients = getattr(settings, 'ALERT_EMAIL_RECIPIENTS', [])
+        if not recipients:
+            self.stdout.write(self.style.ERROR('No email recipients configured'))
+            self.stdout.write('Set ALERT_EMAIL_RECIPIENTS in settings')
+            return
+        
+        # Send digest
+        self.stdout.write(f'Sending digest to {len(recipients)} recipient(s)...')
+        
+        success = send_daily_digest()
+        
+        if success:
+            self.stdout.write(self.style.SUCCESS('✓ Daily digest sent successfully'))
+        else:
+            self.stdout.write(self.style.ERROR('✗ Failed to send daily digest'))
+            self.stdout.write('Check logs for more details')

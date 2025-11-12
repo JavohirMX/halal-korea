@@ -71,15 +71,11 @@ class AggregateMetricsCommandTests(TestCase):
         )
         
         out = StringIO()
-        # Try cleanup, but it's okay if not fully implemented
-        try:
-            call_command('aggregate_metrics', '--cleanup', stdout=out)
-            output = out.getvalue()
-            # Should complete without error
-            self.assertTrue(True)
-        except:
-            # Cleanup might not be implemented yet
-            self.skipTest("Cleanup option not fully implemented")
+        call_command('aggregate_metrics', '--cleanup', stdout=out)
+        
+        output = out.getvalue()
+        # Should mention cleanup
+        self.assertTrue('cleanup' in output.lower() or 'cleaned' in output.lower() or 'old logs' in output.lower())
     
     def test_aggregate_metrics_with_no_logs(self):
         """Test aggregate_metrics with no logs to process."""
@@ -146,19 +142,53 @@ class CheckAlertsCommandTests(TestCase):
 class CheckMonitoringHealthCommandTests(TestCase):
     """Test check_monitoring_health management command."""
     
-    def test_check_monitoring_health_command_skipped(self):
-        """Test that check_monitoring_health command is skipped (not yet implemented)."""
-        # Skip this test as the command is not yet fully implemented
-        self.skipTest("check_monitoring_health command not yet implemented")
+    def test_check_monitoring_health_command_runs(self):
+        """Test that check_monitoring_health command runs successfully."""
+        out = StringIO()
+        call_command('check_monitoring_health', stdout=out)
+        
+        output = out.getvalue()
+        self.assertIn('health', output.lower())
+    
+    def test_check_monitoring_health_with_recent_metrics(self):
+        """Test health check with recent metrics."""
+        # Create recent request log
+        RequestLog.objects.create(
+            path='/test/', method='GET', status_code=200,
+            response_time_ms=100, ip_hash='test', user_agent_hash='test',
+            timestamp=timezone.now()
+        )
+        
+        out = StringIO()
+        call_command('check_monitoring_health', stdout=out)
+        
+        output = out.getvalue()
+        # Should indicate healthy or show some health status
+        self.assertTrue('health' in output.lower())
 
 
 class SendDailyDigestCommandTests(TestCase):
     """Test send_daily_digest management command."""
     
-    def test_send_daily_digest_command_skipped(self):
-        """Test send_daily_digest command (skipped - not yet fully implemented)."""
-        # Skip this test as the command might not be fully implemented
-        self.skipTest("send_daily_digest command not yet fully implemented")
+    @override_settings(ALERT_EMAIL_ENABLED=False)
+    def test_send_daily_digest_disabled(self):
+        """Test send_daily_digest when email alerts are disabled."""
+        out = StringIO()
+        call_command('send_daily_digest', stdout=out)
+        
+        output = out.getvalue()
+        # Should indicate disabled or not sent
+        self.assertTrue('disabled' in output.lower() or 'not' in output.lower())
+    
+    @override_settings(ALERT_EMAIL_ENABLED=True, ALERT_EMAIL_RECIPIENTS=['test@example.com'])
+    def test_send_daily_digest_with_recipients(self):
+        """Test that command runs with recipients configured."""
+        out = StringIO()
+        call_command('send_daily_digest', stdout=out)
+        
+        output = out.getvalue()
+        # Should attempt to send or complete
+        self.assertTrue(len(output) > 0)
 
 
 class CommandIntegrationTests(TestCase):
@@ -199,6 +229,7 @@ class CommandIntegrationTests(TestCase):
         # Commands should work with no data
         call_command('aggregate_metrics', stdout=StringIO())
         call_command('check_alerts', stdout=StringIO())
+        call_command('check_monitoring_health', stdout=StringIO())
         
         # Should complete without errors
         self.assertTrue(True)

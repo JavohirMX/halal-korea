@@ -1,173 +1,214 @@
 """
-Management command to check monitoring system health and detect anomalies.
+Management command to check monitoring system health.
 """
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from django.db.models import Count, Avg
-from utils.models import RequestLog, SystemMetric, AdminNotification
-from utils.telegram_notifications import send_telegram_message
-import logging
-
-logger = logging.getLogger(__name__)
+from django.conf import settings
+from datetime import timedelta
+from utils.models import RequestLog, SecurityEvent, SystemMetric
+from utils.monitoring_emails import send_critical_alert
+from utils.telegram_notifications import send_telegram_notification
 
 
 class Command(BaseCommand):
-    help = 'Check monitoring system health and detect anomalies'
+    help = 'Check monitoring system health and detect issues'
     
     def add_arguments(self, parser):
         parser.add_argument(
             '--alert',
             action='store_true',
-            help='Send alerts if issues are detected'
+            help='Send alerts if issues are detected',
+        )
+        parser.add_argument(
+            '--hours',
+            type=int,
+            default=1,
+            help='Hours to look back for health check (default: 1)',
         )
     
     def handle(self, *args, **options):
-        send_alerts = options['alert']
+        """Execute the command."""
+        alert_on_issues = options['alert']
+        hours = options['hours']
         
-        self.stdout.write(self.style.SUCCESS('Checking monitoring system health...'))
+        self.stdout.write(self.style.WARNING(f'Checking monitoring system health (last {hours} hour(s))...'))
+        self.stdout.write('')
         
         issues = []
+        warnings = []
         
-        # Check 1: Verify recent metrics exist
-        if not self._check_recent_metrics():
-            issues.append('No metrics recorded in the last hour')
+        # Check 1: Recent request logs
+        recent_logs_check = self._check_recent_logs(hours)
+        if recent_logs_check['status'] == 'error':
+            issues.append(recent_logs_check['message'])
+        elif recent_logs_check['status'] == 'warning':
+            warnings.append(recent_logs_check['message'])
+        else:
+            self.stdout.write(self.style.SUCCESS(f"✓ {recent_logs_check['message']}"))
         
-        # Check 2: Check for error spikes
-        error_spike = self._check_error_spike()
-        if error_spike:
-            issues.append(f'Error spike detected: {error_spike}')
+        # Check 2: Error rate
+        error_rate_check = self._check_error_rate(hours)
+        if error_rate_check['status'] == 'error':
+            issues.append(error_rate_check['message'])
+        elif error_rate_check['status'] == 'warning':
+            warnings.append(error_rate_check['message'])
+        else:
+            self.stdout.write(self.style.SUCCESS(f"✓ {error_rate_check['message']}"))
         
-        # Check 3: Check for traffic drops
-        traffic_drop = self._check_traffic_drop()
-        if traffic_drop:
-            issues.append(f'Traffic drop detected: {traffic_drop}')
+        # Check 3: Unresolved security events
+        security_check = self._check_security_events()
+        if security_check['status'] == 'warning':
+            warnings.append(security_check['message'])
+        else:
+            self.stdout.write(self.style.SUCCESS(f"✓ {security_check['message']}"))
         
-        # Check 4: Check for slow performance
-        slow_performance = self._check_slow_performance()
-        if slow_performance:
-            issues.append(f'Slow performance detected: {slow_performance}')
+        # Check 4: System metrics freshness
+        metrics_check = self._check_metrics_freshness(hours)
+        if metrics_check['status'] == 'warning':
+            warnings.append(metrics_check['message'])
+        else:
+            self.stdout.write(self.style.SUCCESS(f"✓ {metrics_check['message']}"))
         
-        # Report results
+        # Summary
+        self.stdout.write('')
+        self.stdout.write('=' * 70)
+        
         if issues:
-            self.stdout.write(self.style.ERROR(f'⚠️  {len(issues)} issue(s) detected:'))
+            self.stdout.write(self.style.ERROR(f'❌ CRITICAL ISSUES DETECTED: {len(issues)}'))
             for issue in issues:
-                self.stdout.write(self.style.WARNING(f'  - {issue}'))
+                self.stdout.write(self.style.ERROR(f'  - {issue}'))
             
-            if send_alerts:
-                self._send_health_alert(issues)
-        else:
-            self.stdout.write(self.style.SUCCESS('✓ Monitoring system is healthy'))
-    
-    def _check_recent_metrics(self):
-        """Check if metrics have been recorded recently."""
-        one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
-        recent_logs = RequestLog.objects.filter(timestamp__gte=one_hour_ago).exists()
+            if alert_on_issues:
+                self._send_health_alert('critical', issues)
         
-        if recent_logs:
-            self.stdout.write('  ✓ Recent metrics found')
-            return True
-        else:
-            self.stdout.write(self.style.WARNING('  ✗ No recent metrics (last hour)'))
-            return False
-    
-    def _check_error_spike(self):
-        """Check for unusual error rates."""
-        now = timezone.now()
-        last_hour = now - timezone.timedelta(hours=1)
-        last_day = now - timezone.timedelta(days=1)
-        
-        # Get error count for last hour
-        recent_errors = RequestLog.objects.filter(
-            timestamp__gte=last_hour,
-            status_code__gte=500
-        ).count()
-        
-        # Get average error count per hour for last day
-        daily_errors = RequestLog.objects.filter(
-            timestamp__gte=last_day,
-            status_code__gte=500
-        ).count()
-        avg_errors_per_hour = daily_errors / 24 if daily_errors > 0 else 0
-        
-        # Alert if recent errors are 3x the average
-        if avg_errors_per_hour > 0 and recent_errors > (avg_errors_per_hour * 3):
-            message = f'{recent_errors} errors in last hour (avg: {avg_errors_per_hour:.1f}/hour)'
-            self.stdout.write(self.style.WARNING(f'  ✗ Error spike: {message}'))
-            return message
-        
-        self.stdout.write('  ✓ Error rate normal')
-        return None
-    
-    def _check_traffic_drop(self):
-        """Check for unusual traffic drops."""
-        now = timezone.now()
-        last_hour = now - timezone.timedelta(hours=1)
-        previous_hour = last_hour - timezone.timedelta(hours=1)
-        
-        # Get request counts
-        recent_requests = RequestLog.objects.filter(
-            timestamp__gte=last_hour
-        ).count()
-        
-        previous_requests = RequestLog.objects.filter(
-            timestamp__gte=previous_hour,
-            timestamp__lt=last_hour
-        ).count()
-        
-        # Alert if traffic dropped by more than 50%
-        if previous_requests > 10 and recent_requests < (previous_requests * 0.5):
-            message = f'{recent_requests} requests (was {previous_requests} previous hour)'
-            self.stdout.write(self.style.WARNING(f'  ✗ Traffic drop: {message}'))
-            return message
-        
-        self.stdout.write('  ✓ Traffic levels normal')
-        return None
-    
-    def _check_slow_performance(self):
-        """Check for slow response times."""
-        one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
-        
-        avg_response = RequestLog.objects.filter(
-            timestamp__gte=one_hour_ago
-        ).aggregate(avg_time=Avg('response_time_ms'))
-        
-        avg_time = avg_response['avg_time']
-        
-        if avg_time and avg_time > 2000:  # 2 seconds
-            message = f'Average response time: {avg_time:.0f}ms'
-            self.stdout.write(self.style.WARNING(f'  ✗ Slow performance: {message}'))
-            return message
-        
-        self.stdout.write('  ✓ Performance normal')
-        return None
-    
-    def _send_health_alert(self, issues):
-        """Send alert notifications about health issues."""
-        try:
-            # Create admin notification
-            AdminNotification.objects.create(
-                recipient=None,  # All admins
-                title='🚨 Monitoring System Health Alert',
-                message=f'{len(issues)} issue(s) detected:\n' + '\n'.join(f'• {issue}' for issue in issues),
-                severity='critical',
-                link='/admin/monitoring/'
-            )
+        if warnings:
+            self.stdout.write(self.style.WARNING(f'⚠️  WARNINGS: {len(warnings)}'))
+            for warning in warnings:
+                self.stdout.write(self.style.WARNING(f'  - {warning}'))
             
-            # Send Telegram alert if enabled
+            if alert_on_issues:
+                self._send_health_alert('warning', warnings)
+        
+        if not issues and not warnings:
+            self.stdout.write(self.style.SUCCESS('✓ All health checks passed - System healthy'))
+        
+        self.stdout.write('=' * 70)
+    
+    def _check_recent_logs(self, hours):
+        """Check if there are recent request logs."""
+        cutoff = timezone.now() - timedelta(hours=hours)
+        recent_count = RequestLog.objects.filter(timestamp__gte=cutoff).count()
+        
+        if recent_count == 0:
+            return {
+                'status': 'error',
+                'message': f'No request logs in the last {hours} hour(s) - Monitoring may be disabled'
+            }
+        elif recent_count < 10:
+            return {
+                'status': 'warning',
+                'message': f'Very few request logs ({recent_count}) in the last {hours} hour(s)'
+            }
+        else:
+            return {
+                'status': 'ok',
+                'message': f'Request logging active ({recent_count:,} logs in last {hours} hour(s))'
+            }
+    
+    def _check_error_rate(self, hours):
+        """Check error rate in recent requests."""
+        cutoff = timezone.now() - timedelta(hours=hours)
+        recent_logs = RequestLog.objects.filter(timestamp__gte=cutoff)
+        
+        total = recent_logs.count()
+        if total == 0:
+            return {'status': 'ok', 'message': 'No requests to check error rate'}
+        
+        errors = recent_logs.filter(status_code__gte=500).count()
+        error_rate = (errors / total) * 100
+        
+        if error_rate > 10:
+            return {
+                'status': 'error',
+                'message': f'High error rate: {error_rate:.1f}% ({errors}/{total} requests)'
+            }
+        elif error_rate > 5:
+            return {
+                'status': 'warning',
+                'message': f'Elevated error rate: {error_rate:.1f}% ({errors}/{total} requests)'
+            }
+        else:
+            return {
+                'status': 'ok',
+                'message': f'Error rate normal: {error_rate:.1f}% ({errors}/{total} requests)'
+            }
+    
+    def _check_security_events(self):
+        """Check for unresolved security events."""
+        unresolved = SecurityEvent.objects.filter(resolved=False)
+        critical_unresolved = unresolved.filter(severity='critical').count()
+        high_unresolved = unresolved.filter(severity='high').count()
+        
+        if critical_unresolved > 0:
+            return {
+                'status': 'error',
+                'message': f'{critical_unresolved} critical security event(s) unresolved'
+            }
+        elif high_unresolved > 5:
+            return {
+                'status': 'warning',
+                'message': f'{high_unresolved} high-severity security event(s) unresolved'
+            }
+        else:
+            total_unresolved = unresolved.count()
+            return {
+                'status': 'ok',
+                'message': f'Security events: {total_unresolved} unresolved (none critical)'
+            }
+    
+    def _check_metrics_freshness(self, hours):
+        """Check if metrics are being aggregated regularly."""
+        cutoff = timezone.now() - timedelta(hours=hours * 2)  # Check last 2x hours
+        recent_metrics = SystemMetric.objects.filter(timestamp__gte=cutoff).count()
+        
+        if recent_metrics == 0:
+            return {
+                'status': 'warning',
+                'message': 'No recent system metrics - Run aggregate_metrics command'
+            }
+        else:
+            return {
+                'status': 'ok',
+                'message': f'System metrics up to date ({recent_metrics} recent metrics)'
+            }
+    
+    def _send_health_alert(self, severity, messages):
+        """Send health alert via configured channels."""
+        if severity == 'critical':
+            title = 'Monitoring System Health: CRITICAL ISSUES'
+            emoji = '🚨'
+        else:
+            title = 'Monitoring System Health: Warnings'
+            emoji = '⚠️'
+        
+        message_text = f"{emoji} {title}\n\n" + "\n".join(f"• {msg}" for msg in messages)
+        
+        # Send email if enabled
+        if getattr(settings, 'ALERT_EMAIL_ENABLED', False):
             try:
-                from django.conf import settings
-                if getattr(settings, 'TELEGRAM_NOTIFICATIONS_ENABLED', False):
-                    message = f"🚨 *Monitoring Health Alert*\n\n"
-                    message += f"{len(issues)} issue(s) detected:\n"
-                    for issue in issues:
-                        message += f"• {issue}\n"
-                    send_telegram_message(message)
-                    self.stdout.write('  ✓ Telegram alert sent')
+                send_critical_alert(
+                    title=title,
+                    message="\n".join(messages),
+                    link='/admin/monitoring/'
+                )
+                self.stdout.write('  → Alert email sent')
             except Exception as e:
-                logger.error(f"Failed to send Telegram alert: {e}")
-            
-            self.stdout.write(self.style.SUCCESS('  ✓ Health alerts sent'))
-        except Exception as e:
-            self.stdout.write(self.style.ERROR(f'  ✗ Failed to send alerts: {e}'))
-            logger.error(f"Failed to send health alerts: {e}", exc_info=True)
-
+                self.stdout.write(self.style.ERROR(f'  → Failed to send email: {e}'))
+        
+        # Send Telegram if enabled
+        if getattr(settings, 'ALERT_TELEGRAM_ENABLED', False):
+            try:
+                send_telegram_notification(message_text)
+                self.stdout.write('  → Alert sent to Telegram')
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f'  → Failed to send Telegram: {e}'))

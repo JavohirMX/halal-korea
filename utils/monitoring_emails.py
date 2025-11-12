@@ -1,14 +1,12 @@
 """
-Email alert system for monitoring notifications.
+Email notifications for monitoring system.
 """
-from django.core.mail import send_mail, EmailMultiAlternatives
-from django.template.loader import render_to_string
+from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import Count, Avg
-from utils.models import RequestLog, SecurityEvent, AdminAction
-from places.models import HalalPlace, PlaceEditSuggestion
-from contact.models import ContactMessage
+from django.db.models import Avg, Count, Q
+from datetime import timedelta
+from typing import Dict, Any
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,65 +14,58 @@ logger = logging.getLogger(__name__)
 
 def send_daily_digest():
     """
-    Send daily digest email to admins with yesterday's summary.
-    Should be run once per day via cron.
+    Send daily digest email to admins.
+    Returns True if sent successfully, False otherwise.
     """
     if not getattr(settings, 'ALERT_EMAIL_ENABLED', False):
-        logger.info("Email alerts are disabled")
+        logger.info("Email alerts disabled, skipping daily digest")
         return False
     
     recipients = getattr(settings, 'ALERT_EMAIL_RECIPIENTS', [])
     if not recipients:
-        logger.warning("No email recipients configured for alerts")
+        logger.warning("No email recipients configured for daily digest")
         return False
     
     try:
-        # Get yesterday's date range
+        # Get yesterday's stats
         today = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        yesterday = today - timezone.timedelta(days=1)
+        yesterday = today - timedelta(days=1)
         
-        # Gather statistics
         stats = _gather_daily_stats(yesterday, today)
         
         # Format email
-        subject = f"[Halal Korea] Daily Monitoring Digest - {yesterday.strftime('%Y-%m-%d')}"
-        
-        # Plain text version
-        text_content = _format_digest_text(stats, yesterday)
-        
-        # HTML version (optional, can be enhanced)
-        html_content = _format_digest_html(stats, yesterday)
+        subject = f"Halal Korea - Daily Monitoring Digest ({yesterday.strftime('%Y-%m-%d')})"
+        message = _format_digest_text(stats, yesterday)
         
         # Send email
-        msg = EmailMultiAlternatives(
+        send_mail(
             subject=subject,
-            body=text_content,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=recipients
+            message=message,
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@halal-korea.com'),
+            recipient_list=recipients,
+            fail_silently=False
         )
         
-        if html_content:
-            msg.attach_alternative(html_content, "text/html")
-        
-        msg.send(fail_silently=False)
-        
-        logger.info(f"Daily digest email sent to {len(recipients)} recipient(s)")
+        logger.info(f"Daily digest sent to {len(recipients)} recipients")
         return True
         
     except Exception as e:
-        logger.error(f"Failed to send daily digest email: {e}", exc_info=True)
+        logger.error(f"Failed to send daily digest: {e}")
         return False
 
 
-def send_critical_alert(title, message, details=None, link=None):
+def send_critical_alert(title: str, message: str, details: Dict[str, Any] = None, link: str = None):
     """
-    Send immediate critical alert email to admins.
+    Send critical alert email to admins.
     
     Args:
         title: Alert title
         message: Alert message
-        details: Optional dict of additional details
-        link: Optional link to relevant admin page
+        details: Optional dictionary of additional details
+        link: Optional link to relevant page
+    
+    Returns:
+        True if sent successfully, False otherwise
     """
     if not getattr(settings, 'ALERT_EMAIL_ENABLED', False):
         return False
@@ -84,179 +75,238 @@ def send_critical_alert(title, message, details=None, link=None):
         return False
     
     try:
-        subject = f"[Halal Korea ALERT] {title}"
+        subject = f"🚨 CRITICAL ALERT: {title}"
         
+        # Format message
         email_body = f"""
 CRITICAL ALERT
-
-{title}
+{'=' * 60}
 
 {message}
+
 """
         
         if details:
-            email_body += "\n\nDetails:\n"
+            email_body += "\nDETAILS:\n"
+            email_body += "-" * 60 + "\n"
             for key, value in details.items():
-                email_body += f"  • {key}: {value}\n"
+                email_body += f"{key}: {value}\n"
         
         if link:
             site_url = getattr(settings, 'SITE_URL', 'http://localhost:8000')
-            email_body += f"\n\nView in admin: {site_url}{link}"
+            full_link = f"{site_url}{link}" if link.startswith('/') else link
+            email_body += f"\nView Details: {full_link}\n"
         
-        email_body += f"\n\nTime: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        email_body += "\n" + "=" * 60 + "\n"
+        email_body += f"Timestamp: {timezone.now().strftime('%Y-%m-%d %H:%M:%S %Z')}\n"
+        email_body += "Halal Korea Monitoring System\n"
         
         send_mail(
             subject=subject,
             message=email_body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@halal-korea.com'),
             recipient_list=recipients,
-            fail_silently=False,
+            fail_silently=False
         )
         
-        logger.info(f"Critical alert email sent: {title}")
+        logger.info(f"Critical alert sent: {title}")
         return True
         
     except Exception as e:
-        logger.error(f"Failed to send critical alert email: {e}", exc_info=True)
+        logger.error(f"Failed to send critical alert: {e}")
         return False
 
 
 def _gather_daily_stats(start_time, end_time):
-    """Gather statistics for the daily digest."""
-    stats = {}
+    """
+    Gather statistics for a time period (typically one day).
+    
+    Args:
+        start_time: Start of time period
+        end_time: End of time period
+    
+    Returns:
+        Dictionary with statistics
+    """
+    from utils.models import RequestLog, SecurityEvent, AdminAction, ContentModerationLog
+    from places.models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
+    from reviews.models import Review
+    from contact.models import ContactMessage
+    from django.contrib.auth import get_user_model
+    
+    User = get_user_model()
     
     # Request statistics
-    total_requests = RequestLog.objects.filter(
+    requests = RequestLog.objects.filter(
         timestamp__gte=start_time,
         timestamp__lt=end_time
-    ).count()
+    )
     
-    error_requests = RequestLog.objects.filter(
-        timestamp__gte=start_time,
-        timestamp__lt=end_time,
-        status_code__gte=500
-    ).count()
+    total_requests = requests.count()
+    error_requests = requests.filter(status_code__gte=400)
+    errors = error_requests.count()
+    error_rate = (errors / total_requests * 100) if total_requests > 0 else 0
     
-    avg_response = RequestLog.objects.filter(
-        timestamp__gte=start_time,
-        timestamp__lt=end_time
-    ).aggregate(avg=Avg('response_time_ms'))
-    
-    stats['requests'] = {
-        'total': total_requests,
-        'errors': error_requests,
-        'error_rate': (error_requests / total_requests * 100) if total_requests > 0 else 0,
-        'avg_response_time': avg_response['avg'] or 0,
-    }
+    avg_response_time_result = requests.aggregate(avg=Avg('response_time_ms'))
+    avg_response_time = avg_response_time_result['avg'] or 0
     
     # Security events
     security_events = SecurityEvent.objects.filter(
         timestamp__gte=start_time,
         timestamp__lt=end_time
-    ).values('event_type').annotate(count=Count('id'))
+    )
     
-    stats['security'] = {
-        'total': sum(e['count'] for e in security_events),
-        'by_type': {e['event_type']: e['count'] for e in security_events},
-        'unresolved': SecurityEvent.objects.filter(
-            timestamp__gte=start_time,
-            timestamp__lt=end_time,
-            resolved=False
-        ).count()
-    }
+    security_by_type = {}
+    for event in security_events.values('event_type').annotate(count=Count('id')):
+        security_by_type[event['event_type']] = event['count']
     
     # Content statistics
-    stats['content'] = {
-        'new_places': HalalPlace.objects.filter(
-            created_at__gte=start_time,
-            created_at__lt=end_time
-        ).count(),
-        'approved_places': HalalPlace.objects.filter(
-            updated_at__gte=start_time,
-            updated_at__lt=end_time,
-            status='approved'
-        ).count(),
-        'pending_places': HalalPlace.objects.filter(status='pending').count(),
-        'pending_suggestions': PlaceEditSuggestion.objects.filter(status='pending').count(),
-        'unread_contacts': ContactMessage.objects.filter(is_read=False).count(),
-    }
+    new_places = HalalPlace.objects.filter(
+        created_at__gte=start_time,
+        created_at__lt=end_time
+    ).count()
+    
+    approved_places = HalalPlace.objects.filter(
+        updated_at__gte=start_time,
+        updated_at__lt=end_time,
+        status='approved'
+    ).count()
+    
+    pending_places = HalalPlace.objects.filter(status='pending').count()
+    pending_suggestions = PlaceEditSuggestion.objects.filter(status='pending').count()
+    pending_image_suggestions = PlaceImageSuggestion.objects.filter(status='pending').count()
+    
+    unread_contacts = ContactMessage.objects.filter(
+        is_read=False
+    ).count()
     
     # Admin actions
     admin_actions = AdminAction.objects.filter(
         timestamp__gte=start_time,
         timestamp__lt=end_time
-    ).values('action_type').annotate(count=Count('id'))
+    )
     
-    stats['admin_actions'] = {
-        'total': sum(a['count'] for a in admin_actions),
-        'by_type': {a['action_type']: a['count'] for a in admin_actions},
+    actions_by_type = {}
+    for action in admin_actions.values('action_type').annotate(count=Count('id')):
+        actions_by_type[action['action_type']] = action['count']
+    
+    # User statistics
+    new_users = User.objects.filter(
+        date_joined__gte=start_time,
+        date_joined__lt=end_time
+    ).count()
+    
+    active_users = RequestLog.objects.filter(
+        timestamp__gte=start_time,
+        timestamp__lt=end_time,
+        user__isnull=False
+    ).values('user').distinct().count()
+    
+    return {
+        'requests': {
+            'total': total_requests,
+            'errors': errors,
+            'error_rate': round(error_rate, 2),
+            'avg_response_time': round(avg_response_time, 2)
+        },
+        'security': {
+            'total': security_events.count(),
+            'unresolved': security_events.filter(resolved=False).count(),
+            'by_type': security_by_type
+        },
+        'content': {
+            'new_places': new_places,
+            'approved_places': approved_places,
+            'pending_places': pending_places,
+            'pending_suggestions': pending_suggestions + pending_image_suggestions,
+            'unread_contacts': unread_contacts
+        },
+        'admin_actions': {
+            'total': admin_actions.count(),
+            'by_type': actions_by_type
+        },
+        'users': {
+            'new_users': new_users,
+            'active_users': active_users
+        }
     }
+
+
+def _format_digest_text(stats: Dict[str, Any], date):
+    """
+    Format statistics into readable email text.
     
-    return stats
-
-
-def _format_digest_text(stats, date):
-    """Format daily digest as plain text."""
-    text = f"""
-HALAL KOREA DAILY MONITORING DIGEST
-Date: {date.strftime('%Y-%m-%d')}
-=====================================
-
-REQUEST STATISTICS
-------------------
-Total Requests: {stats['requests']['total']:,}
-Errors (5xx): {stats['requests']['errors']} ({stats['requests']['error_rate']:.2f}%)
-Avg Response Time: {stats['requests']['avg_response_time']:.0f}ms
-
-SECURITY EVENTS
----------------
-Total Events: {stats['security']['total']}
-Unresolved: {stats['security']['unresolved']}
-"""
+    Args:
+        stats: Statistics dictionary from _gather_daily_stats
+        date: Date for the report
+    
+    Returns:
+        Formatted email text
+    """
+    lines = []
+    lines.append("=" * 70)
+    lines.append(f"HALAL KOREA - DAILY MONITORING DIGEST")
+    lines.append(f"Date: {date.strftime('%A, %B %d, %Y')}")
+    lines.append("=" * 70)
+    lines.append("")
+    
+    # Request Statistics
+    lines.append("📊 REQUEST STATISTICS")
+    lines.append("-" * 70)
+    lines.append(f"Total Requests:      {stats['requests']['total']:,}")
+    lines.append(f"Errors:              {stats['requests']['errors']:,}")
+    lines.append(f"Error Rate:          {stats['requests']['error_rate']}%")
+    lines.append(f"Avg Response Time:   {stats['requests']['avg_response_time']:.2f} ms")
+    lines.append("")
+    
+    # Security Events
+    lines.append("🔒 SECURITY EVENTS")
+    lines.append("-" * 70)
+    lines.append(f"Total Events:        {stats['security']['total']}")
+    lines.append(f"Unresolved:          {stats['security']['unresolved']}")
     
     if stats['security']['by_type']:
-        text += "\nBy Type:\n"
-        for event_type, count in stats['security']['by_type'].items():
-            text += f"  • {event_type}: {count}\n"
+        lines.append("\nBy Type:")
+        for event_type, count in sorted(stats['security']['by_type'].items()):
+            lines.append(f"  - {event_type}: {count}")
+    else:
+        lines.append("  (No security events)")
+    lines.append("")
     
-    text += f"""
-CONTENT STATISTICS
-------------------
-New Places Submitted: {stats['content']['new_places']}
-Places Approved: {stats['content']['approved_places']}
-Pending Places: {stats['content']['pending_places']}
-Pending Suggestions: {stats['content']['pending_suggestions']}
-Unread Contact Messages: {stats['content']['unread_contacts']}
-
-ADMIN ACTIVITY
---------------
-Total Actions: {stats['admin_actions']['total']}
-"""
+    # Content Statistics
+    lines.append("📝 CONTENT STATISTICS")
+    lines.append("-" * 70)
+    lines.append(f"New Places:          {stats['content']['new_places']}")
+    lines.append(f"Approved Places:     {stats['content']['approved_places']}")
+    lines.append(f"Pending Places:      {stats['content']['pending_places']}")
+    lines.append(f"Pending Suggestions: {stats['content']['pending_suggestions']}")
+    lines.append(f"Unread Contacts:     {stats['content']['unread_contacts']}")
+    lines.append("")
+    
+    # Admin Activity
+    lines.append("👤 ADMIN ACTIVITY")
+    lines.append("-" * 70)
+    lines.append(f"Total Actions:       {stats['admin_actions']['total']}")
     
     if stats['admin_actions']['by_type']:
-        text += "\nBy Type:\n"
-        for action_type, count in stats['admin_actions']['by_type'].items():
-            text += f"  • {action_type}: {count}\n"
+        lines.append("\nBy Type:")
+        for action_type, count in sorted(stats['admin_actions']['by_type'].items()):
+            lines.append(f"  - {action_type}: {count}")
+    else:
+        lines.append("  (No admin actions)")
+    lines.append("")
     
-    site_url = getattr(settings, 'SITE_URL', 'http://localhost:8000')
-    text += f"\n\nView full dashboard: {site_url}/admin/monitoring/\n"
+    # User Statistics
+    lines.append("👥 USER STATISTICS")
+    lines.append("-" * 70)
+    lines.append(f"New Users:           {stats['users']['new_users']}")
+    lines.append(f"Active Users:        {stats['users']['active_users']}")
+    lines.append("")
     
-    return text
-
-
-def _format_digest_html(stats, date):
-    """Format daily digest as HTML (optional enhancement)."""
-    # For now, return None to use plain text only
-    # Can be enhanced later with proper HTML templates
-    return None
-
-
-def send_weekly_summary():
-    """
-    Send weekly summary email with trends and insights.
-    Should be run once per week via cron.
-    """
-    # Placeholder for future implementation
-    logger.info("Weekly summary email not yet implemented")
-    return False
-
+    # Footer
+    lines.append("=" * 70)
+    lines.append("This is an automated daily digest from Halal Korea Monitoring System")
+    lines.append(f"Generated at: {timezone.now().strftime('%Y-%m-%d %H:%M:%S %Z')}")
+    lines.append("=" * 70)
+    
+    return "\n".join(lines)

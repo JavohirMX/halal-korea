@@ -144,13 +144,12 @@ class AlertRuleEvaluationTests(TestCase):
         rule = AlertRule.objects.create(
             name='Old Pending Content',
             condition='queue_age_above',
-            threshold=48,  # 48 hours
+            threshold=0,  # 0 hours - any pending content triggers
             window_minutes=60,
             enabled=True
         )
         
-        # Create old pending place
-        old_time = timezone.now() - timezone.timedelta(hours=72)
+        # Create pending place (created_at will be now due to auto_now_add)
         HalalPlace.objects.create(
             name='Old Place',
             description='Test',
@@ -158,18 +157,13 @@ class AlertRuleEvaluationTests(TestCase):
             location=Point(126.9780, 37.5665),
             address='Test',
             status='pending',
-            submitted_by=self.user,
-            created_at=old_time
+            submitted_by=self.user
         )
         
-        # Try to check queue age, but it's okay if not fully implemented
-        try:
-            is_triggered, context = self.manager._check_queue_age(rule)
-            if is_triggered:
-                self.assertGreater(context['old_items'], 0)
-        except (AttributeError, KeyError):
-            # Method might not be fully implemented yet
-            self.skipTest("_check_queue_age not fully implemented")
+        is_triggered, context = self.manager._check_queue_age(rule)
+        
+        self.assertTrue(is_triggered)
+        self.assertGreater(context['old_items'], 0)
     
     def test_cache_hit_rate_alert_triggers(self):
         """Test cache hit rate alert triggers when below threshold."""
