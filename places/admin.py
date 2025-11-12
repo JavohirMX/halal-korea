@@ -8,7 +8,6 @@ from django.urls import path
 from django.http import HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
-from django.utils.safestring import mark_safe
 from django.forms import ModelForm, CharField, Textarea
 from django.core.exceptions import ValidationError
 import json
@@ -507,7 +506,7 @@ class PlaceEditSuggestionAdmin(admin.ModelAdmin):
             else:
                 failed_count += 1
                 # Keep the suggestion as pending but add admin notes
-                suggestion.admin_notes = f"Failed to apply automatically. Please review manually."
+                suggestion.admin_notes = "Failed to apply automatically. Please review manually."
                 suggestion.save()
         
         if approved_count:
@@ -532,7 +531,6 @@ class PlaceEditSuggestionAdmin(admin.ModelAdmin):
     def _apply_suggestion(self, suggestion, reviewer):
         """Apply an approved suggestion to the place"""
         try:
-            from django.contrib import messages
             import logging
             logger = logging.getLogger(__name__)
             
@@ -603,6 +601,25 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
     )
     actions = ['approve_image_suggestions', 'reject_image_suggestions', 'reapply_watermark_action', 'apply_watermark_to_existing']
 
+    def save_model(self, request, obj, form, change):
+        previous_status = None
+        if change and obj.pk:
+            previous_status = PlaceImageSuggestion.objects.filter(pk=obj.pk).values_list('status', flat=True).first()
+        status_changed_to_approved = obj.status == 'approved' and previous_status != 'approved'
+
+        if status_changed_to_approved:
+            if not obj.reviewed_by:
+                obj.reviewed_by = request.user
+            obj.reviewed_at = timezone.now()
+
+        super().save_model(request, obj, form, change)
+
+        if status_changed_to_approved:
+            if self._apply_image_suggestion(obj, request.user):
+                messages.success(request, f"Image added to {obj.place.name} photos.")
+            else:
+                messages.error(request, f"Failed to attach image to {obj.place.name}. Check logs for details.")
+
     def image_preview(self, obj):
         if obj.image:
             return format_html(
@@ -629,7 +646,7 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
             else:
                 failed_count += 1
                 # Keep the suggestion as pending but add admin notes
-                suggestion.admin_notes = f"Failed to apply automatically. Please review manually."
+                suggestion.admin_notes = "Failed to apply automatically. Please review manually."
                 suggestion.save()
         
         if approved_count:
@@ -679,7 +696,6 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
     
     def apply_watermark_to_existing(self, request, queryset):
         """Apply watermark to images that don't have one yet"""
-        from django.conf import settings
         from utils.watermark import apply_watermark_to_uploaded_file
         from django.core.files.base import ContentFile
         import io
