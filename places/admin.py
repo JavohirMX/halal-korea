@@ -18,6 +18,30 @@ from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 logger = logging.getLogger(__name__)
 
 
+class PlaceEditSuggestionAdminForm(ModelForm):
+    """Custom form for PlaceEditSuggestion admin with helpful guidance"""
+    
+    class Meta:
+        model = PlaceEditSuggestion
+        fields = '__all__'
+        help_texts = {
+            'status': 'Change to "Approved" to automatically apply this suggestion to the place. Change to "Rejected" to dismiss it.',
+            'admin_notes': 'Optional notes for internal use. Will be auto-populated if automatic application fails.',
+        }
+
+
+class PlaceImageSuggestionAdminForm(ModelForm):
+    """Custom form for PlaceImageSuggestion admin with helpful guidance"""
+    
+    class Meta:
+        model = PlaceImageSuggestion
+        fields = '__all__'
+        help_texts = {
+            'status': 'Change to "Approved" to automatically add this image to the place gallery. Change to "Rejected" to dismiss it.',
+            'admin_notes': 'Optional notes for internal use. Will be auto-populated if automatic application fails.',
+        }
+
+
 # Custom admin filters
 class StatusFilter(admin.SimpleListFilter):
     title = 'Status'
@@ -460,10 +484,12 @@ class HalalPlaceAdmin(admin.ModelAdmin):
 
 @admin.register(PlaceEditSuggestion)
 class PlaceEditSuggestionAdmin(admin.ModelAdmin):
-    list_display = ('place', 'field_name', 'suggested_by', 'status', 'created_at', 'reviewed_by')
+    form = PlaceEditSuggestionAdminForm
+    list_display = ('place', 'field_name', 'suggested_by', 'status_display', 'created_at', 'reviewed_by', 'quick_actions')
     list_filter = ('status', 'field_name', 'created_at')
     search_fields = ('place__name', 'suggested_by__username', 'reason')
     readonly_fields = ('created_at', 'current_value_display', 'suggested_value_display')
+    ordering = ('status', '-created_at')  # Pending first, then newest first
     raw_id_fields = ('place', 'suggested_by', 'reviewed_by')
     fieldsets = (
         ('Suggestion Info', {
@@ -481,6 +507,86 @@ class PlaceEditSuggestionAdmin(admin.ModelAdmin):
         })
     )
     actions = ['approve_suggestions', 'reject_suggestions']
+
+    def status_display(self, obj):
+        """Display status with colored indicators"""
+        if obj.status == 'pending':
+            return format_html(
+                '<span style="color: #dc2626; font-weight: bold;">⏳ Pending</span>'
+            )
+        elif obj.status == 'approved':
+            return format_html(
+                '<span style="color: #059669; font-weight: bold;">✅ Approved</span>'
+            )
+        elif obj.status == 'rejected':
+            return format_html(
+                '<span style="color: #dc2626; font-weight: bold;">❌ Rejected</span>'
+            )
+        return obj.get_status_display()
+    status_display.short_description = "Status"
+
+    def quick_actions(self, obj):
+        """Display quick action buttons for pending suggestions"""
+        if obj.status == 'pending':
+            return format_html(
+                '<div style="white-space: nowrap;">'
+                '<a href="{}?status=approved" '
+                'style="background: #059669; color: white; padding: 4px 8px; '
+                'border-radius: 4px; text-decoration: none; margin-right: 4px; font-size: 11px;">'
+                '✅ Approve</a>'
+                '<a href="{}?status=rejected" '
+                'style="background: #dc2626; color: white; padding: 4px 8px; '
+                'border-radius: 4px; text-decoration: none; font-size: 11px;">'
+                '❌ Reject</a>'
+                '</div>',
+                f'/admin/places/placeeditsuggestion/{obj.pk}/change/',
+                f'/admin/places/placeeditsuggestion/{obj.pk}/change/'
+            )
+        return '-'
+    quick_actions.short_description = "Quick Actions"
+
+    def save_model(self, request, obj, form, change):
+        """Handle individual approval when admin changes status to approved"""
+        previous_status = None
+        if change and obj.pk:
+            # Get the previous status before saving
+            previous_status = PlaceEditSuggestion.objects.filter(pk=obj.pk).values_list('status', flat=True).first()
+        
+        # Check if status is being changed to approved
+        status_changed_to_approved = obj.status == 'approved' and previous_status != 'approved'
+        
+        if status_changed_to_approved:
+            # Set reviewer info
+            obj.reviewed_by = request.user
+            obj.reviewed_at = timezone.now()
+            
+            # Try to apply the suggestion
+            if self._apply_suggestion(obj, request.user):
+                try:
+                    messages.success(request, f'✅ Suggestion approved and applied successfully: {obj.get_field_name_display()} for "{obj.place.name}"')
+                except Exception:
+                    # Messages framework not available (e.g., in tests)
+                    pass
+            else:
+                # If application failed, keep as pending but add admin notes
+                obj.status = 'pending'
+                obj.admin_notes = f"Failed to apply automatically on {timezone.now().strftime('%Y-%m-%d %H:%M')}. Please review manually."
+                try:
+                    messages.error(request, f'❌ Failed to apply suggestion for {obj.get_field_name_display()}. Check admin notes for details.')
+                except Exception:
+                    # Messages framework not available (e.g., in tests)
+                    pass
+        elif obj.status == 'rejected' and previous_status != 'rejected':
+            # Set reviewer info for rejection
+            obj.reviewed_by = request.user
+            obj.reviewed_at = timezone.now()
+            try:
+                messages.info(request, f'❌ Suggestion rejected: {obj.get_field_name_display()} for "{obj.place.name}"')
+            except Exception:
+                # Messages framework not available (e.g., in tests)
+                pass
+        
+        super().save_model(request, obj, form, change)
 
     def current_value_display(self, obj):
         if obj.current_value:
@@ -579,10 +685,12 @@ class PlaceEditSuggestionAdmin(admin.ModelAdmin):
 
 @admin.register(PlaceImageSuggestion)
 class PlaceImageSuggestionAdmin(admin.ModelAdmin):
-    list_display = ('place', 'suggested_by', 'status', 'created_at', 'reviewed_by', 'image_preview')
+    form = PlaceImageSuggestionAdminForm
+    list_display = ('place', 'suggested_by', 'status_display', 'created_at', 'reviewed_by', 'image_preview', 'quick_actions')
     list_filter = ('status', 'created_at')
     search_fields = ('place__name', 'suggested_by__username', 'caption')
     readonly_fields = ('created_at', 'image_preview')
+    ordering = ('status', '-created_at')  # Pending first, then newest first
     raw_id_fields = ('place', 'suggested_by', 'reviewed_by')
     fieldsets = (
         ('Suggestion Info', {
@@ -601,24 +709,92 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
     )
     actions = ['approve_image_suggestions', 'reject_image_suggestions', 'reapply_watermark_action', 'apply_watermark_to_existing']
 
+    def status_display(self, obj):
+        """Display status with colored indicators"""
+        if obj.status == 'pending':
+            return format_html(
+                '<span style="color: #dc2626; font-weight: bold;">⏳ Pending</span>'
+            )
+        elif obj.status == 'approved':
+            return format_html(
+                '<span style="color: #059669; font-weight: bold;">✅ Approved</span>'
+            )
+        elif obj.status == 'rejected':
+            return format_html(
+                '<span style="color: #dc2626; font-weight: bold;">❌ Rejected</span>'
+            )
+        return obj.get_status_display()
+    status_display.short_description = "Status"
+
+    def quick_actions(self, obj):
+        """Display quick action buttons for pending suggestions"""
+        if obj.status == 'pending':
+            return format_html(
+                '<div style="white-space: nowrap;">'
+                '<a href="{}?status=approved" '
+                'style="background: #059669; color: white; padding: 4px 8px; '
+                'border-radius: 4px; text-decoration: none; margin-right: 4px; font-size: 11px;">'
+                '✅ Approve</a>'
+                '<a href="{}?status=rejected" '
+                'style="background: #dc2626; color: white; padding: 4px 8px; '
+                'border-radius: 4px; text-decoration: none; font-size: 11px;">'
+                '❌ Reject</a>'
+                '</div>',
+                f'/admin/places/placeimagesuggestion/{obj.pk}/change/',
+                f'/admin/places/placeimagesuggestion/{obj.pk}/change/'
+            )
+        return '-'
+    quick_actions.short_description = "Quick Actions"
+
     def save_model(self, request, obj, form, change):
+        """Handle individual approval when admin changes status to approved"""
         previous_status = None
         if change and obj.pk:
+            # Get the previous status before saving
             previous_status = PlaceImageSuggestion.objects.filter(pk=obj.pk).values_list('status', flat=True).first()
+        
+        # Check if status is being changed to approved
         status_changed_to_approved = obj.status == 'approved' and previous_status != 'approved'
-
+        
         if status_changed_to_approved:
+            # Set reviewer info
             if not obj.reviewed_by:
                 obj.reviewed_by = request.user
             obj.reviewed_at = timezone.now()
-
-        super().save_model(request, obj, form, change)
-
-        if status_changed_to_approved:
+            
+            # Save first to ensure we have the updated object
+            super().save_model(request, obj, form, change)
+            
+            # Try to apply the image suggestion
             if self._apply_image_suggestion(obj, request.user):
-                messages.success(request, f"Image added to {obj.place.name} photos.")
+                try:
+                    messages.success(request, f'✅ Image approved and added successfully to "{obj.place.name}" photo gallery')
+                except Exception:
+                    # Messages framework not available (e.g., in tests)
+                    pass
             else:
-                messages.error(request, f"Failed to attach image to {obj.place.name}. Check logs for details.")
+                # If application failed, revert to pending and add admin notes
+                obj.status = 'pending'
+                obj.admin_notes = f"Failed to apply automatically on {timezone.now().strftime('%Y-%m-%d %H:%M')}. Please review manually."
+                obj.save(update_fields=['status', 'admin_notes'])
+                try:
+                    messages.error(request, f'❌ Failed to add image to "{obj.place.name}". Check admin notes for details.')
+                except Exception:
+                    # Messages framework not available (e.g., in tests)
+                    pass
+        elif obj.status == 'rejected' and previous_status != 'rejected':
+            # Set reviewer info for rejection
+            obj.reviewed_by = request.user
+            obj.reviewed_at = timezone.now()
+            try:
+                messages.info(request, f'❌ Image suggestion rejected for "{obj.place.name}"')
+            except Exception:
+                # Messages framework not available (e.g., in tests)
+                pass
+            super().save_model(request, obj, form, change)
+        else:
+            # Normal save for other changes
+            super().save_model(request, obj, form, change)
 
     def image_preview(self, obj):
         if obj.image:
