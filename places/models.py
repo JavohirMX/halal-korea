@@ -199,7 +199,7 @@ class PlaceImageSuggestion(models.Model):
                 img_io.seek(0)
                 
                 # Replace the image field with watermarked version
-                watermarked_filename = f"watermarked_{self.image.name}"
+                watermarked_filename = f"wm_{self.image.name}"
                 self.image.save(
                     watermarked_filename,
                     ContentFile(img_io.read()),
@@ -252,7 +252,7 @@ class PlaceImageSuggestion(models.Model):
             img_io.seek(0)
             
             # Replace the watermarked image
-            watermarked_filename = f"watermarked_{Path(self.original_image.name).name}"
+            watermarked_filename = f"wm_{Path(self.original_image.name).name}"
             self.image.save(
                 watermarked_filename,
                 ContentFile(img_io.read()),

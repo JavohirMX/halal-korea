@@ -488,7 +488,7 @@ class PlaceEditSuggestionAdmin(admin.ModelAdmin):
     list_display = ('place', 'field_name', 'suggested_by', 'status_display', 'created_at', 'reviewed_by', 'quick_actions')
     list_filter = ('status', 'field_name', 'created_at')
     search_fields = ('place__name', 'suggested_by__username', 'reason')
-    readonly_fields = ('created_at', 'current_value_display', 'suggested_value_display')
+    readonly_fields = ('created_at', 'current_value_display', 'suggested_value_display', 'reviewed_by', 'reviewed_at')
     ordering = ('status', '-created_at')  # Pending first, then newest first
     raw_id_fields = ('place', 'suggested_by', 'reviewed_by')
     fieldsets = (
@@ -689,7 +689,7 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
     list_display = ('place', 'suggested_by', 'status_display', 'created_at', 'reviewed_by', 'image_preview', 'quick_actions')
     list_filter = ('status', 'created_at')
     search_fields = ('place__name', 'suggested_by__username', 'caption')
-    readonly_fields = ('created_at', 'image_preview')
+    readonly_fields = ('created_at', 'image_preview', 'reviewed_by', 'reviewed_at')
     ordering = ('status', '-created_at')  # Pending first, then newest first
     raw_id_fields = ('place', 'suggested_by', 'reviewed_by')
     fieldsets = (
@@ -915,7 +915,7 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
                 img_io.seek(0)
                 
                 # Save watermarked version
-                watermarked_filename = f"watermarked_{Path(suggestion.original_image.name).name}"
+                watermarked_filename = f"wm_{Path(suggestion.original_image.name).name}"
                 suggestion.image.save(
                     watermarked_filename,
                     ContentFile(img_io.read()),
