@@ -26,11 +26,11 @@ class SocialAuthRateLimitMiddleware(MiddlewareMixin):
             '/accounts/google/login/',
             '/accounts/facebook/login/',
             '/accounts/github/login/',
-            '/accounts/apple/login/',
+            # '/accounts/apple/login/',  # Commented out temporarily
             '/accounts/google/login/callback/',
             '/accounts/facebook/login/callback/',
             '/accounts/github/login/callback/',
-            '/accounts/apple/login/callback/',
+            # '/accounts/apple/login/callback/',  # Commented out temporarily
         ]
         
         # Rate limiting configuration for social auth
@@ -77,7 +77,7 @@ class SocialAuthRateLimitMiddleware(MiddlewareMixin):
     
     def _extract_provider_from_path(self, path):
         """Extract provider name from URL path"""
-        for provider in ['google', 'facebook', 'github', 'apple']:
+        for provider in ['google', 'facebook', 'github']:  # 'apple' commented out temporarily
             if f'/{provider}/' in path:
                 return provider
         return None
@@ -174,6 +174,6 @@ def get_social_auth_rate_limits():
         'SOCIAL_AUTH_FACEBOOK_PER_IP_WINDOW': 60,
         'SOCIAL_AUTH_GITHUB_PER_IP_LIMIT': 10,
         'SOCIAL_AUTH_GITHUB_PER_IP_WINDOW': 60,
-        'SOCIAL_AUTH_APPLE_PER_IP_LIMIT': 10,
-        'SOCIAL_AUTH_APPLE_PER_IP_WINDOW': 60,
+        # 'SOCIAL_AUTH_APPLE_PER_IP_LIMIT': 10,  # Commented out temporarily
+        # 'SOCIAL_AUTH_APPLE_PER_IP_WINDOW': 60,  # Commented out temporarily
     }

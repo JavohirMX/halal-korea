@@ -83,7 +83,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.apple',
+    # 'allauth.socialaccount.providers.apple',  # Commented out temporarily
     
     # Local apps
     'places',
@@ -213,8 +213,8 @@ RATE_LIMIT_SETTINGS = {
     'SOCIAL_AUTH_FACEBOOK_PER_IP_WINDOW': 60,
     'SOCIAL_AUTH_GITHUB_PER_IP_LIMIT': 10,
     'SOCIAL_AUTH_GITHUB_PER_IP_WINDOW': 60,
-    'SOCIAL_AUTH_APPLE_PER_IP_LIMIT': 10,
-    'SOCIAL_AUTH_APPLE_PER_IP_WINDOW': 60,
+    # 'SOCIAL_AUTH_APPLE_PER_IP_LIMIT': 10,  # Commented out temporarily
+    # 'SOCIAL_AUTH_APPLE_PER_IP_WINDOW': 60,  # Commented out temporarily
 }
 
 # Logging Configuration
@@ -615,14 +615,14 @@ SOCIALACCOUNT_PROVIDERS = {
             'user:email',
         ],
     },
-    'apple': {
-        'APP': {
-            'client_id': config('APPLE_CLIENT_ID', default=''),
-            'secret': config('APPLE_SECRET', default=''),
-            'key': config('APPLE_KEY_ID', default=''),
-            'team': config('APPLE_TEAM_ID', default=''),
-        }
-    },
+    # 'apple': {  # Commented out temporarily
+    #     'APP': {
+    #         'client_id': config('APPLE_CLIENT_ID', default=''),
+    #         'secret': config('APPLE_SECRET', default=''),
+    #         'key': config('APPLE_KEY_ID', default=''),
+    #         'team': config('APPLE_TEAM_ID', default=''),
+    #     }
+    # },
 }
 
 # OAuth Client Credentials (to be set in environment variables)
