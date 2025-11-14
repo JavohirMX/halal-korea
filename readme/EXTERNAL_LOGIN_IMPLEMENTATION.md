@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the external login/signup implementation for the Halal Korea project. The implementation provides comprehensive social authentication support for Google, Facebook, GitHub, and Apple with automatic account merging and profile data import.
+This document summarizes the external login/signup implementation for the Halal Korea project. The implementation provides comprehensive social authentication support for Google and GitHub with automatic account merging and profile data import.
 
 ## Implementation Details
 
@@ -10,7 +10,7 @@ This document summarizes the external login/signup implementation for the Halal 
 
 #### Django AllAuth Integration
 - **Package**: `django-allauth==0.57.0`
-- **Providers**: Google, Facebook, GitHub, Apple
+- **Providers**: Google, GitHub
 - **Features**: OAuth2, profile data import, account merging
 
 #### Custom User Model Extensions
@@ -24,7 +24,7 @@ This document summarizes the external login/signup implementation for the Halal 
 - **CustomSocialAccountAdapter**: Handles account merging and profile import
 - **Account Merging**: Automatically merges accounts by email address
 - **Profile Import**: Imports name, email, and profile pictures
-- **Email Verification**: Trusts Google and Apple providers
+- **Email Verification**: Trusts Google providers
 
 ### 2. Security Features
 
@@ -63,19 +63,9 @@ This document summarizes the external login/signup implementation for the Halal 
 GOOGLE_OAUTH_CLIENT_ID=your_google_client_id
 GOOGLE_OAUTH_CLIENT_SECRET=your_google_client_secret
 
-# Facebook OAuth
-FACEBOOK_APP_ID=your_facebook_app_id
-FACEBOOK_APP_SECRET=your_facebook_app_secret
-
 # GitHub OAuth
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
-
-# Apple Sign In
-APPLE_CLIENT_ID=your_apple_service_id
-APPLE_SECRET=your_apple_private_key_content
-APPLE_KEY_ID=your_apple_key_id
-APPLE_TEAM_ID=your_apple_team_id
 ```
 
 #### Django Settings
@@ -102,9 +92,7 @@ APPLE_TEAM_ID=your_apple_team_id
 
 #### New Endpoints
 - `/accounts/google/login/`: Google OAuth initiation
-- `/accounts/facebook/login/`: Facebook OAuth initiation
 - `/accounts/github/login/`: GitHub OAuth initiation
-- `/accounts/apple/login/`: Apple Sign In initiation
 - `/accounts/*/login/callback/`: OAuth callback handlers
 - `/accounts/social/connections/`: Account management
 

@@ -8,7 +8,6 @@ from django.urls import reverse
 from unittest.mock import patch, MagicMock
 from allauth.socialaccount.models import SocialApp, SocialAccount
 from allauth.socialaccount.providers.google.provider import GoogleProvider
-from allauth.socialaccount.providers.facebook.provider import FacebookProvider
 
 User = get_user_model()
 
@@ -28,13 +27,7 @@ class SocialAuthIntegrationTest(TestCase):
         )
         self.google_app.sites.add(1)  # Add to default site
         
-        self.facebook_app = SocialApp.objects.create(
-            provider='facebook',
-            name='Facebook',
-            client_id='test_facebook_client_id',
-            secret='test_facebook_secret',
-        )
-        self.facebook_app.sites.add(1)
+
     
     def test_user_model_extensions(self):
         """Test that User model has social auth fields"""
@@ -89,9 +82,7 @@ class SocialAuthIntegrationTest(TestCase):
         # Check for social login elements
         self.assertContains(response, 'provider_login_url')
         self.assertContains(response, 'Google')
-        self.assertContains(response, 'Facebook')
         self.assertContains(response, 'GitHub')
-        self.assertContains(response, 'Apple')
         self.assertContains(response, 'Twitter')
     
     def test_register_template_has_social_buttons(self):
@@ -102,9 +93,7 @@ class SocialAuthIntegrationTest(TestCase):
         # Check for social signup elements
         self.assertContains(response, 'provider_login_url')
         self.assertContains(response, 'Google')
-        self.assertContains(response, 'Facebook')
         self.assertContains(response, 'GitHub')
-        self.assertContains(response, 'Apple')
         self.assertContains(response, 'Twitter')
     
     def test_social_auth_urls_configured(self):

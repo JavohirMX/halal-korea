@@ -81,9 +81,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.github',
-    # 'allauth.socialaccount.providers.apple',  # Commented out temporarily
     
     # Local apps
     'places',
@@ -209,12 +207,8 @@ RATE_LIMIT_SETTINGS = {
     'SOCIAL_AUTH_PER_IP_WINDOW': 60,       # minutes
     'SOCIAL_AUTH_GOOGLE_PER_IP_LIMIT': 15,
     'SOCIAL_AUTH_GOOGLE_PER_IP_WINDOW': 60,
-    'SOCIAL_AUTH_FACEBOOK_PER_IP_LIMIT': 15,
-    'SOCIAL_AUTH_FACEBOOK_PER_IP_WINDOW': 60,
     'SOCIAL_AUTH_GITHUB_PER_IP_LIMIT': 10,
     'SOCIAL_AUTH_GITHUB_PER_IP_WINDOW': 60,
-    # 'SOCIAL_AUTH_APPLE_PER_IP_LIMIT': 10,  # Commented out temporarily
-    # 'SOCIAL_AUTH_APPLE_PER_IP_WINDOW': 60,  # Commented out temporarily
 }
 
 # Logging Configuration
@@ -588,41 +582,12 @@ SOCIALACCOUNT_PROVIDERS = {
         'OAUTH_PKCE_ENABLED': True,
         'FETCH_USERINFO': True,
     },
-    'facebook': {
-        'METHOD': 'oauth2',
-        'SDK_URL': '//connect.facebook.net/{locale}/sdk.js',
-        'SCOPE': ['email', 'public_profile'],
-        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
-        'INIT_PARAMS': {'cookie': True},
-        'FIELDS': [
-            'id',
-            'first_name',
-            'last_name',
-            'middle_name',
-            'name',
-            'name_format',
-            'picture',
-            'short_name',
-            'email',
-        ],
-        'EXCHANGE_TOKEN': True,
-        'LOCALE_FUNC': lambda request: 'en_US',
-        'VERIFIED_EMAIL': False,
-        'VERSION': 'v18.0',
-    },
+
     'github': {
         'SCOPE': [
             'user:email',
         ],
     },
-    # 'apple': {  # Commented out temporarily
-    #     'APP': {
-    #         'client_id': config('APPLE_CLIENT_ID', default=''),
-    #         'secret': config('APPLE_SECRET', default=''),
-    #         'key': config('APPLE_KEY_ID', default=''),
-    #         'team': config('APPLE_TEAM_ID', default=''),
-    #     }
-    # },
 }
 
 # OAuth Client Credentials (to be set in environment variables)
@@ -630,12 +595,6 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_PROVIDERS['google']['APP'] = {
     'client_id': config('GOOGLE_OAUTH_CLIENT_ID', default=''),
     'secret': config('GOOGLE_OAUTH_CLIENT_SECRET', default=''),
-}
-
-# Facebook OAuth
-SOCIALACCOUNT_PROVIDERS['facebook']['APP'] = {
-    'client_id': config('FACEBOOK_APP_ID', default=''),
-    'secret': config('FACEBOOK_APP_SECRET', default=''),
 }
 
 # GitHub OAuth

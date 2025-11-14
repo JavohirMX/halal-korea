@@ -6,9 +6,7 @@ This guide explains how to set up OAuth applications for each social provider an
 
 The Halal Korea application supports external authentication through:
 - Google OAuth2
-- Facebook Login
 - GitHub OAuth
-- Apple Sign In
 
 ## Environment Variables
 
@@ -19,19 +17,9 @@ Add these variables to your `.env` file:
 GOOGLE_OAUTH_CLIENT_ID=your_google_client_id
 GOOGLE_OAUTH_CLIENT_SECRET=your_google_client_secret
 
-# Facebook OAuth
-FACEBOOK_APP_ID=your_facebook_app_id
-FACEBOOK_APP_SECRET=your_facebook_app_secret
-
 # GitHub OAuth
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
-
-# Apple Sign In
-APPLE_CLIENT_ID=your_apple_service_id
-APPLE_SECRET=your_apple_private_key_content
-APPLE_KEY_ID=your_apple_key_id
-APPLE_TEAM_ID=your_apple_team_id
 ```
 
 ## Provider Setup Instructions
@@ -48,17 +36,7 @@ APPLE_TEAM_ID=your_apple_team_id
    - Production: `https://yourdomain.com/accounts/google/login/callback/`
 7. Copy Client ID and Client Secret to your `.env` file
 
-### 2. Facebook Login
-
-1. Go to [Facebook Developers](https://developers.facebook.com/)
-2. Create a new app or select existing one
-3. Add "Facebook Login" product
-4. In Facebook Login settings, add Valid OAuth Redirect URIs:
-   - Development: `http://localhost:8000/accounts/facebook/login/callback/`
-   - Production: `https://yourdomain.com/accounts/facebook/login/callback/`
-5. Copy App ID and App Secret to your `.env` file
-
-### 3. GitHub OAuth
+### 2. GitHub OAuth
 
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
 2. Click "New OAuth App"
@@ -69,22 +47,6 @@ APPLE_TEAM_ID=your_apple_team_id
      - Development: `http://localhost:8000/accounts/github/login/callback/`
      - Production: `https://yourdomain.com/accounts/github/login/callback/`
 4. Copy Client ID and Client Secret to your `.env` file
-
-### 4. Apple Sign In
-
-1. Go to [Apple Developer Portal](https://developer.apple.com/account/)
-2. Create a new App ID with Sign In with Apple capability
-3. Create a Services ID:
-   - Configure it for Sign In with Apple
-   - Add your domain and redirect URLs:
-     - Development: `http://localhost:8000/accounts/apple/login/callback/`
-     - Production: `https://yourdomain.com/accounts/apple/login/callback/`
-4. Create a private key for Sign In with Apple
-5. Configure environment variables:
-   - `APPLE_CLIENT_ID`: Your Services ID
-   - `APPLE_SECRET`: Content of your private key file
-   - `APPLE_KEY_ID`: Key ID from Apple Developer Portal
-   - `APPLE_TEAM_ID`: Your Apple Developer Team ID
 
 
 ## Testing the Integration
@@ -106,8 +68,7 @@ APPLE_TEAM_ID=your_apple_team_id
 
 1. **Redirect URI Mismatch**: Ensure the callback URLs in your OAuth apps match exactly with your domain
 2. **Missing Scopes**: Check that you've requested the necessary permissions (email, profile)
-3. **SSL Required**: Some providers (Apple) require HTTPS in production
-4. **App Review**: Facebook may require app review for production use
+3. **SSL Required**: Some providers require HTTPS in production
 
 ### Debug Mode
 
@@ -138,7 +99,7 @@ The existing rate limiting system automatically covers social authentication end
 
 - If a user signs up with email `user@example.com` normally, then later tries to login with Google using the same email, the accounts will be automatically merged
 - Users can link/unlink social accounts from their profile page
-- Email verification is automatically trusted for Google and Apple providers
+- Email verification is automatically trusted for Google providers
 - Profile pictures are automatically imported and stored locally
 
 ## Production Deployment

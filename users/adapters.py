@@ -100,7 +100,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         self._import_profile_data(sociallogin, user)
         
         # Set email as verified for trusted providers
-        if sociallogin.account.provider in ['google', 'apple']:
+        if sociallogin.account.provider in ['google', 'github']:
             user.email_verified = True
             logger.info(f"Email auto-verified for {sociallogin.account.provider} user {user.username}")
         
@@ -123,9 +123,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             if provider == 'google':
                 user.first_name = extra_data.get('given_name', '')[:30]
                 user.last_name = extra_data.get('family_name', '')[:30]
-            elif provider == 'facebook':
-                user.first_name = extra_data.get('first_name', '')[:30]
-                user.last_name = extra_data.get('last_name', '')[:30]
             elif provider == 'github':
                 name = extra_data.get('name', '')
                 if name:
@@ -133,12 +130,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                     user.first_name = name_parts[0][:30]
                     if len(name_parts) > 1:
                         user.last_name = name_parts[1][:30]
-            elif provider == 'apple':
-                # Apple provides name in a different format
-                name = extra_data.get('name', {})
-                if isinstance(name, dict):
-                    user.first_name = name.get('firstName', '')[:30]
-                    user.last_name = name.get('lastName', '')[:30]
             
             # Set username if not already set
             if not user.username:
@@ -163,15 +154,8 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             # Get profile picture URL based on provider
             if provider == 'google':
                 picture_url = extra_data.get('picture')
-            elif provider == 'facebook':
-                picture_data = extra_data.get('picture', {})
-                if isinstance(picture_data, dict):
-                    picture_url = picture_data.get('data', {}).get('url')
             elif provider == 'github':
                 picture_url = extra_data.get('avatar_url')
-            elif provider == 'apple':
-                # Apple doesn't provide profile pictures
-                pass
             
             if picture_url:
                 # Store the URL for immediate use
