@@ -255,7 +255,7 @@
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Places List -->
-        <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto" id="places-container">
+        <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide" id="places-container">
             <!-- Places will be loaded here dynamically -->
             {% include 'places/partials/place_list.html' with places=places %}
             

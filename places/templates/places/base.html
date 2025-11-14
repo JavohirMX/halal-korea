@@ -204,26 +204,38 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
-        /* Scrollbar Styles */
+        /* Scrollbar Styles - Hide All Scrollbars */
         html {
             scroll-behavior: smooth;
         }
 
+        /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
         ::-webkit-scrollbar {
-            width: 8px;
+            display: none;
+            width: 0px;
+            background: transparent;
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            display: none;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #10b981;
-            border-radius: 4px;
+            display: none;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #059669;
+            display: none;
+        }
+
+        /* Hide scrollbar for Firefox */
+        html {
+            scrollbar-width: none;
+        }
+
+        /* Hide scrollbar for IE and Edge Legacy */
+        body {
+            -ms-overflow-style: none;
         }
 
         /* Animations */
@@ -318,17 +330,38 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* Dark Mode Scrollbar */
+        /* Dark Mode Scrollbar - Hide All Scrollbars */
+        .dark ::-webkit-scrollbar {
+            display: none;
+            width: 0px;
+            background: transparent;
+        }
+
         .dark ::-webkit-scrollbar-track {
-            background: #1f2937;
+            display: none;
         }
 
         .dark ::-webkit-scrollbar-thumb {
-            background: #22c55e;
+            display: none;
         }
 
         .dark ::-webkit-scrollbar-thumb:hover {
-            background: #16a34a;
+            display: none;
+        }
+
+        /* Ensure scrollbars are hidden in dark mode for Firefox and IE/Edge */
+        .dark {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Scrollbar hide utility class */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
         }
 
         /* Theme Toggle Animation */

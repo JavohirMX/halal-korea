@@ -265,6 +265,74 @@
             border-color: #374151;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
+
+        /* Hide All Scrollbars */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+        ::-webkit-scrollbar {
+            display: none;
+            width: 0px;
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-track {
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            display: none;
+        }
+
+        /* Hide scrollbar for Firefox */
+        html {
+            scrollbar-width: none;
+        }
+
+        /* Hide scrollbar for IE and Edge Legacy */
+        body {
+            -ms-overflow-style: none;
+        }
+
+        /* Dark Mode Scrollbar - Hide All Scrollbars */
+        .dark ::-webkit-scrollbar {
+            display: none;
+            width: 0px;
+            background: transparent;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            display: none;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            display: none;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            display: none;
+        }
+
+        /* Ensure scrollbars are hidden in dark mode for Firefox and IE/Edge */
+        .dark {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Scrollbar hide utility class */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-dark-bg min-h-screen"  data-dark-mode="false">
@@ -296,7 +364,7 @@
     <!-- Navigation -->
     <nav class="bg-white dark:bg-dark-card shadow-sm border-b dark:border-dark-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-2 py-3 overflow-x-auto">
+            <div class="flex space-x-2 py-3 overflow-x-auto scrollbar-hide">
                 <a href="{% url 'monitoring_dashboard' %}" class="nav-link {% if request.path == '/admin/monitoring/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
                     📊 Overview
                 </a>
