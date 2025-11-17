@@ -1,0 +1,197 @@
+{% extends 'monitoring/base.html' %}
+
+{% block content %}
+<!-- Today's Stats -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Today's Overview</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="stat-card">
+            <div class="stat-value text-blue-600">{{ today_stats.total_requests|default:0 }}</div>
+            <div class="stat-label">Total Requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value {% if today_stats.error_count > 0 %}text-red-600{% else %}text-green-600{% endif %}">
+                {{ today_stats.error_count|default:0 }}
+            </div>
+            <div class="stat-label">Errors ({{ today_stats.error_rate|floatformat:1 }}%)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-purple-600">{{ today_stats.avg_response_time|floatformat:0 }}ms</div>
+            <div class="stat-label">Avg Response Time</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-green-600">{{ today_stats.active_users|default:0 }}</div>
+            <div class="stat-label">Active Users</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">+{{ today_stats.new_users|default:0 }} new today</div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Content -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Pending Content</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ pending_content.places|default:0 }}</div>
+            <div class="stat-label">Places</div>
+            <a href="/admin/places/halalplace/?status=pending" class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 block">View →</a>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ pending_content.suggestions|default:0 }}</div>
+            <div class="stat-label">Suggestions</div>
+            <a href="/admin/places/placeeditsuggestion/?status=pending" class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 block">View →</a>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ pending_content.image_suggestions|default:0 }}</div>
+            <div class="stat-label">Images</div>
+            <a href="/admin/places/placeimagesuggestion/?status=pending" class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 block">View →</a>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ pending_content.contact_messages|default:0 }}</div>
+            <div class="stat-label">Contacts</div>
+            <a href="/admin/contact/contactmessage/?is_read__exact=0" class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 block">View →</a>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ pending_content.blog_posts|default:0 }}</div>
+            <div class="stat-label">Blog Drafts</div>
+            <a href="/admin/blog/blogpost/?status=draft" class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2 block">View →</a>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-green-600">{{ active_users|default:0 }}</div>
+            <div class="stat-label">Active Now</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">Last hour</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Errors -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Recent Errors</h2>
+    <div class="content-container">
+        {% if recent_errors %}
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead class="bg-gray-50 dark:bg-dark-bg">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Path</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Error</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Response Time</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                {% for error in recent_errors %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">
+                        {{ error.timestamp|date:"H:i:s" }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text font-mono">
+                        {{ error.path|truncatechars:50 }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                            {{ error.status_code }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">
+                        {{ error.error_type|default:"Unknown" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-dark-muted">
+                        {{ error.response_time_ms|floatformat:0 }}ms
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">
+            <p>✓ No recent errors</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recent Security Events -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Recent Security Events</h2>
+    <div class="content-container">
+        {% if recent_security_events %}
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead class="bg-gray-50 dark:bg-dark-bg">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Event Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Severity</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">User</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wider">Status</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                {% for event in recent_security_events %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">
+                        {{ event.timestamp|date:"H:i:s" }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">
+                        {{ event.get_event_type_display }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if event.severity == 'critical' %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+                            {% elif event.severity == 'high' %}bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200
+                            {% elif event.severity == 'medium' %}bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
+                            {% else %}bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200{% endif %}">
+                            {{ event.get_severity_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">
+                        {{ event.user.username|default:"Anonymous" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        {% if event.resolved %}
+                        <span class="text-green-600 dark:text-green-400">✓ Resolved</span>
+                        {% else %}
+                        <span class="text-orange-600 dark:text-orange-400">⏳ Pending</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">
+            <p>✓ No recent security events</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="/admin/utils/requestlog/" class="stat-card hover:border-blue-500 dark:hover:border-blue-400 border-2 border-transparent">
+            <div class="text-lg font-semibold text-gray-900 dark:text-dark-text">📋 View Request Logs</div>
+            <div class="text-sm text-gray-600 dark:text-dark-muted mt-2">Detailed request history and analysis</div>
+        </a>
+        <a href="/admin/utils/securityevent/" class="stat-card hover:border-blue-500 dark:hover:border-blue-400 border-2 border-transparent">
+            <div class="text-lg font-semibold text-gray-900 dark:text-dark-text">🔒 Security Events</div>
+            <div class="text-sm text-gray-600 dark:text-dark-muted mt-2">Review and resolve security incidents</div>
+        </a>
+        <a href="/admin/utils/adminaction/" class="stat-card hover:border-blue-500 dark:hover:border-blue-400 border-2 border-transparent">
+            <div class="text-lg font-semibold text-gray-900 dark:text-dark-text">📝 Admin Actions</div>
+            <div class="text-sm text-gray-600 dark:text-dark-muted mt-2">Audit trail of admin operations</div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh every 30 seconds
+    setTimeout(function() {
+        location.reload();
+    }, 30000);
+</script>
+{% endblock %}
+

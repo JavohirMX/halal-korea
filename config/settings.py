@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +32,18 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS").split() # type: ignore
+
+# Sentry Integration for Error Tracking
+if not DEBUG and config('SENTRY_DSN', default=''):
+    sentry_sdk.init(
+        dsn=config('SENTRY_DSN'),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=config('SENTRY_TRACES_SAMPLE_RATE', default=0.1, cast=float),
+        send_default_pii=False,  # Privacy: don't send personally identifiable information
+        environment=config('SENTRY_ENVIRONMENT', default='production'),
+        # Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+    )
 
 # CSRF Settings for production
 # Add your production domain(s) to CSRF_TRUSTED_ORIGINS environment variable
@@ -56,10 +70,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Required for django-allauth
     'django.contrib.sitemaps',  # Added for SEO sitemap generation
     'django.contrib.gis',
     'tinymce',
     'rosetta',  # Web-based translation management
+    
+    # Django AllAuth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+    
+    # Local apps
     'places',
     'reviews',
     'users',
@@ -74,10 +98,15 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # Required for django-allauth
+    'users.social_rate_limiting.SocialAuthRateLimitMiddleware',  # Social auth rate limiting
     'config.language_middleware.SmartLanguageMiddleware',  # Enhanced language detection (replaces LocaleMiddleware)
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'config.middleware.AdminAccessMiddleware',  # Custom admin access control
+    'utils.monitoring_middleware.MonitoringMiddleware',  # Request monitoring
+    'utils.monitoring_middleware.AdminActionMiddleware',  # Admin action tracking
+    'utils.monitoring_middleware.CacheStatsMiddleware',  # Cache statistics
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -87,7 +116,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -166,6 +195,20 @@ RATE_LIMIT_SETTINGS = {
     'REGISTRATION_PER_IP_WINDOW': 60,      # minutes
     'LOGIN_ATTEMPTS_PER_IP_LIMIT': 10,     # login attempts per 30 min per IP
     'LOGIN_ATTEMPTS_PER_IP_WINDOW': 30,    # minutes
+    
+    # Password Reset Rate Limiting (stricter than regular email)
+    'PASSWORD_RESET_PER_IP_LIMIT': 3,      # password reset requests per hour per IP
+    'PASSWORD_RESET_PER_IP_WINDOW': 60,    # minutes
+    'PASSWORD_RESET_PER_EMAIL_LIMIT': 2,   # password reset requests per hour per email
+    'PASSWORD_RESET_PER_EMAIL_WINDOW': 60, # minutes
+    
+    # Social Authentication Rate Limiting
+    'SOCIAL_AUTH_PER_IP_LIMIT': 20,        # social auth attempts per hour per IP
+    'SOCIAL_AUTH_PER_IP_WINDOW': 60,       # minutes
+    'SOCIAL_AUTH_GOOGLE_PER_IP_LIMIT': 15,
+    'SOCIAL_AUTH_GOOGLE_PER_IP_WINDOW': 60,
+    'SOCIAL_AUTH_GITHUB_PER_IP_LIMIT': 10,
+    'SOCIAL_AUTH_GITHUB_PER_IP_WINDOW': 60,
 }
 
 # Logging Configuration
@@ -418,7 +461,17 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 
 AUTH_USER_MODEL = 'users.User'
 
+# Django Sites Framework (required for django-allauth)
+SITE_ID = 1
+
+# Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default Django auth
+    'allauth.account.auth_backends.AuthenticationBackend',  # AllAuth
+]
+
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
+GOOGLE_MAPS_ID = config('GOOGLE_MAPS_ID', default='DEMO_MAP_ID')
 
 LOGIN_URL = 'users:login'  # URL where users will be redirected when login is required
 LOGIN_REDIRECT_URL = 'places:home'  # URL where users will be redirected after successful login
@@ -480,3 +533,115 @@ TINYMCE_DEFAULT_CONFIG = {
     'remove_script_host': False,
     'convert_urls': True,
 }
+
+# ============================================================================
+# DJANGO ALLAUTH CONFIGURATION
+# ============================================================================
+
+# AllAuth Account Configuration
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Use email instead of username
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # We handle verification ourselves
+ACCOUNT_USERNAME_REQUIRED = True  # Keep usernames for our existing system
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email'
+
+# Social Account Configuration - Skip intermediate pages for better UX
+SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip the "Continue" confirmation page
+SOCIALACCOUNT_QUERY_EMAIL = True  # Always request email from providers
+SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens (privacy)
+
+# Login/Logout URLs (integrate with existing system)
+ACCOUNT_LOGIN_URL = '/users/login/'
+ACCOUNT_LOGOUT_URL = '/users/logout/'
+ACCOUNT_LOGIN_REDIRECT_URL = '/places/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/places/'
+
+# Account Management
+ACCOUNT_SIGNUP_REDIRECT_URL = '/places/'
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/places/'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/users/login/'
+
+# Social Account Connection URLs
+SOCIALACCOUNT_CONNECTIONS_REDIRECT_URL = '/users/profile/edit/'
+
+# Custom Adapters
+ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'users.adapters.CustomSocialAccountAdapter'
+
+# Additional Social Account Configuration
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Auto-create accounts for social logins
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Trust social providers for email verification
+
+# Provider-specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+        'FETCH_USERINFO': True,
+    },
+
+    'github': {
+        'SCOPE': [
+            'user:email',
+        ],
+    },
+}
+
+# OAuth Client Credentials (to be set in environment variables)
+# Google OAuth
+SOCIALACCOUNT_PROVIDERS['google']['APP'] = {
+    'client_id': config('GOOGLE_OAUTH_CLIENT_ID', default=''),
+    'secret': config('GOOGLE_OAUTH_CLIENT_SECRET', default=''),
+}
+
+# GitHub OAuth
+SOCIALACCOUNT_PROVIDERS['github']['APP'] = {
+    'client_id': config('GITHUB_CLIENT_ID', default=''),
+    'secret': config('GITHUB_CLIENT_SECRET', default=''),
+}
+
+# ============================================================================
+# MONITORING CONFIGURATION
+# ============================================================================
+
+# Monitoring System
+MONITORING_ENABLED = config('MONITORING_ENABLED', default=True, cast=bool)
+MONITORING_SAMPLE_RATE = config('MONITORING_SAMPLE_RATE', default=0.01, cast=float)  # 1% sampling
+MONITORING_SLOW_THRESHOLD_MS = config('MONITORING_SLOW_THRESHOLD_MS', default=1000, cast=int)  # 1 second
+MONITORING_RETENTION_DAYS = config('MONITORING_RETENTION_DAYS', default=30, cast=int)
+
+# Sentry Error Tracking (to be configured in Phase 1.3)
+SENTRY_DSN = config('SENTRY_DSN', default='')
+SENTRY_ENVIRONMENT = config('SENTRY_ENVIRONMENT', default='production')
+SENTRY_TRACES_SAMPLE_RATE = config('SENTRY_TRACES_SAMPLE_RATE', default=0.1, cast=float)
+
+# Alert Configuration
+ALERT_TELEGRAM_ENABLED = config('ALERT_TELEGRAM_ENABLED', default=True, cast=bool)
+ALERT_EMAIL_ENABLED = config('ALERT_EMAIL_ENABLED', default=True, cast=bool)
+ALERT_EMAIL_RECIPIENTS = config('ALERT_EMAIL_RECIPIENTS', default='').split(',') if config('ALERT_EMAIL_RECIPIENTS', default='') else []
+
+# ============================================================================
+# WATERMARK CONFIGURATION
+# ============================================================================
+
+# Enable/disable watermarking feature
+WATERMARK_ENABLED = config('WATERMARK_ENABLED', default=True, cast=bool)
+
+# Watermark appearance settings
+WATERMARK_OPACITY = config('WATERMARK_OPACITY', default=0.25, cast=float)  # 0.0 to 1.0
+WATERMARK_ANGLE = config('WATERMARK_ANGLE', default=-45, cast=int)  # Rotation angle in degrees
+WATERMARK_SPACING = config('WATERMARK_SPACING', default=50, cast=int)  # Pixels between tiles
+WATERMARK_SIZE = config('WATERMARK_SIZE', default=200, cast=int)  # Width of watermark in pixels (height auto-scales)
+
+# Watermark text settings (used only if watermark.png not found)
+WATERMARK_TEXT = config('WATERMARK_TEXT', default='Halal Korea')
+WATERMARK_TEXT_SIZE = config('WATERMARK_TEXT_SIZE', default=32, cast=int)
+WATERMARK_TILE_SIZE = (300, 100)  # Width, height for generated watermark tile (fallback)
+

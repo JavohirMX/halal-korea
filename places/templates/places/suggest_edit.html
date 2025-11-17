@@ -6,373 +6,593 @@
 
 {% block extra_css %}
 <style>
+/* Enhanced edit field styling */
 .edit-field {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease-in-out;
 }
+
 .edit-field.editing {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 2px solid #0ea5e9;
-    border-radius: 12px;
-    padding: 16px;
+    border-color: #22c55e;
+    background-color: rgba(34, 197, 94, 0.04);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
-.edit-field.editing.dark {
-    background: linear-gradient(135deg, #082f49 0%, #0c4a6e 100%);
-    border-color: #0284c7;
+
+.dark .edit-field.editing {
+    background-color: rgba(34, 197, 94, 0.08);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
 }
-.current-value {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px;
+
+/* Hide edit hints when editing */
+.edit-field.editing .edit-hint {
+    display: none;
 }
-.dark .current-value {
-    background: #1e293b;
-    border-color: #475569;
+
+/* Make current values less prominent when editing */
+.edit-field.editing .current-value {
+    opacity: 0.6;
+    pointer-events: none;
 }
-.suggested-value {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    border: 2px solid #10b981;
-    border-radius: 8px;
-    padding: 12px;
+
+/* Prevent clicks on current-value areas from interfering when editing, but allow input areas */
+.edit-field.editing .current-value {
+    pointer-events: none;
 }
-.dark .suggested-value {
-    background: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
-    border-color: #059669;
+
+.edit-field.editing .suggested-input {
+    pointer-events: all;
 }
-.edit-button {
-    transition: all 0.2s ease;
+
+/* Ensure edit fields remain clickable for startEdit functionality */
+.edit-field {
+    pointer-events: auto;
+    cursor: pointer;
 }
-.edit-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+
+.edit-field.editing {
+    cursor: default;
 }
-.section-card {
-    transition: all 0.3s ease;
+
+/* Better form input styling */
+.edit-field input,
+.edit-field textarea,
+.edit-field select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out;
+    background-color: #ffffff;
 }
-.section-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+.dark .edit-field input,
+.dark .edit-field textarea,
+.dark .edit-field select {
+    border-color: #4b5563;
+    background-color: #1f2937;
+    color: #f3f4f6;
 }
-.progress-indicator {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #3b82f6, #10b981);
-    transition: width 0.3s ease;
-    z-index: 50;
+
+.edit-field input:focus,
+.edit-field textarea:focus,
+.edit-field select:focus {
+    outline: none;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.dark .edit-field input:focus,
+.dark .edit-field textarea:focus,
+.dark .edit-field select:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+    .edit-field {
+        padding: 1rem;
+        margin: 0 -0.5rem;
+        border-radius: 1rem;
+    }
+    
+    .edit-field input,
+    .edit-field textarea,
+    .edit-field select {
+        font-size: 1rem; /* Prevent zoom on iOS */
+        padding: 1rem;
+    }
+    
+    /* Better touch targets */
+    .edit-field,
+    button {
+        min-height: 44px;
+    }
+    
+    /* Improved collapsible sections on mobile */
+    .collapsible-header {
+        padding: 1.25rem 1rem;
+        touch-action: manipulation;
+    }
+}
+
+/* Collapsible sections base styles */
+.collapsible-content {
+    overflow: hidden;
+}
+
+/* Better file upload styling */
+.file-upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.file-upload-area:hover,
+.file-upload-area.dragover {
+    border-color: #22c55e;
+    background-color: rgba(34, 197, 94, 0.04);
+}
+
+.dark .file-upload-area {
+    border-color: #4b5563;
+}
+
+.dark .file-upload-area:hover,
+.dark .file-upload-area.dragover {
+    border-color: #22c55e;
+    background-color: rgba(34, 197, 94, 0.08);
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="progress-indicator" id="progress-bar"></div>
-
-<div class="max-w-6xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-    <!-- Header -->
-    <div class="mb-6 sm:mb-8">
-        <div class="flex items-center justify-between mb-4">
-            <a href="{% url 'places:place_detail' place.pk %}" 
-               class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm sm:text-base">
-                <i class="fas fa-arrow-left mr-1 sm:mr-2"></i>
-                <span class="hidden sm:inline">{% translate "Back to place" %}</span>
-                <span class="sm:hidden">{% translate "Back" %}</span>
+<section class="bg-gradient-to-br from-green-400 to-green-600 text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-black/5"></div>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative">
+        <!-- Back Navigation -->
+        <div class="mb-6">
+            <a href="{% url 'places:place_detail' place.pk %}"
+               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200 text-white/90 hover:text-white font-medium touch-manipulation">
+                <i class="fas fa-arrow-left text-sm"></i>
+                <span>{% translate "Back to place" %}</span>
             </a>
-            <div class="text-right">
-                <div class="text-xs text-gray-500 dark:text-gray-400">{% translate "Editing" %}</div>
-                <div class="font-medium text-gray-900 dark:text-white">{{ place.name|truncatechars:30 }}</div>
-            </div>
         </div>
-        <div class="text-center">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                <i class="fas fa-edit mr-2 text-primary-600 dark:text-primary-400"></i>
-                {% translate "Suggest Improvements" %}
-            </h1>
-            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                {% translate "Help our community by suggesting better information or adding photos" %}
-            </p>
-        </div>
-    </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl">
-            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="edit-count">0</div>
-            <div class="text-xs text-blue-600 dark:text-blue-400">{% translate "Edits" %}</div>
-        </div>
-        <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl">
-            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400" id="image-count">0</div>
-            <div class="text-xs text-purple-600 dark:text-purple-400">{% translate "Images" %}</div>
-        </div>
-        <div class="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl">
-            <div class="text-2xl font-bold text-green-600 dark:text-green-400">3</div>
-            <div class="text-xs text-green-600 dark:text-green-400">{% translate "Min Impact" %}</div>
-        </div>
-        <div class="text-center p-4 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl">
-            <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">⭐</div>
-            <div class="text-xs text-amber-600 dark:text-amber-400">{% translate "Quality" %}</div>
-        </div>
-    </div>
-
-    <!-- Suggestion Form -->
-    <form method="post" enctype="multipart/form-data" class="space-y-6">
-        {% csrf_token %}
-        
-        <!-- Field Edit Suggestions -->
-        <div class="section-card glass-card rounded-xl p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    <i class="fas fa-edit mr-2 text-blue-600 dark:text-blue-400"></i>
-                    {% translate "Edit Information" %}
-                </h2>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {% translate "Click to edit any field" %}
+        <!-- Header Content -->
+        <div class="text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+                <div class="flex h-16 w-16 mx-auto sm:mx-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
+                    <i class="fas fa-edit text-white text-2xl"></i>
+                </div>
+                <div class="flex-1">
+                    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+                        {% translate "Suggest Improvements" %}
+                    </h1>
+                    <div class="text-white/80 text-sm">
+                        {% translate "Editing" %} • <span class="font-medium">{{ place.name|truncatechars:40 }}</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="space-y-4">
+            <div class="max-w-2xl mx-auto sm:mx-0">
+                <p class="text-base sm:text-lg text-white/90 leading-relaxed mb-2">
+                    {% translate "Help our community by suggesting better information or adding photos" %}
+                </p>
+                <p class="text-sm text-white/70">
+                    {% blocktranslate with site_name=STATIC_INFO.site_name %}Accurate edits keep {{ site_name }} reliable for everyone.{% endblocktranslate %}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Suggestion Form -->
+<div class="-mt-6 sm:-mt-8 pb-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+        
+        <!-- Field Edit Suggestions -->
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    {% translate "Place Information" %}
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                    {% translate "Click on any field below to suggest improvements" %}
+                </p>
+            </div>
+            
+            <div class="space-y-6">
                 <!-- Name Field -->
-                <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600" 
-                     data-field="name">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-signature text-gray-400"></i>
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Name" %}</label>
+                <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                     data-field="name" onclick="startEdit('name')">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors">
+                                    <i class="fas fa-signature text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <label class="text-base font-medium text-gray-900 dark:text-white">{% translate "Name" %}</label>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 edit-hint">{% translate "Click to edit" %}</div>
+                                </div>
+                            </div>
+                            <div class="current-value pl-11">
+                                <div class="text-lg font-medium text-gray-900 dark:text-white mb-1">{{ place.name }}</div>
+                            </div>
+                            <div class="suggested-input hidden mt-4 pl-11">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                        <i class="fas fa-edit mr-2"></i>{% translate "Your suggestion:" %}
+                                    </div>
+                                    <button type="button" onclick="cancelEdit('name')" 
+                                            class="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+                                        <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                    </button>
+                                </div>
+                                {{ form.name }}
+                                <div class="hidden">{{ form.suggest_name }}</div>
+                            </div>
                         </div>
-                        <button type="button" class="edit-button text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50"
-                                onclick="toggleEdit('name')">
-                            <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                        </button>
-                    </div>
-                    <div class="current-value">
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
-                        <div class="font-medium text-gray-900 dark:text-white">{{ place.name }}</div>
-                    </div>
-                    <div class="suggested-input hidden mt-3">
-                        <div class="text-sm text-green-700 dark:text-green-300 mb-2">
-                            <i class="fas fa-arrow-right mr-1"></i>{% translate "Your suggestion:" %}
+                        <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-pencil-alt text-primary-500 text-sm"></i>
                         </div>
-                        {{ form.name }}
-                        <div class="hidden">{{ form.suggest_name }}</div>
                     </div>
                 </div>
 
                 <!-- Category Field -->
-                <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600" 
-                     data-field="category">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-tag text-gray-400"></i>
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Category" %}</label>
+                <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                     data-field="category" onclick="startEdit('category')">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors">
+                                    <i class="fas fa-tag text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <label class="text-base font-medium text-gray-900 dark:text-white">{% translate "Category" %}</label>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 edit-hint">{% translate "Click to edit" %}</div>
+                                </div>
+                            </div>
+                            <div class="current-value pl-11">
+                                <div class="flex items-center text-lg font-medium text-gray-900 dark:text-white mb-1">
+                                    <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-3 text-primary-600 dark:text-primary-400"></i>
+                                    {{ place.get_category_display }}
+                                </div>
+                            </div>
+                            <div class="suggested-input hidden mt-4 pl-11">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                        <i class="fas fa-edit mr-2"></i>{% translate "Your suggestion:" %}
+                                    </div>
+                                    <button type="button" onclick="cancelEdit('category')" 
+                                            class="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+                                        <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                    </button>
+                                </div>
+                                {{ form.category }}
+                                <div class="hidden">{{ form.suggest_category }}</div>
+                            </div>
                         </div>
-                        <button type="button" class="edit-button text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50"
-                                onclick="toggleEdit('category')">
-                            <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                        </button>
-                    </div>
-                    <div class="current-value">
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
-                        <div class="font-medium text-gray-900 dark:text-white">
-                            <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-2"></i>
-                            {{ place.get_category_display }}
+                        <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-pencil-alt text-primary-500 text-sm"></i>
                         </div>
-                    </div>
-                    <div class="suggested-input hidden mt-3">
-                        <div class="text-sm text-green-700 dark:text-green-300 mb-2">
-                            <i class="fas fa-arrow-right mr-1"></i>{% translate "Your suggestion:" %}
-                        </div>
-                        {{ form.category }}
-                        <div class="hidden">{{ form.suggest_category }}</div>
                     </div>
                 </div>
 
                 <!-- Description Field -->
-                <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600" 
-                     data-field="description">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-align-left text-gray-400"></i>
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Description" %}</label>
+                <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                     data-field="description" onclick="startEdit('description')">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors">
+                                    <i class="fas fa-align-left text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <label class="text-base font-medium text-gray-900 dark:text-white">{% translate "Description" %}</label>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 edit-hint">{% translate "Click to edit" %}</div>
+                                </div>
+                            </div>
+                            <div class="current-value pl-11">
+                                <div class="text-gray-900 dark:text-white leading-relaxed">
+                                    {% if place.description %}
+                                        {{ place.description|truncatechars:150 }}
+                                    {% else %}
+                                        <span class="italic text-gray-400 dark:text-gray-500">{% translate "No description available" %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="suggested-input hidden mt-4 pl-11">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                        <i class="fas fa-edit mr-2"></i>{% translate "Your suggestion:" %}
+                                    </div>
+                                    <button type="button" onclick="cancelEdit('description')" 
+                                            class="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+                                        <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                    </button>
+                                </div>
+                                {{ form.description }}
+                                <div class="hidden">{{ form.suggest_description }}</div>
+                            </div>
                         </div>
-                        <button type="button" class="edit-button text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50"
-                                onclick="toggleEdit('description')">
-                            <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                        </button>
-                    </div>
-                    <div class="current-value">
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
-                        <div class="text-gray-900 dark:text-white">
-                            {% if place.description %}
-                                {{ place.description|truncatechars:150 }}
-                            {% else %}
-                                <span class="italic text-gray-500">{% translate "No description available" %}</span>
-                            {% endif %}
+                        <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-pencil-alt text-primary-500 text-sm"></i>
                         </div>
-                    </div>
-                    <div class="suggested-input hidden mt-3">
-                        <div class="text-sm text-green-700 dark:text-green-300 mb-2">
-                            <i class="fas fa-arrow-right mr-1"></i>{% translate "Your suggestion:" %}
-                        </div>
-                        {{ form.description }}
-                        <div class="hidden">{{ form.suggest_description }}</div>
                     </div>
                 </div>
 
                 <!-- Address Field -->
-                <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600" 
-                     data-field="address">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-map-marker-alt text-gray-400"></i>
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Address" %}</label>
+                <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                     data-field="address" onclick="startEdit('address')">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors">
+                                    <i class="fas fa-map-marker-alt text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <label class="text-base font-medium text-gray-900 dark:text-white">{% translate "Address" %}</label>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 edit-hint">{% translate "Click to edit" %}</div>
+                                </div>
+                            </div>
+                            <div class="current-value pl-11">
+                                <div class="text-gray-900 dark:text-white leading-relaxed">
+                                    {% if place.address %}
+                                        {{ place.address }}
+                                    {% else %}
+                                        <span class="italic text-gray-400 dark:text-gray-500">{% translate "Not specified" %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="suggested-input hidden mt-4 pl-11">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                        <i class="fas fa-edit mr-2"></i>{% translate "Your suggestion:" %}
+                                    </div>
+                                    <button type="button" onclick="cancelEdit('address')" 
+                                            class="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+                                        <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                    </button>
+                                </div>
+                                {{ form.address }}
+                                <div class="hidden">{{ form.suggest_address }}</div>
+                            </div>
                         </div>
-                        <button type="button" class="edit-button text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50"
-                                onclick="toggleEdit('address')">
-                            <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                        </button>
-                    </div>
-                    <div class="current-value">
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
-                        <div class="text-gray-900 dark:text-white">{{ place.address|default:"Not specified" }}</div>
-                    </div>
-                    <div class="suggested-input hidden mt-3">
-                        <div class="text-sm text-green-700 dark:text-green-300 mb-2">
-                            <i class="fas fa-arrow-right mr-1"></i>{% translate "Your suggestion:" %}
+                        <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-pencil-alt text-primary-500 text-sm"></i>
                         </div>
-                        {{ form.address }}
-                        <div class="hidden">{{ form.suggest_address }}</div>
                     </div>
                 </div>
 
                 <!-- Contact Information Collapsible -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <button type="button" class="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg"
+                <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                    <button type="button" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors touch-manipulation"
                             onclick="toggleSection('contact-section')">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-phone text-gray-400"></i>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Contact Information" %}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">{% translate "(Optional)" %}</span>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                                <i class="fas fa-phone text-gray-500 dark:text-gray-400 text-sm"></i>
+                            </div>
+                            <div>
+                                <span class="text-base font-medium text-gray-900 dark:text-white">{% translate "Contact Information" %}</span>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">{% translate "Phone & Website" %} • {% translate "Optional" %}</div>
+                            </div>
                         </div>
-                        <i class="fas fa-chevron-down text-gray-400 transform transition-transform" id="contact-chevron"></i>
+                        <i class="fas fa-chevron-down text-gray-400 transform transition-transform duration-200" id="contact-chevron"></i>
                     </button>
                     
-                    <div class="hidden border-t border-gray-200 dark:border-gray-700 p-4 space-y-4" id="contact-section">
+                    <div class="hidden border-t border-gray-200 dark:border-gray-700 p-6 space-y-5" id="contact-section">
                         <!-- Phone Number -->
-                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="phone_number">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Phone Number" %}</label>
-                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
-                                        onclick="toggleEdit('phone_number')">
-                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                                </button>
-                            </div>
-                            <div class="current-value">
-                                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
-                                <div class="text-sm text-gray-900 dark:text-white">{{ place.phone_number|default:"Not specified" }}</div>
-                            </div>
-                            <div class="suggested-input hidden mt-2">
-                                {{ form.phone_number }}
-                                <div class="hidden">{{ form.suggest_phone_number }}</div>
+                        <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                             data-field="phone_number" onclick="startEdit('phone_number')">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <i class="fas fa-phone text-primary-600 dark:text-primary-400 text-sm"></i>
+                                        <label class="font-medium text-gray-900 dark:text-white">{% translate "Phone Number" %}</label>
+                                    </div>
+                                    <div class="current-value pl-6">
+                                        <div class="text-gray-700 dark:text-gray-300">
+                                            {% if place.phone_number %}
+                                                {{ place.phone_number }}
+                                            {% else %}
+                                                <span class="italic text-gray-400 dark:text-gray-500">{% translate "Not specified" %}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="suggested-input hidden mt-3 pl-6">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                                <i class="fas fa-edit mr-1"></i>{% translate "Your suggestion:" %}
+                                            </div>
+                                            <button type="button" onclick="cancelEdit('phone_number')" 
+                                                    class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors">
+                                                <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                            </button>
+                                        </div>
+                                        {{ form.phone_number }}
+                                        <div class="hidden">{{ form.suggest_phone_number }}</div>
+                                    </div>
+                                </div>
+                                <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fas fa-pencil-alt text-primary-500 text-xs"></i>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Website -->
-                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="website">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Website" %}</label>
-                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
-                                        onclick="toggleEdit('website')">
-                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                                </button>
-                            </div>
-                            <div class="current-value">
-                                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{% translate "Current:" %}</div>
-                                <div class="text-sm text-gray-900 dark:text-white">
-                                    {% if place.website %}
-                                        <a href="{{ place.website }}" target="_blank" class="text-blue-600 hover:underline">{{ place.website|truncatechars:40 }}</a>
-                                    {% else %}
-                                        {% translate "Not specified" %}
-                                    {% endif %}
+                        <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                             data-field="website" onclick="startEdit('website')">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <i class="fas fa-globe text-primary-600 dark:text-primary-400 text-sm"></i>
+                                        <label class="font-medium text-gray-900 dark:text-white">{% translate "Website" %}</label>
+                                    </div>
+                                    <div class="current-value pl-6">
+                                        <div class="text-gray-700 dark:text-gray-300">
+                                            {% if place.website %}
+                                                <a href="{{ place.website }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:underline">{{ place.website|truncatechars:40 }}</a>
+                                            {% else %}
+                                                <span class="italic text-gray-400 dark:text-gray-500">{% translate "Not specified" %}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="suggested-input hidden mt-3 pl-6">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                                <i class="fas fa-edit mr-1"></i>{% translate "Your suggestion:" %}
+                                            </div>
+                                            <button type="button" onclick="cancelEdit('website')" 
+                                                    class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors">
+                                                <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                            </button>
+                                        </div>
+                                        {{ form.website }}
+                                        <div class="hidden">{{ form.suggest_website }}</div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="suggested-input hidden mt-2">
-                                {{ form.website }}
-                                <div class="hidden">{{ form.suggest_website }}</div>
+                                <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fas fa-pencil-alt text-primary-500 text-xs"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Map Links Collapsible -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <button type="button" class="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg"
+                <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                    <button type="button" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors touch-manipulation"
                             onclick="toggleSection('maps-section')">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-map text-gray-400"></i>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Map Links" %}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">{% translate "(Optional)" %}</span>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                                <i class="fas fa-map text-gray-500 dark:text-gray-400 text-sm"></i>
+                            </div>
+                            <div>
+                                <span class="text-base font-medium text-gray-900 dark:text-white">{% translate "Map Links" %}</span>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">{% translate "Google Maps & Naver" %} • {% translate "Optional" %}</div>
+                            </div>
                         </div>
-                        <i class="fas fa-chevron-down text-gray-400 transform transition-transform" id="maps-chevron"></i>
+                        <i class="fas fa-chevron-down text-gray-400 transform transition-transform duration-200" id="maps-chevron"></i>
                     </button>
                     
-                    <div class="hidden border-t border-gray-200 dark:border-gray-700 p-4 space-y-3" id="maps-section">
+                    <div class="hidden border-t border-gray-200 dark:border-gray-700 p-6 space-y-5" id="maps-section">
                         <!-- Google Maps -->
-                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="google_map_link">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    <i class="fab fa-google mr-1"></i>{% translate "Google Maps" %}
-                                </label>
-                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
-                                        onclick="toggleEdit('google_map_link')">
-                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                                </button>
-                            </div>
-                            <div class="current-value">
-                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ place.google_map_link|default:"Not specified" }}</div>
-                            </div>
-                            <div class="suggested-input hidden mt-2">
-                                {{ form.google_map_link }}
-                                <div class="hidden">{{ form.suggest_google_map_link }}</div>
+                        <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                             data-field="google_map_link" onclick="startEdit('google_map_link')">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <i class="fab fa-google text-primary-600 dark:text-primary-400 text-sm"></i>
+                                        <label class="font-medium text-gray-900 dark:text-white">{% translate "Google Maps" %}</label>
+                                    </div>
+                                    <div class="current-value pl-6">
+                                        <div class="text-gray-700 dark:text-gray-300 text-sm">
+                                            {% if place.google_map_link %}
+                                                <a href="{{ place.google_map_link }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:underline">{{ place.google_map_link|truncatechars:50 }}</a>
+                                            {% else %}
+                                                <span class="italic text-gray-400 dark:text-gray-500">{% translate "Not specified" %}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="suggested-input hidden mt-3 pl-6">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                                <i class="fas fa-edit mr-1"></i>{% translate "Your suggestion:" %}
+                                            </div>
+                                            <button type="button" onclick="cancelEdit('google_map_link')" 
+                                                    class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors">
+                                                <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                            </button>
+                                        </div>
+                                        {{ form.google_map_link }}
+                                        <div class="hidden">{{ form.suggest_google_map_link }}</div>
+                                    </div>
+                                </div>
+                                <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fas fa-pencil-alt text-primary-500 text-xs"></i>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Kakao Maps -->
-                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="kakao_map_link">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {% translate "Kakao Maps" %}
-                                </label>
-                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
-                                        onclick="toggleEdit('kakao_map_link')">
-                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                                </button>
-                            </div>
-                            <div class="current-value">
-                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ place.kakao_map_link|default:"Not specified" }}</div>
-                            </div>
-                            <div class="suggested-input hidden mt-2">
-                                {{ form.kakao_map_link }}
-                                <div class="hidden">{{ form.suggest_kakao_map_link }}</div>
+                        <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                             data-field="kakao_map_link" onclick="startEdit('kakao_map_link')">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <i class="fas fa-map-marker-alt text-primary-600 dark:text-primary-400 text-sm"></i>
+                                        <label class="font-medium text-gray-900 dark:text-white">{% translate "Kakao Maps" %}</label>
+                                    </div>
+                                    <div class="current-value pl-6">
+                                        <div class="text-gray-700 dark:text-gray-300 text-sm">
+                                            {% if place.kakao_map_link %}
+                                                <a href="{{ place.kakao_map_link }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:underline">{{ place.kakao_map_link|truncatechars:50 }}</a>
+                                            {% else %}
+                                                <span class="italic text-gray-400 dark:text-gray-500">{% translate "Not specified" %}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="suggested-input hidden mt-3 pl-6">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                                <i class="fas fa-edit mr-1"></i>{% translate "Your suggestion:" %}
+                                            </div>
+                                            <button type="button" onclick="cancelEdit('kakao_map_link')" 
+                                                    class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors">
+                                                <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                            </button>
+                                        </div>
+                                        {{ form.kakao_map_link }}
+                                        <div class="hidden">{{ form.suggest_kakao_map_link }}</div>
+                                    </div>
+                                </div>
+                                <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fas fa-pencil-alt text-primary-500 text-xs"></i>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Naver Maps -->
-                        <div class="edit-field border border-gray-200 dark:border-gray-700 rounded-lg p-3" data-field="naver_map_link">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {% translate "Naver Maps" %}
-                                </label>
-                                <button type="button" class="edit-button text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full"
-                                        onclick="toggleEdit('naver_map_link')">
-                                    <i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}
-                                </button>
-                            </div>
-                            <div class="current-value">
-                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ place.naver_map_link|default:"Not specified" }}</div>
-                            </div>
-                            <div class="suggested-input hidden mt-2">
-                                {{ form.naver_map_link }}
-                                <div class="hidden">{{ form.suggest_naver_map_link }}</div>
+                        <div class="edit-field group border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                             data-field="naver_map_link" onclick="startEdit('naver_map_link')">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <i class="fas fa-location-arrow text-primary-600 dark:text-primary-400 text-sm"></i>
+                                        <label class="font-medium text-gray-900 dark:text-white">{% translate "Naver Maps" %}</label>
+                                    </div>
+                                    <div class="current-value pl-6">
+                                        <div class="text-gray-700 dark:text-gray-300 text-sm">
+                                            {% if place.naver_map_link %}
+                                                <a href="{{ place.naver_map_link }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:underline">{{ place.naver_map_link|truncatechars:50 }}</a>
+                                            {% else %}
+                                                <span class="italic text-gray-400 dark:text-gray-500">{% translate "Not specified" %}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="suggested-input hidden mt-3 pl-6">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="text-sm text-primary-700 dark:text-primary-300 font-medium">
+                                                <i class="fas fa-edit mr-1"></i>{% translate "Your suggestion:" %}
+                                            </div>
+                                            <button type="button" onclick="cancelEdit('naver_map_link')" 
+                                                    class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors">
+                                                <i class="fas fa-times mr-1"></i>{% translate "Cancel" %}
+                                            </button>
+                                        </div>
+                                        {{ form.naver_map_link }}
+                                        <div class="hidden">{{ form.suggest_naver_map_link }}</div>
+                                    </div>
+                                </div>
+                                <div class="edit-indicator opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="fas fa-pencil-alt text-primary-500 text-xs"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -381,10 +601,10 @@
         </div>
 
         <!-- Image Upload Section -->
-        <div class="section-card glass-card rounded-xl p-6">
+        <div class="section-card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 sm:p-6 shadow-sm">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    <i class="fas fa-images mr-2 text-purple-600 dark:text-purple-400"></i>
+                    <i class="fas fa-images mr-2 text-primary-600 dark:text-primary-400"></i>
                     {% translate "Add Photos" %}
                 </h2>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
@@ -406,7 +626,7 @@
                                  class="w-full h-full object-cover rounded-lg border border-gray-200 dark:border-gray-700">
                             <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                                 <button type="button" onclick="viewImage('{{ photo_url }}')" 
-                                        class="text-white hover:text-blue-300">
+                                        class="text-white hover:text-primary-200">
                                     <i class="fas fa-expand-alt"></i>
                                 </button>
                             </div>
@@ -425,17 +645,17 @@
                 {% endif %}
 
                 <!-- Upload Area -->
-                <div class="upload-zone border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-purple-400 dark:hover:border-purple-500 transition-colors"
+                <div class="upload-zone border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-8 text-center hover:border-primary-400 dark:hover:border-primary-400 transition-colors bg-gray-50 dark:bg-gray-800"
                      ondrop="dropHandler(event)" ondragover="dragOverHandler(event)" ondragenter="dragEnterHandler(event)" ondragleave="dragLeaveHandler(event)">
                     <div class="space-y-4">
-                        <div class="mx-auto w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
-                            <i class="fas fa-cloud-upload-alt text-purple-600 dark:text-purple-400 text-2xl"></i>
+                        <div class="mx-auto w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-primary-600 dark:text-primary-400 text-2xl"></i>
                         </div>
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Upload Images" %}</h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 {% translate "Drag and drop your images here, or" %}
-                                <label for="images" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 cursor-pointer font-medium">
+                                <label for="images" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 cursor-pointer font-medium">
                                     {% translate "browse files" %}
                                 </label>
                             </p>
@@ -461,9 +681,9 @@
         </div>
 
         <!-- Reason Section (Combined for all changes) -->
-        <div class="section-card glass-card rounded-xl p-6">
+        <div class="section-card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 sm:p-6 shadow-sm">
             <div class="flex items-center mb-6">
-                <div class="p-3 rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white mr-4">
+                <div class="p-3 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white mr-4">
                     <i class="fas fa-comment-dots text-xl"></i>
                 </div>
                 <div>
@@ -537,26 +757,27 @@
         {% endif %}
 
         <!-- Summary & Submit Section -->
-        <div class="sticky bottom-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-3 sm:p-6 -mx-2 sm:-mx-4 lg:-mx-8">
-            <div class="max-w-6xl mx-auto">
+        <div class="sticky bottom-0 z-40 -mx-3 sm:-mx-6 lg:-mx-8">
+            <div class="mx-auto rounded-t-2xl bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-inner px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div class="max-w-7xl mx-auto">
                 <!-- Progress Summary - Compact on Mobile -->
-                <div class="mb-3 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg sm:rounded-xl border border-blue-200 dark:border-blue-800">
+                <div class="mb-3 sm:mb-6 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700">
                     <!-- Mobile Compact View -->
                     <div class="block sm:hidden">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
-                                <i class="fas fa-list-check text-blue-600 dark:text-blue-400"></i>
+                                <i class="fas fa-list-check text-primary-600 dark:text-primary-400"></i>
                                 <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                    <span id="summary-count-mobile" class="text-blue-600 dark:text-blue-400">0</span> {% translate "changes" %}
+                                    <span id="summary-count-mobile" class="text-primary-600 dark:text-primary-400">0</span> {% translate "changes" %}
                                 </span>
                             </div>
-                            <button type="button" onclick="toggleMobileSummary()" class="text-blue-600 dark:text-blue-400 text-sm">
+                            <button type="button" onclick="toggleMobileSummary()" class="text-primary-600 dark:text-primary-400 text-sm">
                                 <i class="fas fa-chevron-down transform transition-transform" id="mobile-summary-chevron"></i>
                             </button>
                         </div>
                         <div id="mobile-summary-content" class="hidden mt-2 text-xs text-gray-600 dark:text-gray-400">
                             <div class="flex items-center">
-                                <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                                <i class="fas fa-info-circle mr-1 text-primary-500"></i>
                                 {% translate "Select fields to edit or upload images to create suggestions." %}
                             </div>
                         </div>
@@ -566,16 +787,16 @@
                     <div class="hidden sm:block">
                         <div class="flex items-center justify-between mb-3">
                             <h3 class="font-medium text-gray-900 dark:text-white">
-                                <i class="fas fa-list-check mr-2"></i>{% translate "Suggestion Summary" %}
+                                <i class="fas fa-list-check mr-2 text-primary-600 dark:text-primary-400"></i>{% translate "Suggestion Summary" %}
                             </h3>
                             <div class="text-sm">
-                                <span id="summary-count" class="text-blue-600 dark:text-blue-400 font-medium">0</span>
+                                <span id="summary-count" class="text-primary-600 dark:text-primary-400 font-medium">0</span>
                                 <span class="text-gray-500 dark:text-gray-400">{% translate "changes" %}</span>
                             </div>
                         </div>
                         <div id="summary-content" class="text-sm text-gray-600 dark:text-gray-400">
                             <div class="flex items-center">
-                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                <i class="fas fa-info-circle mr-2 text-primary-500"></i>
                                 {% translate "Select fields to edit or upload images to create suggestions." %}
                             </div>
                         </div>
@@ -587,7 +808,7 @@
                     <!-- Mobile: Hide moderation message, Desktop: Show -->
                     <div class="hidden sm:flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
                         <div class="flex items-center">
-                            <i class="fas fa-shield-alt mr-2 text-green-500"></i>
+                            <i class="fas fa-shield-alt mr-2 text-primary-500"></i>
                             {% translate "Your suggestions will be reviewed by moderators" %}
                         </div>
                     </div>
@@ -598,15 +819,17 @@
                             <i class="fas fa-times mr-1 sm:mr-2"></i>{% translate "Cancel" %}
                         </a>
                         <button type="submit" id="submit-button"
-                                class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg sm:rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 gradient-bg-hover text-white rounded-lg sm:rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                             <i class="fas fa-paper-plane mr-1 sm:mr-2"></i>
                             <span id="submit-text">{% translate "Submit" %}<span class="hidden sm:inline"> {% translate "Suggestions" %}</span></span>
                         </button>
                     </div>
                 </div>
             </div>
+            </div>
         </div>
     </form>
+    </div>
 </div>
 
 <script>
@@ -617,8 +840,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let isDarkMode = document.documentElement.classList.contains('dark');
     
     // Initialize counters
-    updateCounters();
-    updateProgressBar();
     updateSummary();
     
     // Character counter for reason field
@@ -644,54 +865,214 @@ document.addEventListener('DOMContentLoaded', function() {
         charCount.textContent = reasonField.value.length;
     }
     
-    // Toggle edit functionality
-    window.toggleEdit = function(fieldName) {
+    // Start edit functionality - only opens, doesn't close
+    window.startEdit = function(fieldName, event) {
+        // Prevent event bubbling if needed
+        if (event) {
+            event.stopPropagation();
+        }
+        
+        // Don't start editing if already editing this field
+        if (activeEdits.has(fieldName)) {
+            return;
+        }
+        
         const editField = document.querySelector(`[data-field="${fieldName}"]`);
         const suggestedInput = editField.querySelector('.suggested-input');
         const checkbox = document.getElementById(`id_suggest_${fieldName}`);
-        const editButton = editField.querySelector('.edit-button');
         
-        if (activeEdits.has(fieldName)) {
-            // Stop editing
-            activeEdits.delete(fieldName);
-            suggestedInput.classList.add('hidden');
-            editField.classList.remove('editing');
-            checkbox.checked = false;
-            editButton.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i>{% translate "Edit" %}';
-            editButton.className = editButton.className.replace('bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300', 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300');
-        } else {
-            // Start editing
-            activeEdits.add(fieldName);
-            suggestedInput.classList.remove('hidden');
-            editField.classList.add('editing');
-            if (isDarkMode) editField.classList.add('dark');
-            checkbox.checked = true;
-            editButton.innerHTML = '<i class="fas fa-times mr-1"></i>{% translate "Cancel" %}';
-            editButton.className = editButton.className.replace('bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300', 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300');
-            
-            // Focus on input field
-            const input = suggestedInput.querySelector('input, select, textarea');
-            if (input) {
-                setTimeout(() => input.focus(), 100);
-            }
+        // Ensure field is ready for editing (remove any lingering animation styles)
+        suggestedInput.style.maxHeight = '';
+        suggestedInput.style.opacity = '';
+        suggestedInput.style.marginTop = '';
+        
+        // Start editing with smooth animation
+        activeEdits.add(fieldName);
+        
+        editField.classList.add('editing');
+        checkbox.checked = true;
+        
+        // Animate in
+        suggestedInput.classList.remove('hidden');
+        suggestedInput.style.maxHeight = '0px';
+        suggestedInput.style.opacity = '0';
+        suggestedInput.style.marginTop = '0px';
+        
+        requestAnimationFrame(() => {
+            suggestedInput.style.maxHeight = suggestedInput.scrollHeight + 'px';
+            suggestedInput.style.opacity = '1';
+            suggestedInput.style.marginTop = '1rem';
+        });
+        
+        setTimeout(() => {
+            suggestedInput.style.maxHeight = '';
+            suggestedInput.style.opacity = '';
+            suggestedInput.style.marginTop = '';
+        }, 200);
+        
+        // Focus on input field with slight delay
+        const input = suggestedInput.querySelector('input, select, textarea');
+        if (input) {
+            setTimeout(() => {
+                input.focus();
+                // Add subtle highlight animation
+                input.style.transform = 'scale(1.01)';
+                setTimeout(() => {
+                    input.style.transform = 'scale(1)';
+                }, 150);
+            }, 250);
         }
         
-        updateCounters();
-        updateProgressBar();
+        // Scroll into view on mobile
+        if (window.innerWidth < 640) {
+            setTimeout(() => {
+                editField.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }, 100);
+        }
+        
         updateSummary();
     };
     
-    // Toggle collapsible sections
+    // Cancel edit functionality - no confirmation needed
+    window.cancelEdit = function(fieldName) {
+        const editField = document.querySelector(`[data-field="${fieldName}"]`);
+        const suggestedInput = editField.querySelector('.suggested-input');
+        const checkbox = document.getElementById(`id_suggest_${fieldName}`);
+        const input = suggestedInput.querySelector('input, select, textarea');
+        
+        // Stop editing with smooth animation
+        activeEdits.delete(fieldName);
+        
+        // Remove editing class immediately to restore clickability
+        editField.classList.remove('editing');
+        checkbox.checked = false;
+        
+        // Clear the input
+        if (input) {
+            if (input.tagName === 'SELECT') {
+                input.selectedIndex = 0;
+            } else {
+                input.value = '';
+            }
+        }
+        
+        // Animate out
+        suggestedInput.style.maxHeight = suggestedInput.scrollHeight + 'px';
+        suggestedInput.style.opacity = '1';
+        
+        requestAnimationFrame(() => {
+            suggestedInput.style.maxHeight = '0px';
+            suggestedInput.style.opacity = '0';
+            suggestedInput.style.marginTop = '0px';
+        });
+        
+        setTimeout(() => {
+            suggestedInput.classList.add('hidden');
+            suggestedInput.style.maxHeight = '';
+            suggestedInput.style.opacity = '';
+            suggestedInput.style.marginTop = '';
+        }, 200);
+        
+        updateSummary();
+    };
+    
+    // Legacy function for backward compatibility - redirects to startEdit
+    window.toggleEdit = function(fieldName) {
+        startEdit(fieldName);
+    };
+    
+    // Enhanced toggle collapsible sections with smooth animations
     window.toggleSection = function(sectionId) {
         const section = document.getElementById(sectionId);
         const chevron = document.getElementById(sectionId.replace('-section', '-chevron'));
+        const isHidden = section.classList.contains('hidden');
         
-        if (section.classList.contains('hidden')) {
+        // Prevent multiple animations on the same section
+        if (section.dataset.animating === 'true') {
+            return;
+        }
+        
+        section.dataset.animating = 'true';
+        
+        // Clean up any existing inline styles first
+        section.style.maxHeight = '';
+        section.style.opacity = '';
+        
+        if (isHidden) {
+            // Show section
             section.classList.remove('hidden');
-            chevron.classList.add('rotate-180');
+            
+            // Force a reflow to ensure hidden class removal takes effect
+            section.offsetHeight;
+            
+            // Get the natural height
+            const sectionHeight = section.scrollHeight;
+            
+            // Set initial state for animation
+            section.style.maxHeight = '0px';
+            section.style.opacity = '0';
+            
+            // Trigger animation
+            requestAnimationFrame(() => {
+                section.style.transition = 'max-height 300ms ease-out, opacity 300ms ease-out';
+                section.style.maxHeight = sectionHeight + 'px';
+                section.style.opacity = '1';
+                chevron.style.transform = 'rotate(180deg)';
+            });
+            
+            // Clean up after animation
+            const cleanup = () => {
+                section.style.maxHeight = '';
+                section.style.opacity = '';
+                section.style.transition = '';
+                section.dataset.animating = 'false';
+                section.removeEventListener('transitionend', cleanup);
+            };
+            
+            section.addEventListener('transitionend', cleanup);
+            
+            // Fallback cleanup in case transitionend doesn't fire
+            setTimeout(cleanup, 350);
+            
         } else {
-            section.classList.add('hidden');
-            chevron.classList.remove('rotate-180');
+            // Hide section
+            const sectionHeight = section.scrollHeight;
+            section.style.maxHeight = sectionHeight + 'px';
+            section.style.opacity = '1';
+            
+            // Force a reflow
+            section.offsetHeight;
+            
+            // Trigger animation
+            requestAnimationFrame(() => {
+                section.style.transition = 'max-height 300ms ease-out, opacity 300ms ease-out';
+                section.style.maxHeight = '0px';
+                section.style.opacity = '0';
+                chevron.style.transform = 'rotate(0deg)';
+            });
+            
+            // Clean up after animation
+            const cleanup = () => {
+                section.classList.add('hidden');
+                section.style.maxHeight = '';
+                section.style.opacity = '';
+                section.style.transition = '';
+                section.dataset.animating = 'false';
+                section.removeEventListener('transitionend', cleanup);
+            };
+            
+            section.addEventListener('transitionend', cleanup);
+            
+            // Fallback cleanup in case transitionend doesn't fire
+            setTimeout(cleanup, 350);
+        }
+        
+        // Add haptic feedback for mobile
+        if (navigator.vibrate && window.innerWidth < 640) {
+            navigator.vibrate(10);
         }
     };
     
@@ -704,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Drag and drop handlers
     window.dragOverHandler = function(event) {
         event.preventDefault();
-        event.currentTarget.classList.add('border-purple-500', 'bg-purple-50', 'dark:bg-purple-900/20');
+        event.currentTarget.classList.add('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
     };
     
     window.dragEnterHandler = function(event) {
@@ -714,13 +1095,13 @@ document.addEventListener('DOMContentLoaded', function() {
     window.dragLeaveHandler = function(event) {
         event.preventDefault();
         if (!event.currentTarget.contains(event.relatedTarget)) {
-            event.currentTarget.classList.remove('border-purple-500', 'bg-purple-50', 'dark:bg-purple-900/20');
+            event.currentTarget.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
         }
     };
     
     window.dropHandler = function(event) {
         event.preventDefault();
-        event.currentTarget.classList.remove('border-purple-500', 'bg-purple-50', 'dark:bg-purple-900/20');
+        event.currentTarget.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900/20');
         
         const files = Array.from(event.dataTransfer.files).filter(file => file.type.startsWith('image/'));
         if (files.length > 0) {
@@ -761,8 +1142,6 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.files = dataTransfer.files;
         
         updateImagePreview();
-        updateCounters();
-        updateProgressBar();
         updateSummary();
     }
     
@@ -815,15 +1194,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.files = dataTransfer.files;
 
         updateImagePreview();
-        updateCounters();
-        updateProgressBar();
         updateSummary();
     };
-    
-    function updateCounters() {
-        document.getElementById('edit-count').textContent = activeEdits.size;
-        document.getElementById('image-count').textContent = selectedImages.length;
-    }
     
     // Toggle mobile summary
     window.toggleMobileSummary = function() {
@@ -839,16 +1211,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    function updateProgressBar() {
-        const totalChanges = activeEdits.size + selectedImages.length;
-        const progress = Math.min(totalChanges * 25, 100); // 25% per change, max 100%
+    // Validate if a field has actual changes
+    function validateFieldChanges() {
+        let validChanges = 0;
         
-        const progressBar = document.getElementById('progress-bar');
-        progressBar.style.width = progress + '%';
+        activeEdits.forEach(fieldName => {
+            const editField = document.querySelector(`[data-field="${fieldName}"]`);
+            const input = editField.querySelector('.suggested-input input, .suggested-input select, .suggested-input textarea');
+            
+            if (input) {
+                let hasValidContent = false;
+                
+                if (input.type === 'textarea' || input.type === 'text' || input.type === 'url' || input.type === 'tel') {
+                    hasValidContent = input.value.trim().length > 0;
+                } else if (input.tagName === 'SELECT') {
+                    hasValidContent = input.value !== '' && input.value !== input.querySelector('option').value;
+                }
+                
+                // Add visual feedback for empty fields
+                if (!hasValidContent) {
+                    input.classList.add('border-red-300', 'dark:border-red-600');
+                    input.classList.remove('border-gray-300', 'dark:border-gray-600');
+                } else {
+                    input.classList.remove('border-red-300', 'dark:border-red-600');
+                    input.classList.add('border-green-300', 'dark:border-green-600');
+                    validChanges++;
+                }
+            }
+        });
+        
+        return validChanges;
     }
     
     function updateSummary() {
-        const totalChanges = activeEdits.size + selectedImages.length;
+        const validChanges = validateFieldChanges();
+        const totalItems = validChanges + selectedImages.length;
+        
         const summaryCount = document.getElementById('summary-count');
         const summaryCountMobile = document.getElementById('summary-count-mobile');
         const summaryContent = document.getElementById('summary-content');
@@ -856,19 +1254,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitButton = document.getElementById('submit-button');
         
         // Update both desktop and mobile counters
-        if (summaryCount) summaryCount.textContent = totalChanges;
-        if (summaryCountMobile) summaryCountMobile.textContent = totalChanges;
+        if (summaryCount) summaryCount.textContent = totalItems;
+        if (summaryCountMobile) summaryCountMobile.textContent = totalItems;
         
-        if (totalChanges === 0) {
+        if (totalItems === 0) {
             const infoContent = `
                 <div class="flex items-center">
-                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                    <i class="fas fa-info-circle mr-2 text-primary-500"></i>
                     {% translate "Select fields to edit or upload images to create suggestions." %}
                 </div>
             `;
             const mobileInfoContent = `
                 <div class="flex items-center">
-                    <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                    <i class="fas fa-info-circle mr-1 text-primary-500"></i>
                     {% translate "Select fields to edit or upload images to create suggestions." %}
                 </div>
             `;
@@ -879,26 +1277,62 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.classList.add('opacity-50', 'cursor-not-allowed');
         } else {
-            let summary = [];
-            if (activeEdits.size > 0) {
-                summary.push(`${activeEdits.size} field edit${activeEdits.size > 1 ? 's' : ''}`);
+            const summaryItems = [];
+            const fieldEditSingular = "{% translate 'Field edit' %}";
+            const fieldEditPlural = "{% translate 'Field edits' %}";
+            const photoUploadSingular = "{% translate 'Photo upload' %}";
+            const photoUploadPlural = "{% translate 'Photo uploads' %}";
+            
+            if (validChanges > 0) {
+                const fieldEditLabel = validChanges === 1 ? fieldEditSingular : fieldEditPlural;
+                const emptyFields = activeEdits.size - validChanges;
+                
+                summaryItems.push(`
+                    <li class="flex items-center gap-2">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-300 text-xs font-semibold">${validChanges}</span>
+                        <span>${fieldEditLabel}</span>
+                    </li>
+                `);
+                
+                if (emptyFields > 0) {
+                    summaryItems.push(`
+                        <li class="flex items-center gap-2">
+                            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 text-xs font-semibold">${emptyFields}</span>
+                            <span class="text-red-600 dark:text-red-400">{% translate "Empty fields" %}</span>
+                        </li>
+                    `);
+                }
             }
             if (selectedImages.length > 0) {
-                summary.push(`${selectedImages.length} image${selectedImages.length > 1 ? 's' : ''}`);
+                const photoUploadLabel = selectedImages.length === 1 ? photoUploadSingular : photoUploadPlural;
+                summaryItems.push(`
+                    <li class="flex items-center gap-2">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-300 text-xs font-semibold">${selectedImages.length}</span>
+                        <span>${photoUploadLabel}</span>
+                    </li>
+                `);
             }
             
             const readyContent = `
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle mr-2 text-green-500"></i>
-                    <span class="font-medium">Ready to submit:</span>
-                    <span class="ml-1">${summary.join(' + ')}</span>
+                <div class="space-y-3">
+                    <div class="flex items-center font-medium text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-check-circle mr-2 text-primary-500"></i>
+                        {% translate "Ready to submit" %}
+                    </div>
+                    <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                        ${summaryItems.join('')}
+                    </ul>
                 </div>
             `;
             const mobileReadyContent = `
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle mr-1 text-green-500"></i>
-                    <span class="font-medium">Ready:</span>
-                    <span class="ml-1">${summary.join(' + ')}</span>
+                <div class="space-y-2">
+                    <div class="flex items-center font-medium text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-check-circle mr-1 text-primary-500"></i>
+                        {% translate "Ready" %}
+                    </div>
+                    <ul class="space-y-1 text-gray-700 dark:text-gray-300">
+                        ${summaryItems.join('')}
+                    </ul>
                 </div>
             `;
             
@@ -910,14 +1344,104 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Form submission handling
+    // Mobile summary toggle
+    window.toggleMobileSummary = function() {
+        const content = document.getElementById('mobile-summary-content');
+        const chevron = document.getElementById('mobile-summary-chevron');
+        
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            content.classList.add('hidden');
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    };
+    
+    // Add real-time validation to all form inputs
+    function addInputValidation() {
+        const inputs = document.querySelectorAll('.edit-field input, .edit-field select, .edit-field textarea');
+        
+        inputs.forEach(input => {
+            // Prevent clicks on inputs from bubbling up to parent startEdit
+            input.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            ['input', 'change', 'blur'].forEach(event => {
+                input.addEventListener(event, function() {
+                    updateSummary();
+                });
+            });
+        });
+        
+        // Also prevent clicks on suggested-input containers from bubbling
+        const suggestedInputs = document.querySelectorAll('.suggested-input');
+        suggestedInputs.forEach(container => {
+            container.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+        
+        // Prevent cancel button clicks from bubbling
+        const cancelButtons = document.querySelectorAll('button[onclick*="cancelEdit"]');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    }
+    
+    // Initialize input validation when DOM is ready
+    setTimeout(addInputValidation, 100);
+    
+    // Enhanced form submission handling with validation
     document.querySelector('form').addEventListener('submit', function(e) {
         const submitButton = document.getElementById('submit-button');
         const submitText = document.getElementById('submit-text');
         
-        // Update submit button state
+        // Prevent double submission
+        if (submitButton.disabled) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Validate all fields one more time
+        const validChanges = validateFieldChanges();
+        const totalItems = validChanges + selectedImages.length;
+        
+        if (totalItems === 0) {
+            e.preventDefault();
+            alert('{% translate "Please make at least one change or upload an image before submitting." %}');
+            return false;
+        }
+        
+        // Check for empty fields and show warning
+        if (activeEdits.size > validChanges) {
+            const emptyCount = activeEdits.size - validChanges;
+            const message = emptyCount === 1 ? 
+                '{% translate "You have 1 empty field. Continue anyway?" %}' : 
+                `{% translate "You have" %} ${emptyCount} {% translate "empty fields. Continue anyway?" %}`;
+            
+            if (!confirm(message)) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        // Update submit button state with animation
         submitButton.disabled = true;
+        submitButton.style.transform = 'scale(0.98)';
+        
+        setTimeout(() => {
+            submitButton.style.transform = 'scale(1)';
+        }, 100);
+        
         submitText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>{% translate "Submitting..." %}';
+        
+        // Add loading state to the page
+        document.body.style.pointerEvents = 'none';
+        document.body.style.opacity = '0.8';
     });
 });
 </script>

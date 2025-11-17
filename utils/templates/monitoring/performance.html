@@ -1,0 +1,101 @@
+{% extends 'monitoring/base.html' %}
+
+{% block content %}
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Response Time Statistics (Last {{ days }} Days)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="stat-card">
+            <div class="stat-value text-blue-600">{{ response_time_stats.avg|floatformat:0|default:0 }}ms</div>
+            <div class="stat-label">Average Response Time</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ response_time_stats.max|floatformat:0|default:0 }}ms</div>
+            <div class="stat-label">Max Response Time</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-green-600">{{ response_time_stats.min|floatformat:0|default:0 }}ms</div>
+            <div class="stat-label">Min Response Time</div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Database & Cache Performance</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="stat-card">
+            <div class="stat-value text-purple-600">{{ db_query_stats.avg_queries|floatformat:1|default:0 }}</div>
+            <div class="stat-label">Avg Queries per Request</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">Max: {{ db_query_stats.max_queries|default:0 }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-green-600">{{ cache_stats.hit_rate|floatformat:1|default:0 }}%</div>
+            <div class="stat-label">Cache Hit Rate</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">{{ cache_stats.hits|default:0 }} hits / {{ cache_stats.misses|default:0 }} misses</div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Slowest Endpoints</h2>
+    <div class="content-container">
+        {% if slow_endpoints %}
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead class="bg-gray-50 dark:bg-dark-bg">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Endpoint</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Avg Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Max Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Requests</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                {% for endpoint in slow_endpoints %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                    <td class="px-6 py-4 text-sm font-mono text-gray-900 dark:text-dark-text">{{ endpoint.path|truncatechars:60 }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ endpoint.avg_time|floatformat:0 }}ms</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ endpoint.max_time|floatformat:0 }}ms</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-dark-muted">{{ endpoint.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4">
+    <canvas id="responseTimeChart" height="80"></canvas>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Placeholder for response time chart
+const ctx = document.getElementById('responseTimeChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Hour 1', 'Hour 2', 'Hour 3', 'Hour 4', 'Hour 5', 'Hour 6'],
+            datasets: [{
+                label: 'Response Time (ms)',
+                data: [120, 150, 180, 140, 160, 130],
+                borderColor: 'rgb(59, 130, 246)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Response Time Trend (Last 6 Hours)'
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

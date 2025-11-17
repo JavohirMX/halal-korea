@@ -1,0 +1,55 @@
+{% extends 'places/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "Confirm Disconnect" %} - {% translate "Halal Korea" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="glass-card rounded-lg p-8 text-center">
+            <!-- Warning Icon -->
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/20 mb-6">
+                <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-2xl"></i>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                {% translate "Disconnect Social Account?" %}
+            </h1>
+            
+            <!-- Description -->
+            <div class="text-gray-600 dark:text-gray-400 mb-8">
+                <p class="mb-3">
+                    {% translate "You are about to disconnect your" %} 
+                    <strong>{{ account.get_provider.name }}</strong> 
+                    {% translate "account." %}
+                </p>
+                <p class="text-sm">
+                    {% translate "You will no longer be able to sign in using this account, but you can reconnect it later if needed." %}
+                </p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <form method="post" action="{% url 'socialaccount_connections' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="account" value="{{ account.id }}">
+                    <button type="submit" 
+                            name="action_remove"
+                            class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                        <i class="fas fa-unlink mr-2"></i>
+                        {% translate "Yes, Disconnect Account" %}
+                    </button>
+                </form>
+                
+                <a href="{% url 'socialaccount_connections' %}" 
+                   class="w-full inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    {% translate "Cancel" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

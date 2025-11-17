@@ -102,9 +102,9 @@
                 "contactType": "customer support"
             },
             "sameAs": [
-                "{{ STATIC_INFO.facebook }}",
-                "{{ STATIC_INFO.twitter }}",
-                "{{ STATIC_INFO.instagram }}"
+                {% if STATIC_INFO.twitter %}"{{ STATIC_INFO.twitter }}"{% if STATIC_INFO.instagram or STATIC_INFO.facebook %},{% endif %}{% endif %}
+                {% if STATIC_INFO.instagram %}"{{ STATIC_INFO.instagram }}"{% if STATIC_INFO.facebook %},{% endif %}{% endif %}
+                {% if STATIC_INFO.facebook %}"{{ STATIC_INFO.facebook }}"{% endif %}
             ]
         },
         "inLanguage": ["en-US", "ko-KR", "uz-UZ"],
@@ -125,6 +125,7 @@
         (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
             key: "{{ google_maps_api_key }}",
             v: "beta",
+            mapIds: ["{{ STATIC_INFO.google_maps_id }}"],
         });
     </script>
 
@@ -204,26 +205,38 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
-        /* Scrollbar Styles */
+        /* Scrollbar Styles - Hide All Scrollbars */
         html {
             scroll-behavior: smooth;
         }
 
+        /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
         ::-webkit-scrollbar {
-            width: 8px;
+            display: none;
+            width: 0px;
+            background: transparent;
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            display: none;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #10b981;
-            border-radius: 4px;
+            display: none;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #059669;
+            display: none;
+        }
+
+        /* Hide scrollbar for Firefox */
+        html {
+            scrollbar-width: none;
+        }
+
+        /* Hide scrollbar for IE and Edge Legacy */
+        body {
+            -ms-overflow-style: none;
         }
 
         /* Animations */
@@ -318,17 +331,38 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* Dark Mode Scrollbar */
+        /* Dark Mode Scrollbar - Hide All Scrollbars */
+        .dark ::-webkit-scrollbar {
+            display: none;
+            width: 0px;
+            background: transparent;
+        }
+
         .dark ::-webkit-scrollbar-track {
-            background: #1f2937;
+            display: none;
         }
 
         .dark ::-webkit-scrollbar-thumb {
-            background: #22c55e;
+            display: none;
         }
 
         .dark ::-webkit-scrollbar-thumb:hover {
-            background: #16a34a;
+            display: none;
+        }
+
+        /* Ensure scrollbars are hidden in dark mode for Firefox and IE/Edge */
+        .dark {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Scrollbar hide utility class */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
         }
 
         /* Theme Toggle Animation */
@@ -353,6 +387,15 @@
                 document.documentElement.classList.remove('dark');
             }
         })();
+    </script>
+
+    <!-- Google Maps Theme Management -->
+    <script>
+        // Utility function to detect current theme and return appropriate ColorScheme
+        function getMapColorScheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return isDark ? google.maps.ColorScheme.DARK : google.maps.ColorScheme.LIGHT;
+        }
     </script>
 </head>
 
@@ -593,7 +636,7 @@
                         {% else %}
                             <div class="flex items-center space-x-3">
                                 <a href="{% url 'users:login' %}" 
-                                   class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 text-sm font-medium">
+                                   class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 text-sm font-medium whitespace-nowrap">
                                     {% translate "Log in" %}
                                 </a>
                                 <a href="{% url 'users:register' %}" 
@@ -964,6 +1007,14 @@
         window.toggleTheme = function() {
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.theme = isDark ? 'dark' : 'light';
+            
+            // Check if there's a map on the page
+            const hasMap = typeof map !== 'undefined' || typeof desktopMap !== 'undefined' || typeof mobileMap !== 'undefined';
+            
+            // If map exists, reload the page to apply new theme to map
+            if (hasMap) {
+                location.reload();
+            }
             
             // Animate icon
             const icon = document.querySelector('.theme-toggle-icon');

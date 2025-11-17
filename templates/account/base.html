@@ -1,0 +1,13 @@
+{% extends 'places/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% block head_title %}{% endblock %} - {% translate "Halal Korea" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        {% block inner %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

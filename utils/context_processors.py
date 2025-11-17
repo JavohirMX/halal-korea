@@ -2,6 +2,7 @@ from .location_manager import get_user_location
 from config import static_info
 from datetime import datetime
 from django.utils.translation import gettext as _
+from django.conf import settings
 
 def user_location(request):
     """
@@ -29,5 +30,15 @@ def static_info_context(request):
     # Handle copyright text with year formatting
     copyright_text = _('© {year} Halal Korea. All rights reserved.')
     info['copyright_text'] = copyright_text.format(year=datetime.now().year)
+    
+    # Add Google Maps ID
+    info['google_maps_id'] = settings.GOOGLE_MAPS_ID
+    
+    # Ensure all social media keys exist (even if None) to prevent KeyError in templates
+    # This allows templates to safely check if STATIC_INFO.facebook, etc. exist
+    social_keys = ['facebook', 'twitter', 'instagram']
+    for key in social_keys:
+        if key not in info:
+            info[key] = None
     
     return {'STATIC_INFO': info}

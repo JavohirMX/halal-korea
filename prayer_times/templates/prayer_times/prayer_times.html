@@ -79,7 +79,7 @@
                     </button>
 
                     <!-- City List -->
-                    <div class="py-1 max-h-60 overflow-y-auto">
+                    <div class="py-1 max-h-60 overflow-y-auto scrollbar-hide">
                         <template x-for="city in cities.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))" :key="city.name">
                             <a href="#" 
                                @click.prevent="updateLocation(city.name)"

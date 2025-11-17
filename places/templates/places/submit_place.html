@@ -16,7 +16,8 @@
         map = new Map(document.getElementById("map"), {
             zoom: 12,
             center: seoul,
-            mapId: 'DEMO_MAP_ID',
+            mapId: '{{ STATIC_INFO.google_maps_id }}',
+            colorScheme: getMapColorScheme(),
         });
         
         let marker = null;
@@ -65,9 +66,10 @@
 
                         // Update coordinates when marker is dragged
                         marker.addListener('dragend', function() {
-                            const position = marker.getPosition();
-                            const lat = position.lat();
-                            const lng = position.lng();
+                            const position = marker.position;
+                            // Handle both LatLng object (with methods) and LatLngLiteral (with properties)
+                            const lat = typeof position.lat === 'function' ? position.lat() : position.lat;
+                            const lng = typeof position.lng === 'function' ? position.lng() : position.lng;
                             document.getElementById('id_latitude').value = lat;
                             document.getElementById('id_longitude').value = lng;
                             updateAddressFromCoordinates(lat, lng);
@@ -106,9 +108,10 @@
 
                 // Update coordinates when marker is dragged
                 marker.addListener('dragend', function() {
-                    const position = marker.getPosition();
-                    const lat = position.lat();
-                    const lng = position.lng();
+                    const position = marker.position;
+                    // Handle both LatLng object (with methods) and LatLngLiteral (with properties)
+                    const lat = typeof position.lat === 'function' ? position.lat() : position.lat;
+                    const lng = typeof position.lng === 'function' ? position.lng() : position.lng;
                     document.getElementById('id_latitude').value = lat;
                     document.getElementById('id_longitude').value = lng;
                     updateAddressFromCoordinates(lat, lng);

@@ -1,0 +1,49 @@
+{% extends 'places/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "Account Disconnected" %} - {% translate "Halal Korea" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="glass-card rounded-lg p-8 text-center">
+            <!-- Success Icon -->
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/20 mb-6">
+                <i class="fas fa-check text-green-600 dark:text-green-400 text-2xl"></i>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                {% translate "Account Successfully Disconnected" %}
+            </h1>
+            
+            <!-- Description -->
+            <p class="text-gray-600 dark:text-gray-400 mb-8">
+                {% translate "Your social account has been successfully disconnected from your Halal Korea account." %}
+            </p>
+            
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <a href="{% url 'users:edit_profile' %}" 
+                   class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white gradient-bg-hover">
+                    <i class="fas fa-user-edit mr-2"></i>
+                    {% translate "Back to Profile Settings" %}
+                </a>
+                
+                <a href="{% url 'socialaccount_connections' %}" 
+                   class="w-full inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <i class="fas fa-link mr-2"></i>
+                    {% translate "Manage Connections" %}
+                </a>
+                
+                <a href="{% url 'places:home' %}" 
+                   class="w-full inline-flex items-center justify-center px-6 py-3 text-base font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
+                    <i class="fas fa-home mr-2"></i>
+                    {% translate "Go to Home" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

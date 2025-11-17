@@ -6,7 +6,6 @@ INFO = {
     "address": "Seoul, South Korea",
     
     # Social media links
-    "facebook": "https://facebook.com",
     "twitter": "https://twitter.com",
     "instagram": "https://instagram.com",
     

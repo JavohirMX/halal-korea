@@ -1,0 +1,459 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Halal Korea Monitoring</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+        // Dark mode configuration for Tailwind
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                dark: {
+                    bg: '#111827',
+                    card: '#1f2937',
+                    border: '#374151',
+                    text: '#f9fafb',
+                    muted: '#9ca3af',
+                }
+                    }
+                }
+            }
+        }
+        
+        // Initialize dark mode from localStorage
+        if (localStorage.getItem('darkMode') === 'enabled' || 
+            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+    
+    <style>
+        /* Light mode styles */
+        .stat-card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+        .dark .stat-card {
+            background: #1f2937;
+            border-color: #374151;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        .stat-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .dark .stat-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #111827;
+        }
+        .dark .stat-value {
+            color: #f9fafb;
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        .dark .stat-label {
+            color: #9ca3af;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .nav-link-active {
+            background: #2563eb;
+            color: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .dark .nav-link-active {
+            background: #3b82f6;
+            color: #ffffff !important;
+        }
+        .nav-link-inactive {
+            color: #374151;
+        }
+        .dark .nav-link-inactive {
+            color: #f9fafb;
+        }
+        .nav-link-inactive:hover {
+            background: #f3f4f6;
+        }
+        .dark .nav-link-inactive:hover {
+            background: #1f2937;
+        }
+        
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            border: 1px solid #e5e7eb;
+        }
+        .dark-mode-toggle:hover {
+            background: #f3f4f6;
+        }
+        .dark .dark-mode-toggle {
+            border-color: #475569;
+        }
+        .dark .dark-mode-toggle:hover {
+            background: #334155;
+        }
+        .dark-mode-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            transition: transform 0.3s ease;
+            color: #374151;
+        }
+        .dark .dark-mode-icon {
+            color: #f9fafb;
+        }
+        .dark .sun-icon {
+            transform: rotate(180deg) scale(0);
+        }
+        .dark .moon-icon {
+            transform: rotate(0deg) scale(1);
+        }
+        .sun-icon {
+            transform: rotate(0deg) scale(1);
+            color: #f59e0b;
+        }
+        .moon-icon {
+            transform: rotate(-180deg) scale(0);
+            color: #60a5fa;
+        }
+        .dark .moon-icon {
+            color: #fbbf24;
+        }
+        
+        /* Smooth transitions for dark mode */
+        * {
+            @apply transition-colors duration-200;
+        }
+        
+        /* Table styles */
+        .table-container {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        .dark .table-container {
+            background: #1f2937;
+            border-color: #374151;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        table {
+            width: 100%;
+        }
+        th {
+            background: #f9fafb;
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .dark th {
+            background: #111827;
+            color: #d1d5db;
+        }
+        td {
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            color: #111827;
+            border-top: 1px solid #e5e7eb;
+        }
+        .dark td {
+            color: #f9fafb;
+            border-top-color: #374151;
+        }
+        
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 9999px;
+        }
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .dark .badge-success {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .dark .badge-warning {
+            background: #78350f;
+            color: #fcd34d;
+        }
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .dark .badge-danger {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .dark .badge-info {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+        
+        /* Section heading styles */
+        .section-heading {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+        .dark .section-heading {
+            color: #f9fafb;
+        }
+        
+        /* Content container styles */
+        .content-container {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        .dark .content-container {
+            background: #1f2937;
+            border-color: #374151;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Hide All Scrollbars */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+        ::-webkit-scrollbar {
+            display: none;
+            width: 0px;
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-track {
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            display: none;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            display: none;
+        }
+
+        /* Hide scrollbar for Firefox */
+        html {
+            scrollbar-width: none;
+        }
+
+        /* Hide scrollbar for IE and Edge Legacy */
+        body {
+            -ms-overflow-style: none;
+        }
+
+        /* Dark Mode Scrollbar - Hide All Scrollbars */
+        .dark ::-webkit-scrollbar {
+            display: none;
+            width: 0px;
+            background: transparent;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            display: none;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            display: none;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            display: none;
+        }
+
+        /* Ensure scrollbars are hidden in dark mode for Firefox and IE/Edge */
+        .dark {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Scrollbar hide utility class */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-dark-bg min-h-screen"  data-dark-mode="false">
+    <!-- Header -->
+    <header class="bg-white dark:bg-dark-card shadow-sm border-b dark:border-dark-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-dark-text">{{ title }}</h1>
+                    <p class="text-sm text-gray-600 dark:text-dark-muted">Halal Korea Monitoring System</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                        <svg class="dark-mode-icon sun-icon absolute" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                        </svg>
+                        <svg class="dark-mode-icon moon-icon absolute" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                        </svg>
+                    </button>
+                    <span class="text-sm text-gray-600 dark:text-dark-muted">{{ request.user.username }}</span>
+                    <a href="/admin/" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">← Back to Admin</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-dark-card shadow-sm border-b dark:border-dark-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex space-x-2 py-3 overflow-x-auto scrollbar-hide">
+                <a href="{% url 'monitoring_dashboard' %}" class="nav-link {% if request.path == '/admin/monitoring/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    📊 Overview
+                </a>
+                <a href="{% url 'monitoring_performance' %}" class="nav-link {% if 'performance' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    ⚡ Performance
+                </a>
+                <a href="{% url 'monitoring_security' %}" class="nav-link {% if 'security' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    🔒 Security
+                </a>
+                <a href="{% url 'monitoring_content' %}" class="nav-link {% if 'content' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    📝 Content Ops
+                </a>
+                <a href="{% url 'monitoring_analytics' %}" class="nav-link {% if 'analytics' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    📈 Analytics
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-dark-card border-t dark:border-dark-border mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm text-gray-600 dark:text-dark-muted">
+                Halal Korea Monitoring System &copy; {{ current_year }}
+            </p>
+        </div>
+    </footer>
+
+    <!-- Dark Mode JavaScript -->
+    <script>
+        // Dark mode toggle functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const html = document.documentElement;
+        
+        function toggleDarkMode() {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('darkMode', 'disabled');
+                updateCharts('light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('darkMode', 'enabled');
+                updateCharts('dark');
+            }
+        }
+        
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+        
+        // Update Chart.js themes for dark mode
+        function updateCharts(mode) {
+            if (typeof Chart !== 'undefined') {
+                const isDark = mode === 'dark';
+                Chart.defaults.color = isDark ? '#94a3b8' : '#6b7280';
+                Chart.defaults.borderColor = isDark ? '#334155' : '#e5e7eb';
+                
+                // Re-render all charts
+                Chart.instances.forEach(chart => {
+                    if (chart.options.scales) {
+                        Object.keys(chart.options.scales).forEach(scaleKey => {
+                            const scale = chart.options.scales[scaleKey];
+                            if (scale.grid) {
+                                scale.grid.color = isDark ? '#334155' : '#e5e7eb';
+                            }
+                            if (scale.ticks) {
+                                scale.ticks.color = isDark ? '#94a3b8' : '#6b7280';
+                            }
+                        });
+                    }
+                    if (chart.options.plugins?.legend?.labels) {
+                        chart.options.plugins.legend.labels.color = isDark ? '#94a3b8' : '#6b7280';
+                    }
+                    chart.update();
+                });
+            }
+        }
+        
+        // Initialize charts with current mode
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentMode = html.classList.contains('dark') ? 'dark' : 'light';
+            updateCharts(currentMode);
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

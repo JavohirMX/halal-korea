@@ -243,3 +243,62 @@ def record_login_attempt(request):
     # Record IP-based attempt
     ip_config = RATE_LIMITS['login_attempts']['per_ip']
     RateLimiter.record_attempt('login_ip', ip, ip_config['window_minutes'])
+
+
+def check_password_reset_rate_limit(request, email=None) -> Tuple[bool, str]:
+    """
+    Check if password reset requests are rate limited
+    
+    Returns:
+        Tuple of (is_allowed, error_message)
+    """
+    ip = RateLimiter.get_client_ip(request)
+    
+    # Check IP-based rate limit
+    ip_config = {
+        'limit': getattr(settings, 'RATE_LIMIT_SETTINGS', {}).get('PASSWORD_RESET_PER_IP_LIMIT', 3),
+        'window_minutes': getattr(settings, 'RATE_LIMIT_SETTINGS', {}).get('PASSWORD_RESET_PER_IP_WINDOW', 60)
+    }
+    
+    ip_limited, ip_count, ip_reset_time = RateLimiter.is_rate_limited(
+        'password_reset_ip', ip, ip_config['limit'], ip_config['window_minutes']
+    )
+    
+    if ip_limited:
+        logger.warning(f"Password reset rate limit exceeded for IP {ip}. Attempts: {ip_count}")
+        return False, f"Too many password reset requests from your IP address. Please try again in {ip_reset_time} minutes."
+    
+    # Check email-based rate limit (if email provided)
+    if email:
+        email_config = {
+            'limit': getattr(settings, 'RATE_LIMIT_SETTINGS', {}).get('PASSWORD_RESET_PER_EMAIL_LIMIT', 2),
+            'window_minutes': getattr(settings, 'RATE_LIMIT_SETTINGS', {}).get('PASSWORD_RESET_PER_EMAIL_WINDOW', 60)
+        }
+        
+        email_limited, email_count, email_reset_time = RateLimiter.is_rate_limited(
+            'password_reset_email', email.lower(), email_config['limit'], email_config['window_minutes']
+        )
+        
+        if email_limited:
+            logger.warning(f"Password reset rate limit exceeded for email {email}. Attempts: {email_count}")
+            return False, f"Too many password reset requests for this email address. Please try again in {email_reset_time} minutes."
+    
+    return True, ""
+
+
+def record_password_reset_attempt(request, email=None):
+    """Record a password reset attempt"""
+    ip = RateLimiter.get_client_ip(request)
+    
+    # Record IP-based attempt
+    ip_config = {
+        'window_minutes': getattr(settings, 'RATE_LIMIT_SETTINGS', {}).get('PASSWORD_RESET_PER_IP_WINDOW', 60)
+    }
+    RateLimiter.record_attempt('password_reset_ip', ip, ip_config['window_minutes'])
+    
+    # Record email-based attempt (if email provided)
+    if email:
+        email_config = {
+            'window_minutes': getattr(settings, 'RATE_LIMIT_SETTINGS', {}).get('PASSWORD_RESET_PER_EMAIL_WINDOW', 60)
+        }
+        RateLimiter.record_attempt('password_reset_email', email.lower(), email_config['window_minutes'])

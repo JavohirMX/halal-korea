@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -6,6 +6,8 @@ from django.contrib.gis.geos import Point
 from io import BytesIO
 from PIL import Image
 import json
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.messages.storage.fallback import FallbackStorage
 
 from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 from .forms import PlaceSuggestionForm
@@ -22,6 +24,8 @@ class PlaceEditSuggestionModelTest(TestCase):
             email='test@example.com',
             password='testpass123'
         )
+        self.user.email_verified = True
+        self.user.save(update_fields=['email_verified'])
         self.place = HalalPlace.objects.create(
             name='Test Restaurant',
             description='A test restaurant',
@@ -66,6 +70,8 @@ class PlaceImageSuggestionModelTest(TestCase):
             email='test@example.com',
             password='testpass123'
         )
+        self.user.email_verified = True
+        self.user.save(update_fields=['email_verified'])
         self.place = HalalPlace.objects.create(
             name='Test Restaurant',
             description='A test restaurant',
@@ -112,6 +118,8 @@ class PlaceSuggestionFormTest(TestCase):
             email='test@example.com',
             password='testpass123'
         )
+        self.user.email_verified = True
+        self.user.save(update_fields=['email_verified'])
         self.place = HalalPlace.objects.create(
             name='Test Restaurant',
             description='A test restaurant',
@@ -172,6 +180,8 @@ class SuggestionViewsTest(TestCase):
             email='test@example.com',
             password='testpass123'
         )
+        self.user.email_verified = True
+        self.user.save(update_fields=['email_verified'])
         self.place = HalalPlace.objects.create(
             name='Test Restaurant',
             description='A test restaurant',
@@ -364,11 +374,15 @@ class SuggestionIntegrationTest(TestCase):
             email='test@example.com',
             password='testpass123'
         )
+        self.user.email_verified = True
+        self.user.save(update_fields=['email_verified'])
         self.admin_user = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
             password='adminpass123'
         )
+        self.admin_user.email_verified = True
+        self.admin_user.save(update_fields=['email_verified'])
         self.place = HalalPlace.objects.create(
             name='Test Restaurant',
             description='A test restaurant',
@@ -435,3 +449,90 @@ class SuggestionIntegrationTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Suggest Edit')
+
+
+class PlaceImageSuggestionAdminSaveModelTest(TestCase):
+    """Test admin save_model workflow for image suggestions"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        self.user.email_verified = True
+        self.user.save(update_fields=['email_verified'])
+        self.admin_user = User.objects.create_superuser(
+            username='admin',
+            email='admin@example.com',
+            password='adminpass123'
+        )
+        self.admin_user.email_verified = True
+        self.admin_user.save(update_fields=['email_verified'])
+        self.place = HalalPlace.objects.create(
+            name='Test Restaurant',
+            description='A test restaurant',
+            category='restaurant',
+            location=Point(127.0, 37.5),
+            address='Test Address',
+            status='approved',
+            submitted_by=self.user
+        )
+        # Create image suggestion with valid image
+        image = Image.new('RGB', (100, 100), color='blue')
+        img_io = BytesIO()
+        image.save(img_io, format='JPEG')
+        img_io.seek(0)
+        uploaded_file = SimpleUploadedFile(
+            "admin_save_image.jpg",
+            img_io.getvalue(),
+            content_type="image/jpeg"
+        )
+        self.suggestion = PlaceImageSuggestion.objects.create(
+            place=self.place,
+            suggested_by=self.user,
+            image=uploaded_file,
+            caption='Admin save image'
+        )
+        from places.admin import PlaceImageSuggestionAdmin
+        self.admin = PlaceImageSuggestionAdmin(PlaceImageSuggestion, None)
+
+    def _build_request(self):
+        request = self.factory.post('/admin/places/placeimagesuggestion/')
+        request.user = self.admin_user
+        # Attach session and messages to support Django admin messaging
+        session_middleware = SessionMiddleware(lambda req: None)
+        session_middleware.process_request(request)
+        request.session.save()
+        setattr(request, '_messages', FallbackStorage(request))
+        return request
+
+    def test_save_model_adds_photo_when_status_approved(self):
+        """Approving via save_model adds image to place photos and sets reviewer metadata"""
+        request = self._build_request()
+        self.suggestion.status = 'approved'
+
+        self.admin.save_model(request, self.suggestion, form=None, change=False)
+
+        self.place.refresh_from_db()
+        self.suggestion.refresh_from_db()
+        self.assertIsNotNone(self.place.photo_urls)
+        self.assertEqual(len(self.place.photo_urls), 1)
+        self.assertIn('admin_save_image', self.place.photo_urls[0])
+        self.assertEqual(self.suggestion.reviewed_by, self.admin_user)
+        self.assertIsNotNone(self.suggestion.reviewed_at)
+
+    def test_save_model_no_duplicate_on_reapproval(self):
+        """Editing an already-approved suggestion keeps photo list stable"""
+        request = self._build_request()
+        self.suggestion.status = 'approved'
+        self.admin.save_model(request, self.suggestion, form=None, change=False)
+
+        initial_photo_urls = list(self.place.photo_urls)
+
+        second_request = self._build_request()
+        self.admin.save_model(second_request, self.suggestion, form=None, change=True)
+
+        self.place.refresh_from_db()
+        self.assertEqual(self.place.photo_urls, initial_photo_urls)
