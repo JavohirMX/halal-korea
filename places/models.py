@@ -171,14 +171,29 @@ class PlaceImageSuggestion(models.Model):
         
         # If this is a new upload (not yet saved) and watermarking is enabled
         if not self.pk and self.image and watermark_enabled:
-            # Save original image
+            # Save original image BEFORE watermarking
             if not self.original_image:
-                self.original_image = self.image
+                # Read the original file content and create a separate copy
+                original_file = self.image.file
+                original_file.seek(0)  # Ensure we're at the beginning
+                original_content = original_file.read()
+                
+                # Create a new ContentFile with the original content
+                original_filename = Path(self.image.name).name
+                self.original_image.save(
+                    original_filename,
+                    ContentFile(original_content),
+                    save=False
+                )
+                
+                # Reset the file pointer for watermarking
+                original_file.seek(0)
             
             # Apply watermark to the image
             try:
-                # Get the uploaded file
-                uploaded_file = self.image.file
+                # Get the uploaded file (use original_image if available, otherwise image)
+                uploaded_file = self.original_image.file if self.original_image else self.image.file
+                uploaded_file.seek(0)  # Ensure we're at the beginning
                 
                 # Apply watermark
                 watermarked_img = apply_watermark_to_uploaded_file(uploaded_file)
@@ -199,7 +214,7 @@ class PlaceImageSuggestion(models.Model):
                 img_io.seek(0)
                 
                 # Replace the image field with watermarked version
-                watermarked_filename = f"wm_{self.image.name}"
+                watermarked_filename = f"wm_{Path(self.image.name).name}"
                 self.image.save(
                     watermarked_filename,
                     ContentFile(img_io.read()),
@@ -217,7 +232,6 @@ class PlaceImageSuggestion(models.Model):
     def reapply_watermark(self, opacity=None, angle=None, spacing=None):
         """Reapply watermark with custom settings"""
         from django.core.files.base import ContentFile
-        from django.conf import settings
         from utils.watermark import apply_watermark_to_uploaded_file
         import io
         from pathlib import Path
