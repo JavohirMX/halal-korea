@@ -201,12 +201,12 @@ class SmartLanguageMiddleware(MiddlewareMixin):
         """
         # Priority 1: URL parameter (immediate override)
         if url_lang:
-            logger.info(f"Using URL language: {url_lang}")
+            logger.debug(f"Using URL language: {url_lang}")
             return url_lang
         
         # Priority 2: User profile (for authenticated users)
         if user_lang:
-            logger.info(f"Using user preferred language: {user_lang}")
+            logger.debug(f"Using user preferred language: {user_lang}")
             return user_lang
         
         # Priority 3: Session language (previous choice)
@@ -216,7 +216,7 @@ class SmartLanguageMiddleware(MiddlewareMixin):
         
         # Priority 4: Browser preference
         if browser_lang:
-            logger.info(f"Using browser language: {browser_lang}")
+            logger.debug(f"Using browser language: {browser_lang}")
             return browser_lang
         
         # Priority 5: Default language
