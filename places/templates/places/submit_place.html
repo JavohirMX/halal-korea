@@ -16,7 +16,7 @@
         map = new Map(document.getElementById("map"), {
             zoom: 12,
             center: seoul,
-            mapId: 'DEMO_MAP_ID',
+            mapId: '{{ STATIC_INFO.google_maps_id }}',
         });
         
         let marker = null;

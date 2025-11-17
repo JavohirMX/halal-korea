@@ -2,6 +2,7 @@ from .location_manager import get_user_location
 from config import static_info
 from datetime import datetime
 from django.utils.translation import gettext as _
+from django.conf import settings
 
 def user_location(request):
     """
@@ -29,5 +30,8 @@ def static_info_context(request):
     # Handle copyright text with year formatting
     copyright_text = _('© {year} Halal Korea. All rights reserved.')
     info['copyright_text'] = copyright_text.format(year=datetime.now().year)
+    
+    # Add Google Maps ID
+    info['google_maps_id'] = settings.GOOGLE_MAPS_ID
     
     return {'STATIC_INFO': info}

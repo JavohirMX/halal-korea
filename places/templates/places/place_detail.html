@@ -531,7 +531,7 @@
         const desktopMap = new Map(document.getElementById("map-desktop"), {
             zoom: 15,
             center: location,
-            mapId: 'DEMO_MAP_ID',
+            mapId: '{{ STATIC_INFO.google_maps_id }}',
         });
 
         const desktopMarker = new AdvancedMarkerElement({
@@ -557,7 +557,7 @@
         const mobileMap = new Map(document.getElementById("map-mobile"), {
             zoom: 15,
             center: location,
-            mapId: 'DEMO_MAP_ID',
+            mapId: '{{ STATIC_INFO.google_maps_id }}',
         });
 
         const mobileMarker = new AdvancedMarkerElement({

@@ -305,7 +305,7 @@
         map = new Map(document.getElementById("map"), {
             zoom: 12,
             center: center,
-            mapId: 'DEMO_MAP_ID',
+            mapId: '{{ STATIC_INFO.google_maps_id }}',
         });
 
         // Add marker for user's current location if available
