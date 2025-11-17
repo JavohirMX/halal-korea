@@ -59,7 +59,7 @@ def get_prayer_times(city, country, date=None, method=None, school=1):
         return cached_data
         
     # If not in cache, make API call
-    url = f'http://api.aladhan.com/v1/timingsByCity/{date}'
+    url = f'https://api.aladhan.com/v1/timingsByCity/{date}'
     params = {
         'city': city,
         'country': country,
@@ -95,7 +95,7 @@ def get_prayer_times_ll(latitude, longitude, date=None, method=None, school=1):
         return cached_data
         
     # If not in cache, make API call
-    url = f'http://api.aladhan.com/v1/timings/{date}'
+    url = f'https://api.aladhan.com/v1/timings/{date}'
     params = {
         'latitude': latitude,
         'longitude': longitude,
