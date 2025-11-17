@@ -310,6 +310,13 @@
             colorScheme: getMapColorScheme(),
         });
 
+        // Add map click listener once to close info window when clicking elsewhere
+        map.addListener('click', () => {
+            if (sharedInfoWindow) {
+                sharedInfoWindow.close();
+            }
+        });
+
         // Add marker for user's current location if available
         {% if user_location %}
         const userMarker = new AdvancedMarkerElement({
@@ -410,11 +417,6 @@
             `);
             // Open info window at clicked marker
             sharedInfoWindow.open(map, markers[place.id]);
-        });
-        
-        // Close info window when clicking elsewhere on the map
-        map.addListener('click', () => {
-            sharedInfoWindow.close();
         });
         
     }
