@@ -284,6 +284,7 @@
     let isLoading = false;
     let hasNextPage = {% if places.has_next %}true{% else %}false{% endif %};
     let allPlaces = [];
+    let sharedInfoWindow = null; // Single shared info window for all markers
     
     // Initialize Google Map
     async function initMap() {
@@ -306,6 +307,7 @@
             zoom: 12,
             center: center,
             mapId: '{{ STATIC_INFO.google_maps_id }}',
+            colorScheme: getMapColorScheme(),
         });
 
         // Add marker for user's current location if available
@@ -385,24 +387,36 @@
             content: markerIcons[place.id],
         });
         
-        // Create info window
-        const infowindow = new google.maps.InfoWindow({
-            content: `
-                <div class="text-center">
-                    <p class="font-semibold text-black text-md">${place.name}</p>
+        // Create shared info window on first marker (reuse for all other markers)
+        if (!sharedInfoWindow) {
+            sharedInfoWindow = new google.maps.InfoWindow({
+                headerDisabled: true,
+                maxWidth: 200,
+            });
+        }
+
+        // Add click listener to marker
+        markers[place.id].addListener('gmp-click', () => {
+            // Update info window content
+            sharedInfoWindow.setContent(`
+                <div style="padding: 12px; margin: -12px 0 0 -12px;">
+                    <p class="font-semibold text-lg text-gray-900 mb-1">${place.name}</p>
                     <p class="text-sm text-gray-600">${place.category === 'prayer_room' ? "{% translate 'Prayer Space'|escapejs %}" : place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
                     <a href="/place/${place.id}/" 
                        class="text-primary-600 hover:text-primary-700 text-sm">
                         {% translate "View Details" %}
                     </a>
                 </div>
-            `
+            `);
+            // Open info window at clicked marker
+            sharedInfoWindow.open(map, markers[place.id]);
         });
-
-        // Add click listener
-        markers[place.id].addListener('gmp-click', () => {
-            infowindow.open(map, markers[place.id]);
+        
+        // Close info window when clicking elsewhere on the map
+        map.addListener('click', () => {
+            sharedInfoWindow.close();
         });
+        
     }
     
     // Clear all markers from the map

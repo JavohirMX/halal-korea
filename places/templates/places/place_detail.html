@@ -532,6 +532,7 @@
             zoom: 15,
             center: location,
             mapId: '{{ STATIC_INFO.google_maps_id }}',
+            colorScheme: getMapColorScheme(),
         });
 
         const desktopMarker = new AdvancedMarkerElement({
@@ -542,11 +543,12 @@
 
         const desktopInfowindow = new google.maps.InfoWindow({
             content: `
-                <div class="text-center">
-                    <h3 class="font-semibold">{{ place.name }}</h3>
-                    <p class="text-sm text-gray-600">{{ place.address }}</p>
+                <div style="padding: 12px; margin: -12px 0 0 -12px;">
+                    <p style="font-size:18px; font-weight:700; color:#111;" class="font-bold">{{ place.name }}</p>
+                    <p style="font-size:14px; color:#4B5563;" class="text-sm">{{ place.address }}</p>
                 </div>
-            `
+            `,
+            headerDisabled: true,
         });
 
         desktopMarker.addListener('gmp-click', () => {
@@ -558,6 +560,7 @@
             zoom: 15,
             center: location,
             mapId: '{{ STATIC_INFO.google_maps_id }}',
+            colorScheme: getMapColorScheme(),
         });
 
         const mobileMarker = new AdvancedMarkerElement({
@@ -568,11 +571,12 @@
 
         const mobileInfowindow = new google.maps.InfoWindow({
             content: `
-                <div class="text-center">
-                    <h3 class="font-semibold">{{ place.name }}</h3>
-                    <p class="text-sm text-gray-600">{{ place.address }}</p>
+                <div style="padding: 12px; margin: -12px 0 0 -12px;">
+                    <p style="font-size:18px; font-weight:700; color:#111;" class="font-bold">{{ place.name }}</p>
+                    <p style="font-size:14px; color:#4B5563;" class="text-sm">{{ place.address }}</p>
                 </div>
-            `
+            `,
+            headerDisabled: true,
         });
 
         mobileMarker.addListener('gmp-click', () => {

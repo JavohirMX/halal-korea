@@ -124,6 +124,7 @@
         (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
             key: "{{ google_maps_api_key }}",
             v: "beta",
+            mapIds: ["{{ STATIC_INFO.google_maps_id }}"],
         });
     </script>
 
@@ -385,6 +386,15 @@
                 document.documentElement.classList.remove('dark');
             }
         })();
+    </script>
+
+    <!-- Google Maps Theme Management -->
+    <script>
+        // Utility function to detect current theme and return appropriate ColorScheme
+        function getMapColorScheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return isDark ? google.maps.ColorScheme.DARK : google.maps.ColorScheme.LIGHT;
+        }
     </script>
 </head>
 
@@ -996,6 +1006,14 @@
         window.toggleTheme = function() {
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.theme = isDark ? 'dark' : 'light';
+            
+            // Check if there's a map on the page
+            const hasMap = typeof map !== 'undefined' || typeof desktopMap !== 'undefined' || typeof mobileMap !== 'undefined';
+            
+            // If map exists, reload the page to apply new theme to map
+            if (hasMap) {
+                location.reload();
+            }
             
             // Animate icon
             const icon = document.querySelector('.theme-toggle-icon');
