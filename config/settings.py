@@ -101,8 +101,8 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',  # Required for django-allauth
     'users.social_rate_limiting.SocialAuthRateLimitMiddleware',  # Social auth rate limiting
     'config.language_middleware.SmartLanguageMiddleware',  # Enhanced language detection (replaces LocaleMiddleware)
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'config.middleware.AdminAccessMiddleware',  # Custom admin access control
     'utils.monitoring_middleware.MonitoringMiddleware',  # Request monitoring
     'utils.monitoring_middleware.AdminActionMiddleware',  # Admin action tracking
