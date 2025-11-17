@@ -473,6 +473,9 @@ AUTHENTICATION_BACKENDS = [
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
 GOOGLE_MAPS_ID = config('GOOGLE_MAPS_ID', default='DEMO_MAP_ID')
 
+# Prayer Times API Configuration
+PRAYER_TIMES_API_BASE_URL = config('PRAYER_TIMES_API_BASE_URL', default='https://api.aladhan.com')
+
 LOGIN_URL = 'users:login'  # URL where users will be redirected when login is required
 LOGIN_REDIRECT_URL = 'places:home'  # URL where users will be redirected after successful login
 LOGOUT_REDIRECT_URL = 'places:home'  # URL where users will be redirected after logout

@@ -1,6 +1,7 @@
 import requests
 from datetime import datetime
 from django.core.cache import cache
+from django.conf import settings
 from .models import PrayerTimeCache
 import logging
 
@@ -59,7 +60,8 @@ def get_prayer_times(city, country, date=None, method=None, school=1):
         return cached_data
         
     # If not in cache, make API call
-    url = f'https://api.aladhan.com/v1/timingsByCity/{date}'
+    api_base_url = getattr(settings, 'PRAYER_TIMES_API_BASE_URL', 'https://api.aladhan.com')
+    url = f'{api_base_url}/v1/timingsByCity/{date}'
     params = {
         'city': city,
         'country': country,
@@ -95,7 +97,8 @@ def get_prayer_times_ll(latitude, longitude, date=None, method=None, school=1):
         return cached_data
         
     # If not in cache, make API call
-    url = f'https://api.aladhan.com/v1/timings/{date}'
+    api_base_url = getattr(settings, 'PRAYER_TIMES_API_BASE_URL', 'https://api.aladhan.com')
+    url = f'{api_base_url}/v1/timings/{date}'
     params = {
         'latitude': latitude,
         'longitude': longitude,

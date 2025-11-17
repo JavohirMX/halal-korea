@@ -233,6 +233,7 @@ Visit `http://localhost:8000` to access the application.
 
    # External APIs
    GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+   PRAYER_TIMES_API_BASE_URL=https://api.aladhan.com
 
    # Optional: Backup system
    TELEGRAM_BOT_TOKEN=your-telegram-bot-token
@@ -327,6 +328,7 @@ services:
 | `DJANGO_DEBUG` | Enable debug mode | `True` |
 | `ALLOWED_HOSTS` | Comma-separated list of allowed hosts | `localhost,127.0.0.1` |
 | `CSRF_TRUSTED_ORIGINS` | Trusted origins for CSRF | `https://yourdomain.com` |
+| `PRAYER_TIMES_API_BASE_URL` | Base URL for prayer times API | `https://api.aladhan.com` |
 | `TELEGRAM_BOT_TOKEN` | Telegram bot token for backups | N/A |
 | `TELEGRAM_CHAT_ID` | Telegram chat ID for notifications | N/A |
 
