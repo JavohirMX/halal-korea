@@ -436,7 +436,7 @@
     function highlightMarker(placeId) {
             const marker = markers[placeId];
             if (marker) {
-                map.panTo(marker.getPosition());
+                map.panTo(marker.position);
                 google.maps.event.trigger(marker, 'click');
             }
     }
