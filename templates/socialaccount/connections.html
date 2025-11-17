@@ -1,0 +1,152 @@
+{% extends 'places/base.html' %}
+{% load static %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}{% translate "Social Account Connections" %} - {% translate "Halal Korea" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                {% translate "Social Account Connections" %}
+            </h1>
+            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+                {% translate "Manage your connected social accounts" %}
+            </p>
+        </div>
+
+        <!-- Back to Profile Button -->
+        <div class="mb-6">
+            <a href="{% url 'users:edit_profile' %}" 
+               class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
+                <i class="fas fa-arrow-left mr-2"></i>
+                {% translate "Back to Profile Settings" %}
+            </a>
+        </div>
+
+        <!-- Connected Accounts Section -->
+        <div class="glass-card rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                {% translate "Connected Accounts" %}
+            </h2>
+            
+            {% if form.accounts %}
+                <div class="space-y-4">
+                    {% for base_account in form.accounts %}
+                    <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                {% if base_account.get_provider.id == 'google' %}
+                                    <i class="fab fa-google text-red-500 text-2xl"></i>
+                                {% elif base_account.get_provider.id == 'github' %}
+                                    <i class="fab fa-github text-gray-800 dark:text-gray-200 text-2xl"></i>
+                                {% else %}
+                                    <i class="fas fa-user-circle text-gray-500 text-2xl"></i>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ base_account.get_provider.name }}
+                                </h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    {% translate "Connected on" %} {{ base_account.date_joined|date:"F j, Y" }}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Disconnect Button -->
+                        <form method="post" action="{% url 'socialaccount_connections' %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    name="account" 
+                                    value="{{ base_account.id }}"
+                                    class="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-500 border border-red-300 hover:border-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
+                                {% translate "Disconnect" %}
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-unlink text-gray-400 text-4xl mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">
+                        {% translate "No social accounts are currently connected." %}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Connect New Account Section -->
+        <div class="glass-card rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                {% translate "Connect New Account" %}
+            </h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Google Connect -->
+                {% load socialaccount %}
+                {% get_providers as socialaccount_providers %}
+                
+                {% for provider in socialaccount_providers %}
+                    {% if provider.id == "google" %}
+                        <a href="{% provider_login_url provider.id %}"
+                           class="flex items-center justify-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                            <i class="fab fa-google text-red-500 text-xl mr-3"></i>
+                            <span class="text-gray-900 dark:text-white font-medium">
+                                {% translate "Connect Google" %}
+                            </span>
+                        </a>
+                    {% endif %}
+                    
+                    {% if provider.id == "github" %}
+                        <a href="{% provider_login_url provider.id %}"
+                           class="flex items-center justify-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                            <i class="fab fa-github text-gray-800 dark:text-gray-200 text-xl mr-3"></i>
+                            <span class="text-gray-900 dark:text-white font-medium">
+                                {% translate "Connect GitHub" %}
+                            </span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                            {% translate "About Social Login" %}
+                        </h3>
+                        <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                            <p>
+                                {% translate "Connecting social accounts allows you to sign in quickly using your existing accounts. You can disconnect them at any time." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'users:edit_profile' %}" 
+               class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white gradient-bg-hover">
+                <i class="fas fa-user-edit mr-2"></i>
+                {% translate "Back to Profile Settings" %}
+            </a>
+            
+            <a href="{% url 'places:home' %}" 
+               class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <i class="fas fa-home mr-2"></i>
+                {% translate "Go to Home" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

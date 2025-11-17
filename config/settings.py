@@ -116,7 +116,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -560,6 +560,9 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/places/'
 ACCOUNT_SIGNUP_REDIRECT_URL = '/places/'
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/places/'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/users/login/'
+
+# Social Account Connection URLs
+SOCIALACCOUNT_CONNECTIONS_REDIRECT_URL = '/users/profile/edit/'
 
 # Custom Adapters
 ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'

@@ -49,6 +49,8 @@ def profile(request, username=None):
 
 @login_required
 def edit_profile(request):
+    from allauth.socialaccount.models import SocialAccount
+    
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -58,7 +60,13 @@ def edit_profile(request):
     else:
         form = UserUpdateForm(instance=request.user)
     
-    return render(request, 'users/edit_profile.html', {'form': form})
+    # Get social accounts for the user
+    social_accounts = SocialAccount.objects.filter(user=request.user)
+    
+    return render(request, 'users/edit_profile.html', {
+        'form': form,
+        'social_accounts': social_accounts,
+    })
 
 @login_required
 @require_POST
