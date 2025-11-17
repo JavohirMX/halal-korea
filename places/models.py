@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.gis.db import models
+from django.urls import reverse
 
 
 # Halal Place model
@@ -40,6 +41,9 @@ class HalalPlace(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse('places:place_detail', kwargs={'pk': self.pk})
 
 
 # Place Edit Suggestion model for field changes
