@@ -102,8 +102,9 @@
                 "contactType": "customer support"
             },
             "sameAs": [
-                "{{ STATIC_INFO.twitter }}",
-                "{{ STATIC_INFO.instagram }}"
+                {% if STATIC_INFO.twitter %}"{{ STATIC_INFO.twitter }}"{% if STATIC_INFO.instagram or STATIC_INFO.facebook %},{% endif %}{% endif %}
+                {% if STATIC_INFO.instagram %}"{{ STATIC_INFO.instagram }}"{% if STATIC_INFO.facebook %},{% endif %}{% endif %}
+                {% if STATIC_INFO.facebook %}"{{ STATIC_INFO.facebook }}"{% endif %}
             ]
         },
         "inLanguage": ["en-US", "ko-KR", "uz-UZ"],
