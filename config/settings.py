@@ -645,3 +645,22 @@ WATERMARK_TEXT = config('WATERMARK_TEXT', default='Halal Korea')
 WATERMARK_TEXT_SIZE = config('WATERMARK_TEXT_SIZE', default=32, cast=int)
 WATERMARK_TILE_SIZE = (300, 100)  # Width, height for generated watermark tile (fallback)
 
+# Security Settings for Production (behind reverse proxy)
+# When Django is behind a reverse proxy (nginx, etc.) that terminates SSL,
+# Django needs to trust the X-Forwarded-Proto header to determine the original protocol
+if not DEBUG:
+    # Trust the X-Forwarded-Proto header from your reverse proxy
+    # Format: ('HTTP_HEADER_NAME', 'header_value_to_trust')
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Force HTTPS redirects
+    SECURE_SSL_REDIRECT = True
+    
+    # Other security settings
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # Only send cookies over HTTPS
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
