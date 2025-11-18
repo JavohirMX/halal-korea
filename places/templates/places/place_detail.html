@@ -276,7 +276,8 @@
                 </div>
                 {% endif %}
 
-                <!-- Rating and Reviews -->
+                <!-- Rating and Reviews (only show if reviews exist) -->
+                {% if place.reviews.count > 0 %}
                 <div class="mt-4">
                     <div class="flex items-center">
                         <div class="flex items-center">
@@ -288,10 +289,11 @@
                             {% endfor %}
                         </div>
                         <span class="ml-2 text-gray-600 dark:text-gray-400">
-                            {{ place.average_rating|default:_("No ratings yet") }} ({{ place.reviews.count }} {% translate "reviews" %})
+                            {{ place.average_rating|floatformat:1 }} ({{ place.reviews.count }} {% if place.reviews.count == 1 %}{% translate "review" %}{% else %}{% translate "reviews" %}{% endif %})
                         </span>
                     </div>
                 </div>
+                {% endif %}
 
                 {% if place.description %}
                 <!-- About Section -->
