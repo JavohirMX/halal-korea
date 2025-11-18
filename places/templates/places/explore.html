@@ -13,6 +13,56 @@
     .loading-spinner.active {
         display: block;
     }
+
+    /* Mobile View Switcher Styles */
+    .view-switcher-btn.active {
+        background-color: rgb(var(--primary-100));
+        color: rgb(var(--primary-700));
+    }
+    
+    .dark .view-switcher-btn.active {
+        background-color: rgba(var(--primary-900), 0.5);
+        color: rgb(var(--primary-200));
+    }
+
+    /* Mobile View States */
+    @media (max-width: 1023px) {
+        /* List View - Show list, hide map */
+        #places-container[data-mobile-view="list"] {
+            display: block;
+        }
+        #map-container[data-mobile-view="hidden"] {
+            display: none;
+        }
+
+        /* Map View - Hide list, show map full screen */
+        #places-container[data-mobile-view="hidden"] {
+            display: none;
+        }
+        #map-container[data-mobile-view="map"] {
+            display: block;
+            height: calc(100vh - 250px);
+        }
+
+        /* Split View - Show both stacked */
+        #places-container[data-mobile-view="split"] {
+            display: block;
+            height: 50vh;
+        }
+        #map-container[data-mobile-view="split"] {
+            display: block;
+            height: 50vh;
+            margin-top: 1rem;
+        }
+    }
+
+    /* Desktop always shows both */
+    @media (min-width: 1024px) {
+        #places-container,
+        #map-container {
+            display: block !important;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -107,17 +157,27 @@
                 </div>
             {% endif %}
         </div>
-        
-        <!-- View Map Button (Visible until lg breakpoint) -->
-        <button id="view-map-btn" type="button"
-            class="lg:hidden inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-sm sm:text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
-        >
-            <span class="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
-                <i class="fas fa-map-marked-alt text-xs sm:text-sm"></i>
-            </span>
-            <span class="hidden sm:inline">{% translate "View Map" %}</span>
-            <span class="sm:hidden">{% translate "Map" %}</span>
-        </button>
+    </div>
+
+    <!-- Mobile View Switcher (Only visible on mobile) -->
+    <div class="mb-4 lg:hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-1 inline-flex" role="group">
+            <button type="button" id="view-list-btn" data-view="list"
+                class="view-switcher-btn flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-200">
+                <i class="fas fa-list"></i>
+                <span>{% translate "List" %}</span>
+            </button>
+            <button type="button" id="view-map-btn" data-view="map"
+                class="view-switcher-btn flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-map"></i>
+                <span>{% translate "Map" %}</span>
+            </button>
+            <button type="button" id="view-split-btn" data-view="split"
+                class="view-switcher-btn flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-columns"></i>
+                <span>{% translate "Both" %}</span>
+            </button>
+        </div>
     </div>
 
     <!-- Search and Filters -->
@@ -255,7 +315,9 @@
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Places List -->
-        <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide" id="places-container">
+        <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide transition-all duration-300" 
+             id="places-container" 
+             data-mobile-view="list">
             <!-- Places will be loaded here dynamically -->
             {% include 'places/partials/place_list.html' with places=places %}
             
@@ -269,7 +331,9 @@
         </div>
 
         <!-- Map -->
-        <div class="lg:col-span-2 rounded-lg overflow-hidden h-[calc(100vh-300px)]">
+        <div class="lg:col-span-2 rounded-lg overflow-hidden h-[calc(100vh-300px)] transition-all duration-300" 
+             id="map-container"
+             data-mobile-view="hidden">
             <div id="map" class="w-full h-full dark:brightness-90"></div>
         </div>
     </div>
@@ -622,6 +686,53 @@
         });
     }
 
+    // Mobile View Switcher
+    function switchView(view) {
+        const placesContainer = document.getElementById('places-container');
+        const mapContainer = document.getElementById('map-container');
+        const viewButtons = document.querySelectorAll('.view-switcher-btn');
+        
+        // Remove active class from all buttons
+        viewButtons.forEach(btn => {
+            btn.classList.remove('active', 'bg-primary-100', 'dark:bg-primary-900/50', 'text-primary-700', 'dark:text-primary-200');
+            btn.classList.add('text-gray-600', 'dark:text-gray-400');
+        });
+        
+        // Add active class to clicked button
+        const activeBtn = document.querySelector(`[data-view="${view}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'bg-primary-100', 'dark:bg-primary-900/50', 'text-primary-700', 'dark:text-primary-200');
+            activeBtn.classList.remove('text-gray-600', 'dark:text-gray-400');
+        }
+        
+        // Update view
+        if (view === 'list') {
+            placesContainer.setAttribute('data-mobile-view', 'list');
+            mapContainer.setAttribute('data-mobile-view', 'hidden');
+        } else if (view === 'map') {
+            placesContainer.setAttribute('data-mobile-view', 'hidden');
+            mapContainer.setAttribute('data-mobile-view', 'map');
+            // Trigger map resize to ensure proper display
+            setTimeout(() => {
+                if (map) {
+                    google.maps.event.trigger(map, 'resize');
+                }
+            }, 300);
+        } else if (view === 'split') {
+            placesContainer.setAttribute('data-mobile-view', 'split');
+            mapContainer.setAttribute('data-mobile-view', 'split');
+            // Trigger map resize to ensure proper display
+            setTimeout(() => {
+                if (map) {
+                    google.maps.event.trigger(map, 'resize');
+                }
+            }, 300);
+        }
+        
+        // Save preference to localStorage
+        localStorage.setItem('mobileViewPreference', view);
+    }
+
     // Call initMap when the page loads
     document.addEventListener('DOMContentLoaded', function() {
         initMap();
@@ -629,6 +740,17 @@
         // Set up infinite scroll
         const placesContainer = document.getElementById('places-container');
         placesContainer.addEventListener('scroll', handleScroll);
+        
+        // Set up view switcher buttons (mobile only)
+        document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
+        document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
+        document.getElementById('view-split-btn').addEventListener('click', () => switchView('split'));
+        
+        // Restore saved view preference
+        const savedView = localStorage.getItem('mobileViewPreference') || 'list';
+        if (window.innerWidth < 1024) {
+            switchView(savedView);
+        }
         
         // Set up filter change handlers
         const filterForm = document.getElementById('filter-form');
@@ -698,12 +820,6 @@
     // Toggle mobile filters dropdown
     document.getElementById('filter-toggle').addEventListener('click', function() {
         document.getElementById('mobile-filters').classList.toggle('hidden');
-    });
-
-    // View Map Button functionality
-    document.getElementById('view-map-btn').addEventListener('click', function() {
-        const mapElement = document.getElementById('map');
-        mapElement.scrollIntoView({ behavior: 'smooth' });
     });
 </script>
 
