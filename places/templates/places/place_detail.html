@@ -232,7 +232,36 @@
                 {% if place.category != 'mosque' and place.category != 'prayer_room' %}
                 <!-- Warning Message -->
                 <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                    <div class="flex">
+                    <!-- Mobile: Collapsible -->
+                    <div class="lg:hidden">
+                        <button onclick="toggleNotice()" class="w-full flex items-start justify-between text-left focus:outline-none group">
+                            <div class="flex items-start flex-1">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-yellow-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.3-.921 1.603-.921 1.902 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm font-semibold text-yellow-700 dark:text-yellow-200">
+                                        {% translate "Important Notice" %}
+                                    </p>
+                                    <div id="notice-content" class="hidden mt-2">
+                                        <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                                            {% blocktranslate %}This place has been added by our community. While we strive to maintain accurate information, we recommend verifying the halal status directly with the establishment before visiting.{% endblocktranslate %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 ml-3">
+                                <svg id="notice-chevron" class="h-5 w-5 text-yellow-600 dark:text-yellow-300 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <!-- Desktop: Always visible -->
+                    <div class="hidden lg:flex">
                         <div class="flex-shrink-0">
                             <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M8.257 3.099c.3-.921 1.603-.921 1.902 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -922,6 +951,20 @@
                 },
             }).showToast();
         });
+    }
+
+    // Toggle notice visibility (mobile)
+    function toggleNotice() {
+        const noticeContent = document.getElementById('notice-content');
+        const noticeChevron = document.getElementById('notice-chevron');
+        
+        if (noticeContent.classList.contains('hidden')) {
+            noticeContent.classList.remove('hidden');
+            noticeChevron.style.transform = 'rotate(180deg)';
+        } else {
+            noticeContent.classList.add('hidden');
+            noticeChevron.style.transform = 'rotate(0deg)';
+        }
     }
 
     // Image Modal functionality
