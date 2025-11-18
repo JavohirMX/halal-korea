@@ -842,6 +842,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize counters
     updateSummary();
     
+    // Check for tab parameter and scroll to image section if needed
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab === 'images') {
+        // Wait a bit for the page to fully render
+        setTimeout(() => {
+            const imageSection = document.querySelector('.section-card:has(.fa-images)');
+            if (imageSection) {
+                imageSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                // Add a subtle highlight animation
+                imageSection.style.transition = 'box-shadow 0.3s ease-in-out';
+                imageSection.style.boxShadow = '0 0 0 4px rgba(34, 197, 94, 0.2)';
+                setTimeout(() => {
+                    imageSection.style.boxShadow = '';
+                }, 2000);
+            }
+        }, 100);
+    }
+    
     // Character counter for reason field
     const reasonField = document.getElementById('{{ form.reason.id_for_label }}');
     const charCount = document.getElementById('char-count');
