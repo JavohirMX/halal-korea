@@ -88,76 +88,54 @@
             {% endif %}
         </div>
         
-        <!-- Desktop Location Button (Only visible on desktop) -->
-        {% if location_context.is_in_korea %}
+        <!-- Desktop Location Info (Only visible on desktop) -->
         <div class="hidden lg:block">
-            <button id="update-location-btn-desktop" type="button"
-                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
-            >
-                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
-                    <i class="fas fa-map-marker-alt"></i>
-                </span>
-                <span>{% translate "Update My Location" %}</span>
-            </button>
-        </div>
-        {% else %}
-                <div class="hidden lg:flex items-center space-x-1 sm:space-x-2">
-                    <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        <i class="fas fa-globe-americas mr-1"></i>
-                        <span class="hidden sm:inline">{% translate "Your location:" %}</span>
-                        {{ location_context.location.city|default:"International" }}
-                    </span>
-                    <button id="update-location-btn-desktop" type="button" class="text-primary-600 hover:text-primary-800 text-xs sm:text-sm">
-                        {% translate "Update" %}
-                    </button>
-                    <span class="w-2"></span>
-                    <button id="set-seoul-btn" type="button" 
-                        class="hidden lg:inline-flex items-center px-1.5 sm:px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                        title="{% translate 'Set location to Seoul' %}">
-                        <i class="fas fa-map-pin mr-1 text-xs"></i>
-                        <span class="hidden sm:inline">Seoul</span>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm px-4 py-2.5 flex items-center gap-3">
+                <!-- Location Display -->
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center">
+                        <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-none">
+                            {% if location_context.is_in_korea %}
+                                {% translate "Current Location" %}
+                            {% else %}
+                                {% translate "Viewing from" %}
+                            {% endif %}
+                        </p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                            {% if location_context.location.city %}
+                                {{ location_context.location.city }}
+                            {% else %}
+                                {% translate "Unknown Location" %}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 border-l border-gray-200 dark:border-gray-700 pl-3">
+                    {% if not location_context.is_in_korea %}
+                        <button id="set-seoul-btn" type="button" 
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm"
+                            title="{% translate 'Set location to Seoul' %}">
+                            <i class="fas fa-map-pin text-xs"></i>
+                            <span>Seoul</span>
+                        </button>
+                    {% endif %}
+                    <button id="update-location-btn-desktop" type="button"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium shadow-sm"
+                        title="{% translate 'Update my location' %}">
+                        <i class="fas fa-crosshairs text-sm"></i>
+                        <span>{% translate "Update" %}</span>
                     </button>
                 </div>
-        {% endif %}
+            </div>
+        </div>
     </div>
 
-    <!-- Mobile Location/Action Buttons -->
-    <div class="mb-4 flex justify-between items-center lg:hidden">
-        <div class="flex items-center space-x-2 sm:space-x-3">
-            {% if location_context.is_in_korea %}
-                <button id="update-location-btn-mobile" type="button"
-                    class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full shadow-md border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-white dark:from-primary-900/40 dark:to-gray-800 text-sm sm:text-base font-semibold text-primary-700 dark:text-primary-200 hover:from-primary-100 hover:to-primary-50 dark:hover:from-primary-800 dark:hover:to-primary-900 hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2"
-                >
-                    <span class="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300 shadow-sm">
-                        <i class="fas fa-map-marker-alt text-xs sm:text-sm"></i>
-                    </span>
-                    <span class="hidden sm:inline">{% translate "Update My Location" %}</span>
-                    <span class="sm:hidden">{% translate "Location" %}</span>
-                </button>
-            {% else %}
-                <div class="flex items-center space-x-1 sm:space-x-2">
-                    <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        <i class="fas fa-globe-americas mr-1"></i>
-                        <span class="hidden sm:inline">{% translate "Your location:" %}</span>
-                        <span class="sm:hidden">{% translate "Location:" %}</span>
-                        {{ location_context.location.city|default:"International" }}
-                    </span>
-                    <button id="update-location-btn-mobile" type="button" class="text-primary-600 hover:text-primary-800 text-xs sm:text-sm">
-                        {% translate "Update" %}
-                    </button>
-                    
-                    <!-- Seoul Default Button (Development/Testing) - Only for international users -->
-                    <button id="set-seoul-btn-mobile" type="button" 
-                    class="lg:hidden inline-flex items-center px-1.5 sm:px-2 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                    title="{% translate 'Set location to Seoul' %}">
-                        <i class="fas fa-map-pin mr-1 text-xs"></i>
-                        <span class="hidden sm:inline">Seoul</span>
-                        <span class="sm:hidden">S</span>
-                    </button>
-                </div>
-            {% endif %}
-        </div>
-    </div>
+
 
     <!-- Mobile View Switcher (Only visible on mobile) -->
     <div class="mb-4 lg:hidden">
@@ -182,6 +160,61 @@
 
     <!-- Search and Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-4 mb-6">
+        <!-- Mobile Location Chip (Compact) -->
+        <div class="mb-3 lg:hidden flex items-center justify-between">
+            <button type="button" id="location-chip-mobile" 
+                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-xs">
+                <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
+                <span class="font-medium truncate max-w-[120px]">
+                    {% if location_context.location.city %}
+                        {{ location_context.location.city }}
+                    {% else %}
+                        {% translate "Set Location" %}
+                    {% endif %}
+                </span>
+                <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Location Menu (Hidden by default) -->
+        <div id="location-menu-mobile" class="hidden lg:hidden mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {% if location_context.is_in_korea %}
+                            {% translate "Current Location" %}
+                        {% else %}
+                            {% translate "Viewing from" %}
+                        {% endif %}
+                    </p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        {% if location_context.location.city %}
+                            {{ location_context.location.city }}
+                        {% else %}
+                            {% translate "Unknown Location" %}
+                        {% endif %}
+                    </p>
+                </div>
+                <button type="button" id="close-location-menu" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex gap-2">
+                <button id="update-location-btn-mobile" type="button"
+                    class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium">
+                    <i class="fas fa-crosshairs"></i>
+                    <span>{% translate "Update" %}</span>
+                </button>
+                {% if not location_context.is_in_korea %}
+                    <button id="set-seoul-btn-mobile" type="button" 
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm">
+                        <i class="fas fa-map-pin"></i>
+                        <span>Seoul</span>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
         <form id="filter-form" class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 relative">
             <!-- Search Bar -->
             <div class="md:col-span-2 flex items-center">
@@ -821,6 +854,34 @@
     document.getElementById('filter-toggle').addEventListener('click', function() {
         document.getElementById('mobile-filters').classList.toggle('hidden');
     });
+
+    // Toggle mobile location menu
+    const locationChip = document.getElementById('location-chip-mobile');
+    const locationMenu = document.getElementById('location-menu-mobile');
+    const closeLocationMenu = document.getElementById('close-location-menu');
+    
+    if (locationChip && locationMenu) {
+        locationChip.addEventListener('click', function() {
+            locationMenu.classList.toggle('hidden');
+            // Toggle chevron direction
+            const chevron = this.querySelector('.fa-chevron-down, .fa-chevron-up');
+            if (chevron) {
+                chevron.classList.toggle('fa-chevron-down');
+                chevron.classList.toggle('fa-chevron-up');
+            }
+        });
+        
+        if (closeLocationMenu) {
+            closeLocationMenu.addEventListener('click', function() {
+                locationMenu.classList.add('hidden');
+                const chevron = locationChip.querySelector('.fa-chevron-up, .fa-chevron-down');
+                if (chevron) {
+                    chevron.classList.remove('fa-chevron-up');
+                    chevron.classList.add('fa-chevron-down');
+                }
+            });
+        }
+    }
 </script>
 
 <script>
