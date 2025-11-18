@@ -16,13 +16,23 @@
 
     /* Mobile View Switcher Styles */
     .view-switcher-btn.active {
-        background-color: rgb(var(--primary-100));
-        color: rgb(var(--primary-700));
+        background-color: white;
+        color: #2563eb;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
     
     .dark .view-switcher-btn.active {
-        background-color: rgba(var(--primary-900), 0.5);
-        color: rgb(var(--primary-200));
+        background-color: rgb(75, 85, 99);
+        color: rgb(147, 197, 253);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .view-switcher-btn:not(.active):hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .dark .view-switcher-btn:not(.active):hover {
+        background-color: rgba(75, 85, 99, 0.5);
     }
 
     /* Mobile View States */
@@ -137,35 +147,15 @@
 
 
 
-    <!-- Mobile View Switcher (Only visible on mobile) -->
-    <div class="mb-4 lg:hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-1 inline-flex" role="group">
-            <button type="button" id="view-list-btn" data-view="list"
-                class="view-switcher-btn flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-200">
-                <i class="fas fa-list"></i>
-                <span>{% translate "List" %}</span>
-            </button>
-            <button type="button" id="view-map-btn" data-view="map"
-                class="view-switcher-btn flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-map"></i>
-                <span>{% translate "Map" %}</span>
-            </button>
-            <button type="button" id="view-split-btn" data-view="split"
-                class="view-switcher-btn flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-columns"></i>
-                <span>{% translate "Both" %}</span>
-            </button>
-        </div>
-    </div>
-
     <!-- Search and Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-4 mb-6">
-        <!-- Mobile Location Chip (Compact) -->
-        <div class="mb-3 lg:hidden flex items-center justify-between">
+        <!-- Mobile Top Bar: Location + View Switcher -->
+        <div class="mb-3 lg:hidden flex items-center justify-between gap-2">
+            <!-- Location Chip (Left) -->
             <button type="button" id="location-chip-mobile" 
-                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-xs">
+                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-xs flex-shrink-0">
                 <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
-                <span class="font-medium truncate max-w-[120px]">
+                <span class="font-medium truncate max-w-[80px]">
                     {% if location_context.location.city %}
                         {{ location_context.location.city }}
                     {% else %}
@@ -174,6 +164,25 @@
                 </span>
                 <i class="fas fa-chevron-down text-xs"></i>
             </button>
+
+            <!-- View Switcher (Right) -->
+            <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5" role="group">
+                <button type="button" id="view-list-btn" data-view="list"
+                    class="view-switcher-btn inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-all duration-200 text-gray-600 dark:text-gray-400"
+                    title="{% translate 'List View' %}">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button type="button" id="view-map-btn" data-view="map"
+                    class="view-switcher-btn inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-all duration-200 text-gray-600 dark:text-gray-400"
+                    title="{% translate 'Map View' %}">
+                    <i class="fas fa-map"></i>
+                </button>
+                <button type="button" id="view-split-btn" data-view="split"
+                    class="view-switcher-btn inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-all duration-200 bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm"
+                    title="{% translate 'Split View' %}">
+                    <i class="fas fa-columns"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Mobile Location Menu (Hidden by default) -->
@@ -350,7 +359,7 @@
         <!-- Places List -->
         <div class="lg:col-span-1 space-y-4 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide transition-all duration-300" 
              id="places-container" 
-             data-mobile-view="list">
+             data-mobile-view="split">
             <!-- Places will be loaded here dynamically -->
             {% include 'places/partials/place_list.html' with places=places %}
             
@@ -366,7 +375,7 @@
         <!-- Map -->
         <div class="lg:col-span-2 rounded-lg overflow-hidden h-[calc(100vh-300px)] transition-all duration-300" 
              id="map-container"
-             data-mobile-view="hidden">
+             data-mobile-view="split">
             <div id="map" class="w-full h-full dark:brightness-90"></div>
         </div>
     </div>
@@ -727,15 +736,13 @@
         
         // Remove active class from all buttons
         viewButtons.forEach(btn => {
-            btn.classList.remove('active', 'bg-primary-100', 'dark:bg-primary-900/50', 'text-primary-700', 'dark:text-primary-200');
-            btn.classList.add('text-gray-600', 'dark:text-gray-400');
+            btn.classList.remove('active');
         });
         
         // Add active class to clicked button
         const activeBtn = document.querySelector(`[data-view="${view}"]`);
         if (activeBtn) {
-            activeBtn.classList.add('active', 'bg-primary-100', 'dark:bg-primary-900/50', 'text-primary-700', 'dark:text-primary-200');
-            activeBtn.classList.remove('text-gray-600', 'dark:text-gray-400');
+            activeBtn.classList.add('active');
         }
         
         // Update view
@@ -779,8 +786,8 @@
         document.getElementById('view-map-btn').addEventListener('click', () => switchView('map'));
         document.getElementById('view-split-btn').addEventListener('click', () => switchView('split'));
         
-        // Restore saved view preference
-        const savedView = localStorage.getItem('mobileViewPreference') || 'list';
+        // Restore saved view preference (default to 'split')
+        const savedView = localStorage.getItem('mobileViewPreference') || 'split';
         if (window.innerWidth < 1024) {
             switchView(savedView);
         }
