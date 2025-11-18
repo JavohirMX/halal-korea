@@ -293,8 +293,22 @@
                     </div>
                 </div>
 
-                <!-- Description -->
-                <p class="mt-4 text-gray-600 dark:text-gray-400">{{ place.description }}</p>
+                {% if place.description %}
+                <!-- About Section -->
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center mb-3">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                            <svg class="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
+                            {% translate "About" %}
+                        </h3>
+                    </div>
+                    <p class="text-base leading-relaxed text-gray-700 dark:text-gray-300">{{ place.description }}</p>
+                </div>
+                {% endif %}
 
                 <!-- Last Updated -->
                 <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
