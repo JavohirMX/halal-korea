@@ -48,6 +48,12 @@
         }
     }
 
+    /* Pull-to-Refresh Indicator */
+    #pull-to-refresh-indicator {
+        pointer-events: none;
+        will-change: transform, opacity;
+    }
+
     /* Mobile View Switcher Styles */
     .view-switcher-btn.active {
         background-color: white;
@@ -361,9 +367,17 @@
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Places List -->
-        <div class="lg:col-span-1 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide transition-all duration-300 px-1" 
+        <div class="lg:col-span-1 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide transition-all duration-300 px-1 relative" 
              id="places-container" 
              data-mobile-view="split">
+            
+            <!-- Pull-to-Refresh Indicator (Mobile Only) -->
+            <div id="pull-to-refresh-indicator" class="lg:hidden absolute top-0 left-0 right-0 flex items-center justify-center transition-all duration-300 opacity-0 z-10" style="transform: translateY(-3rem);">
+                <div class="flex items-center gap-2 px-4 py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-md text-primary-600 dark:text-primary-400">
+                    <i class="fas fa-arrow-down text-base" id="refresh-icon"></i>
+                    <span class="text-sm font-medium" id="refresh-text">{% translate "Pull to refresh" %}</span>
+                </div>
+            </div>
             
             <!-- Skeleton Loader (hidden by default, shown only when filtering) -->
             <div id="skeleton-loader-container" class="hidden">
@@ -795,6 +809,150 @@
         localStorage.setItem('mobileViewPreference', view);
     }
 
+    // Pull-to-Refresh functionality (Mobile only)
+    function setupPullToRefresh() {
+        // Only enable on mobile devices
+        if (window.innerWidth >= 1024) return;
+        
+        const placesContainer = document.getElementById('places-container');
+        const indicator = document.getElementById('pull-to-refresh-indicator');
+        const refreshIcon = document.getElementById('refresh-icon');
+        const refreshText = document.getElementById('refresh-text');
+        
+        let startY = 0;
+        let currentY = 0;
+        let isPulling = false;
+        let isRefreshing = false;
+        
+        placesContainer.addEventListener('touchstart', (e) => {
+            // Only trigger if at the top of the scroll
+            if (placesContainer.scrollTop === 0 && !isRefreshing) {
+                startY = e.touches[0].clientY;
+                isPulling = true;
+            }
+        });
+        
+        placesContainer.addEventListener('touchmove', (e) => {
+            if (!isPulling || isRefreshing) return;
+            
+            currentY = e.touches[0].clientY;
+            const pullDistance = currentY - startY;
+            
+            // Only show indicator if pulling down
+            if (pullDistance > 0 && placesContainer.scrollTop === 0) {
+                e.preventDefault(); // Prevent default scroll
+                
+                // Calculate opacity and translation based on pull distance
+                const maxPull = 100;
+                const maxTranslation = 60; // Maximum distance indicator can move down
+                const progress = Math.min(pullDistance / maxPull, 1);
+                
+                // Use easing function to slow down movement as it approaches max
+                const easedDistance = maxTranslation * (1 - Math.pow(1 - Math.min(pullDistance / 200, 1), 2));
+                
+                indicator.style.opacity = progress;
+                indicator.style.transform = `translateY(${easedDistance}px)`;
+                
+                // Update text and icon based on pull progress
+                if (pullDistance > maxPull) {
+                    refreshText.textContent = "{% translate 'Release to refresh' %}";
+                    refreshIcon.classList.remove('fa-arrow-down');
+                    refreshIcon.classList.add('fa-arrow-up');
+                } else {
+                    refreshText.textContent = "{% translate 'Pull to refresh' %}";
+                    refreshIcon.classList.remove('fa-arrow-up');
+                    refreshIcon.classList.add('fa-arrow-down');
+                }
+            }
+        });
+        
+        placesContainer.addEventListener('touchend', (e) => {
+            if (!isPulling || isRefreshing) return;
+            
+            const pullDistance = currentY - startY;
+            isPulling = false;
+            
+            // Trigger refresh if pulled far enough
+            if (pullDistance > 100) {
+                isRefreshing = true;
+                
+                // Show spinning animation
+                refreshText.textContent = "{% translate 'Refreshing...' %}";
+                refreshIcon.classList.remove('fa-arrow-down', 'fa-arrow-up');
+                refreshIcon.classList.add('fa-spinner', 'fa-spin');
+                indicator.style.opacity = '1';
+                indicator.style.transform = 'translateY(0)';
+                
+                // Perform refresh
+                refreshPlaces();
+            } else {
+                // Reset indicator
+                indicator.style.opacity = '0';
+                indicator.style.transform = 'translateY(-3rem)';
+            }
+        });
+    }
+    
+    // Refresh places and update location
+    function refreshPlaces() {
+        const indicator = document.getElementById('pull-to-refresh-indicator');
+        const refreshIcon = document.getElementById('refresh-icon');
+        const refreshText = document.getElementById('refresh-text');
+        
+        // Update user location and refresh places
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Update location on server
+                    fetch('{% url "places:set_location" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({ latitude: lat, longitude: lng })
+                    })
+                    .then(() => {
+                        // Reload the page to show updated places
+                        window.location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Error updating location:', error);
+                        finishRefresh();
+                    });
+                },
+                (error) => {
+                    // If location fails, just refresh the current view
+                    applyFilters();
+                    setTimeout(finishRefresh, 1000);
+                }
+            );
+        } else {
+            // No geolocation, just refresh
+            applyFilters();
+            setTimeout(finishRefresh, 1000);
+        }
+        
+        function finishRefresh() {
+            // Reset indicator
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                indicator.style.transform = 'translateY(-3rem)';
+                refreshIcon.classList.remove('fa-spinner', 'fa-spin');
+                refreshIcon.classList.add('fa-arrow-down');
+                refreshText.textContent = "{% translate 'Pull to refresh' %}";
+                
+                // Reset state
+                const placesContainer = document.getElementById('places-container');
+                placesContainer.isRefreshing = false;
+                window.isRefreshing = false;
+            }, 500);
+        }
+    }
+
     // Call initMap when the page loads
     document.addEventListener('DOMContentLoaded', function() {
         initMap();
@@ -802,6 +960,9 @@
         // Set up infinite scroll
         const placesContainer = document.getElementById('places-container');
         placesContainer.addEventListener('scroll', handleScroll);
+        
+        // Set up pull-to-refresh (mobile only)
+        setupPullToRefresh();
         
         // Set up view switcher buttons (mobile only)
         document.getElementById('view-list-btn').addEventListener('click', () => switchView('list'));
