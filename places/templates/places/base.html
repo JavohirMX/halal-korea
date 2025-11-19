@@ -175,6 +175,11 @@
 
     <!-- Custom Styles -->
     <style>
+        /* Alpine.js Cloak - Prevents flash of unstyled content */
+        [x-cloak] {
+            display: none !important;
+        }
+        
         /* Form Focus Styles */
         input:focus, textarea:focus, select:focus {
             outline: none !important;
@@ -503,6 +508,7 @@
                         
                         <!-- Mobile Language Dropdown -->
                         <div x-show="open" 
+                             x-cloak
                              @click.away="open = false"
                              class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20"
                              x-transition:enter="transition ease-out duration-100"
@@ -561,6 +567,7 @@
                         
                         <!-- Language Dropdown -->
                         <div x-show="open" 
+                             x-cloak
                              @click.away="open = false"
                              class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20"
                              x-transition:enter="transition ease-out duration-100"
@@ -612,6 +619,7 @@
                                 
                                 <!-- User Dropdown -->
                                 <div x-show="open" 
+                                     x-cloak
                                      @click.away="open = false"
                                      class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
                                     <div class="py-1">
@@ -666,6 +674,7 @@
 
             <!-- Mobile menu -->
             <div x-show="isOpen" 
+                 x-cloak
                  class="xl:hidden glass-effect dark:bg-gray-900/95 rounded-lg mb-4"
                  x-transition:enter="transition ease-out duration-100 transform"
                  x-transition:enter-start="opacity-0 scale-95"
@@ -726,6 +735,7 @@
                             
                             <!-- Mobile Language Dropdown -->
                             <div x-show="open" 
+                                 x-cloak
                                  @click.away="open = false"
                                  class="mt-2 w-full rounded-md shadow-lg glass-effect dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20"
                                  x-transition:enter="transition ease-out duration-100"
