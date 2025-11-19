@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .utils import get_prayer_times, get_prayer_times_ll, get_fallback_prayer_times
+from .utils import get_prayer_times, get_prayer_times_ll
 from utils.location_manager import get_user_location_context, get_default_korea_location, update_user_location, get_korea_location_from_coordinates, clear_user_location
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -83,7 +83,7 @@ def get_prayer_times_data(request):
         korea_data = None
         korea_location_info = None
         
-        if not is_in_korea and primary_data:
+        if not is_in_korea and primary_data and primary_data.get('code') == 200:
             try:
                 korea_location = get_default_korea_location()
                 korea_data = get_prayer_times_ll(
@@ -92,17 +92,21 @@ def get_prayer_times_data(request):
                     method=calculation_method,
                     school=asr_method
                 )
-                korea_location_info = {
-                    "city": korea_location['city'],
-                    "country": korea_location['country'],
-                    "latitude": korea_location['lat'],
-                    "longitude": korea_location['lng']
-                }
+                # Only include korea_data if it's successful
+                if korea_data.get('code') != 200:
+                    korea_data = None
+                else:
+                    korea_location_info = {
+                        "city": korea_location['city'],
+                        "country": korea_location['country'],
+                        "latitude": korea_location['lat'],
+                        "longitude": korea_location['lng']
+                    }
             except Exception as e:
                 logger.warning(f"Failed to get Korea prayer times for international user: {str(e)}")
         
         # If we couldn't get user's location prayer times, fall back
-        if not primary_data:
+        if not primary_data or primary_data.get('code') != 200:
             if is_in_korea:
                 # User is in Korea but we couldn't get specific location
                 korea_location = get_default_korea_location()
@@ -117,12 +121,20 @@ def get_prayer_times_data(request):
                     "country": korea_location['country']
                 }
             else:
-                # International user with no location data
-                primary_data = get_fallback_prayer_times()
-                primary_location_info = {
-                    "city": "Unknown Location",
-                    "country": "Unknown"
-                }
+                # International user with no location data - return error
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Unable to determine your location. Please enable location services or set your location manually.',
+                    'show_error_ui': True
+                }, status=400)
+        
+        # Check if primary data is an error response
+        if primary_data.get('code') != 200:
+            return JsonResponse({
+                'success': False,
+                'error': primary_data.get('error', 'Failed to load prayer times'),
+                'show_error_ui': True
+            }, status=503)
         
         response_data = {
             'success': True,
@@ -142,11 +154,11 @@ def get_prayer_times_data(request):
         return JsonResponse(response_data)
         
     except Exception as e:
-        logger.error(f"Error in get_prayer_times_data: {str(e)}")
+        logger.error(f"Error in get_prayer_times_data: {str(e)}", exc_info=True)
         return JsonResponse({
             'success': False,
-            'error': 'Failed to load prayer times',
-            'fallback_data': get_fallback_prayer_times()["data"]
+            'error': 'An unexpected error occurred. Please try again later.',
+            'show_error_ui': True
         }, status=500)
 
 @require_http_methods(["POST"])

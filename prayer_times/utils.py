@@ -8,36 +8,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 def get_fallback_prayer_times():
-    """Return fallback prayer times in case of API failure"""
+    """Return error response in case of API failure - no fake prayer times"""
     return {
-        "code": 200,
-        "status": "OK",
-        "data": {
-            "timings": {
-                "Fajr": "05:00",
-                "Sunrise": "07:00",
-                "Dhuhr": "12:00",
-                "Asr": "15:00",
-                "Maghrib": "18:00",
-                "Isha": "19:30"
-            },
-            "date": {
-                "gregorian": {
-                    "date": datetime.now().strftime("%d-%m-%Y"),
-                    "day": datetime.now().day,
-                    "month": {"en": datetime.now().strftime("%B")},
-                    "year": datetime.now().year,
-                    "weekday": {"en": datetime.now().strftime("%A")}
-                },
-                "hijri": {
-                    "date": "01-01-1445",
-                    "day": "1",
-                    "month": {"en": "Muharram"},
-                    "year": "1445",
-                    "weekday": {"en": "Monday"}
-                }
-            }
-        }
+        "code": 503,
+        "status": "ERROR",
+        "success": False,
+        "error": "Unable to fetch prayer times at this moment. Please try again later.",
+        "show_error_ui": True
     }
 
 def get_prayer_times(city, country, date=None, method=None, school=1):
@@ -53,8 +30,8 @@ def get_prayer_times(city, country, date=None, method=None, school=1):
     if cached_data:
         return cached_data
         
-    # Try to get from memory cache
-    cache_key = f"prayer_times_{city}_{country}_{date}_{method}_{school}"
+    # Try to get from memory cache - sanitize cache key
+    cache_key = f"prayer_times_{city}_{country}_{date}_{method}_{school}".replace(' ', '_')
     cached_data = cache.get(cache_key)
     if cached_data:
         return cached_data
@@ -71,15 +48,17 @@ def get_prayer_times(city, country, date=None, method=None, school=1):
     
     try:
         response = requests.get(url, params=params, timeout=5)  # 5 second timeout
+        response.raise_for_status()  # Raise error for bad status codes
         data = response.json()
         
-        # Cache the result
-        cache.set(cache_key, data, 3600)  # Cache for 1 hour
-        PrayerTimeCache.set_cached_times(city, country, date, data, method, school)
+        # Cache the result only if successful
+        if data.get('code') == 200:
+            cache.set(cache_key, data, 3600)  # Cache for 1 hour
+            PrayerTimeCache.set_cached_times(city, country, date, data, method, school)
         
         return data
     except (requests.Timeout, requests.RequestException) as e:
-        logger.error(f"Error fetching prayer times: {str(e)}")
+        logger.error(f"Error fetching prayer times for {city}, {country}: {str(e)}")
         return get_fallback_prayer_times()
 
 def get_prayer_times_ll(latitude, longitude, date=None, method=None, school=1):
@@ -108,14 +87,16 @@ def get_prayer_times_ll(latitude, longitude, date=None, method=None, school=1):
     
     try:
         response = requests.get(url, params=params, timeout=5)  # 5 second timeout
+        response.raise_for_status()  # Raise error for bad status codes
         data = response.json()
         
-        # Cache the result
-        cache.set(cache_key, data, 3600)  # Cache for 1 hour
+        # Cache the result only if successful
+        if data.get('code') == 200:
+            cache.set(cache_key, data, 3600)  # Cache for 1 hour
         
         return data
     except (requests.Timeout, requests.RequestException) as e:
-        logger.error(f"Error fetching prayer times: {str(e)}")
+        logger.error(f"Error fetching prayer times for coordinates ({latitude}, {longitude}): {str(e)}")
         return get_fallback_prayer_times()
 
 """ Example response for get_prayer_times
