@@ -216,35 +216,64 @@
     </div>
 </div>
 
-<!-- Add this section below the Featured Places Section -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="text-center">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {% translate "Stay Updated with Prayer Times" %}
-        </h2>
-        <p class="mb-6 text-base text-gray-500 dark:text-gray-400">
-            {% translate "Check the latest prayer times for your location." %}
-        </p>
+<!-- CTA Sections - Prayer Times & Submit Place -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        
+        <!-- Prayer Times CTA Card -->
         <a href="{% url 'prayer_times:prayer_times' %}" 
-           class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white gradient-bg-hover">
-            {% translate "View Prayer Times" %}
+           class="group glass-card rounded-xl p-6 sm:p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]">
+            <div class="flex items-start space-x-4">
+                <!-- Icon -->
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-primary-100 to-teal-100 dark:from-primary-900/30 dark:to-teal-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-pray text-primary-600 dark:text-primary-400 text-xl sm:text-2xl"></i>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                        {% translate "Prayer Times" %}
+                    </h3>
+                    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3">
+                        {% translate "Check the latest prayer times for your location." %}
+                    </p>
+                    <span class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400">
+                        {% translate "View Times" %}
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                    </span>
+                </div>
+            </div>
         </a>
-    </div>
-</div>
-
-<!-- Submit Place Section -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="text-center">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {% translate "Know a Halal Spot? Share It!" %}
-        </h2>
-        <p class="mb-6 text-base text-gray-500 dark:text-gray-400">
-            {% translate "Help us grow our community by submitting halal places you know!" %}
-        </p>
+        
+        <!-- Submit Place CTA Card -->
         <a href="{% url 'places:submit_place' %}" 
-           class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white gradient-bg-hover">
-            {% translate "Submit a Place" %}
+           class="group glass-card rounded-xl p-6 sm:p-8 bg-gradient-to-br from-primary-50 to-teal-50 dark:from-primary-900/20 dark:to-teal-900/20 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]">
+            <div class="flex items-start space-x-4">
+                <!-- Icon -->
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-plus-circle text-primary-600 dark:text-primary-400 text-xl sm:text-2xl"></i>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                        {% translate "Know a Halal Spot?" %}
+                    </h3>
+                    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3">
+                        {% translate "Help us grow our community by submitting halal places you know!" %}
+                    </p>
+                    <span class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm font-medium text-primary-600 dark:text-primary-400 shadow-sm group-hover:shadow-md transition-shadow">
+                        {% translate "Submit Place" %}
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+                    </span>
+                </div>
+            </div>
         </a>
+        
     </div>
 </div>
 
