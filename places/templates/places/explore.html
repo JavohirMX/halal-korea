@@ -148,7 +148,19 @@
 
 
     <!-- Search and Filters -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-4 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+        <!-- Collapse Toggle Bar (Mobile only) -->
+        <button type="button" id="search-collapse-toggle" 
+                class="lg:hidden w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors rounded-t-lg">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-search text-primary-600 dark:text-primary-400"></i>
+                <span>{% translate "Search & Filters" %}</span>
+            </div>
+            <i id="search-toggle-icon" class="fas fa-chevron-down text-gray-400 transition-transform duration-200"></i>
+        </button>
+        
+        <!-- Collapsible Search/Filter Content -->
+        <div id="search-filter-content" class="hidden p-3 sm:p-4 transition-all duration-300 ease-in-out">
         <!-- Mobile Top Bar: Location + View Switcher -->
         <div class="mb-3 lg:hidden flex items-center justify-between gap-2">
             <!-- Location Chip (Left) -->
@@ -309,6 +321,7 @@
                 </div>
             </div>
         </form>
+        </div> <!-- End collapsible content -->
     </div>
 
     <!-- Main Content -->
@@ -838,6 +851,41 @@
             applyFilters();
         });
     });
+
+    // Search/Filter collapse toggle (Mobile only)
+    const searchCollapseToggle = document.getElementById('search-collapse-toggle');
+    const searchFilterContent = document.getElementById('search-filter-content');
+    const searchToggleIcon = document.getElementById('search-toggle-icon');
+    
+    if (searchCollapseToggle && searchFilterContent) {
+        // Check saved state - default is collapsed (hidden)
+        const isCollapsed = localStorage.getItem('searchFilterCollapsed') !== 'false';
+        
+        if (!isCollapsed) {
+            // Only show if user previously expanded it
+            searchFilterContent.classList.remove('hidden');
+            searchToggleIcon.classList.remove('fa-chevron-down');
+            searchToggleIcon.classList.add('fa-chevron-up');
+        }
+        
+        searchCollapseToggle.addEventListener('click', function() {
+            const isCurrentlyCollapsed = searchFilterContent.classList.contains('hidden');
+            
+            if (isCurrentlyCollapsed) {
+                // Expand
+                searchFilterContent.classList.remove('hidden');
+                searchToggleIcon.classList.remove('fa-chevron-down');
+                searchToggleIcon.classList.add('fa-chevron-up');
+                localStorage.setItem('searchFilterCollapsed', 'false');
+            } else {
+                // Collapse
+                searchFilterContent.classList.add('hidden');
+                searchToggleIcon.classList.remove('fa-chevron-up');
+                searchToggleIcon.classList.add('fa-chevron-down');
+                localStorage.setItem('searchFilterCollapsed', 'true');
+            }
+        });
+    }
 
     // Toggle mobile location menu
     const locationChip = document.getElementById('location-chip-mobile');
