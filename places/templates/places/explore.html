@@ -530,20 +530,69 @@
         if (!sharedInfoWindow) {
             sharedInfoWindow = new google.maps.InfoWindow({
                 headerDisabled: true,
-                maxWidth: 200,
+                maxWidth: 280,
             });
         }
 
         // Add click listener to marker
         markers[place.id].addListener('gmp-click', () => {
-            // Update info window content
+            // Build category display
+            const categoryDisplay = place.category === 'prayer_room' ? 
+                "{% translate 'Prayer Space'|escapejs %}" : 
+                place.category.charAt(0).toUpperCase() + place.category.slice(1);
+            
+            // Build category icon path
+            const categoryIcon = place.category === 'mosque' ? 'M10 2L3 7v11h5v-6h4v6h5V7l-7-5z' : 
+                                 place.category === 'restaurant' ? 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' :
+                                 place.category === 'market' ? 'M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z' :
+                                 'M10 2L3 7v11h5v-6h4v6h5V7l-7-5z';
+            
+            // Build compact info window content
+            // Note: Google's info window has 12px padding on top/left, 0px on right/bottom
+            // We compensate with negative margins and adjusted padding for even spacing
             sharedInfoWindow.setContent(`
-                <div style="padding: 12px; margin: -12px 0 0 -12px;">
-                    <p class="font-semibold text-lg text-gray-900 mb-1">${place.name}</p>
-                    <p class="text-sm text-gray-600">${place.category === 'prayer_room' ? "{% translate 'Prayer Space'|escapejs %}" : place.category.charAt(0).toUpperCase() + place.category.slice(1)}</p>
+                <div class="-m-3 mr-0 mb-0 p-3 min-w-[220px] max-w-[260px]">
+                    <!-- Title -->
+                    <h3 class="font-bold text-sm text-gray-900 mb-2 leading-snug line-clamp-2">${place.name}</h3>
+                    
+                    <!-- Category & Rating Row -->
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="inline-flex items-center text-xs text-primary-600 bg-primary-50 px-2 py-1 rounded-full shrink-0">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="${categoryIcon}"/>
+                            </svg>
+                            ${categoryDisplay}
+                        </span>
+                        ${place.average_rating ? `
+                        <div class="flex items-center gap-0.5 shrink-0">
+                            <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <span class="text-xs font-semibold text-gray-700">${place.average_rating}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Distance -->
+                    ${place.distance ? `
+                    <div class="flex items-center gap-1 text-xs text-gray-500 mb-2.5">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>${place.distance.m > 1000 ? 
+                            place.distance.km.toFixed(1) + ' km {% translate "away"|escapejs %}' : 
+                            Math.round(place.distance.m) + 'm {% translate "away"|escapejs %}'
+                        }</span>
+                    </div>
+                    ` : ''}
+                    
+                    <!-- CTA Button -->
                     <a href="/place/${place.id}/" 
-                       class="text-primary-600 hover:text-primary-700 text-sm">
+                       class="inline-flex items-center justify-center w-full px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors duration-200">
                         {% translate "View Details" %}
+                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
                     </a>
                 </div>
             `);
