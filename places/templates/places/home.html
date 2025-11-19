@@ -16,7 +16,7 @@
 
 <!-- Hero Section -->
 <div class="relative bg-gradient-to-br from-green-400 to-green-600 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24 relative z-10">
         <div class="text-center">
             {% if location_context.is_in_korea %}
                 <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
@@ -85,17 +85,17 @@
 
 <!-- Category Section -->
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-2 gap-4 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <!-- Restaurants -->
         <a href="{% url 'places:explore' %}?category=restaurant" 
-           class="glass-card rounded-lg p-6 transition-all duration-200">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
+           class="glass-card rounded-lg p-4 sm:p-6 transition-all duration-200 h-full">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left">
+                <div class="flex-shrink-0 mb-2 sm:mb-0">
                     <i class="fas fa-utensils w-8 h-8 text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Restaurants" %}</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <div class="sm:ml-4">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900 dark:text-white">{% translate "Restaurants" %}</h3>
+                    <p class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-2 sm:line-clamp-none">
                         {% if location_context.is_in_korea %}
                             {% translate "Find halal restaurants near you" %}
                         {% else %}
@@ -108,14 +108,14 @@
 
         <!-- Markets -->
         <a href="{% url 'places:explore' %}?category=market" 
-           class="glass-card rounded-lg p-6 transition-all duration-200">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
+           class="glass-card rounded-lg p-4 sm:p-6 transition-all duration-200 h-full">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left">
+                <div class="flex-shrink-0 mb-2 sm:mb-0">
                     <i class="fas fa-shopping-basket w-8 h-8 text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Markets" %}</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <div class="sm:ml-4">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900 dark:text-white">{% translate "Markets" %}</h3>
+                    <p class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-2 sm:line-clamp-none">
                         {% if location_context.is_in_korea %}
                             {% translate "Discover halal grocery stores" %}
                         {% else %}
@@ -128,14 +128,14 @@
 
         <!-- Mosques & Prayer Rooms -->
         <a href="{% url 'places:explore' %}?category=mosque" 
-           class="glass-card rounded-lg p-6 transition-all duration-200">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
+           class="glass-card rounded-lg p-4 sm:p-6 transition-all duration-200 h-full">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left">
+                <div class="flex-shrink-0 mb-2 sm:mb-0">
                     <i class="fas fa-mosque w-8 h-8 text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Mosques & Prayer Rooms" %}</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <div class="sm:ml-4">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900 dark:text-white">{% translate "Mosques" %}</h3>
+                    <p class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-2 sm:line-clamp-none">
                         {% if location_context.is_in_korea %}
                             {% translate "Find nearby prayer spaces" %}
                         {% else %}
@@ -148,14 +148,14 @@
 
         <!-- Explore All -->
         <a href="{% url 'places:explore' %}" 
-           class="glass-card rounded-lg p-6 transition-all duration-200 col-span-full sm:col-span-2 lg:col-span-3">
-            <div class="flex items-center justify-center">
-                <div class="flex-shrink-0">
+           class="glass-card rounded-lg p-4 sm:p-6 transition-all duration-200 lg:col-span-3 h-full">
+            <div class="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left">
+                <div class="flex-shrink-0 mb-2 sm:mb-0">
                     <i class="fas fa-compass w-8 h-8 text-primary-600 dark:text-primary-400 text-2xl"></i>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Explore All" %}</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% translate "Discover all halal places in Korea" %}</p>
+                <div class="sm:ml-4">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900 dark:text-white">{% translate "Explore All" %}</h3>
+                    <p class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">{% translate "Discover all halal places in Korea" %}</p>
                 </div>
             </div>
         </a>
