@@ -42,6 +42,7 @@
                 { name: 'Jeju', country: 'South Korea' }
             ] }">
                 <button @click="open = !open" 
+                        id="location-button"
                         class="w-full flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 glass-card">
                     <div class="flex items-center space-x-2">
                         <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
@@ -49,9 +50,19 @@
                     </div>
                     <i class="fas fa-chevron-down text-xs"></i>
                 </button>
+
+                <!-- Location Loading Skeleton -->
+                <div id="location-skeleton" class="hidden w-full flex items-center justify-between px-4 py-2 rounded-md glass-card">
+                    <div class="flex items-center space-x-2 flex-1">
+                        <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
+                        <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                </div>
                 
                 <!-- Dropdown menu -->
                 <div x-show="open" 
+                     x-cloak
                      @click.away="open = false"
                      class="absolute z-10 mt-2 w-full rounded-md shadow-lg glass-card dark:bg-gray-800 ring-1 ring-black ring-opacity-5"
                      x-transition:enter="transition ease-out duration-100"
@@ -101,6 +112,7 @@
 
                 <!-- Settings Dropdown -->
                 <div x-show="open" 
+                     x-cloak
                      @click.away="open = false"
                      class="absolute right-0 mt-2 w-72 rounded-md shadow-lg glass-card dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-20"
                      x-transition:enter="transition ease-out duration-100"
@@ -159,10 +171,96 @@
             </div>
         </div>
 
-        <!-- Loading State -->
-        <div id="loading-state" class="mt-4 max-w-md w-full mx-auto text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">{% translate "Loading prayer times..." %}</p>
+        <!-- Loading State with Skeleton -->
+        <div id="loading-state" class="mt-4 max-w-md w-full mx-auto">
+            <!-- Date Display Skeleton -->
+            <div class="glass-card p-3 rounded-lg">
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">{% translate "Gregorian Date" %}</h3>
+                        <div class="mt-1 h-5 bg-gray-300 dark:bg-gray-700 rounded w-24 mx-auto mb-1 animate-pulse"></div>
+                        <div class="h-3 bg-gray-300 dark:bg-gray-700 rounded w-16 mx-auto animate-pulse"></div>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">{% translate "Current Time" %}</h3>
+                        <div class="mt-1 h-5 bg-gray-300 dark:bg-gray-700 rounded w-16 mx-auto animate-pulse"></div>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">{% translate "Hijri Date" %}</h3>
+                        <div class="mt-1 h-5 bg-gray-300 dark:bg-gray-700 rounded w-24 mx-auto mb-1 animate-pulse"></div>
+                        <div class="h-3 bg-gray-300 dark:bg-gray-700 rounded w-16 mx-auto animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prayer Times Table Skeleton -->
+            <div class="mt-6 glass-card rounded-lg overflow-hidden">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-primary-50 dark:bg-primary-900/30">
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">{% translate "Prayer" %}</th>
+                            <th class="py-3 px-4 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">{% translate "Time" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{% translate "Fajr" %}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-12 ml-auto animate-pulse"></div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{% translate "Sunrise" %}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-12 ml-auto animate-pulse"></div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{% translate "Dhuhr" %}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-12 ml-auto animate-pulse"></div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{% translate "Asr" %}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-12 ml-auto animate-pulse"></div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{% translate "Maghrib" %}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-12 ml-auto animate-pulse"></div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{% translate "Isha" %}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-12 ml-auto animate-pulse"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-primary-50 dark:bg-primary-900/30">
+                            <td class="py-3 px-4 font-medium text-primary-700 dark:text-primary-400">{% translate "Next Prayer" %}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="h-4 bg-gray-400 dark:bg-gray-600 rounded w-16 ml-auto animate-pulse"></div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Loading Text -->
+            <p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                <span class="inline-flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {% translate "Loading prayer times..." %}
+                </span>
+            </p>
         </div>
 
         <!-- Error State -->
@@ -337,6 +435,10 @@
         document.getElementById('error-state').classList.add('hidden');
         document.getElementById('content-container').classList.add('hidden');
         
+        // Show location skeleton
+        document.getElementById('location-button').classList.add('hidden');
+        document.getElementById('location-skeleton').classList.remove('hidden');
+        
         try {
             const response = await fetch('/prayer/get-prayer-times/');
             const data = await response.json();
@@ -345,6 +447,10 @@
                 // Update location display
                 document.getElementById('location-display').textContent = 
                     `${data.location.city}, ${data.location.country}`;
+                
+                // Hide location skeleton, show button
+                document.getElementById('location-skeleton').classList.add('hidden');
+                document.getElementById('location-button').classList.remove('hidden');
                 
                 // Update dates
                 const gregorian = data.data.date.gregorian;
@@ -390,9 +496,13 @@
                 throw new Error(data.error || "{% translate 'Failed to load prayer times'|escapejs %}");
             }
         } catch (error) {
-                            console.error("{% translate 'Error loading prayer times:'|escapejs %}", error);
+            console.error("{% translate 'Error loading prayer times:'|escapejs %}", error);
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('error-state').classList.remove('hidden');
+            
+            // Hide location skeleton, show button on error
+            document.getElementById('location-skeleton').classList.add('hidden');
+            document.getElementById('location-button').classList.remove('hidden');
         }
     }
     
