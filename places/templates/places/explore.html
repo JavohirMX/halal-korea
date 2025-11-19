@@ -14,6 +14,40 @@
         display: block;
     }
 
+    /* Skeleton Loading Styles */
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s ease-in-out infinite;
+    }
+    
+    .dark .skeleton {
+        background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+        background-size: 200% 100%;
+    }
+    
+    @keyframes loading {
+        0% {
+            background-position: 200% 0;
+        }
+        100% {
+            background-position: -200% 0;
+        }
+    }
+    
+    .skeleton-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+
     /* Mobile View Switcher Styles */
     .view-switcher-btn.active {
         background-color: white;
@@ -327,18 +361,26 @@
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Places List -->
-        <div class="lg:col-span-1 space-y-3 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide transition-all duration-300 px-1" 
+        <div class="lg:col-span-1 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide transition-all duration-300 px-1" 
              id="places-container" 
              data-mobile-view="split">
-            <!-- Places will be loaded here dynamically -->
-            {% include 'places/partials/place_list.html' with places=places %}
             
-            <!-- Loading Spinner -->
+            <!-- Skeleton Loader (hidden by default, shown only when filtering) -->
+            <div id="skeleton-loader-container" class="hidden">
+                {% include 'places/partials/skeleton_loader.html' %}
+            </div>
+            
+            <!-- Places List Container -->
+            <div id="places-list-container" class="space-y-3">
+                {% include 'places/partials/place_list.html' with places=places %}
+            </div>
+            
+            <!-- Loading Spinner (for infinite scroll) -->
             <div class="loading-spinner" id="loading-spinner">
                 <div class="flex justify-center items-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                 </div>
-                <p class="mt-2 text-sm text-gray-500">{% translate "Loading more places..." %}</p>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% translate "Loading more places..." %}</p>
             </div>
         </div>
 
@@ -551,7 +593,8 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Append new places to the container
+            // Append new places to the places list container (not the outer container)
+            const placesListContainer = document.getElementById('places-list-container');
             const placesContainer = document.getElementById('places-container');
             
             // Remove loading spinner before adding new content (to avoid duplicates)
@@ -560,10 +603,12 @@
                 existingSpinner.remove();
             }
             
-            // Add the new content
-            placesContainer.insertAdjacentHTML('beforeend', data.html);
+            // Add the new content to the places list container
+            if (placesListContainer) {
+                placesListContainer.insertAdjacentHTML('beforeend', data.html);
+            }
             
-            // Add loading spinner back
+            // Add loading spinner back to the outer container
             const loadingSpinner = document.createElement('div');
             loadingSpinner.id = 'loading-spinner';
             loadingSpinner.className = 'loading-spinner';
@@ -571,7 +616,7 @@
                <div class="flex justify-center items-center">
                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                </div>
-               <p class="mt-2 text-sm text-gray-500">{% translate "Loading more places..." %}</p>
+               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% translate "Loading more places..." %}</p>
             `;
             placesContainer.appendChild(loadingSpinner);
             
@@ -644,11 +689,11 @@
         currentPage = 1;
         isLoading = true;
         
-        // Show loading state
+        // Show skeleton loader while fetching
         const placesContainer = document.getElementById('places-container');
         placesContainer.innerHTML = `
-            <div class="flex justify-center items-center py-8">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+            <div id="skeleton-loader-container">
+                {% include 'places/partials/skeleton_loader.html' %}
             </div>
         `;
         
@@ -660,8 +705,15 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Update places list
-            placesContainer.innerHTML = data.html;
+            // Replace with actual content and re-add hidden skeleton loader for future use
+            placesContainer.innerHTML = `
+                <div id="skeleton-loader-container" class="hidden">
+                    {% include 'places/partials/skeleton_loader.html' %}
+                </div>
+                <div id="places-list-container" class="space-y-3">
+                    ${data.html}
+                </div>
+            `;
             
             // Add loading spinner back to the container
             const loadingSpinner = document.createElement('div');
@@ -671,7 +723,7 @@
                <div class="flex justify-center items-center">
                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                </div>
-               <p class="mt-2 text-sm text-gray-500">{% translate "Loading more places..." %}</p>
+               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% translate "Loading more places..." %}</p>
             `;
             placesContainer.appendChild(loadingSpinner);
             
@@ -794,6 +846,13 @@
                 // Clear previous timeout
                 clearTimeout(searchTimeout);
                 
+                // Show searching indicator
+                const searchIcon = this.previousElementSibling?.querySelector('i');
+                if (searchIcon) {
+                    searchIcon.classList.remove('fa-search');
+                    searchIcon.classList.add('fa-spinner', 'fa-spin');
+                }
+                
                 // Set a timeout to avoid too many requests while typing
                 searchTimeout = setTimeout(() => {
                     // Update all other search inputs
@@ -805,6 +864,12 @@
                     
                     // Apply filters
                     applyFilters();
+                    
+                    // Reset search icon
+                    if (searchIcon) {
+                        searchIcon.classList.remove('fa-spinner', 'fa-spin');
+                        searchIcon.classList.add('fa-search');
+                    }
                 }, 500);
             });
             
