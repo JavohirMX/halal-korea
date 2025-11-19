@@ -86,7 +86,7 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
-    <div class="mb-8 flex flex-col lg:flex-row lg:justify-between lg:items-center">
+    <div class="mb-4 flex flex-col lg:flex-row lg:justify-between lg:items-center">
         <div class="flex-1">
             {% if location_context.is_in_korea %}
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{% translate "Explore Halal Places" %}</h1>
@@ -226,8 +226,8 @@
 
         <form id="filter-form" class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 relative">
             <!-- Search Bar -->
-            <div class="md:col-span-2 flex items-center">
-                <div class="relative flex-grow">
+            <div class="md:col-span-2">
+                <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400 text-sm sm:text-base"></i>
                     </div>
@@ -237,82 +237,39 @@
                            class="pl-9 sm:pl-10 w-full h-10 sm:h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out text-sm sm:text-base"
                            placeholder="{% translate 'Search places...' %}">
                 </div>
-                <button type="button" id="filter-toggle" class="ml-2 p-1.5 sm:p-2 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 md:hidden">
-                    <i class="fas fa-filter text-sm sm:text-base"></i>
-                </button>
+            </div>
+
+            <!-- Category Filter Chips (Compact icon-only on mobile) -->
+            <div class="md:col-span-2 flex items-center gap-2 md:hidden">
+                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">{% translate "Filter:" %}</span>
+                <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 gap-0.5" role="group">
+                    <button type="button" 
+                            class="category-chip inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-all duration-200 {% if not request.GET.category %}bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400{% endif %}"
+                            data-category=""
+                            title="{% translate 'All Categories' %}">
+                        <i class="fas fa-grip-horizontal"></i>
+                    </button>
+                    <button type="button" 
+                            class="category-chip inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-all duration-200 {% if request.GET.category == 'restaurant' %}bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400{% endif %}"
+                            data-category="restaurant"
+                            title="{% translate 'Restaurants' %}">
+                        <i class="fas fa-utensils"></i>
+                    </button>
+                    <button type="button" 
+                            class="category-chip inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-all duration-200 {% if request.GET.category == 'market' %}bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400{% endif %}"
+                            data-category="market"
+                            title="{% translate 'Markets' %}">
+                        <i class="fas fa-shopping-basket"></i>
+                    </button>
+                    <button type="button" 
+                            class="category-chip inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-all duration-200 {% if request.GET.category == 'mosque' or request.GET.category == 'prayer_room' %}bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400{% endif %}"
+                            data-category="mosque"
+                            title="{% translate 'Prayer Spaces' %}">
+                        <i class="fas fa-mosque"></i>
+                    </button>
+                </div>
             </div>
             
-            <!-- Mobile Filters Dropdown -->
-            <div id="mobile-filters" class="hidden md:hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 z-10">
-                <!-- Category Filter -->
-                <div class="mb-3 sm:mb-4">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-filter text-gray-400 text-sm sm:text-base"></i>
-                        </div>
-                        <select name="category" 
-                                class="pl-9 sm:pl-10 w-full h-10 sm:h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none text-sm sm:text-base">
-                            <option value="">{% translate "All Categories" %}</option>
-                            <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>{% translate "Restaurants" %}</option>
-                            <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>{% translate "Markets" %}</option>
-                            <option value="mosque" {% if request.GET.category == 'mosque' or request.GET.category == 'prayer_room' %}selected{% endif %}>{% translate "Mosques & Prayer Rooms" %}</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i class="fas fa-chevron-down text-gray-400 text-sm sm:text-base"></i>
-                        </div>
-                    </div>
-                </div>
-                <!-- City Filter (for trip planning) -->
-                {% if not location_context.is_in_korea %}
-                <div class="mb-3 sm:mb-4">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-map-marker-alt text-gray-400 text-sm sm:text-base"></i>
-                        </div>
-                        <select name="city" 
-                                class="pl-9 sm:pl-10 w-full h-10 sm:h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none text-sm sm:text-base">
-                            <option value="">{% translate "All Cities" %}</option>
-                            <option value="Seoul" {% if request.GET.city == 'Seoul' %}selected{% endif %}>Seoul</option>
-                            <option value="Busan" {% if request.GET.city == 'Busan' %}selected{% endif %}>Busan</option>
-                            <option value="Incheon" {% if request.GET.city == 'Incheon' %}selected{% endif %}>Incheon</option>
-                            <option value="Ansan" {% if request.GET.city == 'Ansan' %}selected{% endif %}>Ansan</option>
-                            <option value="Seongnam" {% if request.GET.city == 'Seongnam' %}selected{% endif %}>Seongnam</option>
-                            <option value="Bucheon" {% if request.GET.city == 'Bucheon' %}selected{% endif %}>Bucheon</option>
-                            <option value="Yangsan" {% if request.GET.city == 'Yangsan' %}selected{% endif %}>Yangsan</option>
-                            <option value="Gyeongju" {% if request.GET.city == 'Gyeongju' %}selected{% endif %}>Gyeongju</option>
-                            <option value="Cheonan" {% if request.GET.city == 'Cheonan' %}selected{% endif %}>Cheonan</option>
-                            <option value="Cheongju" {% if request.GET.city == 'Cheongju' %}selected{% endif %}>Cheongju</option>
-                            <option value="Anyang" {% if request.GET.city == 'Anyang' %}selected{% endif %}>Anyang</option>
-                            <option value="Gimpo" {% if request.GET.city == 'Gimpo' %}selected{% endif %}>Gimpo</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i class="fas fa-chevron-down text-gray-400 text-sm sm:text-base"></i>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                <!-- Sorting Options -->
-                <div>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-sort text-gray-400 text-sm sm:text-base"></i>
-                        </div>
-                        <select name="sort" 
-                                class="pl-9 sm:pl-10 w-full h-10 sm:h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600 text-sm sm:text-base">
-                            {% if location_context.is_in_korea %}
-                                <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
-                                <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
-                            {% else %}
-                                <option value="rating" {% if request.GET.sort == 'rating' or not request.GET.sort %}selected{% endif %}>{% translate "Most Popular" %}</option>
-                                <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "By Location" %}</option>
-                            {% endif %}
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i class="fas fa-chevron-down text-gray-400 text-sm sm:text-base"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <!-- Desktop Filters -->
             <div class="hidden md:block md:col-span-1">
                 <div class="relative">
@@ -857,9 +814,29 @@
         });
     });
 
-    // Toggle mobile filters dropdown
-    document.getElementById('filter-toggle').addEventListener('click', function() {
-        document.getElementById('mobile-filters').classList.toggle('hidden');
+    // Category chip filtering
+    document.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            const category = this.getAttribute('data-category');
+            
+            // Update all category select elements
+            document.querySelectorAll('select[name="category"]').forEach(select => {
+                select.value = category;
+            });
+            
+            // Update chip styles - remove active class from all
+            document.querySelectorAll('.category-chip').forEach(c => {
+                c.classList.remove('bg-white', 'dark:bg-gray-600', 'text-primary-600', 'dark:text-primary-400', 'shadow-sm');
+                c.classList.add('text-gray-600', 'dark:text-gray-400');
+            });
+            
+            // Add active class to clicked chip
+            this.classList.remove('text-gray-600', 'dark:text-gray-400');
+            this.classList.add('bg-white', 'dark:bg-gray-600', 'text-primary-600', 'dark:text-primary-400', 'shadow-sm');
+            
+            // Apply filters
+            applyFilters();
+        });
     });
 
     // Toggle mobile location menu
