@@ -339,12 +339,12 @@
             <!-- Photos -->
             <div>
                 <label for="photo-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {% translate "Photos" %}
+                    {% translate "Photos" %} <span class="text-gray-400 text-xs font-normal">({% translate "Optional" %})</span>
                 </label>
-                <div id="drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-primary-500 dark:hover:border-primary-400 transition-colors duration-200">
+                <div id="drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-primary-500 dark:hover:border-primary-400 transition-colors duration-200 cursor-pointer">
                     <div class="space-y-1 text-center">
                         <i class="fas fa-image text-gray-400 dark:text-gray-600 text-3xl mb-3"></i>
-                        <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                        <div class="flex flex-wrap justify-center text-sm text-gray-600 dark:text-gray-400">
                             <label for="photo-input" class="relative cursor-pointer rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 focus-within:outline-none">
                                 <span>{% translate "Upload photos" %}</span>
                                 <input id="photo-input" 
@@ -361,7 +361,13 @@
                         </p>
                     </div>
                 </div>
-                <div id="photo-preview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4"></div>
+                <!-- Photo counter -->
+                <div id="photo-count" class="hidden mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    <i class="fas fa-images"></i>
+                    <span id="photo-count-text">0 {% translate "photos selected" %}</span>
+                </div>
+                <!-- Photo preview grid - single column on mobile for better visibility -->
+                <div id="photo-preview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 mt-4"></div>
             </div>
 
             <!-- Submit Button -->
@@ -467,28 +473,56 @@
         const reader = new FileReader();
         reader.onload = function(e) {
             const div = document.createElement('div');
-            div.className = 'relative aspect-square';
+            div.className = 'relative group';
             div.innerHTML = `
-                <div class="h-full">
+                <div class="relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
                     <img src="${e.target.result}" 
                          alt="{% translate 'Preview' %}" 
-                         class="w-full h-full object-cover rounded-lg">
-                    <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                         class="w-full h-full object-cover">
+                    <!-- Larger, more touch-friendly delete button -->
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center">
                         <button type="button" 
-                                class="text-white hover:text-red-500 p-2"
-                                onclick="removePhoto(this)">
-                            <i class="fas fa-trash"></i>
+                                class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-red-500 hover:bg-red-600 text-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shadow-lg transform hover:scale-110 active:scale-95 transition-transform"
+                                onclick="removePhoto(this)"
+                                aria-label="{% translate 'Remove photo' %}">
+                            <i class="fas fa-trash text-base sm:text-lg"></i>
                         </button>
+                    </div>
+                    <!-- Always visible delete button on mobile for easier access -->
+                    <button type="button" 
+                            class="sm:hidden absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg active:scale-95 transition-transform z-10"
+                            onclick="removePhoto(this)"
+                            aria-label="{% translate 'Remove photo' %}">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                    <!-- File name tooltip on hover -->
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p class="text-white text-xs truncate">${file.name}</p>
+                        <p class="text-white/70 text-xs">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
                     </div>
                 </div>
             `;
             preview.appendChild(div);
+            updatePhotoCount();
         };
         reader.readAsDataURL(file);
     }
 
+    function updatePhotoCount() {
+        const photoCount = document.getElementById('photo-count');
+        const photoCountText = document.getElementById('photo-count-text');
+        const count = currentFiles.length;
+        
+        if (count > 0) {
+            photoCount.classList.remove('hidden');
+            photoCountText.textContent = count + ' {% translate "photos selected"|escapejs %}';
+        } else {
+            photoCount.classList.add('hidden');
+        }
+    }
+
     function removePhoto(button) {
-        const photoDiv = button.closest('.relative');
+        const photoDiv = button.closest('.relative.group');
         const index = Array.from(preview.children).indexOf(photoDiv);
         
         // Remove from preview with animation
@@ -512,6 +546,8 @@
             const dt = new DataTransfer();
             currentFiles.forEach(file => dt.items.add(file));
             photoInput.files = dt.files;
+            
+            updatePhotoCount();
         }, 300);
     }
 
