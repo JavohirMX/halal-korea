@@ -218,14 +218,22 @@
             <!-- Location -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {% translate "Location" %}
+                    {% translate "Location" %} <span class="text-red-500">*</span>
                 </label>
-                <div class="h-64 rounded-lg overflow-hidden mb-2">
+                <div class="h-80 sm:h-96 lg:h-[28rem] rounded-lg overflow-hidden mb-2 shadow-md border-2 border-gray-200 dark:border-gray-700">
                     <div id="map" class="w-full h-full dark:brightness-90"></div>
                 </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {% translate "Click on the map to set the location" %}
-                </p>
+                <div class="flex items-start space-x-2 text-sm text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                    <i class="fas fa-info-circle text-blue-500 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <p class="font-medium text-gray-700 dark:text-gray-300">{% translate "How to set location:" %}</p>
+                        <ul class="mt-1 space-y-1 text-xs">
+                            <li>• {% translate "Click on the map to place a marker" %}</li>
+                            <li>• {% translate "Drag the marker to adjust the position" %}</li>
+                            <li>• {% translate "Or type the address below to auto-locate" %}</li>
+                        </ul>
+                    </div>
+                </div>
                 <input type="hidden" name="latitude" id="id_latitude" required>
                 <input type="hidden" name="longitude" id="id_longitude" required>
             </div>
