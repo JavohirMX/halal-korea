@@ -4,6 +4,42 @@
 {% block title %}{% translate "Submit a Place" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block extra_head %}
+<style>
+    /* Validation animations */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    @keyframes slide-down {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-shake {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    .animate-slide-down {
+        animation: slide-down 0.3s ease-out;
+    }
+    
+    /* Success state for inputs */
+    .border-green-500 {
+        border-color: #22c55e !important;
+    }
+    
+    .dark .dark\:border-green-500 {
+        border-color: #22c55e !important;
+    }
+</style>
 <script>
     // Define initMap globally
     async function initMap() {
@@ -153,7 +189,24 @@
 
     <!-- Form Container -->
     <div class="glass-card rounded-lg p-6">
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- Form-level errors -->
+        {% if form.non_field_errors %}
+        <div class="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded">
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-circle text-red-500 mt-0.5 mr-3"></i>
+                <div class="flex-1">
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-300">{% translate "Please correct the following errors:" %}</h3>
+                    <ul class="mt-2 text-sm text-red-700 dark:text-red-400 list-disc list-inside">
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-6" id="submit-place-form" novalidate>
             {% csrf_token %}
 
             <!-- Basic Information -->
@@ -164,15 +217,23 @@
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-store text-gray-400"></i>
+                            <i class="fas fa-store text-gray-400" id="place-name-icon"></i>
                         </div>
                         <input type="text" 
                                id="place-name"
                                name="name" 
                                required 
+                               minlength="2"
+                               maxlength="200"
                                placeholder="{% translate 'Enter place name' %}"
-                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
+                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
+                               aria-describedby="place-name-error">
                     </div>
+                    {% if form.name.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400" id="place-name-error">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.name.errors.0 }}
+                    </p>
+                    {% endif %}
                 </div>
 
                 <div>
@@ -181,12 +242,13 @@
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-tag text-gray-400"></i>
+                            <i class="fas fa-tag text-gray-400" id="place-category-icon"></i>
                         </div>
                         <select id="place-category"
                                 name="category" 
                                 required 
-                                class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
+                                class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
+                                aria-describedby="place-category-error">
                             <option value="">{% translate "Select a category" %}</option>
                             <option value="restaurant">{% translate "Restaurant" %}</option>
                             <option value="market">{% translate "Market" %}</option>
@@ -194,6 +256,14 @@
                             <option value="prayer_room">{% translate "Prayer Room" %}</option>
                         </select>
                     </div>
+                    {% if form.category.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400" id="place-category-error">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.category.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="text-xs text-gray-500 mt-1">
+                        {% blocktranslate %}Note: <strong>Mosque</strong> is for dedicated Islamic centers, while <strong>Prayer Room</strong> is for designated prayer spaces in other locations.{% endblocktranslate %}
+                    </p>
                 </div>
             </div>
 
@@ -207,12 +277,20 @@
                               name="description" 
                               rows="4" 
                               required 
+                              minlength="10"
+                              maxlength="500"
                               placeholder="{% translate 'Describe the place...' %}"
-                              class="block w-full p-3 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"></textarea>
-                    <div class="absolute bottom-2 right-2 text-xs text-gray-400">
-                        <span id="char-count">0</span>/500
+                              class="block w-full p-3 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
+                              aria-describedby="place-description-error"></textarea>
+                    <div class="absolute bottom-2 right-2 text-xs" id="char-count-container">
+                        <span id="char-count" class="text-gray-400">0</span><span class="text-gray-400">/500</span>
                     </div>
                 </div>
+                {% if form.description.errors %}
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400" id="place-description-error">
+                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.description.errors.0 }}
+                </p>
+                {% endif %}
             </div>
 
             <!-- Location -->
@@ -234,6 +312,13 @@
                         </ul>
                     </div>
                 </div>
+                {% if form.latitude.errors or form.longitude.errors %}
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400" id="location-error">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    {% if form.latitude.errors %}{{ form.latitude.errors.0 }}{% endif %}
+                    {% if form.longitude.errors %}{{ form.longitude.errors.0 }}{% endif %}
+                </p>
+                {% endif %}
                 <input type="hidden" name="latitude" id="id_latitude" required>
                 <input type="hidden" name="longitude" id="id_longitude" required>
             </div>
@@ -242,26 +327,31 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="place-address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {% translate "Address" %}
+                        {% translate "Address" %} <span class="text-red-500">*</span>
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-location-dot text-gray-400"></i>
+                            <i class="fas fa-location-dot text-gray-400" id="place-address-icon"></i>
                         </div>
                         <input type="text" 
                            id="place-address"
                            name="address" 
                            required 
+                           minlength="5"
                            placeholder="{% translate 'Enter address' %}"
-                           class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
-                           
+                           class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                           aria-describedby="place-address-error">
                     </div>
-                    
+                    {% if form.address.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400" id="place-address-error">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.address.errors.0 }}
+                    </p>
+                    {% endif %}
                 </div>
 
                 <div>
                     <label for="place-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {% translate "Phone Number" %}
+                        {% translate "Phone Number" %} <span class="text-gray-400 text-xs font-normal">({% translate "Optional" %})</span>
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -271,9 +361,14 @@
                             id="place-phone"
                             name="phone_number" 
                             placeholder="{% translate 'Enter phone number' %}"
-                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                            aria-describedby="place-phone-error">
                     </div>
-                    
+                    {% if form.phone_number.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400" id="place-phone-error">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.phone_number.errors.0 }}
+                    </p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -281,7 +376,7 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="place-website" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {% translate "Website" %}
+                        {% translate "Website" %} <span class="text-gray-400 text-xs font-normal">({% translate "Optional" %})</span>
                     </label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -291,8 +386,14 @@
                             id="place-website"
                             name="website"
                             placeholder="{% translate 'Enter website URL' %}" 
-                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                            aria-describedby="place-website-error">
                     </div>
+                    {% if form.website.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400" id="place-website-error">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.website.errors.0 }}
+                    </p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -391,11 +492,206 @@
     // Add a help text below category to explain the difference between mosque and prayer room
     const categorySelect = document.getElementById('place-category');
     const categoryParent = categorySelect.closest('div').parentElement;
-    
-    const helpText = document.createElement('p');
-    helpText.className = 'text-xs text-gray-500 mt-1';
-    helpText.innerHTML = "{% blocktranslate %}Note: <strong>Mosque</strong> is for dedicated Islamic centers, while <strong>Prayer Room</strong> is for designated prayer spaces in other locations.{% endblocktranslate %}";
-    categoryParent.appendChild(helpText);
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let isValid = true;
+        const errors = [];
+
+        // Clear previous error states
+        document.querySelectorAll('.border-red-500').forEach(el => {
+            el.classList.remove('border-red-500', 'dark:border-red-500');
+            el.classList.add('border-gray-300', 'dark:border-gray-600');
+        });
+        document.querySelectorAll('.text-red-500').forEach(el => {
+            if (el.tagName === 'I') {
+                el.classList.remove('text-red-500');
+                el.classList.add('text-gray-400');
+            }
+        });
+
+        // Validate place name
+        const placeName = document.getElementById('place-name');
+        if (!placeName.value.trim() || placeName.value.trim().length < 2) {
+            isValid = false;
+            errors.push('{% translate "Please enter a valid place name (at least 2 characters)"|escapejs %}');
+            markFieldAsError(placeName, 'place-name-icon');
+        }
+
+        // Validate category
+        const category = document.getElementById('place-category');
+        if (!category.value) {
+            isValid = false;
+            errors.push('{% translate "Please select a category"|escapejs %}');
+            markFieldAsError(category, 'place-category-icon');
+        }
+
+        // Validate description
+        const description = document.getElementById('place-description');
+        if (!description.value.trim() || description.value.trim().length < 10) {
+            isValid = false;
+            errors.push('{% translate "Please enter a description (at least 10 characters)"|escapejs %}');
+            markFieldAsError(description);
+        }
+
+        // Validate location
+        const lat = document.getElementById('id_latitude').value;
+        const lng = document.getElementById('id_longitude').value;
+        
+        if (!lat || !lng) {
+            isValid = false;
+            errors.push('{% translate "Please select a location on the map"|escapejs %}');
+            const mapContainer = document.getElementById('map').parentElement;
+            mapContainer.classList.add('border-red-500', 'dark:border-red-500');
+            mapContainer.classList.remove('border-gray-200', 'dark:border-gray-700');
+        }
+
+        // Validate address
+        const address = document.getElementById('place-address');
+        if (!address.value.trim() || address.value.trim().length < 5) {
+            isValid = false;
+            errors.push('{% translate "Please enter a valid address (at least 5 characters)"|escapejs %}');
+            markFieldAsError(address, 'place-address-icon');
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            
+            // Show error summary
+            showErrorSummary(errors);
+            
+            // Scroll to first error
+            const firstError = document.querySelector('.border-red-500');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            return false;
+        }
+
+        // Show loading state
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>{% translate "Submitting..."|escapejs %}';
+        }
+    });
+
+    function markFieldAsError(field, iconId = null) {
+        field.classList.add('border-red-500', 'dark:border-red-500');
+        field.classList.remove('border-gray-300', 'dark:border-gray-600');
+        
+        if (iconId) {
+            const icon = document.getElementById(iconId);
+            if (icon) {
+                icon.classList.remove('text-gray-400');
+                icon.classList.add('text-red-500');
+            }
+        }
+
+        // Add shake animation
+        field.classList.add('animate-shake');
+        setTimeout(() => field.classList.remove('animate-shake'), 500);
+    }
+
+    function showErrorSummary(errors) {
+        // Remove existing error summary if present
+        const existingError = document.getElementById('validation-error-summary');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Create error summary
+        const errorDiv = document.createElement('div');
+        errorDiv.id = 'validation-error-summary';
+        errorDiv.className = 'mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded animate-slide-down';
+        errorDiv.innerHTML = `
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-triangle text-red-500 mt-0.5 mr-3 text-lg"></i>
+                <div class="flex-1">
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+                        {% translate "Please correct the following errors:"|escapejs %}
+                    </h3>
+                    <ul class="mt-2 text-sm text-red-700 dark:text-red-400 list-disc list-inside space-y-1">
+                        ${errors.map(error => `<li>${error}</li>`).join('')}
+                    </ul>
+                </div>
+                <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+
+        const form = document.getElementById('submit-place-form');
+        form.insertBefore(errorDiv, form.firstChild);
+    }
+
+    // Real-time validation feedback
+    document.getElementById('place-name').addEventListener('blur', function() {
+        if (this.value.trim() && this.value.trim().length >= 2) {
+            this.classList.remove('border-red-500', 'dark:border-red-500');
+            this.classList.add('border-green-500', 'dark:border-green-500');
+            const icon = document.getElementById('place-name-icon');
+            if (icon) {
+                icon.classList.remove('text-gray-400', 'text-red-500');
+                icon.classList.add('text-green-500');
+            }
+        }
+    });
+
+    document.getElementById('place-category').addEventListener('change', function() {
+        if (this.value) {
+            this.classList.remove('border-red-500', 'dark:border-red-500');
+            this.classList.add('border-green-500', 'dark:border-green-500');
+            const icon = document.getElementById('place-category-icon');
+            if (icon) {
+                icon.classList.remove('text-gray-400', 'text-red-500');
+                icon.classList.add('text-green-500');
+            }
+        }
+    });
+
+    document.getElementById('place-description').addEventListener('input', function() {
+        if (this.value.trim() && this.value.trim().length >= 10) {
+            this.classList.remove('border-red-500', 'dark:border-red-500');
+            this.classList.add('border-green-500', 'dark:border-green-500');
+        }
+    });
+
+    document.getElementById('place-address').addEventListener('blur', function() {
+        if (this.value.trim() && this.value.trim().length >= 5) {
+            this.classList.remove('border-red-500', 'dark:border-red-500');
+            this.classList.add('border-green-500', 'dark:border-green-500');
+            const icon = document.getElementById('place-address-icon');
+            if (icon) {
+                icon.classList.remove('text-gray-400', 'text-red-500');
+                icon.classList.add('text-green-500');
+            }
+        }
+    });
+
+    const textarea = document.querySelector('textarea[name="description"]');
+    const charCount = document.getElementById('char-count');
+
+    textarea.addEventListener('input', function() {
+        const count = this.value.length;
+        charCount.textContent = count;
+        
+        // Reset all color classes
+        charCount.classList.remove('text-gray-400', 'text-yellow-500', 'text-red-500', 'text-green-500');
+        
+        if (count === 0) {
+            charCount.classList.add('text-gray-400');
+        } else if (count < 10) {
+            charCount.classList.add('text-yellow-500');
+        } else if (count > 450 && count <= 490) {
+            charCount.classList.add('text-yellow-500');
+        } else if (count > 490) {
+            charCount.classList.add('text-red-500');
+        } else {
+            charCount.classList.add('text-green-500');
+        }
+    });
 
     // Handle file selection through input
     photoInput.addEventListener('change', function(e) {
@@ -550,36 +846,5 @@
             updatePhotoCount();
         }, 300);
     }
-
-    // Form validation
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const lat = document.getElementById('id_latitude').value;
-        const lng = document.getElementById('id_longitude').value;
-        
-        if (!lat || !lng) {
-            e.preventDefault();
-            alert("{% translate 'Please select a location on the map'|escapejs %}");
-        }
-    });
-
-    const textarea = document.querySelector('textarea[name="description"]');
-    const charCount = document.getElementById('char-count');
-
-    textarea.addEventListener('input', function() {
-        const count = this.value.length;
-        charCount.textContent = count;
-        
-        if (count > 450) {
-            charCount.classList.add('text-yellow-500');
-        } else {
-            charCount.classList.remove('text-yellow-500');
-        }
-        
-        if (count > 500) {
-            charCount.classList.add('text-red-500');
-        } else {
-            charCount.classList.remove('text-red-500');
-        }
-    });
 </script>
 {% endblock %}
