@@ -10,20 +10,31 @@ Halal Korea is a comprehensive location-based web application designed to help M
 - **📍 Smart Place Discovery** - Automatic location detection with distance-based recommendations
 - **⭐ Community-Driven Reviews** - User-generated reviews and 5-star rating system
 - **🕌 Prayer Time Calculator** - Accurate Islamic prayer times for any location in Korea with multiple calculation methods
-- **👥 User Profile Management** - Personalized favorites, submission history, and settings
+- **👥 User Profile Management** - Personalized favorites, submission history, and settings with social login support
 - **🌍 Multi-language Support** - English, Korean, and Uzbek with persistent language preferences
 - **📱 Responsive Design** - Mobile-first approach with progressive enhancement
 - **🔧 Admin Moderation System** - Comprehensive admin tools for content approval and management
+- **📝 Blog & Content Management** - Full-featured blog system with rich text editing (TinyMCE)
+- **💬 Contact System** - Integrated contact forms with Telegram notifications and rate limiting
+- **📊 Monitoring System** - Real-time admin dashboards for performance, security, and content operations
+- **🔐 Social Authentication** - Google and GitHub OAuth integration with account merging
+- **🖼️ Image Watermarking** - Automatic watermark application to uploaded images
+- **✏️ Community Suggestions** - Users can suggest edits and upload images for existing places
 
 ### Tech Stack:
 - **Backend**: Django 5.1.6 with Python 3.12
 - **Database**: PostgreSQL with PostGIS extension for geospatial queries
 - **Frontend**: HTML5, Tailwind CSS 3.x, Alpine.js, Vanilla JavaScript
 - **Maps**: Google Maps JavaScript API with custom markers
-- **Rich Text**: TinyMCE for blog content editing
-- **Deployment**: Docker + Gunicorn with Nginx
+- **Rich Text**: TinyMCE 4.1.0 for blog content editing
+- **Authentication**: Django AllAuth 0.57.0 (Google & GitHub OAuth)
+- **Translation**: Django Rosetta 0.10.2 for web-based translation management
+- **Image Processing**: Pillow 11.3.0 with custom watermarking
+- **Error Tracking**: Sentry SDK 1.40.0 for production monitoring
+- **Deployment**: Docker + Gunicorn 23.0.0 with Nginx
 - **Caching**: Django Local Memory Cache (Redis ready)
 - **Logging**: Comprehensive multi-level logging with file rotation
+- **Notifications**: Telegram Bot API for admin notifications
 
 ### Architectural Style:
 **Monolithic Django MVC Architecture** with:
@@ -31,8 +42,11 @@ Halal Korea is a comprehensive location-based web application designed to help M
 - **PostGIS spatial database** for geographic queries
 - **RESTful API endpoints** for AJAX interactions
 - **Template-based server-side rendering** with progressive enhancement
-- **Comprehensive logging system** with structured log files
+- **Comprehensive logging system** with structured log files and security event tracking
 - **Environment-based configuration** using python-decouple
+- **Real-time monitoring** with custom middleware for request tracking and performance metrics
+- **Social authentication** integrated with existing user system via AllAuth adapters
+- **Image processing pipeline** with automatic watermarking for user uploads
 
 ## Coding Guidelines
 

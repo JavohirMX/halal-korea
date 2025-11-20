@@ -11,13 +11,13 @@
 
 - [🎯 Overview](#-overview)
 - [✨ Features](#-features)
-- [🏗️ Architecture](#️-architecture)
+- [🏗️ Architecture](#-architecture)
 - [🚀 Quick Start](#-quick-start)
-- [⚙️ Installation](#️-installation)
+- [⚙️ Installation](#-installation)
 - [🐳 Docker Deployment](#-docker-deployment)
 - [🌍 Environment Configuration](#-environment-configuration)
 - [📱 Apps & Modules](#-apps--modules)
-- [🗄️ Database Schema](#️-database-schema)
+- [🗄️ Database Schema](#-database-schema)
 - [🔧 Management Commands](#-management-commands)
 - [📊 Logging System](#-logging-system)
 - [💾 Backup System](#-backup-system)
@@ -43,6 +43,12 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **👥 User Profiles** - Personalized favorites and submission history
 - **🌍 Multi-language** - Support for English, Korean, and Uzbek languages
 - **📱 Responsive Design** - Mobile-first design with Tailwind CSS
+- **📝 Blog System** - Full-featured blog with rich text editing and categories
+- **💬 Contact Forms** - Integrated contact system with Telegram notifications
+- **🔐 Social Login** - Google and GitHub OAuth integration
+- **🖼️ Image Watermarking** - Automatic branding for uploaded images
+- **📊 Admin Monitoring** - Real-time dashboards for performance and security
+- **✏️ Community Suggestions** - Edit and image suggestions for existing places
 
 ## ✨ Features
 
@@ -53,14 +59,21 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **Rich Information**: Photos, contact details, map links (Google, Kakao, Naver)
 - **Geographic Search**: PostGIS-powered location queries
 - **Filtering & Sorting**: By category, distance, rating
+- **Community Suggestions**: Users can suggest edits to existing place information
+- **Image Contributions**: Users can upload additional images for places
+- **Watermarked Images**: Automatic watermark application to protect content
 
 ### 👤 User Experience
 
 - **Authentication**: Custom user model with enhanced profiles
+- **Social Login**: Google and GitHub OAuth integration
+- **Account Merging**: Automatic merging of social accounts by email
+- **Profile Pictures**: Support for uploaded and social provider avatars
 - **Favorites**: Save and organize preferred places
 - **Reviews**: Rate and review visited places (1-5 stars)
 - **Submissions**: Submit new places for community verification
-- **Language Preferences**: Persistent language selection
+- **Language Preferences**: Persistent language selection (EN/KO/UZ)
+- **Contribution Tracking**: View personal submission and suggestion history
 
 ### 🕰️ Prayer Times
 
@@ -75,14 +88,50 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **User Management**: Comprehensive user administration
 - **Analytics**: Built-in Django admin with custom logging
 - **Backup System**: Automated database backups with Telegram notifications
+- **Monitoring Dashboards**: 5 real-time dashboards for system health
+  - Main monitoring dashboard with key metrics
+  - Performance monitoring (slow queries, response times)
+  - Security dashboard (failed logins, suspicious activity)
+  - Content operations (pending submissions, moderation queue)
+  - Analytics dashboard (user engagement, popular content)
+- **Suggestion Management**: Review and approve community edits and images
+- **Blog Management**: Full CMS with TinyMCE rich text editor
+- **Translation Management**: Rosetta web interface for i18n strings
 
 ### 💬 Contact System
 
 - **Contact Form**: Integrated contact forms on home and about pages
+- **AJAX Submission**: Smooth form submission without page reload
 - **Telegram Integration**: Instant notifications for new contact messages
-- **Rate Limiting**: Spam protection with IP and user-based limits
+- **Rate Limiting**: Spam protection with IP and user-based limits (3-5 per hour)
 - **Admin Management**: Full contact message management in admin panel
 - **Universal Access**: Available to both authenticated and anonymous users
+- **Message Tracking**: Read status and response tracking
+
+### 📝 Blog & Content Management
+
+- **Rich Text Editor**: TinyMCE integration with image uploads
+- **Content Organization**: Categories and tags for organizing posts
+- **Publishing Workflow**: Draft → Published → Archived states
+- **Multi-language Support**: Per-post language selection
+- **Featured Images**: Eye-catching images for blog posts
+- **Related Places**: Link blog posts to halal places
+- **SEO Optimization**: Automatic slug generation and meta descriptions
+- **Author Attribution**: Track post authors and publication dates
+
+### 📊 Admin Monitoring System
+
+- **Real-time Dashboards**: 5 comprehensive monitoring dashboards
+  - Main Dashboard: Overview of key system metrics
+  - Performance Dashboard: Slow queries, response times, throughput
+  - Security Dashboard: Failed logins, suspicious activity, authentication events
+  - Content Operations: Pending submissions, moderation queue
+  - Analytics Dashboard: User engagement, popular content, trends
+- **Request Logging**: Sampled request tracking with performance data
+- **Admin Actions Audit**: Complete audit trail of all admin operations
+- **Security Event Tracking**: Log authentication failures and suspicious activity
+- **Alert System**: Configurable alerts via Telegram and email
+- **Data Retention**: Automatic cleanup of old monitoring data
 
 ## 🏗️ Architecture
 
@@ -90,12 +139,18 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 
 - **Framework**: Django 5.1.6 with Python 3.12
 - **Database**: PostgreSQL with PostGIS extension
-- **Caching**: Django session-based caching
-- **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript
+- **Caching**: Django session-based caching (Redis-ready)
+- **Frontend**: HTML5, Tailwind CSS, Alpine.js, Vanilla JavaScript
 - **Maps**: Google Maps JavaScript API
-- **Deployment**: Docker + Gunicorn
+- **Rich Text**: TinyMCE 4.1.0 for blog editing
+- **Authentication**: Django AllAuth 0.57.0 (Google & GitHub OAuth)
+- **Image Processing**: Pillow 11.3.0 with watermarking
+- **Translation**: Django Rosetta 0.10.2 for i18n management
+- **Error Tracking**: Sentry SDK 1.40.0 for production monitoring
+- **Deployment**: Docker + Gunicorn 23.0.0
 - **Task Queue**: Django management commands
-- **Monitoring**: Comprehensive logging system
+- **Monitoring**: Custom middleware with request/performance tracking
+- **Notifications**: Telegram Bot API integration
 
 ### Project Structure
 
@@ -127,9 +182,23 @@ halal-korea/
 │   ├── views.py          # AJAX form submission
 │   ├── rate_limiting.py  # Spam protection utilities
 │   └── templates/        # Contact form templates
-├── utils/                # Shared utilities and helpers
+├── blog/                 # Blog and content management
+│   ├── models.py         # BlogPost, Category, Tag models
+│   ├── views.py          # Blog views and article display
+│   ├── upload_views.py   # TinyMCE image upload handler
+│   └── templates/        # Blog templates
+├── contact/              # Contact form system
+│   ├── models.py         # ContactMessage model
+│   ├── views.py          # AJAX form submission
+│   ├── rate_limiting.py  # Spam protection utilities
+│   └── templates/        # Contact form templates
+├── utils/                # Shared utilities and monitoring
 │   ├── location_manager.py  # Location detection and management
 │   ├── logging_utils.py     # Custom logging utilities
+│   ├── watermark.py         # Image watermarking utilities
+│   ├── models.py            # Monitoring models (SystemMetric, RequestLog, etc.)
+│   ├── admin_views.py       # Monitoring dashboard views
+│   ├── monitoring_middleware.py  # Request tracking middleware
 │   └── management/          # Custom Django commands
 ├── static/               # Static assets (CSS, JS, images)
 ├── media/                # User-uploaded content
@@ -329,8 +398,23 @@ services:
 | `ALLOWED_HOSTS` | Comma-separated list of allowed hosts | `localhost,127.0.0.1` |
 | `CSRF_TRUSTED_ORIGINS` | Trusted origins for CSRF | `https://yourdomain.com` |
 | `PRAYER_TIMES_API_BASE_URL` | Base URL for prayer times API | `https://api.aladhan.com` |
-| `TELEGRAM_BOT_TOKEN` | Telegram bot token for backups | N/A |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token for backups/notifications | N/A |
 | `TELEGRAM_CHAT_ID` | Telegram chat ID for notifications | N/A |
+| `TELEGRAM_NOTIFICATIONS_ENABLED` | Enable Telegram notifications | `False` |
+| `GOOGLE_OAUTH_CLIENT_ID` | Google OAuth client ID | N/A |
+| `GOOGLE_OAUTH_CLIENT_SECRET` | Google OAuth client secret | N/A |
+| `GITHUB_CLIENT_ID` | GitHub OAuth client ID | N/A |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth client secret | N/A |
+| `SENTRY_DSN` | Sentry DSN for error tracking | N/A |
+| `SENTRY_ENVIRONMENT` | Sentry environment name | `production` |
+| `SENTRY_TRACES_SAMPLE_RATE` | Sentry traces sample rate | `0.1` |
+| `MONITORING_ENABLED` | Enable monitoring system | `True` |
+| `MONITORING_SAMPLE_RATE` | Request sampling rate | `0.01` |
+| `MONITORING_SLOW_THRESHOLD_MS` | Slow query threshold | `1000` |
+| `WATERMARK_ENABLED` | Enable image watermarking | `True` |
+| `WATERMARK_OPACITY` | Watermark opacity (0.0-1.0) | `0.25` |
+| `EMAIL_BACKEND` | Email backend class | Console in dev |
+| `EMAIL_HOST` | SMTP server host | `smtp.gmail.com` |
 
 ## 📱 Apps & Modules
 
@@ -338,19 +422,23 @@ services:
 
 **Core functionality for halal place management**
 
-- **Models**: `HalalPlace` with PostGIS Point field
+- **Models**: `HalalPlace`, `PlaceEditSuggestion`, `PlaceImageSuggestion` with PostGIS Point field
 - **Categories**: Restaurant, Market, Mosque, Prayer Room
 - **Status Workflow**: Pending → Approved/Rejected/Archived
 - **Features**: Photo uploads, multiple map links, GPS coordinates
+- **Community Features**: Users can suggest edits and upload additional images
 
 ### Users App (`users/`)
 
 **Authentication and user profile management**
 
-- **Custom User Model**: Extended Django user with favorites
+- **Custom User Model**: Extended Django user with favorites, social auth support
 - **Language Preferences**: Per-user language settings
-- **Profile Management**: Edit profile, manage submissions
+- **Profile Management**: Edit profile, manage submissions, profile pictures
 - **Authentication Views**: Login, register, logout with custom templates
+- **Social Login**: Google and GitHub OAuth integration
+- **Account Merging**: Automatic merging of social accounts by email
+- **Profile Pictures**: Support for uploaded and social provider avatars
 
 ### Reviews App (`reviews/`)
 
@@ -376,8 +464,33 @@ services:
 
 - **Location Manager**: IP-based location detection
 - **Logging Utilities**: Custom logging decorators and helpers
+- **Watermarking**: Automatic watermark application to uploaded images
+- **Monitoring Models**: SystemMetric, RequestLog, AdminAction, SecurityEvent
+- **Admin Dashboards**: 5 comprehensive monitoring dashboards
+- **Middleware**: Request tracking, performance monitoring, cache statistics
 - **Context Processors**: Global template context variables
 - **Management Commands**: Custom Django commands for maintenance
+
+### Blog App (`blog/`)
+
+**Content management system**
+
+- **Models**: BlogPost, Category, Tag, RelatedPlace
+- **Rich Text Editing**: TinyMCE integration with image uploads
+- **Publishing Workflow**: Draft → Published → Archived
+- **Multi-language**: Per-post language selection
+- **Features**: Featured images, excerpts, slug generation
+- **Related Content**: Link blog posts to halal places
+
+### Contact App (`contact/`)
+
+**Contact form system**
+
+- **Models**: ContactMessage with user tracking
+- **AJAX Submission**: Smooth form submission without page reload
+- **Rate Limiting**: IP and user-based spam protection
+- **Telegram Integration**: Instant notifications for new messages
+- **Admin Management**: Full contact message management in admin panel
 
 ## 🗄️ Database Schema
 
@@ -404,14 +517,54 @@ class HalalPlace(models.Model):
     updated_at = DateTimeField(auto_now=True)
 ```
 
+#### PlaceEditSuggestion Model
+
+```python
+class PlaceEditSuggestion(models.Model):
+    place = ForeignKey(HalalPlace)
+    suggested_by = ForeignKey(User)
+    field_name = CharField(max_length=50, choices=EDITABLE_FIELDS)
+    current_value = TextField()
+    suggested_value = TextField()
+    reason = TextField()
+    status = CharField(choices=['pending', 'approved', 'rejected'])
+    created_at = DateTimeField(auto_now_add=True)
+    reviewed_by = ForeignKey(User, optional)
+    reviewed_at = DateTimeField(optional)
+    admin_notes = TextField(optional)
+```
+
+#### PlaceImageSuggestion Model
+
+```python
+class PlaceImageSuggestion(models.Model):
+    place = ForeignKey(HalalPlace)
+    suggested_by = ForeignKey(User)
+    original_image = ImageField(upload_to='place_suggestions/originals/')
+    image = ImageField(upload_to='place_suggestions/')  # Watermarked
+    caption = CharField(max_length=255, optional)
+    status = CharField(choices=['pending', 'approved', 'rejected'])
+    created_at = DateTimeField(auto_now_add=True)
+    reviewed_by = ForeignKey(User, optional)
+    reviewed_at = DateTimeField(optional)
+```
+
 #### User Model
 
 ```python
 class User(AbstractUser):
     favorite_places = ManyToManyField(HalalPlace)
     preferred_language = CharField(choices=LANGUAGE_CHOICES)
+    email_verified = BooleanField(default=False)
+    profile_picture = ImageField(upload_to='users/profile_pictures/', optional)
+    social_avatar_url = URLField(optional)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
+    
+    @property
+    def avatar_url(self):
+        """Returns profile picture or social avatar URL"""
+        return self.profile_picture.url if self.profile_picture else self.social_avatar_url
 ```
 
 #### Review Model
@@ -441,13 +594,102 @@ class PrayerTimeCache(models.Model):
     last_updated = DateTimeField(auto_now=True)
 ```
 
+#### BlogPost Model
+
+```python
+class BlogPost(models.Model):
+    title = CharField(max_length=200)
+    slug = SlugField(unique=True)
+    author = ForeignKey(User)
+    excerpt = TextField(max_length=500)
+    content = HTMLField()  # TinyMCE rich text
+    featured_image = ImageField(upload_to='blog/featured_images/', optional)
+    category = ForeignKey(Category)
+    tags = ManyToManyField(Tag)
+    status = CharField(choices=['draft', 'published', 'archived'])
+    language = CharField(choices=LANGUAGE_CHOICES)
+    published_at = DateTimeField(optional)
+    created_at = DateTimeField(auto_now_add=True)
+    updated_at = DateTimeField(auto_now=True)
+```
+
+#### ContactMessage Model
+
+```python
+class ContactMessage(models.Model):
+    user = ForeignKey(User, optional)
+    name = CharField(max_length=100)
+    email = EmailField()
+    subject = CharField(max_length=200, optional)
+    message = TextField()
+    ip_address = GenericIPAddressField()
+    user_agent = TextField()
+    created_at = DateTimeField(auto_now_add=True)
+    is_read = BooleanField(default=False)
+    responded_at = DateTimeField(optional)
+```
+
+#### Monitoring Models
+
+```python
+class SystemMetric(models.Model):
+    """Aggregate metrics by hour/day for system monitoring"""
+    timestamp = DateTimeField()
+    metric_type = CharField(choices=['hourly', 'daily'])
+    metric_name = CharField(max_length=100)
+    value = FloatField()
+    metadata = JSONField(optional)
+
+class RequestLog(models.Model):
+    """Sampled request tracking with performance data"""
+    path = CharField(max_length=500)
+    method = CharField(max_length=10)
+    status_code = IntegerField()
+    response_time_ms = FloatField()
+    ip_hash = CharField(max_length=64)
+    user_agent_hash = CharField(max_length=64)
+    timestamp = DateTimeField(auto_now_add=True)
+    user = ForeignKey(User, optional)
+
+class AdminAction(models.Model):
+    """Audit trail for admin operations"""
+    admin_user = ForeignKey(User)
+    action_type = CharField(choices=ACTION_TYPE_CHOICES)
+    content_type = ForeignKey(ContentType)
+    object_id = PositiveIntegerField()
+    object_repr = CharField(max_length=200)
+    changes = JSONField()
+    timestamp = DateTimeField(auto_now_add=True)
+    ip_hash = CharField(max_length=64)
+
+class SecurityEvent(models.Model):
+    """Security incidents and suspicious activity tracking"""
+    event_type = CharField(choices=EVENT_TYPE_CHOICES)
+    severity = CharField(choices=['low', 'medium', 'high', 'critical'])
+    description = TextField()
+    ip_hash = CharField(max_length=64)
+    user = ForeignKey(User, optional)
+    metadata = JSONField()
+    timestamp = DateTimeField(auto_now_add=True)
+```
+
 ### Relationships
 
 - **Users** can submit multiple **Places**
 - **Users** can favorite multiple **Places**
 - **Users** can write one **Review** per **Place**
+- **Users** can suggest edits via **PlaceEditSuggestion**
+- **Users** can upload images via **PlaceImageSuggestion**
+- **Users** can author multiple **BlogPosts**
 - **Places** can have multiple **Reviews**
+- **Places** can have multiple **PlaceEditSuggestions**
+- **Places** can have multiple **PlaceImageSuggestions**
+- **BlogPosts** can be linked to multiple **Places** via **RelatedPlace**
+- **BlogPosts** belong to one **Category** and can have multiple **Tags**
 - **Prayer Times** are cached per location and calculation method
+- **ContactMessages** can be linked to **Users** (optional)
+- **AdminActions** track all admin operations on content
+- **SecurityEvents** log authentication and security-related events
 
 ## 🔧 Management Commands
 
@@ -474,6 +716,20 @@ python manage.py create_test_data
 
 # Create specific number of test places
 python manage.py create_test_data --count 50
+```
+
+#### Image Watermarking Test
+
+```bash
+# Test watermark application
+python manage.py test_watermark path/to/image.jpg
+```
+
+#### Monitoring System Cleanup
+
+```bash
+# Clean old monitoring data
+python manage.py cleanup_monitoring --days 30
 ```
 
 #### Logging Test
@@ -594,11 +850,9 @@ python manage.py backup_database --local-only
 0 2 * * * cd /path/to/halal-korea && python manage.py backup_database
 ```
 
-## 🌐 API Endpoints
+### API Endpoints
 
-### Places API
-
-#### Get Places JSON
+#### Get Places JSON API
 
 ```http
 GET /api/places/?category=restaurant&lat=37.5665&lng=126.9780&radius=5000
@@ -636,12 +890,10 @@ GET /api/places/?category=restaurant&lat=37.5665&lng=126.9780&radius=5000
 }
 ```
 
-### Prayer Times API
-
-#### Get Prayer Times
+#### Prayer Times API
 
 ```http
-POST /prayer/get-times/
+POST /prayer/get-prayer-times/
 Content-Type: application/json
 
 {
@@ -674,9 +926,7 @@ Content-Type: application/json
 }
 ```
 
-### Location API
-
-#### Update User Location
+#### Location API
 
 ```http
 POST /set-location/
@@ -690,30 +940,41 @@ Content-Type: application/json
 }
 ```
 
+#### Monitoring API Endpoints (Admin Only)
+
+```http
+GET /admin/monitoring/api/metrics/?type=request_count&hours=24
+GET /admin/monitoring/api/stats/?period=today
+GET /admin/monitoring/api/performance/?days=7
+```
+
 ## 🎨 Frontend & UI
 
 ### Design System
 
 - **Framework**: Tailwind CSS for utility-first styling
 - **Color Scheme**: Green primary (#22c55e) with semantic color usage
-- **Typography**: System font stack with optimal readability
+- **Typography**: Ubuntu font family with system fallbacks
 - **Layout**: Mobile-first responsive design
 - **Components**: Reusable UI components with consistent styling
+- **Dark Mode**: Full dark mode support with automatic theme switching
 
 ### Key UI Components
 
 #### Navigation
 
 - Responsive navbar with language selector
-- Mobile hamburger menu
+- Mobile hamburger menu with smooth animations
 - User authentication status indicators
+- Admin dashboard links for staff users
 
 #### Place Cards
 
-- Image carousel with lazy loading
+- Image carousel with Swiper.js integration
 - Rating display with star icons
 - Distance calculation and display
-- Quick action buttons (favorite, directions)
+- Quick action buttons (favorite, directions, suggest edit)
+- Lazy loading for performance
 
 #### Map Integration
 
@@ -721,21 +982,28 @@ Content-Type: application/json
 - Category-specific marker icons
 - Info windows with place previews
 - Real-time location detection
+- Clustering for dense areas
 
 #### Forms
 
 - Multi-step place submission form
-- Client-side validation
-- Image upload with preview
+- Client-side validation with error messages
+- Image upload with preview and watermarking
 - Geographic coordinate picker
+- AJAX form submissions with loading states
 
 ### JavaScript Features
 
 - **Progressive Enhancement**: Works without JavaScript
-- **AJAX Forms**: Smooth form submissions
-- **Real-time Search**: Instant place filtering
-- **Location Services**: Browser geolocation API
-- **Map Interactions**: Custom Google Maps integration
+- **AJAX Forms**: Smooth form submissions with fetch API
+- **Real-time Search**: Instant place filtering and search
+- **Location Services**: Browser geolocation API integration
+- **Map Interactions**: Custom Google Maps JavaScript API integration
+- **Alpine.js**: Lightweight reactivity for interactive components
+- **Swiper.js**: Touch-enabled image carousels
+- **Toastify**: Non-intrusive notification system
+- **Dark Mode Toggle**: Persistent theme preferences
+- **Infinite Scroll**: Pagination without page reloads (where applicable)
 
 ### Accessibility
 
@@ -810,6 +1078,15 @@ locale/
 - **Session Security**: Secure session configuration
 - **CSRF Protection**: Cross-site request forgery protection
 - **Permission System**: Django's built-in permission framework
+- **Email Verification**: Required for content submissions
+- **Social Authentication**: OAuth2 with Google and GitHub
+- **Account Merging**: Secure merging of social accounts by email
+- **Rate Limiting**: Protection against brute force attacks
+  - Login attempts: IP and user-based limits
+  - Registration: IP-based limits (3 per hour)
+  - Password reset: IP and email-based limits
+  - Contact form: IP and user-based limits (3-5 per hour)
+  - Social auth: Request-based rate limiting
 
 ### Data Protection
 
@@ -818,6 +1095,9 @@ locale/
 - **XSS Protection**: Template auto-escaping and CSP headers
 - **File Upload Security**: Validated file types and size limits
 - **Environment Variables**: Sensitive data in environment variables
+- **Password Hashing**: PBKDF2 algorithm with SHA256
+- **IP Hashing**: Privacy-preserving IP address hashing for logs
+- **User Agent Hashing**: Hashed user agent strings in logs
 
 ### Security Headers
 
@@ -830,17 +1110,29 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ```
 
 ### Security Logging
 
-All security-related events are logged to `logs/security.log`:
+All security-related events are logged to `logs/security.log` in JSON format:
 
-- User authentication attempts
+- User authentication attempts (success/failure)
 - Permission denials
 - Suspicious activity patterns
-- Admin actions
+- Admin actions (create, update, delete, approve)
 - Failed form submissions
+- Rate limit violations
+- Social authentication events
+- Account merging operations
+
+### Monitoring & Alerts
+
+- **Real-time Security Dashboard**: Monitor authentication failures and suspicious activity
+- **Automated Alerts**: Email and Telegram notifications for critical security events
+- **Audit Trail**: Complete history of admin actions with before/after values
+- **Security Event Tracking**: Categorized by severity (low, medium, high, critical)
+- **IP-based Tracking**: Hashed IP addresses for privacy-preserving security monitoring
 
 ## 📈 Performance
 
@@ -1004,9 +1296,25 @@ class PlaceTestCase(TestCase):
 
 ### Documentation
 
-- **Technical Docs**: `/readme/` directory contains detailed technical documentation
+- **Technical Docs**: `/readme/` directory contains detailed technical documentation:
+  - `BACKUP_SYSTEM.md` - Automated database backup system with Telegram integration
+  - `BLOG_IMPLEMENTATION.md` - Blog system architecture and features
+  - `CONTACT_FORM.md` - Contact form implementation and rate limiting
+  - `EXTERNAL_LOGIN_IMPLEMENTATION.md` - Social authentication setup and configuration
+  - `EXTERNAL_LOGIN_SETUP.md` - Step-by-step OAuth setup guide
+  - `LOGGING_SYSTEM.md` - Comprehensive logging system documentation
+  - `MONITORING_SYSTEM.md` - Admin monitoring dashboards and features
+  - `MONITORING_FEATURES_IMPLEMENTED.md` - Detailed monitoring implementation
+  - `MONITORING_IMPLEMENTATION_SUMMARY.md` - Quick reference for monitoring
+  - `PAGES_OVERVIEW.md` - Complete list of all pages and endpoints
+  - `PASSWORD_RESET_IMPLEMENTATION.md` - Password reset flow documentation
+  - `TELEGRAM_NOTIFICATIONS.md` - Telegram bot integration guide
+  - `TESTING.md` - Testing guidelines and test coverage
+  - `TRANSLATION_GUIDELINES.md` - i18n and localization best practices
+  - `WATERMARK_FEATURE.md` - Image watermarking system documentation
 - **API Documentation**: Available in this README
 - **Deployment Guides**: Docker and production deployment instructions
+- **PROJECT_CONTEXT.md**: Comprehensive project context and coding guidelines
 
 ### Community
 
