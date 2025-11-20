@@ -507,11 +507,9 @@
             </div>
             {% endif %}
 
-            <!-- Map for mobile view -->
-            <div class="lg:hidden">
-                <div class="glass-card rounded-lg overflow-hidden">
-                    <div id="map-mobile" class="h-64 w-full dark:brightness-90"></div>
-                </div>
+            <!-- Map (responsive - single instance, shown on mobile/tablet, hidden on desktop) -->
+            <div class="lg:hidden glass-card rounded-lg overflow-hidden">
+                <div id="map" class="h-64 w-full dark:brightness-90"></div>
             </div>
 
             <!-- Reviews Section -->
@@ -674,10 +672,12 @@
             </div>
         </div>
 
-        <!-- Right Column: Map (desktop only) -->
+        <!-- Right Column: Sticky sidebar on desktop -->
         <div class="hidden lg:block lg:col-span-1">
-            <div class="glass-card rounded-lg overflow-hidden">
-                <div id="map-desktop" class="h-64 w-full dark:brightness-90"></div>
+            <div class="sticky top-4">
+                <div class="glass-card rounded-lg overflow-hidden">
+                    <div id="map-sidebar" class="h-96 w-full dark:brightness-90"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -693,72 +693,100 @@
         },
     });
 
-    // Initialize Google Map
-    async function initMap() {
+    // Initialize Google Map (responsive with viewport change handling)
+    let sidebarMapInstance = null;
+    let inlineMapInstance = null;
+    let mapsLibraryLoaded = false;
+    let GoogleMap, GoogleMarker;
+
+    async function initMaps() {
         const location = { lat: {{ place.location.y|unlocalize }}, lng: {{ place.location.x|unlocalize }} };
-        const { Map } = await google.maps.importLibrary("maps")
-        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+        
+        // Load Google Maps libraries once
+        if (!mapsLibraryLoaded) {
+            GoogleMap = (await google.maps.importLibrary("maps")).Map;
+            GoogleMarker = (await google.maps.importLibrary("marker")).AdvancedMarkerElement;
+            mapsLibraryLoaded = true;
+        }
 
-        // Initialize desktop map
-        const desktopMap = new Map(document.getElementById("map-desktop"), {
-            zoom: 15,
-            center: location,
-            mapId: '{{ STATIC_INFO.google_maps_id }}',
-            colorScheme: getMapColorScheme(),
-        });
+        const infoWindowContent = `
+            <div style="padding: 12px; margin: -12px 0 0 -12px;">
+                <p style="font-size:18px; font-weight:700; color:#111;" class="font-bold">{{ place.name }}</p>
+                <p style="font-size:14px; color:#4B5563;" class="text-sm">{{ place.address }}</p>
+            </div>
+        `;
 
-        const desktopMarker = new AdvancedMarkerElement({
-            map: desktopMap,
-            position: location,
-            title: '{{ place.name }}'
-        });
+        const isDesktop = window.innerWidth >= 1024; // lg breakpoint
 
-        const desktopInfowindow = new google.maps.InfoWindow({
-            content: `
-                <div style="padding: 12px; margin: -12px 0 0 -12px;">
-                    <p style="font-size:18px; font-weight:700; color:#111;" class="font-bold">{{ place.name }}</p>
-                    <p style="font-size:14px; color:#4B5563;" class="text-sm">{{ place.address }}</p>
-                </div>
-            `,
-            headerDisabled: true,
-        });
+        // Initialize sidebar map on desktop (if not already initialized)
+        if (isDesktop) {
+            const sidebarMapElement = document.getElementById("map-sidebar");
+            if (sidebarMapElement && !sidebarMapInstance) {
+                sidebarMapInstance = new GoogleMap(sidebarMapElement, {
+                    zoom: 15,
+                    center: location,
+                    mapId: '{{ STATIC_INFO.google_maps_id }}',
+                    colorScheme: getMapColorScheme(),
+                });
 
-        desktopMarker.addListener('gmp-click', () => {
-            desktopInfowindow.open(desktopMap, desktopMarker);
-        });
+                const sidebarMarker = new GoogleMarker({
+                    map: sidebarMapInstance,
+                    position: location,
+                    title: '{{ place.name }}'
+                });
 
-        // Initialize mobile map
-        const mobileMap = new Map(document.getElementById("map-mobile"), {
-            zoom: 15,
-            center: location,
-            mapId: '{{ STATIC_INFO.google_maps_id }}',
-            colorScheme: getMapColorScheme(),
-        });
+                const sidebarInfowindow = new google.maps.InfoWindow({
+                    content: infoWindowContent,
+                    headerDisabled: true,
+                });
 
-        const mobileMarker = new AdvancedMarkerElement({
-            map: mobileMap,
-            position: location,
-            title: '{{ place.name }}'
-        });
+                sidebarMarker.addListener('gmp-click', () => {
+                    sidebarInfowindow.open(sidebarMapInstance, sidebarMarker);
+                });
+            }
+        }
 
-        const mobileInfowindow = new google.maps.InfoWindow({
-            content: `
-                <div style="padding: 12px; margin: -12px 0 0 -12px;">
-                    <p style="font-size:18px; font-weight:700; color:#111;" class="font-bold">{{ place.name }}</p>
-                    <p style="font-size:14px; color:#4B5563;" class="text-sm">{{ place.address }}</p>
-                </div>
-            `,
-            headerDisabled: true,
-        });
+        // Initialize inline map on mobile/tablet (if not already initialized)
+        if (!isDesktop) {
+            const inlineMapElement = document.getElementById("map");
+            if (inlineMapElement && !inlineMapInstance) {
+                inlineMapInstance = new GoogleMap(inlineMapElement, {
+                    zoom: 15,
+                    center: location,
+                    mapId: '{{ STATIC_INFO.google_maps_id }}',
+                    colorScheme: getMapColorScheme(),
+                });
 
-        mobileMarker.addListener('gmp-click', () => {
-            mobileInfowindow.open(mobileMap, mobileMarker);
-        });
+                const inlineMarker = new GoogleMarker({
+                    map: inlineMapInstance,
+                    position: location,
+                    title: '{{ place.name }}'
+                });
+
+                const inlineInfowindow = new google.maps.InfoWindow({
+                    content: infoWindowContent,
+                    headerDisabled: true,
+                });
+
+                inlineMarker.addListener('gmp-click', () => {
+                    inlineInfowindow.open(inlineMapInstance, inlineMarker);
+                });
+            }
+        }
     }
 
-    // Call initMap when the page loads
+    // Call initMaps when the page loads
     document.addEventListener('DOMContentLoaded', function() {
-        initMap();
+        initMaps();
+    });
+
+    // Handle viewport resize (debounced to avoid excessive calls)
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            initMaps();
+        }, 250);
     });
 
     // Star rating interaction
