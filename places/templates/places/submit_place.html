@@ -275,15 +275,21 @@
                 <div class="relative mt-1">
                     <textarea id="place-description"
                               name="description" 
-                              rows="4" 
+                              rows="5" 
                               required 
                               minlength="10"
                               maxlength="500"
                               placeholder="{% translate 'Describe the place...' %}"
-                              class="block w-full p-3 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
+                              class="block w-full px-3 py-2.5 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out resize-none"
+                              style="padding-bottom: 2rem;"
                               aria-describedby="place-description-error"></textarea>
-                    <div class="absolute bottom-2 right-2 text-xs" id="char-count-container">
-                        <span id="char-count" class="text-gray-400">0</span><span class="text-gray-400">/500</span>
+                    <!-- Character counter with better positioning -->
+                    <div class="absolute bottom-2.5 right-3 flex items-center gap-2 pointer-events-none">
+                        <div class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-2 py-0.5 rounded text-xs font-medium" id="char-count-container">
+                            <span id="char-count" class="text-gray-400">0</span>
+                            <span class="text-gray-400">/</span>
+                            <span class="text-gray-400">500</span>
+                        </div>
                     </div>
                 </div>
                 {% if form.description.errors %}
@@ -291,6 +297,10 @@
                     <i class="fas fa-exclamation-circle mr-1"></i>{{ form.description.errors.0 }}
                 </p>
                 {% endif %}
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-lightbulb mr-1"></i>
+                    {% translate "Tip: Mention cuisine type, halal certification, special features, or operating hours" %}
+                </p>
             </div>
 
             <!-- Location -->
@@ -361,7 +371,7 @@
                             id="place-phone"
                             name="phone_number" 
                             placeholder="{% translate 'Enter phone number' %}"
-                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
                             aria-describedby="place-phone-error">
                     </div>
                     {% if form.phone_number.errors %}
@@ -369,6 +379,10 @@
                         <i class="fas fa-exclamation-circle mr-1"></i>{{ form.phone_number.errors.0 }}
                     </p>
                     {% endif %}
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        {% translate "Include country code for international numbers (e.g., +82 for Korea)" %}
+                    </p>
                 </div>
             </div>
 
@@ -386,7 +400,7 @@
                             id="place-website"
                             name="website"
                             placeholder="{% translate 'Enter website URL' %}" 
-                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500"
+                            class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out"
                             aria-describedby="place-website-error">
                     </div>
                     {% if form.website.errors %}
@@ -394,12 +408,22 @@
                         <i class="fas fa-exclamation-circle mr-1"></i>{{ form.website.errors.0 }}
                     </p>
                     {% endif %}
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        {% translate "Full URL including https:// (e.g., https://example.com)" %}
+                    </p>
                 </div>
             </div>
 
             <!-- Map Links -->
             <div class="space-y-4">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Additional Map Links" %}</h3>
+                <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">{% translate "Additional Map Links" %}</h3>
+                    <span class="text-xs text-gray-400">({% translate "Optional" %})</span>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {% translate "Korean users often prefer local map services. Adding these links improves accessibility." %}
+                </p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Naver Maps -->
                     <div>
@@ -414,7 +438,7 @@
                                id="place-naver-map"
                                name="naver_map_link"
                                placeholder="{% translate 'Enter Naver Maps link' %}" 
-                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
                         </div>
                     </div>
 
@@ -431,7 +455,7 @@
                                id="place-kakao-map"
                                name="kakao_map_link"
                                placeholder="{% translate 'Enter Kakao Maps link' %}" 
-                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                               class="pl-10 block w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out">
                         </div>
                     </div>
                 </div>
