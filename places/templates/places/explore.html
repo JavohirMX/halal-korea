@@ -91,17 +91,17 @@
         }
         #map-container[data-mobile-view="map"] {
             display: block;
-            height: calc(100vh - 250px);
+            height: calc(100vh - 180px);
         }
 
         /* Split View - Show both stacked */
         #places-container[data-mobile-view="split"] {
             display: block;
-            height: 50vh;
+            height: 55vh;
         }
         #map-container[data-mobile-view="split"] {
             display: block;
-            height: 50vh;
+            height: 55vh;
             margin-top: 1rem;
         }
     }
@@ -367,7 +367,7 @@
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Places List -->
-        <div class="lg:col-span-1 h-[calc(100vh-300px)] overflow-y-auto scrollbar-hide transition-all duration-300 px-1 relative" 
+        <div class="lg:col-span-1 h-[calc(100vh-200px)] overflow-y-auto scrollbar-hide transition-all duration-300 px-1 relative" 
              id="places-container" 
              data-mobile-view="split">
             
@@ -399,7 +399,7 @@
         </div>
 
         <!-- Map -->
-        <div class="lg:col-span-2 rounded-lg overflow-hidden h-[calc(100vh-300px)] transition-all duration-300" 
+        <div class="lg:col-span-2 rounded-lg overflow-hidden h-[calc(100vh-200px)] transition-all duration-300" 
              id="map-container"
              data-mobile-view="split">
             <div id="map" class="w-full h-full dark:brightness-90"></div>
