@@ -168,6 +168,13 @@
                     <div class="swiper-button-next"></div>
                 </div>
                 
+                <!-- Image Counter -->
+                <div class="absolute top-4 right-4 z-10">
+                    <div class="image-counter px-3 py-1.5 bg-black/70 dark:bg-black/80 text-white rounded-full text-sm font-medium backdrop-blur-sm">
+                        <span class="current-slide">1</span>/<span class="total-slides">{{ place.photo_urls|length }}</span>
+                    </div>
+                </div>
+                
                 <!-- Add More Photos Button (for partial state: 1-2 images) -->
                 {% if place.photo_urls|length < 3 %}
                 <div class="absolute bottom-4 right-4 z-10">
@@ -186,6 +193,14 @@
             <!-- Image Modal -->
             <div id="imageModal" class="image-modal">
                 <span class="close-button" onclick="closeImageModal()">&times;</span>
+                
+                <!-- Modal Image Counter -->
+                <div class="absolute top-4 left-1/2 -translate-x-1/2 z-[1002]">
+                    <div class="modal-image-counter px-4 py-2 bg-black/70 text-white rounded-full text-base font-medium backdrop-blur-sm">
+                        <span class="modal-current-slide">1</span>/<span class="modal-total-slides">{{ place.photo_urls|length }}</span>
+                    </div>
+                </div>
+                
                 <div class="modal-swiper">
                     <div class="swiper-wrapper">
                         {% for photo_url in place.photo_urls %}
@@ -686,11 +701,25 @@
 <script>
     // Initialize Swiper
     const swiper = new Swiper('.swiper', {
-        pagination: { el: '.swiper-pagination' },
+        loop: true,
+        pagination: { 
+            el: '.swiper-pagination',
+            clickable: true,
+        },
         navigation: {
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
         },
+        on: {
+            slideChange: function () {
+                // Update image counter
+                const currentSlide = this.realIndex + 1;
+                const currentSlideElement = document.querySelector('.current-slide');
+                if (currentSlideElement) {
+                    currentSlideElement.textContent = currentSlide;
+                }
+            }
+        }
     });
 
     // Initialize Google Map (responsive with viewport change handling)
@@ -1032,6 +1061,7 @@
 
     function initModalSwiper() {
         modalSwiper = new Swiper('.modal-swiper', {
+            loop: true,
             navigation: {
                 nextEl: '.modal-swiper .swiper-button-next',
                 prevEl: '.modal-swiper .swiper-button-prev',
@@ -1043,6 +1073,16 @@
             zoom: {
                 maxRatio: 2,
             },
+            on: {
+                slideChange: function () {
+                    // Update modal image counter
+                    const currentSlide = this.realIndex + 1;
+                    const modalCurrentSlideElement = document.querySelector('.modal-current-slide');
+                    if (modalCurrentSlideElement) {
+                        modalCurrentSlideElement.textContent = currentSlide;
+                    }
+                }
+            }
         });
     }
 
@@ -1055,8 +1095,8 @@
             initModalSwiper();
         }
         
-        // Slide to the clicked image
-        modalSwiper.slideTo(index, 0);
+        // Slide to the clicked image (use slideToLoop for looped swiper)
+        modalSwiper.slideToLoop(index, 0);
     }
 
     function closeImageModal() {
