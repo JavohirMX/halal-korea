@@ -117,6 +117,64 @@
     .modal-swiper .swiper-button-prev {
         color: #fff;
     }
+    
+    /* Swiper button customization */
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: #fff !important;
+        background: rgba(0, 0, 0, 0.5);
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50%;
+        backdrop-filter: blur(4px);
+    }
+    
+    .swiper-button-next:after,
+    .swiper-button-prev:after {
+        font-size: 18px !important;
+        font-weight: bold;
+    }
+    
+    .swiper-button-next:hover,
+    .swiper-button-prev:hover {
+        background: rgba(0, 0, 0, 0.7);
+    }
+    
+    /* Modal swiper buttons - larger for fullscreen */
+    .modal-swiper .swiper-button-next,
+    .modal-swiper .swiper-button-prev {
+        color: #fff !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        width: 50px !important;
+        height: 50px !important;
+        border-radius: 50%;
+        backdrop-filter: blur(4px);
+    }
+    
+    .modal-swiper .swiper-button-next:after,
+    .modal-swiper .swiper-button-prev:after {
+        font-size: 22px !important;
+    }
+    
+    .modal-swiper .swiper-button-next:hover,
+    .modal-swiper .swiper-button-prev:hover {
+        background: rgba(0, 0, 0, 0.8) !important;
+    }
+    
+    /* Pagination dots customization */
+    .swiper-pagination-bullet {
+        background: #fff !important;
+        opacity: 0.6 !important;
+        width: 8px !important;
+        height: 8px !important;
+    }
+    
+    .swiper-pagination-bullet-active {
+        opacity: 1 !important;
+        background: #0d9488 !important; /* primary-600 teal color */
+        width: 24px !important;
+        border-radius: 4px !important;
+    }
 </style>
 {% endblock %}
 
@@ -175,12 +233,13 @@
                     </div>
                 </div>
                 
-                <!-- Add More Photos Button (for partial state: 1-2 images) -->
-                {% if place.photo_urls|length < 3 %}
+                <!-- Add Photos Button (always visible, bottom-right) -->
+                {% if user.is_authenticated %}
                 <div class="absolute bottom-4 right-4 z-10">
                     <a href="{% url 'places:suggest_place_edit' place.pk %}?tab=images" 
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 rounded-lg shadow-lg hover:shadow-xl border-2 border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-200 font-medium">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white rounded-full shadow-lg hover:shadow-xl hover:bg-primary-700 transition-all duration-200 text-sm font-medium backdrop-blur-sm"
+                       title="{% translate 'Upload photos for this place' %}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                         <span>{% translate "Add Photos" %}</span>
