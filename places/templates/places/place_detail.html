@@ -124,13 +124,24 @@
 {% csrf_token %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
-    <nav class="flex mb-4" aria-label="{% translate 'Breadcrumb' %}">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li><a href="{% url 'places:home' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">{% translate "Home" %}</a></li>
-            <li><span class="text-gray-400 dark:text-gray-600 mx-2">/</span></li>
-            <li><a href="{% url 'places:explore' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">{% translate "Explore" %}</a></li>
-            <li><span class="text-gray-400 dark:text-gray-600 mx-2">/</span></li>
-            <li class="text-gray-700 dark:text-gray-300">{{ place.name }}</li>
+    <nav class="flex mb-4 overflow-x-auto scrollbar-hide" aria-label="{% translate 'Breadcrumb' %}">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3 whitespace-nowrap">
+            <li class="inline-flex items-center">
+                <a href="{% url 'places:home' %}" class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    <span class="hidden sm:inline">{% translate "Home" %}</span>
+                </a>
+            </li>
+            <li class="inline-flex items-center">
+                <span class="text-gray-400 dark:text-gray-600 mx-1 md:mx-2">/</span>
+                <a href="{% url 'places:explore' %}" class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">{% translate "Explore" %}</a>
+            </li>
+            <li class="inline-flex items-center">
+                <span class="text-gray-400 dark:text-gray-600 mx-1 md:mx-2">/</span>
+                <span class="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[150px] sm:max-w-[200px] md:max-w-none" title="{{ place.name }}">{{ place.name }}</span>
+            </li>
         </ol>
     </nav>
 
