@@ -111,6 +111,7 @@ def home(request):
             'details': str(e)
         })
 
+@log_execution(level='info', sample=True)  # High-volume endpoint with sampling
 def explore(request):
     # Get filter parameters
     category = request.GET.get('category')
@@ -118,6 +119,22 @@ def explore(request):
     city_filter = request.GET.get('city', '')  # New city filter
     sort = request.GET.get('sort', 'distance')  # Default to distance sorting
     page = request.GET.get('page', 1)
+    
+    # Log explore action with filters
+    log_user_action(
+        logger,
+        'explore_places',
+        request.user if request.user.is_authenticated else None,
+        request,
+        extra_data={
+            'category': category,
+            'search_query': search_query,
+            'city_filter': city_filter,
+            'sort': sort,
+            'page': page,
+            'is_ajax': request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        }
+    )
     
     # Get user location context
     location_context = get_user_location_context(request)
@@ -198,6 +215,16 @@ def explore(request):
             'location_context': location_context,
         })
         
+        logger.info(
+            "AJAX explore request completed",
+            extra={
+                'results_count': paginated_places.paginator.count,
+                'page_number': paginated_places.number,
+                'has_next': paginated_places.has_next(),
+                'filters_applied': bool(category or search_query or city_filter)
+            }
+        )
+        
         # Return JSON response with HTML and pagination info
         response = JsonResponse({
             'html': places_html,
@@ -207,6 +234,16 @@ def explore(request):
         })
         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         return response
+    
+    logger.info(
+        "Explore page rendered",
+        extra={
+            'results_count': paginated_places.paginator.count,
+            'page_number': paginated_places.number,
+            'total_pages': paginator.num_pages,
+            'filters_applied': bool(category or search_query or city_filter)
+        }
+    )
         
     return render(request, 'places/explore.html', {
         'places': paginated_places,
@@ -221,6 +258,7 @@ def explore(request):
         'location_context': location_context,
     })
 
+@log_execution(level='info', sample=True)  # High-volume API endpoint with sampling
 def get_places_json(request):
     """API endpoint to get places as JSON for map and dynamic loading"""
     # Get filter parameters
@@ -228,6 +266,20 @@ def get_places_json(request):
     search_query = request.GET.get('q', '')
     sort = request.GET.get('sort', 'distance')  # Default to distance sorting
     page = request.GET.get('page', 1)
+    
+    # Log API request with parameters
+    log_user_action(
+        logger,
+        'api_get_places_json',
+        request.user if request.user.is_authenticated else None,
+        request,
+        extra_data={
+            'category': category,
+            'search_query': search_query,
+            'sort': sort,
+            'page': page
+        }
+    )
     
     # Get user location
     location = get_user_location_context(request)['location']
@@ -320,6 +372,17 @@ def get_places_json(request):
             
         places_data.append(place_data)
     
+    logger.info(
+        "API get_places_json completed",
+        extra={
+            'places_returned': len(places_data),
+            'total_places': paginated_places.paginator.count,
+            'page_number': paginated_places.number,
+            'has_next': paginated_places.has_next(),
+            'filters_applied': bool(category or search_query)
+        }
+    )
+    
     # Return JSON response
     response = JsonResponse({
         'places': places_data,
@@ -331,6 +394,7 @@ def get_places_json(request):
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     return response
 
+@log_execution(level='info', sample=True)  # High-volume endpoint with sampling
 def place_detail(request, pk):
     place = get_object_or_404(HalalPlace, pk=pk, status='approved')
     reviews = place.reviews.all().select_related('user').order_by('-created_at')
@@ -339,6 +403,21 @@ def place_detail(request, pk):
     user_has_reviewed = False
     if request.user.is_authenticated:
         user_has_reviewed = reviews.filter(user=request.user).exists()
+    
+    # Log place view with context
+    log_user_action(
+        logger,
+        'place_detail_viewed',
+        request.user if request.user.is_authenticated else None,
+        request,
+        extra_data={
+            'place_id': place.id,
+            'place_name': place.name,
+            'place_category': place.category,
+            'user_has_reviewed': user_has_reviewed,
+            'reviews_count': reviews.count()
+        }
+    )
         
     # Annotate with average rating
     place = HalalPlace.objects.annotate(
@@ -405,11 +484,19 @@ def upload_photo(photo):
 
 @login_required
 @email_verification_required
+@log_execution(level='info')  # No sampling - important user action
 def submit_place(request):
     """Handle place submission by authenticated users"""
     try:
         if request.method == 'POST':
-            logger.info(f"Place submission attempt by user: {request.user.username}")
+            log_user_action(
+                logger,
+                'place_submission_attempt',
+                request.user,
+                request,
+                extra_data={'has_files': bool(request.FILES)}
+            )
+            
             form = HalalPlaceForm(request.POST, request.FILES)
             if form.is_valid():
                 place = form.save(commit=False)
@@ -441,7 +528,21 @@ def submit_place(request):
                     place.photo_urls = photo_urls
                 
                 place.save()
-                logger.info(f"Place '{place.name}' submitted successfully by user {request.user.username}")
+                
+                log_user_action(
+                    logger,
+                    'place_submitted_successfully',
+                    request.user,
+                    request,
+                    extra_data={
+                        'place_id': place.id,
+                        'place_name': place.name,
+                        'place_category': place.category,
+                        'photos_count': len(place.photo_urls) if place.photo_urls else 0,
+                        'has_website': bool(place.website),
+                        'has_phone': bool(place.phone_number)
+                    }
+                )
                 
                 # Send Telegram notification about the new submission
                 try:
@@ -470,7 +571,15 @@ def submit_place(request):
                 messages.success(request, 'Place submitted successfully! It will be reviewed by our team.')
                 return redirect('places:explore')
             else:
-                logger.warning(f"Invalid place submission form by user {request.user.username}: {form.errors}")
+                log_user_action(
+                    logger,
+                    'place_submission_validation_failed',
+                    request.user,
+                    request,
+                    extra_data={
+                        'form_errors': sanitize_sensitive_data(str(form.errors.as_json()))
+                    }
+                )
                 messages.error(request, 'Please correct the errors below.')
         else:
             form = HalalPlaceForm()
@@ -480,7 +589,15 @@ def submit_place(request):
             'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
         })
     except Exception as e:
-        logger.error(f"Error in submit_place view: {str(e)}", exc_info=True)
+        logger.error(
+            "Error in submit_place view",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e),
+                'user': request.user.username if request.user.is_authenticated else None
+            },
+            exc_info=True
+        )
         messages.error(request, 'An error occurred while submitting the place. Please try again.')
         return redirect('places:home')
 
@@ -499,6 +616,7 @@ def legal(request):
     """Combined legal page with Privacy Policy, Terms of Service, and Cookie Policy"""
     return render(request, 'places/legal.html')
 
+@log_execution(level='info', sample=True)  # High-volume API with sampling
 def set_location(request):
     """API endpoint to set user location"""
     if request.method != 'POST':
@@ -512,6 +630,10 @@ def set_location(request):
         country = data.get('country')
         
         if not (lat and lng) and not city:
+            logger.warning(
+                "Location update failed - missing data",
+                extra={'has_lat_lng': bool(lat and lng), 'has_city': bool(city)}
+            )
             return JsonResponse({'error': 'Missing location data'}, status=400)
             
         # Prepare location data
@@ -523,22 +645,60 @@ def set_location(request):
             location_data['city'] = city
         if country:
             location_data['country'] = country
+        
+        # Log location update
+        log_user_action(
+            logger,
+            'user_location_updated',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={
+                'has_coordinates': bool(lat and lng),
+                'city': city,
+                'country': country
+            }
+        )
             
         # Update location in session
         location = update_user_location(request, location_data)  # noqa: F841
             
         return JsonResponse({'success': True})
+    except json.JSONDecodeError as e:
+        logger.error(
+            "Invalid JSON in set_location",
+            extra={'error': str(e)},
+            exc_info=True
+        )
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
+        logger.error(
+            "Error in set_location",
+            extra={'error_type': type(e).__name__, 'error': str(e)},
+            exc_info=True
+        )
         return JsonResponse({'error': str(e)}, status=500)
 
 
 @login_required
 @email_verification_required
+@log_execution(level='info')  # No sampling - important user action
 def suggest_place_edit(request, pk):
     """Display form for suggesting edits to a place"""
     place = get_object_or_404(HalalPlace, pk=pk, status='approved')
     
     if request.method == 'POST':
+        log_user_action(
+            logger,
+            'place_edit_suggestion_attempt',
+            request.user,
+            request,
+            extra_data={
+                'place_id': place.id,
+                'place_name': place.name,
+                'has_files': bool(request.FILES)
+            }
+        )
+        
         form = PlaceSuggestionForm(place=place, data=request.POST, files=request.FILES)
         if form.is_valid():
             return _process_place_suggestions(request, form, place)
@@ -588,12 +748,27 @@ def _process_place_suggestions(request, form, place):
                 )
                 created_image_suggestions.append(image_suggestion)
         
+        # Log successful suggestion submission
+        total_suggestions = len(created_suggestions) + len(created_image_suggestions)
+        log_user_action(
+            logger,
+            'place_edit_suggestion_submitted',
+            request.user,
+            request,
+            extra_data={
+                'place_id': place.id,
+                'place_name': place.name,
+                'field_suggestions_count': len(created_suggestions),
+                'image_suggestions_count': len(created_image_suggestions),
+                'total_suggestions': total_suggestions
+            }
+        )
+        
         # Send notification if any suggestions were created
         if created_suggestions or created_image_suggestions:
             _send_suggestion_notification(place, request.user, created_suggestions, created_image_suggestions)
         
         # Success message
-        total_suggestions = len(created_suggestions) + len(created_image_suggestions)
         if total_suggestions > 0:
             messages.success(
                 request, 
@@ -605,7 +780,16 @@ def _process_place_suggestions(request, form, place):
         return redirect('places:place_detail', pk=place.pk)
         
     except Exception as e:
-        logger.error(f"Error processing place suggestions: {e}")
+        logger.error(
+            "Error processing place suggestions",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e),
+                'place_id': place.id,
+                'user': request.user.username
+            },
+            exc_info=True
+        )
         messages.error(request, 'There was an error processing your suggestions. Please try again.')
         return redirect('places:suggest_place_edit', pk=place.pk)
 
