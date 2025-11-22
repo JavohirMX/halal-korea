@@ -4,19 +4,10 @@ import json
 import logging
 
 from .models import FeedbackResponse
+from .rate_limiting import check_feedback_rate_limit, record_feedback_attempt, get_client_ip
 from utils.telegram_notifications import send_telegram_notification
 
 logger = logging.getLogger(__name__)
-
-
-def get_client_ip(request):
-    """Get the client's IP address from the request"""
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
 
 
 @require_http_methods(["POST"])
@@ -26,6 +17,14 @@ def submit_feedback(request):
     Accepts JSON data and creates a FeedbackResponse object.
     """
     try:
+        # Check rate limiting first
+        can_submit, error_message = check_feedback_rate_limit(request)
+        if not can_submit:
+            return JsonResponse({
+                'success': False,
+                'error': error_message
+            }, status=429)
+        
         # Parse JSON data
         data = json.loads(request.body)
         
@@ -69,6 +68,9 @@ def submit_feedback(request):
             user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
             referrer=data.get('referrer', '')[:500],
         )
+        
+        # Record the attempt for rate limiting
+        record_feedback_attempt(request)
         
         # Log the feedback submission
         logger.info(
