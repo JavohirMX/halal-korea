@@ -7,9 +7,10 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Count, Avg, Q, Sum, Max, Min
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from utils.models import (
     RequestLog, SystemMetric, AdminAction, ContentModerationLog,
-    SecurityEvent, AdminNotification
+    SecurityEvent
 )
 from places.models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 from reviews.models import Review
@@ -91,6 +92,86 @@ def analytics_dashboard(request):
         'language_preferences': _get_language_preferences(),
     }
     return render(request, 'monitoring/analytics.html', context)
+
+
+@staff_member_required
+def logs_dashboard(request):
+    """Logs viewer dashboard."""
+    log_type = request.GET.get('log_type', 'django')
+    lines = int(request.GET.get('lines', 100))
+    search = request.GET.get('search', '')
+    
+    # Get log files from settings
+    logs_dir = settings.BASE_DIR / 'logs'
+    
+    # Available log files
+    log_files = {
+        'django': logs_dir / 'django.log',
+        'error': logs_dir / 'django_errors.log',
+        'security': logs_dir / 'security.log',
+        'api': logs_dir / 'api.log',
+        'database': logs_dir / 'database.log',
+    }
+    
+    log_content = []
+    log_size = 0
+    log_exists = False
+    
+    if log_type in log_files:
+        log_path = log_files[log_type]
+        if log_path.exists():
+            log_exists = True
+            log_size = log_path.stat().st_size
+            
+            try:
+                # Read the last N lines
+                with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    all_lines = f.readlines()
+                    
+                    # Get last N lines
+                    last_lines = all_lines[-lines:] if len(all_lines) > lines else all_lines
+                    
+                    # Filter by search term if provided
+                    if search:
+                        last_lines = [line for line in last_lines if search.lower() in line.lower()]
+                    
+                    log_content = last_lines
+            except Exception as e:
+                log_content = [f"Error reading log file: {str(e)}"]
+    
+    # Calculate log file sizes for all logs
+    log_file_info = {}
+    for name, path in log_files.items():
+        if path.exists():
+            size_bytes = path.stat().st_size
+            size_mb = size_bytes / (1024 * 1024)
+            log_file_info[name] = {
+                'path': str(path),
+                'size_bytes': size_bytes,
+                'size_mb': round(size_mb, 2),
+                'exists': True
+            }
+        else:
+            log_file_info[name] = {
+                'path': str(path),
+                'size_bytes': 0,
+                'size_mb': 0,
+                'exists': False
+            }
+    
+    context = {
+        'title': 'System Logs',
+        'log_type': log_type,
+        'log_content': log_content,
+        'log_size': log_size,
+        'log_size_mb': round(log_size / (1024 * 1024), 2) if log_size > 0 else 0,
+        'log_exists': log_exists,
+        'lines': lines,
+        'search': search,
+        'log_file_info': log_file_info,
+        'available_logs': list(log_files.keys()),
+    }
+    return render(request, 'monitoring/logs.html', context)
 
 
 # ============================================================================

@@ -32,6 +32,7 @@ urlpatterns = [
     path('admin/monitoring/security/', admin_views.security_dashboard, name='monitoring_security'),
     path('admin/monitoring/content/', admin_views.content_operations_dashboard, name='monitoring_content'),
     path('admin/monitoring/analytics/', admin_views.analytics_dashboard, name='monitoring_analytics'),
+    path('admin/monitoring/logs/', admin_views.logs_dashboard, name='monitoring_logs'),
     
     # --- Monitoring API Endpoints ---
     path('admin/monitoring/api/metrics/', admin_views.api_metrics, name='monitoring_api_metrics'),

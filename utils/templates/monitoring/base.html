@@ -380,6 +380,9 @@
                 <a href="{% url 'monitoring_analytics' %}" class="nav-link {% if 'analytics' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
                     📈 Analytics
                 </a>
+                <a href="{% url 'monitoring_logs' %}" class="nav-link {% if 'logs' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    📋 Logs
+                </a>
             </div>
         </div>
     </nav>

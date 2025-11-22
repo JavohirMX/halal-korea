@@ -1,0 +1,185 @@
+{% extends 'monitoring/base.html' %}
+
+{% block content %}
+<!-- Log Controls -->
+<div class="mb-6">
+    <div class="content-container p-6">
+        <form method="get" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Log Type Selection -->
+                <div>
+                    <label for="log_type" class="block text-sm font-medium text-gray-700 dark:text-dark-muted mb-2">Log File</label>
+                    <select name="log_type" id="log_type" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-dark-bg text-gray-900 dark:text-dark-text">
+                        <option value="django" {% if log_type == 'django' %}selected{% endif %}>Django (General)</option>
+                        <option value="error" {% if log_type == 'error' %}selected{% endif %}>Errors Only</option>
+                        <option value="security" {% if log_type == 'security' %}selected{% endif %}>Security</option>
+                        <option value="api" {% if log_type == 'api' %}selected{% endif %}>API</option>
+                        <option value="database" {% if log_type == 'database' %}selected{% endif %}>Database</option>
+                    </select>
+                </div>
+                
+                <!-- Lines Selection -->
+                <div>
+                    <label for="lines" class="block text-sm font-medium text-gray-700 dark:text-dark-muted mb-2">Lines to Show</label>
+                    <select name="lines" id="lines" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-dark-bg text-gray-900 dark:text-dark-text">
+                        <option value="50" {% if lines == 50 %}selected{% endif %}>50</option>
+                        <option value="100" {% if lines == 100 %}selected{% endif %}>100</option>
+                        <option value="200" {% if lines == 200 %}selected{% endif %}>200</option>
+                        <option value="500" {% if lines == 500 %}selected{% endif %}>500</option>
+                        <option value="1000" {% if lines == 1000 %}selected{% endif %}>1000</option>
+                    </select>
+                </div>
+                
+                <!-- Search Input -->
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 dark:text-dark-muted mb-2">Search</label>
+                    <input type="text" name="search" id="search" value="{{ search }}" placeholder="Filter logs..." class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-dark-bg text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-dark-muted">
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="flex items-end">
+                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                        🔍 Filter
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Log File Stats -->
+<div class="mb-6">
+    <h2 class="section-heading mb-4">Log File Information</h2>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        {% for name, info in log_file_info.items %}
+        <div class="stat-card {% if name == log_type %}ring-2 ring-blue-500{% endif %}">
+            <div class="text-sm font-medium text-gray-600 dark:text-dark-muted mb-1">{{ name|title }}</div>
+            {% if info.exists %}
+                <div class="stat-value text-lg {% if info.size_mb > 5 %}text-orange-600{% else %}text-blue-600{% endif %}">
+                    {{ info.size_mb }} MB
+                </div>
+                <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">
+                    {{ info.size_bytes|filesizeformat }}
+                </div>
+            {% else %}
+                <div class="text-sm text-gray-400 dark:text-dark-muted">No file</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Current Log Display -->
+<div class="mb-8">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="section-heading">{{ log_type|title }} Log</h2>
+        <div class="flex items-center space-x-2">
+            {% if log_exists %}
+                <span class="text-sm text-gray-600 dark:text-dark-muted">
+                    Size: {{ log_size_mb }} MB
+                </span>
+                <span class="text-sm text-gray-400 dark:text-dark-muted">•</span>
+                <span class="text-sm text-gray-600 dark:text-dark-muted">
+                    Showing {{ log_content|length }} line{{ log_content|length|pluralize }}
+                </span>
+                <button onclick="refreshLog()" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                    🔄 Refresh
+                </button>
+                <button onclick="copyLog()" class="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">
+                    📋 Copy
+                </button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="content-container">
+        {% if log_exists %}
+            {% if log_content %}
+                <div class="p-4 bg-gray-900 dark:bg-black rounded-lg overflow-x-auto" style="max-height: 70vh;">
+                    <pre id="logContent" class="text-xs font-mono text-green-400 whitespace-pre-wrap break-words"><code>{% for line in log_content %}{{ line }}{% endfor %}</code></pre>
+                </div>
+            {% else %}
+                <div class="p-6 text-center text-gray-500 dark:text-dark-muted">
+                    {% if search %}
+                        No log entries match your search: "{{ search }}"
+                    {% else %}
+                        Log file is empty
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="p-6 text-center text-gray-500 dark:text-dark-muted">
+                ⚠️ Log file does not exist yet
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Log Level Legend -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Log Level Guide</h2>
+    <div class="content-container p-6">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 text-xs font-semibold rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">DEBUG</span>
+                <span class="text-sm text-gray-600 dark:text-dark-muted">Detailed info</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 text-xs font-semibold rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">INFO</span>
+                <span class="text-sm text-gray-600 dark:text-dark-muted">General info</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 text-xs font-semibold rounded bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">WARNING</span>
+                <span class="text-sm text-gray-600 dark:text-dark-muted">Warning events</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 text-xs font-semibold rounded bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">ERROR</span>
+                <span class="text-sm text-gray-600 dark:text-dark-muted">Error events</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 text-xs font-semibold rounded bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">CRITICAL</span>
+                <span class="text-sm text-gray-600 dark:text-dark-muted">Critical issues</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tips -->
+<div class="content-container p-6">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-dark-text mb-3">💡 Tips</h3>
+    <ul class="space-y-2 text-sm text-gray-600 dark:text-dark-muted">
+        <li>• Use the search filter to find specific errors or events</li>
+        <li>• Increase the number of lines to see more historical data</li>
+        <li>• Check the <strong>Error</strong> log for quick access to error-level messages only</li>
+        <li>• Security log uses JSON format for structured event data</li>
+        <li>• Log files are automatically rotated when they reach 10MB (5MB for security/api)</li>
+    </ul>
+</div>
+
+<script>
+function refreshLog() {
+    window.location.reload();
+}
+
+function copyLog() {
+    const logContent = document.getElementById('logContent');
+    if (logContent) {
+        const text = logContent.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Log content copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy log content');
+        });
+    }
+}
+
+// Auto-scroll to bottom of log
+window.addEventListener('load', () => {
+    const logContainer = document.querySelector('.overflow-x-auto');
+    if (logContainer) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+});
+</script>
+{% endblock %}
