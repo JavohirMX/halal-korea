@@ -68,6 +68,7 @@ urlpatterns = [
     path('prayer/', include('prayer_times.urls')),
     path('blog/', include('blog.urls')),
     path('contact/', include('contact.urls')),
+    path('feedback/', include('feedback.urls')),
 ]
 
 # Static and media files are typically not prefixed
