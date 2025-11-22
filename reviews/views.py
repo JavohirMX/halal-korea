@@ -8,6 +8,7 @@ from .models import Review
 from places.models import HalalPlace
 from users.decorators import email_verification_required
 import logging
+from utils.logging_utils import log_user_action, sanitize_sensitive_data
 
 logger = logging.getLogger(__name__)
 
@@ -15,14 +16,31 @@ logger = logging.getLogger(__name__)
 @email_verification_required
 @require_http_methods(["POST"])
 def add_review(request, place_id):
-    """Add a new review for a place."""
+    """Add a new review for a place with enhanced logging."""
     place = get_object_or_404(HalalPlace, id=place_id, status='approved')
     
-    logger.info(f"Review submission attempt by user {request.user.username} for place {place.name}")
+    # Enhanced logging for review submission
+    log_user_action(
+        logger,
+        'review_submission_attempt',
+        request.user,
+        request,
+        extra_data={
+            'place_id': place_id,
+            'place_name': place.name
+        }
+    )
     
     # Check if user has already reviewed this place
     if Review.objects.filter(user=request.user, place=place).exists():
-        logger.warning(f"Duplicate review attempt by user {request.user.username} for place {place.name}")
+        logger.warning(
+            "Duplicate review attempt",
+            extra={
+                'user_id': request.user.id,
+                'place_id': place_id,
+                'place_name': place.name
+            }
+        )
         messages.error(request, 'You have already reviewed this place.')
         return redirect('places:place_detail', pk=place_id)
     
@@ -33,7 +51,14 @@ def add_review(request, place_id):
         
         # Validate rating
         if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
-            logger.warning(f"Invalid rating {rating} submitted by user {request.user.username} for place {place.name}")
+            logger.warning(
+                "Invalid rating submitted",
+                extra={
+                    'user_id': request.user.id,
+                    'place_id': place_id,
+                    'rating_value': rating
+                }
+            )
             raise ValidationError('Please provide a valid rating between 1 and 5.')
         
         # Create review
@@ -44,7 +69,19 @@ def add_review(request, place_id):
             comment=comment
         )
         
-        logger.info(f"Review created successfully by user {request.user.username} for place {place.name} with rating {rating}")
+        # Enhanced success logging
+        log_user_action(
+            logger,
+            'review_created_successfully',
+            request.user,
+            request,
+            extra_data={
+                'review_id': review.id,
+                'place_id': place_id,
+                'place_name': place.name,
+                'rating': rating
+            }
+        )
         messages.success(request, 'Your review has been added successfully!')
         
         # Return JSON response for AJAX requests

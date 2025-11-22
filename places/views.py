@@ -21,16 +21,25 @@ import json
 import logging
 from utils.telegram_notifications import send_new_place_notification
 from utils.watermark import apply_watermark_to_uploaded_file
+from utils.logging_utils import log_user_action, log_execution, sanitize_sensitive_data
 import io
 from users.decorators import email_verification_required
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+@log_execution(level='info', sample=True)  # Apply sampling for high-volume endpoint
 def home(request):
     """Main home page view showing featured places with international user support"""
     try:
-        logger.info(f"Home page accessed by user: {request.user.username if request.user.is_authenticated else 'anonymous'}")
+        # Log with structured data
+        log_user_action(
+            logger,
+            'home_page_accessed',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={'is_authenticated': request.user.is_authenticated}
+        )
         
         # Get user location context (includes international user detection)
         location_context = get_user_location_context(request)
@@ -40,7 +49,14 @@ def home(request):
         
         if 'lat' in location and 'lng' in location and not location.get('is_fallback'):
             user_location = Point(location['lng'], location['lat'], srid=4326)
-            logger.debug(f"User location determined: lat={location['lat']}, lng={location['lng']}")
+            logger.debug(
+                "User location determined",
+                extra={
+                    'latitude': location['lat'],
+                    'longitude': location['lng'],
+                    'is_in_korea': is_in_korea
+                }
+            )
 
         # Get featured places with different logic for Korea vs international users
         featured_places = HalalPlace.objects.filter(
@@ -55,22 +71,41 @@ def home(request):
             featured_places = featured_places.annotate(
                 distance=Distance('location', user_location)
             ).order_by('distance')[:6]
-            logger.debug("Featured places ordered by distance for Korea user")
+            logger.debug(
+                "Featured places ordered by distance",
+                extra={'sort_method': 'distance', 'user_type': 'korea'}
+            )
         else:
             # For international users: popular/highly-rated places
             # Use Coalesce to ensure places with no ratings appear last
             featured_places = featured_places.annotate(
                 rating_for_sort=Coalesce('average_rating', Value(-1.0), output_field=FloatField())
             ).order_by('-rating_for_sort', '-created_at')[:6]
-            logger.debug("Featured places ordered by rating for international user")
+            logger.debug(
+                "Featured places ordered by rating",
+                extra={'sort_method': 'rating', 'user_type': 'international'}
+            )
         
-        logger.info(f"Home page rendered with {featured_places.count()} featured places")
+        logger.info(
+            "Home page rendered successfully",
+            extra={
+                'featured_places_count': featured_places.count(),
+                'is_in_korea': is_in_korea
+            }
+        )
         return render(request, 'places/home.html', {
             'featured_places': featured_places,
             'location_context': location_context,
         })
     except Exception as e:
-        logger.error(f"Error in home view: {str(e)}", exc_info=True)
+        logger.error(
+            "Error in home view",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e)
+            },
+            exc_info=True
+        )
         return render(request, 'places/error.html', {
             'error': 'Unable to load home page',
             'details': str(e)
