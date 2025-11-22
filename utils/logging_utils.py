@@ -10,6 +10,18 @@ Enhanced Features:
 - Enhanced PII sanitization
 - Async logging support
 - Request tracing
+
+IMPORTANT: Reserved LogRecord Attributes
+The following attribute names CANNOT be used in logging extra dictionaries
+as they are reserved by Python's logging.LogRecord:
+
+Reserved names:
+- name, msg, args, created, filename, funcName, levelname, levelno, lineno,
+  module, msecs, message, pathname, process, processName, relativeCreated,
+  thread, threadName, exc_info, exc_text, stack_info
+
+Always prefix custom attributes (e.g., 'func_name', 'func_module', 'place_name')
+to avoid conflicts with these reserved names.
 """
 
 import logging
@@ -378,15 +390,15 @@ def log_execution(level: str = 'info', include_args: bool = False, sample: bool 
             start = time.time()
             
             log_data = {
-                'function': func.__name__,
-                'module': func.__module__,
+                'func_name': func.__name__,
+                'func_module': func.__module__,
                 'request_id': request_context.get().get('request_id', 'N/A') if request_context.get() else 'N/A',
             }
             
             if include_args:
                 # Sanitize arguments before logging
-                log_data['args'] = sanitize_sensitive_data({'args': str(args)})
-                log_data['kwargs'] = sanitize_sensitive_data(kwargs) if kwargs else {}
+                log_data['func_args'] = sanitize_sensitive_data({'args': str(args)})
+                log_data['func_kwargs'] = sanitize_sensitive_data(kwargs) if kwargs else {}
             
             try:
                 result = func(*args, **kwargs)
