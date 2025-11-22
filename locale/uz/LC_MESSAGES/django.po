@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-30 02:36+0900\n"
+"POT-Creation-Date: 2025-11-23 03:52+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,17 +19,18 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: blog/templates/blog/archive.html:12 blog/templates/blog/category.html:16
-#: blog/templates/blog/detail.html:138 blog/templates/blog/search.html:12
-#: blog/templates/blog/tag.html:16 places/templates/places/place_detail.html:67
+#: blog/templates/blog/detail.html:217 blog/templates/blog/search.html:12
+#: blog/templates/blog/tag.html:16
+#: places/templates/places/place_detail.html:192
 msgid "Home"
 msgstr "Bosh sahifa"
 
 #: blog/templates/blog/archive.html:14 blog/templates/blog/category.html:4
-#: blog/templates/blog/category.html:18 blog/templates/blog/detail.html:140
-#: blog/templates/blog/home.html:79 blog/templates/blog/search.html:14
+#: blog/templates/blog/category.html:18 blog/templates/blog/detail.html:219
+#: blog/templates/blog/home.html:96 blog/templates/blog/search.html:14
 #: blog/templates/blog/tag.html:4 blog/templates/blog/tag.html:18
-#: places/templates/places/base.html:303 places/templates/places/base.html:333
-#: places/templates/places/base.html:561 places/templates/places/base.html:795
+#: places/templates/places/base.html:224 places/templates/places/base.html:254
+#: places/templates/places/base.html:486 places/templates/places/base.html:711
 msgid "Blog"
 msgstr "Blog"
 
@@ -62,29 +63,29 @@ msgstr "bu yilda"
 msgid "Browse by Year"
 msgstr "Yil bo'yicha ko'rish"
 
-#: blog/templates/blog/archive.html:180
+#: blog/templates/blog/archive.html:191
 msgid "No articles published in this month"
 msgstr "Bu oyda hech qanday maqola chop etilmagan"
 
-#: blog/templates/blog/archive.html:182
+#: blog/templates/blog/archive.html:193
 msgid "No articles published in this year"
 msgstr "Bu yilda hech qanday maqola chop etilmagan"
 
-#: blog/templates/blog/archive.html:184
+#: blog/templates/blog/archive.html:195
 msgid "No archived articles"
 msgstr "Arxivlangan maqolalar yo'q"
 
-#: blog/templates/blog/archive.html:188
+#: blog/templates/blog/archive.html:199
 msgid "Check out our latest articles or browse other time periods"
 msgstr ""
 "Eng so'nggi maqolalarimizni ko'ring yoki boshqa davrlarni ko'rib chiqing"
 
-#: blog/templates/blog/archive.html:194 blog/templates/blog/category.html:146
-#: blog/templates/blog/search.html:180 blog/templates/blog/tag.html:156
+#: blog/templates/blog/archive.html:205 blog/templates/blog/category.html:157
+#: blog/templates/blog/search.html:191 blog/templates/blog/tag.html:167
 msgid "Back to Blog"
 msgstr "Blogni qaytish"
 
-#: blog/templates/blog/archive.html:200
+#: blog/templates/blog/archive.html:211
 msgid "Browse All Years"
 msgstr "Barcha yillarni ko'rish"
 
@@ -97,85 +98,96 @@ msgstr ""
 "%(category_name)s toifasidagi maqolalarni kashf eting. Koreyadagi halol "
 "hayot haqida ma'lumot oling."
 
-#: blog/templates/blog/category.html:138
+#: blog/templates/blog/category.html:149
 msgid "No articles in this category yet"
 msgstr "Bu toifada hali maqolalar yo'q"
 
-#: blog/templates/blog/category.html:141 blog/templates/blog/tag.html:151
+#: blog/templates/blog/category.html:152 blog/templates/blog/tag.html:162
 msgid "Check back soon for new content!"
 msgstr "Yangi kontent uchun tez orada qaytib turing!"
 
-#: blog/templates/blog/detail.html:176
+#: blog/templates/blog/detail.html:255
 msgid "views"
 msgstr "ko'rishlar"
 
-#: blog/templates/blog/detail.html:181
+#: blog/templates/blog/detail.html:260
 msgid "Updated"
 msgstr "Yangilangan"
 
-#: blog/templates/blog/detail.html:248
+#: blog/templates/blog/detail.html:274
+#, fuzzy
+#| msgid "Important Notice:"
+msgid "Language Notice:"
+msgstr "Til bo'yicha eslatma:"
+
+#: blog/templates/blog/detail.html:275
+#, python-format
+msgid "This blog post is only available in %(language)s."
+msgstr "Bu blog posti faqat %(language)s tilida mavjud."
+
+#: blog/templates/blog/detail.html:344
 msgid "Related Places"
 msgstr "Bog'liq joylar"
 
-#: blog/templates/blog/detail.html:277
+#: blog/templates/blog/detail.html:373
 msgid "Share this article"
 msgstr "Bu maqolani ulashish"
 
-#: blog/templates/blog/detail.html:284
+#: blog/templates/blog/detail.html:380
 msgid "Twitter"
 msgstr "Twitter"
 
-#: blog/templates/blog/detail.html:290
+#: blog/templates/blog/detail.html:386
 msgid "Facebook"
 msgstr "Facebook"
 
-#: blog/templates/blog/detail.html:295
+#: blog/templates/blog/detail.html:391
 msgid "Copy Link"
 msgstr "Havolani nusxalash"
 
-#: blog/templates/blog/detail.html:305
+#: blog/templates/blog/detail.html:401
 msgid "Related Articles"
 msgstr "Bog'liq maqolalar"
 
-#: blog/templates/blog/detail.html:349
+#: blog/templates/blog/detail.html:445
 msgid "Copied!"
 msgstr "Nusxalandi!"
 
-#: blog/templates/blog/home.html:30
+#: blog/templates/blog/home.html:37
 msgid "Featured Post"
 msgstr "Tavsiya etilgan post"
 
-#: blog/templates/blog/home.html:62
+#: blog/templates/blog/home.html:79
 msgid "Read More"
 msgstr "Ko'proq o'qish"
 
-#: blog/templates/blog/home.html:82
+#: blog/templates/blog/home.html:99
 msgid "Discover the latest articles about halal lifestyle in Korea"
 msgstr "Koreyadagi halol hayot haqidagi eng so'nggi maqolalarni kashf eting"
 
-#: blog/templates/blog/home.html:170
+#: blog/templates/blog/home.html:198
 msgid "No blog posts yet"
 msgstr "Hali blog postlari yo'q"
 
-#: blog/templates/blog/home.html:173
+#: blog/templates/blog/home.html:201
 msgid "Check back soon for new articles!"
 msgstr "Yangi maqolalar uchun tez orada qaytib turing!"
 
-#: blog/templates/blog/home.html:185
+#: blog/templates/blog/home.html:213
 msgid "Categories"
 msgstr "Toifalar"
 
-#: blog/templates/blog/home.html:206 blog/templates/blog/search.html:29
+#: blog/templates/blog/home.html:234 blog/templates/blog/search.html:29
 msgid "Search Blog"
 msgstr "Blogni qidirish"
 
-#: blog/templates/blog/home.html:212
+#: blog/templates/blog/home.html:240
 msgid "Search articles..."
 msgstr "Maqolalarni qidirish..."
 
-#: blog/templates/blog/home.html:220 blog/templates/blog/search.html:18
+#: blog/templates/blog/home.html:248 blog/templates/blog/search.html:18
 #: blog/templates/blog/search.html:20 blog/templates/blog/search.html:47
-#: places/templates/places/home.html:52
+#: places/templates/places/home.html:53
 msgid "Search"
 msgstr "Qidirish"
 
@@ -195,37 +207,37 @@ msgstr[1] "\"%(query)s\" uchun %(counter)s natija"
 msgid "No results for \"%(query)s\""
 msgstr "\"%(query)s\" uchun natija topilmadi"
 
-#: blog/templates/blog/search.html:171
+#: blog/templates/blog/search.html:182
 msgid "No articles found"
 msgstr "Maqolalar topilmadi"
 
-#: blog/templates/blog/search.html:174
+#: blog/templates/blog/search.html:185
 msgid "Try adjusting your search terms or browse our categories"
 msgstr ""
 "Qidiruv so'zlarini o'zgartirishga harakat qiling yoki toifalarimizni ko'rib "
 "chiqing"
 
-#: blog/templates/blog/search.html:185
+#: blog/templates/blog/search.html:196
 msgid "Clear Search"
 msgstr "Qidiruvni tozalash"
 
-#: blog/templates/blog/search.html:194
+#: blog/templates/blog/search.html:205
 msgid "Search Tips"
 msgstr "Qidiruv maslahatlari"
 
-#: blog/templates/blog/search.html:199
+#: blog/templates/blog/search.html:210
 msgid "Search by keywords, titles, or content"
 msgstr "Kalit so'zlar, sarlavhalar yoki kontent bo'yicha qidiring"
 
-#: blog/templates/blog/search.html:203
+#: blog/templates/blog/search.html:214
 msgid "Use category names to find related articles"
 msgstr "Bog'liq maqolalarni topish uchun toifa nomlaridan foydalaning"
 
-#: blog/templates/blog/search.html:207
+#: blog/templates/blog/search.html:218
 msgid "Search for specific tags to narrow results"
 msgstr "Natijalarni toraytirish uchun aniq teglarni qidiring"
 
-#: blog/templates/blog/search.html:211
+#: blog/templates/blog/search.html:222
 msgid "Try different spelling variations"
 msgstr "Turli xil yozish variantlarini sinab ko'ring"
 
@@ -246,11 +258,11 @@ msgstr "Teg"
 msgid "with this tag"
 msgstr "bu teg bilan"
 
-#: blog/templates/blog/tag.html:148
+#: blog/templates/blog/tag.html:159
 msgid "No articles with this tag yet"
 msgstr "Bu teg bilan hali maqolalar yo'q"
 
-#: contact/admin.py:17 places/templates/places/suggest_edit.html:253
+#: contact/admin.py:17 places/templates/places/suggest_edit.html:382
 msgid "Contact Information"
 msgstr "Aloqa ma'lumotlari"
 
@@ -346,9 +358,7 @@ msgstr "Xabaringizni toifalarga ajratishimizga yordam beradi"
 
 #: contact/forms.py:41
 msgid "Share your thoughts, questions, or feedback"
-msgstr ""
-"Fikrlaringiz, savollaringiz yoki fikr-mulohazalaringizni "
-"ulashing"
+msgstr "Fikrlaringiz, savollaringiz yoki fikr-mulohazalaringizni ulashing"
 
 #: contact/forms.py:57
 msgid "Please enter a message."
@@ -362,9 +372,9 @@ msgstr "Iltimos, to'g'ri ism kiriting."
 msgid "Have an account? "
 msgstr "Hisobingiz bormi? "
 
-#: contact/templates/contact/form.html:9 places/templates/places/base.html:514
-#: places/templates/places/base.html:660 users/templates/users/login.html:4
-#: users/templates/users/login.html:87
+#: contact/templates/contact/form.html:9 places/templates/places/base.html:438
+#: places/templates/places/base.html:586 users/templates/users/login.html:5
+#: users/templates/users/login.html:88
 msgid "Log in"
 msgstr "Kirish"
 
@@ -455,19 +465,23 @@ msgstr "Bizga xabar yuboring"
 msgid "Send us an email and we'll respond within 24 hours."
 msgstr "Bizga elektron xabar yuboring va biz 24 soat ichida javob beramiz."
 
-#: contact/templates/contact/section.html:49
+#: contact/templates/contact/section.html:34
+msgid "Send email to"
+msgstr "Quyidagi manzilga xabar yuboring"
+
+#: contact/templates/contact/section.html:50
 msgid "Quick Response"
 msgstr "Tez javob"
 
-#: contact/templates/contact/section.html:52
+#: contact/templates/contact/section.html:53
 msgid "We typically respond to messages within 24 hours during business days."
 msgstr "Biz odatda ish kunlarida 24 soat ichida xabarlarga javob beramiz."
 
-#: contact/templates/contact/section.html:66
+#: contact/templates/contact/section.html:67
 msgid "Community Driven"
 msgstr "Jamiyat tomonidan boshqariladi"
 
-#: contact/templates/contact/section.html:69
+#: contact/templates/contact/section.html:70
 msgid ""
 "Your feedback helps us improve our platform and serve the halal community "
 "better."
@@ -475,19 +489,27 @@ msgstr ""
 "Sizning fikr-mulohazalaringiz platformamizni yaxshilash va halol jamiyatiga "
 "yaxshiroq xizmat qilishga yordam beradi."
 
-#: contact/templates/contact/section.html:81
+#: contact/templates/contact/section.html:82
 msgid "Send us a message"
 msgstr "Bizga xabar yuboring"
 
-#: contact/templates/contact/section.html:89
+#: contact/templates/contact/section.html:90
 msgid "Loading contact form..."
 msgstr "Aloqa shakli yuklanmoqda..."
 
-#: contact/templates/contact/section.html:116
-msgid "Error loading contact form. Please refresh the page."
-msgstr "Aloqa shaklini yuklashda xatolik. Iltimos, sahifani yangilang."
+#: contact/templates/contact/section.html:91
+msgid "Loading"
+msgstr "Yuklanmoqda"
 
-#: contact/templates/contact/section.html:182 contact/views.py:85
+#: contact/templates/contact/section.html:132
+msgid "Error loading contact form."
+msgstr "Aloqa shaklini yuklashda xatolik yuz berdi."
+
+#: contact/templates/contact/section.html:138
+msgid "Retry"
+msgstr "Qayta urinib ko'rish"
+
+#: contact/templates/contact/section.html:209 contact/views.py:85
 msgid "An unexpected error occurred. Please try again later."
 msgstr "Kutilmagan xatolik yuz berdi. Iltimos, keyinroq qayta urinib ko'ring."
 
@@ -516,15 +538,16 @@ msgid "Return Home"
 msgstr "Bosh sahifaga qaytish"
 
 #: places/templates/places/about.html:5 places/templates/places/about.html:14
-#: places/templates/places/base.html:307 places/templates/places/base.html:565
+#: places/templates/places/base.html:228 places/templates/places/base.html:490
+#: places/templates/places/place_detail.html:398
 msgid "About"
 msgstr "Haqimizda"
 
-#: places/templates/places/about.html:33 places/templates/places/about.html:43
+#: places/templates/places/about.html:39
 msgid "Our Mission"
 msgstr "Bizning vazifamiz"
 
-#: places/templates/places/about.html:35
+#: places/templates/places/about.html:42
 msgid ""
 "Halal Korea aims to make life easier for Muslims living in and visiting "
 "South Korea by providing a comprehensive platform to find halal food, "
@@ -534,7 +557,7 @@ msgstr ""
 "uchun halol ovqat, do'konlar va namozgohlarni topish uchun keng qamrovli "
 "platforma taqdim etish orqali hayotni osonlashtirishni maqsad qiladi."
 
-#: places/templates/places/about.html:38
+#: places/templates/places/about.html:45
 msgid ""
 "We understand the challenges of finding halal options in a new country, and "
 "we're here to bridge that gap by connecting our community with verified "
@@ -544,15 +567,22 @@ msgstr ""
 "va jamiyatimizni Koreya bo'ylab tasdiqlangan halol muassasalar bilan "
 "bog'lash orqali bu bo'shliqni to'ldirish uchun shu yerda turibmiz."
 
-#: places/templates/places/about.html:53
+#: places/templates/places/about.html:50
+msgid ""
+"Central Mosque in Seoul - Our Mission to serve the Muslim community in Korea"
+msgstr ""
+"Seuldagi Markaziy masjid – Koreyadagi musulmon jamiyatiga xizmat qilish "
+"bizning vazifamiz"
+
+#: places/templates/places/about.html:64
 msgid "What We Offer"
 msgstr "Nima taklif qilamiz"
 
-#: places/templates/places/about.html:63 places/templates/places/about.html:120
+#: places/templates/places/about.html:76 places/templates/places/about.html:160
 msgid "Community Reviews"
 msgstr "Jamiyat sharhlari"
 
-#: places/templates/places/about.html:65
+#: places/templates/places/about.html:79
 msgid ""
 "Real experiences shared by our community members help others make informed "
 "decisions."
@@ -560,21 +590,21 @@ msgstr ""
 "Jamiyat a'zolarimiz tomonidan ulashilgan haqiqiy tajribalar boshqalarga "
 "ma'lumotli qarorlar qabul qilishga yordam beradi."
 
-#: places/templates/places/about.html:77
+#: places/templates/places/about.html:92
 msgid "Multi-Language Support"
 msgstr "Ko'p tilli qo'llab-quvvatlash"
 
-#: places/templates/places/about.html:79
+#: places/templates/places/about.html:95
 msgid "Available in English, Korean, and Uzbek to serve our diverse community."
 msgstr ""
 "Turli xil jamiyatimizga xizmat qilish uchun ingliz, koreys va o'zbek "
 "tillarida mavjud."
 
-#: places/templates/places/about.html:93
+#: places/templates/places/about.html:110
 msgid "Find Nearby Places"
 msgstr "Yaqin joylarni topish"
 
-#: places/templates/places/about.html:95
+#: places/templates/places/about.html:113
 msgid ""
 "Discover halal restaurants, markets, and prayer spaces in your vicinity with "
 "our interactive map feature."
@@ -582,23 +612,24 @@ msgstr ""
 "Interaktiv xarita xususiyatimiz bilan atrofingizdagi halol restoranlar, "
 "do'konlar va namozgohlarini kashf eting."
 
-#: places/templates/places/about.html:105
+#: places/templates/places/about.html:124
 msgid "Our Growing Community"
 msgstr "Bizning o'sayotgan jamiyatimiz"
 
-#: places/templates/places/about.html:112
+#: places/templates/places/about.html:143
 msgid "Community Added Places"
 msgstr "Jamiyat tomonidan qo'shilgan joylar"
 
-#: places/templates/places/about.html:128
+#: places/templates/places/about.html:177
 msgid "Active Users"
 msgstr "Faol foydalanuvchilar"
 
-#: places/templates/places/about.html:144
+#: places/templates/places/about.html:195
+#: places/templates/places/place_detail.html:336
 msgid "Important Notice"
 msgstr "Muhim eslatma"
 
-#: places/templates/places/about.html:146
+#: places/templates/places/about.html:198
 msgid ""
 "All places listed on our platform are community-contributed. While we make "
 "every effort to maintain accurate information, we strongly recommend "
@@ -611,7 +642,8 @@ msgstr ""
 "halol holatini tekshirishingizni tavsiya qilamiz. Sizning "
 "mehnatsevarligingiz jamiyatimizning yaxlitligini saqlashga yordam beradi."
 
-#: places/templates/places/base.html:19 places/templates/places/base.html:23
+#: places/templates/places/base.html:19 places/templates/places/base.html:33
+#: places/templates/places/base.html:47 places/templates/places/base.html:80
 msgid ""
 "Discover halal restaurants, markets, and prayer spaces across South Korea. "
 "Your comprehensive guide to halal dining and Islamic facilities in Korea."
@@ -620,36 +652,48 @@ msgstr ""
 "eting. Koreyadagi halol ovqatlanish va islomiy muassasalar bo'yicha sizning "
 "keng qamrovli yo'riqnomangiz."
 
-#: places/templates/places/base.html:22 places/templates/places/base.html:27
-#: places/templates/places/home.html:5 utils/context_processors.py:24
-#: utils/context_processors.py:25
+#: places/templates/places/base.html:32 places/templates/places/base.html:46
+#: places/templates/places/base.html:56 places/templates/places/home.html:5
+#: templates/account/base.html:5
+#: templates/socialaccount/account_disconnected.html:5
+#: templates/socialaccount/connection_confirm_disconnect.html:5
+#: templates/socialaccount/connections.html:6
+#: users/templates/users/password_reset_confirm.html:4
+#: users/templates/users/password_reset_confirm.html:10
+#: users/templates/users/password_reset_invalid.html:4
+#: users/templates/users/password_reset_invalid.html:10
+#: users/templates/users/password_reset_request.html:4
+#: users/templates/users/password_reset_request.html:10
+#: users/templates/users/password_reset_sent.html:4
+#: users/templates/users/password_reset_sent.html:10
+#: utils/context_processors.py:25 utils/context_processors.py:26
 msgid "Halal Korea"
 msgstr "Halal Korea"
 
-#: places/templates/places/base.html:22 places/templates/places/base.html:27
-#: places/templates/places/home.html:5 places/templates/places/home.html:23
+#: places/templates/places/base.html:32 places/templates/places/base.html:46
+#: places/templates/places/base.html:56 places/templates/places/home.html:5
 msgid "Find Halal Places in Korea"
 msgstr "Koreyadagi halol joylarni toping"
 
-#: places/templates/places/base.html:295 places/templates/places/base.html:323
-#: places/templates/places/base.html:553
-#: places/templates/places/place_detail.html:69
+#: places/templates/places/base.html:216 places/templates/places/base.html:244
+#: places/templates/places/base.html:478
+#: places/templates/places/place_detail.html:197
 msgid "Explore"
 msgstr "Kashf etish"
 
-#: places/templates/places/base.html:299 places/templates/places/base.html:328
-#: places/templates/places/base.html:557
-#: places/templates/places/submit_place.html:360
+#: places/templates/places/base.html:220 places/templates/places/base.html:249
+#: places/templates/places/base.html:482 places/templates/places/home.html:269
+#: places/templates/places/submit_place.html:502
 msgid "Submit Place"
 msgstr "Joy qo'shish"
 
-#: places/templates/places/base.html:311 places/templates/places/base.html:569
+#: places/templates/places/base.html:232 places/templates/places/base.html:494
 #: places/templates/places/donate.html:4
 msgid "Donate"
 msgstr "Donat"
 
-#: places/templates/places/base.html:315 places/templates/places/base.html:338
-#: places/templates/places/base.html:573
+#: places/templates/places/base.html:236 places/templates/places/base.html:259
+#: places/templates/places/base.html:498 places/templates/places/home.html:236
 #: prayer_times/templates/prayer_times/error.html:4
 #: prayer_times/templates/prayer_times/prayer_times.html:4
 #: prayer_times/templates/prayer_times/prayer_times.html:10
@@ -657,24 +701,24 @@ msgstr "Donat"
 msgid "Prayer Times"
 msgstr "Namoz vaqtlari"
 
-#: places/templates/places/base.html:494 places/templates/places/base.html:645
+#: places/templates/places/base.html:418 places/templates/places/base.html:571
 msgid "Profile"
 msgstr "Profil"
 
-#: places/templates/places/base.html:498 places/templates/places/base.html:648
+#: places/templates/places/base.html:422 places/templates/places/base.html:574
 msgid "Settings"
 msgstr "Sozlamalar"
 
-#: places/templates/places/base.html:504
+#: places/templates/places/base.html:428
 msgid "Log out"
 msgstr "Chiqish"
 
-#: places/templates/places/base.html:518 places/templates/places/base.html:663
-#: users/templates/users/login.html:107 users/templates/users/register.html:4
+#: places/templates/places/base.html:442 places/templates/places/base.html:589
+#: users/templates/users/login.html:148 users/templates/users/register.html:5
 msgid "Sign up"
 msgstr "Ro'yxatdan o'tish"
 
-#: places/templates/places/base.html:642
+#: places/templates/places/base.html:568
 #, python-format
 msgid ""
 "Signed in as <span class=\"font-bold text-gray-700 dark:text-"
@@ -683,30 +727,30 @@ msgstr ""
 "<span class=\"font-bold text-gray-700 dark:text-white\">%(username)s</span> "
 "sifatida kirilgan"
 
-#: places/templates/places/base.html:653
+#: places/templates/places/base.html:579
 msgid "Logout"
 msgstr "Chiqish"
 
-#: places/templates/places/base.html:729
+#: places/templates/places/base.html:655
 msgid "Email verification required"
 msgstr "Elektron pochta tasdiqlash talab qilinadi"
 
-#: places/templates/places/base.html:730
+#: places/templates/places/base.html:656
 msgid ""
 "Please verify your email address to submit places, reviews, and suggestions."
 msgstr ""
 "Iltimos, joylar, sharhlar va takliflarni yuborish uchun elektron pochta "
 "manzilingizni tasdiqlang."
 
-#: places/templates/places/base.html:732
+#: places/templates/places/base.html:658
 msgid "Send verification email"
 msgstr "Tasdiqlash xabarini yuborish"
 
-#: places/templates/places/base.html:781
+#: places/templates/places/base.html:697
 msgid "Quick Links"
 msgstr "Tezkor havolalar"
 
-#: places/templates/places/base.html:785
+#: places/templates/places/base.html:701
 #: places/templates/places/my_contributions.html:563
 #: places/templates/places/my_contributions.html:663
 #: users/templates/users/profile.html:157
@@ -714,31 +758,31 @@ msgstr "Tezkor havolalar"
 msgid "Explore Places"
 msgstr "Joylarni kashf etish"
 
-#: places/templates/places/base.html:790 places/templates/places/home.html:242
+#: places/templates/places/base.html:706
 #: places/templates/places/my_contributions.html:370
 #: places/templates/places/submit_place.html:4
 msgid "Submit a Place"
 msgstr "Joy qo'shish"
 
-#: places/templates/places/base.html:800
+#: places/templates/places/base.html:716
 msgid "About Us"
 msgstr "Biz haqimizda"
 
-#: places/templates/places/base.html:808
+#: places/templates/places/base.html:724
 msgid "Contact"
 msgstr "Aloqa"
 
-#: places/templates/places/base.html:839 places/templates/places/legal.html:28
+#: places/templates/places/base.html:755 places/templates/places/legal.html:28
 #: places/templates/places/legal.html:48
 msgid "Privacy Policy"
 msgstr "Maxfiylik siyosati"
 
-#: places/templates/places/base.html:842 places/templates/places/legal.html:31
+#: places/templates/places/base.html:758 places/templates/places/legal.html:31
 #: places/templates/places/legal.html:110
 msgid "Terms of Service"
 msgstr "Xizmat ko'rsatish shartlari"
 
-#: places/templates/places/base.html:845 places/templates/places/legal.html:34
+#: places/templates/places/base.html:761 places/templates/places/legal.html:34
 #: places/templates/places/legal.html:171
 msgid "Cookie Policy"
 msgstr "Cookie siyosati"
@@ -753,8 +797,8 @@ msgid ""
 "community in Korea.\n"
 "                Your support makes a difference!"
 msgstr ""
-"Platformamizni musulmonlar hamjamiyatiga Koreyada yanada yaxshi xizmat qilishi uchun "
-"saqlash va rivojlantirishda yordam bering.\n"
+"Platformamizni musulmonlar hamjamiyatiga Koreyada yanada yaxshi xizmat "
+"qilishi uchun saqlash va rivojlantirishda yordam bering.\n"
 "                Sizning qo'llab-quvvatlashingiz katta ahamiyatga ega!"
 
 #: places/templates/places/donate.html:31
@@ -770,76 +814,83 @@ msgstr ""
 msgid "Donate Now"
 msgstr "Hozir donat qilish"
 
-#: places/templates/places/donate.html:47
+#: places/templates/places/donate.html:45
+#, fuzzy
+#| msgid "Most Popular"
+msgid "Popular"
+msgstr "Eng mashhur"
+
+#: places/templates/places/donate.html:52
 msgid "Monthly Support"
 msgstr "Oylik qo'llab-quvvatlash"
 
-#: places/templates/places/donate.html:49
+#: places/templates/places/donate.html:54
 msgid "Become a regular supporter with monthly donations"
 msgstr "Oylik donatlar bilan muntazam qo'llab-quvvatlovchi bo'ling"
 
-#: places/templates/places/donate.html:52
+#: places/templates/places/donate.html:57
 msgid "Subscribe Monthly"
 msgstr "Oylik obuna bo'lish"
 
-#: places/templates/places/donate.html:63
+#: places/templates/places/donate.html:68
 msgid "Corporate Sponsorship"
 msgstr "Korporativ homiylik"
 
-#: places/templates/places/donate.html:65
+#: places/templates/places/donate.html:70
 msgid "Partner with us as a corporate sponsor"
 msgstr "Korporativ homiy sifatida biz bilan hamkorlik qiling"
 
-#: places/templates/places/donate.html:68
+#: places/templates/places/donate.html:73
 #: places/templates/places/legal.html:272
 msgid "Contact Us"
 msgstr "Biz bilan bog'laning"
 
-#: places/templates/places/donate.html:76
+#: places/templates/places/donate.html:81
 msgid "Why Donate?"
 msgstr "Nega donat qilish kerak?"
 
-#: places/templates/places/donate.html:83
+#: places/templates/places/donate.html:88
 msgid "Server Costs"
 msgstr "Server xarajatlari"
 
-#: places/templates/places/donate.html:85
+#: places/templates/places/donate.html:90
 msgid "Help us maintain reliable and fast server infrastructure"
 msgstr "Ishonchli va tez server infratuzilmasi saqlashga yordam bering"
 
-#: places/templates/places/donate.html:92
+#: places/templates/places/donate.html:97
 msgid "Development"
 msgstr "Rivojlanish"
 
-#: places/templates/places/donate.html:94
+#: places/templates/places/donate.html:99
 msgid "Support ongoing development of new features"
 msgstr "Yangi imkoniyatlarni ishlab chiqishni qo‘llab-quvvatlang"
 
-#: places/templates/places/donate.html:101
+#: places/templates/places/donate.html:106
 msgid "Community Growth"
 msgstr "Jamiyat o'sishi"
 
-#: places/templates/places/donate.html:103
+#: places/templates/places/donate.html:108
 msgid "Help us reach and serve more Muslims in Korea"
-msgstr "Koreyada ko'proq musulmonlarga yetish va xizmat qilishimizga yordam bering"
+msgstr ""
+"Koreyada ko'proq musulmonlarga yetish va xizmat qilishimizga yordam bering"
 
-#: places/templates/places/donate.html:110
+#: places/templates/places/donate.html:115
 msgid "Sustainability"
 msgstr "Barqarorlik"
 
-#: places/templates/places/donate.html:112
+#: places/templates/places/donate.html:117
 msgid "Ensure long-term sustainability of the platform"
 msgstr "Platformaning uzoq muddatli barqarorligini ta'minlang"
 
-#: places/templates/places/donate.html:119
+#: places/templates/places/donate.html:124
 msgid "Frequently Asked Questions"
 msgstr "Ko'p so'raladigan savollar"
 
-#: places/templates/places/donate.html:122
+#: places/templates/places/donate.html:127
 msgid "How is my donation used?"
 msgstr "Mening donatim qanday ishlatiladi?"
 
-#: places/templates/places/donate.html:123
+#: places/templates/places/donate.html:128
 msgid ""
 "Your donations directly support server costs, development, and community "
 "outreach efforts."
@@ -847,205 +898,261 @@ msgstr ""
 "Sizning donatlaringiz server xarajatlari, dasturiy ta’minotni rivojlantirish "
 "va hamjamiyat bilan ishlash faoliyatini bevosita qo‘llab-quvvatlaydi."
 
-#: places/templates/places/donate.html:126
+#: places/templates/places/donate.html:131
 msgid "Why does Halal Korea need donations?"
 msgstr "Nega Halal Korea'ga donat qilish kerak?"
 
-#: places/templates/places/donate.html:127
+#: places/templates/places/donate.html:132
 msgid ""
 "As a non-profit community platform, we don't run ads or have other revenue "
 "streams. Your donations help us maintain and improve our services, ensuring "
 "Muslims in Korea have access to reliable halal information and resources."
 msgstr ""
-"Notijorat hamjamiyat platformasi sifatida biz reklama joylashtirmaymiz va boshqa daromad "
-"manbalariga ega emasmiz. Sizning donatlaringiz xizmatlarimizni saqlash va "
-"yaxshilashga yordam beradi hamda Koreyadagi musulmonlarning ishonchli halol "
-"ma'lumot va resurslarga ega bo'lishini ta'minlaydi."
+"Notijorat hamjamiyat platformasi sifatida biz reklama joylashtirmaymiz va "
+"boshqa daromad manbalariga ega emasmiz. Sizning donatlaringiz "
+"xizmatlarimizni saqlash va yaxshilashga yordam beradi hamda Koreyadagi "
+"musulmonlarning ishonchli halol ma'lumot va resurslarga ega bo'lishini "
+"ta'minlaydi."
 
-#: places/templates/places/donate.html:130
+#: places/templates/places/donate.html:135
 msgid "Can I donate from outside Korea?"
 msgstr "Koreyadan tashqaridan donat qilishim mumkinmi?"
 
-#: places/templates/places/donate.html:133
+#: places/templates/places/donate.html:136
 msgid "Yes! We accept international donations through various payment methods."
 msgstr ""
 "Ha! Biz turli xil to'lov usullari orqali xalqaro donatlarni qabul qilamiz."
 
-#: places/templates/places/explore.html:19
-#: places/templates/places/explore.html:32
+#: places/templates/places/donate.html:144
+msgid "Payment System Coming Soon"
+msgstr "To'lov tizimi tez orada ishga tushadi"
+
+#: places/templates/places/donate.html:146
+msgid ""
+"We're currently working on integrating secure payment systems. In the "
+"meantime, please contact us to discuss donation options."
+msgstr ""
+"Hozirda biz xavfsiz to'lov tizimlarini integratsiya qilish ustida "
+"ishlayapmiz. Shu vaqt ichida donat qilish imkoniyatlari haqida "
+"gaplashish uchun iltimos, biz bilan bog'laning."
+
+#: places/templates/places/donate.html:150
+msgid "Contact us for more information"
+msgstr "Qo'shimcha ma'lumot uchun biz bilan bog'laning"
+
+#: places/templates/places/explore.html:119
+#: places/templates/places/explore.html:132
 msgid "Explore Halal Places"
 msgstr "Halol joylarni kashf etish"
 
-#: places/templates/places/explore.html:33
+#: places/templates/places/explore.html:133
 msgid "Discover halal restaurants, markets, and prayer spaces near you"
 msgstr ""
 "Atrofingizdagi halol restoranlar, do'konlar va namozgohlarni kashf eting"
 
-#: places/templates/places/explore.html:35
+#: places/templates/places/explore.html:135
+#: places/templates/places/home.html:23
 msgid "Halal Places in Korea"
 msgstr "Koreyadagi halol joylar"
 
-#: places/templates/places/explore.html:36
+#: places/templates/places/explore.html:136
 msgid "Plan your halal journey across South Korea - browse by city and region"
 msgstr ""
 "Janubiy Koreya bo'ylab halol sayohatingizni rejalashtiring - shahar va "
 "hududlar bo'yicha ko'ring"
 
-#: places/templates/places/explore.html:50
-#: places/templates/places/explore.html:84
-msgid "Update My Location"
-msgstr "Manzilimni yangilash"
+#: places/templates/places/explore.html:152
+#: places/templates/places/explore.html:246
+#, fuzzy
+#| msgid "Use Current Location"
+msgid "Current Location"
+msgstr "Joriy joylashuv"
 
-#: places/templates/places/explore.html:57
-#: places/templates/places/explore.html:91
-msgid "Your location:"
-msgstr "Sizning manzilingiz:"
+#: places/templates/places/explore.html:154
+#: places/templates/places/explore.html:248
+msgid "Viewing from"
+msgstr "Quyidagi joydan ko'rilmoqda:"
 
-#: places/templates/places/explore.html:61
-#: places/templates/places/explore.html:96
-msgid "Update"
-msgstr "Yangilash"
+#: places/templates/places/explore.html:161
+#: places/templates/places/explore.html:255
+#, fuzzy
+#| msgid "Your Location"
+msgid "Unknown Location"
+msgstr "Noma'lum joylashuv"
 
-#: places/templates/places/explore.html:66
-#: places/templates/places/explore.html:102
+#: places/templates/places/explore.html:172
 msgid "Set location to Seoul"
 msgstr "Manzilni Seulga o'rnatish"
 
-#: places/templates/places/explore.html:85
-#: places/templates/places/submit_place.html:218
-msgid "Location"
-msgstr "Manzil"
+#: places/templates/places/explore.html:179
+msgid "Update my location"
+msgstr "Joylashuvimni yangilash"
 
-#: places/templates/places/explore.html:92
-msgid "Location:"
-msgstr "Manzil:"
+#: places/templates/places/explore.html:181
+#: places/templates/places/explore.html:267
+msgid "Update"
+msgstr "Yangilash"
 
-#: places/templates/places/explore.html:118
-msgid "View Map"
-msgstr "Xaritani ko'rish"
+#: places/templates/places/explore.html:197
+msgid "Search & Filters"
+msgstr "Qidiruv va filtrlash"
 
-#: places/templates/places/explore.html:119
-msgid "Map"
-msgstr "Xarita"
+#: places/templates/places/explore.html:214
+msgid "Set Location"
+msgstr "Joylashuvni o'rnatish"
 
-#: places/templates/places/explore.html:136
+#: places/templates/places/explore.html:224
+msgid "List View"
+msgstr "Ro'yxat ko'rinishi"
+
+#: places/templates/places/explore.html:229
+msgid "Map View"
+msgstr "Xarita ko'rinishi"
+
+#: places/templates/places/explore.html:234
+msgid "Split View"
+msgstr "Bo'lingan ko'rinish"
+
+#: places/templates/places/explore.html:290
 #: places/templates/places/home.html:50
 msgid "Search places..."
 msgstr "Joylarni qidirish..."
 
-#: places/templates/places/explore.html:153
-#: places/templates/places/explore.html:222
+#: places/templates/places/explore.html:296
+msgid "Filter:"
+msgstr "Filtr:"
+
+#: places/templates/places/explore.html:301
+#: places/templates/places/explore.html:333
 msgid "All Categories"
 msgstr "Barcha toifalar"
 
-#: places/templates/places/explore.html:154
-#: places/templates/places/explore.html:223
-#: places/templates/places/home.html:97
+#: places/templates/places/explore.html:307
+#: places/templates/places/explore.html:334
+#: places/templates/places/home.html:99
 msgid "Restaurants"
 msgstr "Restoranlar"
 
-#: places/templates/places/explore.html:155
-#: places/templates/places/explore.html:224
-#: places/templates/places/home.html:117
+#: places/templates/places/explore.html:313
+#: places/templates/places/explore.html:335
+#: places/templates/places/home.html:119
 msgid "Markets"
 msgstr "Do'konlar"
 
-#: places/templates/places/explore.html:156
-#: places/templates/places/explore.html:225
-#: places/templates/places/home.html:137
+#: places/templates/places/explore.html:319
+msgid "Prayer Spaces"
+msgstr "Namozgohlar"
+
+#: places/templates/places/explore.html:336
 msgid "Mosques & Prayer Rooms"
 msgstr "Masjidlar va namoz xonalari"
 
-#: places/templates/places/explore.html:172
-msgid "All Cities"
-msgstr "Barcha shaharlar"
-
-#: places/templates/places/explore.html:201
-#: places/templates/places/explore.html:240
+#: places/templates/places/explore.html:351
 msgid "Sort by Distance"
 msgstr "Masofa bo'yicha saralash"
 
-#: places/templates/places/explore.html:202
-#: places/templates/places/explore.html:241
+#: places/templates/places/explore.html:352
 msgid "Sort by Rating"
 msgstr "Reyting bo'yicha saralash"
 
-#: places/templates/places/explore.html:204
-#: places/templates/places/explore.html:243
+#: places/templates/places/explore.html:354
 msgid "Most Popular"
 msgstr "Eng mashhur"
 
-#: places/templates/places/explore.html:205
-#: places/templates/places/explore.html:244
+#: places/templates/places/explore.html:355
 msgid "By Location"
 msgstr "Manzil bo'yicha"
 
-#: places/templates/places/explore.html:267
-#: places/templates/places/explore.html:482
-#: places/templates/places/explore.html:582
+#: places/templates/places/explore.html:378
+#: places/templates/places/explore.html:911
+#: places/templates/places/explore.html:995
+msgid "Pull to refresh"
+msgstr "Yangilash uchun pastga torting"
+
+#: places/templates/places/explore.html:397
+#: places/templates/places/explore.html:682
+#: places/templates/places/explore.html:789
 msgid "Loading more places..."
 msgstr "Ko'proq joylar yuklanmoqda..."
 
-#: places/templates/places/explore.html:297
+#: places/templates/places/explore.html:430
 msgid "Your Location"
 msgstr "Sizning manzilingiz"
 
-#: places/templates/places/explore.html:351
+#: places/templates/places/explore.html:492
 msgid "Error loading places:"
 msgstr "Joylarni yuklashda xatolik:"
 
-#: places/templates/places/explore.html:393
+#: places/templates/places/explore.html:541
 msgid "Prayer Space"
 msgstr "Namozgoh"
 
-#: places/templates/places/explore.html:396
+#: places/templates/places/explore.html:583
+#: places/templates/places/explore.html:584
+msgid "away"
+msgstr "uzoqlikda"
+
+#: places/templates/places/explore.html:592
 #: users/templates/users/profile.html:145
 msgid "View Details"
 msgstr "Tafsilotlarni ko'rish"
 
-#: places/templates/places/explore.html:510
+#: places/templates/places/explore.html:710
 msgid "Error loading more places:"
 msgstr "Ko'proq joylarni yuklashda xatolik:"
 
-#: places/templates/places/explore.html:604
+#: places/templates/places/explore.html:811
 msgid "Error applying filters:"
 msgstr "Filtrlarni qo'llashda xatolik:"
 
-#: places/templates/places/explore.html:730
+#: places/templates/places/explore.html:907
+msgid "Release to refresh"
+msgstr "Yangilash uchun qo'yib yuboring"
+
+#: places/templates/places/explore.html:929
+#, fuzzy
+#| msgid "Sending..."
+msgid "Refreshing..."
+msgstr "Yangilanmoqda..."
+
+#: places/templates/places/explore.html:1230
 msgid "Failed to set location to Seoul"
 msgstr "Manzilni Seulga o'rnatish amalga oshmadi"
 
-#: places/templates/places/explore.html:734
+#: places/templates/places/explore.html:1234
 msgid "Error setting location to Seoul"
 msgstr "Manzilni Seulga o'rnatishda xatolik"
 
-#: places/templates/places/explore.html:770
-#: places/templates/places/explore.html:773
-#: places/templates/places/home.html:273 places/templates/places/home.html:276
+#: places/templates/places/explore.html:1270
+#: places/templates/places/explore.html:1273
+#: places/templates/places/home.html:305 places/templates/places/home.html:308
 msgid "Failed to update location: "
 msgstr "Manzilni yangilash amalga oshmadi: "
 
-#: places/templates/places/explore.html:770
-#: places/templates/places/home.html:273
+#: places/templates/places/explore.html:1270
+#: places/templates/places/home.html:305
 msgid "Unknown error"
 msgstr "Noma'lum xatolik"
 
-#: places/templates/places/explore.html:776
-#: places/templates/places/home.html:279
+#: places/templates/places/explore.html:1276
+#: places/templates/places/home.html:311
 msgid "Could not get your location: "
 msgstr "Joylashuvingiz aniqlanmadi: "
 
-#: places/templates/places/explore.html:779
-#: places/templates/places/home.html:282
+#: places/templates/places/explore.html:1279
+#: places/templates/places/home.html:314
 msgid "Geolocation is not supported by your browser."
 msgstr "Geolokatsiya brauzeringiz tomonidan qo'llab-quvvatlanmaydi."
 
 #: places/templates/places/home.html:26
 msgid "Discover halal restaurants, markets, and prayer spaces near you."
-msgstr "Atrofingizdagi halol restoranlar, do'konlar va namozgohlarni kashf eting."
+msgstr ""
+"Atrofingizdagi halol restoranlar, do'konlar va namozgohlarni kashf eting."
 
 #: places/templates/places/home.html:30
-msgid "Planning Your Halal Journey to Korea?"
+#, fuzzy
+#| msgid "Planning Your Halal Journey to Korea?"
+msgid "Planning a Trip to Korea?"
 msgstr "Koreyaga halol sayohatingizni rejalashtirmoqchimisiz?"
 
 #: places/templates/places/home.html:33
@@ -1066,87 +1173,93 @@ msgstr ""
 msgid "Search places in Korea..."
 msgstr "Koreyadagi joylarni qidirish..."
 
-#: places/templates/places/home.html:60
+#: places/templates/places/home.html:62
 #: users/templates/users/resend_activation.html:117
 msgid "or"
 msgstr "yoki"
 
-#: places/templates/places/home.html:70
+#: places/templates/places/home.html:72
 msgid "Find Places Near Me"
 msgstr "Yaqin joylarni topish"
 
-#: places/templates/places/home.html:78
+#: places/templates/places/home.html:80
 msgid "Browse All Places"
 msgstr "Barcha joylarni ko'rish"
 
-#: places/templates/places/home.html:100
+#: places/templates/places/home.html:102
 msgid "Find halal restaurants near you"
 msgstr "Atrofingizdagi halol restoranlarni toping"
 
-#: places/templates/places/home.html:102
+#: places/templates/places/home.html:104
 msgid "Find halal restaurants in Korea"
 msgstr "Koreyadagi halol restoranlarni toping"
 
-#: places/templates/places/home.html:120
+#: places/templates/places/home.html:122
 msgid "Discover halal grocery stores"
 msgstr "Halol oziq-ovqat do'konlarini kashf eting"
 
-#: places/templates/places/home.html:122
+#: places/templates/places/home.html:124
 msgid "Find halal markets for your trip"
 msgstr "Sayohatingiz uchun halol do'konlarni toping"
 
-#: places/templates/places/home.html:140
+#: places/templates/places/home.html:139
+#, fuzzy
+#| msgid "Mosque"
+msgid "Mosques"
+msgstr "Masjid"
+
+#: places/templates/places/home.html:142
 msgid "Find nearby prayer spaces"
 msgstr "Yaqin namozgohlarni toping"
 
-#: places/templates/places/home.html:142
+#: places/templates/places/home.html:144
 msgid "Prayer spaces for your journey"
 msgstr "Sayohatingiz uchun namozgohlar"
 
-#: places/templates/places/home.html:157
+#: places/templates/places/home.html:159
 msgid "Explore All"
 msgstr "Hammasini kashf etish"
 
-#: places/templates/places/home.html:158
+#: places/templates/places/home.html:160
 msgid "Discover all halal places in Korea"
 msgstr "Koreyadagi barcha halol joylarni kashf eting"
 
-#: places/templates/places/home.html:170
+#: places/templates/places/home.html:172
 msgid "Featured Places"
 msgstr "Tavsiya etilgan joylar"
 
-#: places/templates/places/home.html:172
+#: places/templates/places/home.html:174
 msgid "Popular Places to Visit"
 msgstr "Tashrif buyurish uchun mashhur joylar"
 
-#: places/templates/places/home.html:203
+#: places/templates/places/home.html:206
 #, python-format
 msgid "(%(review_count)s review)"
 msgid_plural "(%(review_count)s reviews)"
 msgstr[0] "(%(review_count)s sharh)"
 msgstr[1] "(%(review_count)s sharh)"
 
-#: places/templates/places/home.html:219
-msgid "Stay Updated with Prayer Times"
-msgstr "Namoz vaqtlaridan xabardor bo'ling"
-
-#: places/templates/places/home.html:222
+#: places/templates/places/home.html:239
 msgid "Check the latest prayer times for your location."
 msgstr "Manzilingiz uchun eng so'nggi namoz vaqtlarini tekshiring."
 
-#: places/templates/places/home.html:226
-msgid "View Prayer Times"
+#: places/templates/places/home.html:242
+#, fuzzy
+#| msgid "View Prayer Times"
+msgid "View Times"
 msgstr "Namoz vaqtlarini ko'rish"
 
-#: places/templates/places/home.html:235
-msgid "Know a Halal Spot? Share It!"
+#: places/templates/places/home.html:263
+#, fuzzy
+#| msgid "Know a Halal Spot? Share It!"
+msgid "Know a Halal Spot?"
 msgstr "Halol joyni bilasizmi? Ulashing!"
 
-#: places/templates/places/home.html:238
+#: places/templates/places/home.html:266
 msgid "Help us grow our community by submitting halal places you know!"
 msgstr ""
-"Bilgan halol joylaringizni yuborish orqali hamjamiyatimizning o'sishiga yordam "
-"bering!"
+"Bilgan halol joylaringizni yuborish orqali hamjamiyatimizning o'sishiga "
+"yordam bering!"
 
 #: places/templates/places/legal.html:5
 msgid "Legal"
@@ -1615,7 +1728,6 @@ msgid "Back to Profile"
 msgstr "Profilga qaytish"
 
 #: places/templates/places/my_contributions.html:34
-#: places/templates/places/suggest_edit.html:79
 msgid "Back"
 msgstr "Qaytish"
 
@@ -1714,13 +1826,11 @@ msgstr "Joylar"
 
 #: places/templates/places/my_contributions.html:200
 #: places/templates/places/my_contributions.html:230
-#: places/templates/places/suggest_edit.html:101
 msgid "Edits"
 msgstr "Tahrirlar"
 
 #: places/templates/places/my_contributions.html:204
 #: places/templates/places/my_contributions.html:240
-#: places/templates/places/suggest_edit.html:105
 msgid "Images"
 msgstr "Rasmlar"
 
@@ -1820,8 +1930,8 @@ msgid ""
 "You haven't suggested any field edits yet. Visit a place page and click "
 "'Suggest Edit' to get started!"
 msgstr ""
-"Siz hali hech qanday tahrirni taklif qilmagansiz. Joy sahifasiga "
-"tashrif buyuring va boshlash uchun 'Tahrir taklif qilish'ni bosing!"
+"Siz hali hech qanday tahrirni taklif qilmagansiz. Joy sahifasiga tashrif "
+"buyuring va boshlash uchun 'Tahrir taklif qilish'ni bosing!"
 
 #: places/templates/places/my_contributions.html:573
 msgid "Image Upload Suggestions"
@@ -1855,41 +1965,89 @@ msgstr ""
 "Siz hali hech qanday rasm yuklamagansiz. Joy sahifasiga tashrif buyuring va "
 "fotolar yuklash uchun 'Tahrir taklif qilish'ni bosing!"
 
-#: places/templates/places/partials/place_list.html:62
-#: places/templates/places/place_detail.html:231
+#: places/templates/places/partials/place_list.html:151
+#: places/templates/places/place_detail.html:452
 msgid "Open in Google Maps"
 msgstr "Google Maps-da ochish"
 
-#: places/templates/places/partials/place_list.html:87
-#: places/templates/places/place_detail.html:255
+#: places/templates/places/partials/place_list.html:162
+#: places/templates/places/place_detail.html:465
+msgid "Open in Naver Maps"
+msgstr "Naver Maps-da ochish"
+
+#: places/templates/places/partials/place_list.html:172
+#: places/templates/places/place_detail.html:477
+msgid "Open in Kakao Maps"
+msgstr "Kakao Maps-da ochish"
+
+#: places/templates/places/partials/place_list.html:181
+#: places/templates/places/place_detail.html:493
 msgid "Korean maps:"
 msgstr "Koreys xaritalari:"
 
-#: places/templates/places/partials/place_list.html:92
-#: places/templates/places/partials/place_list.html:100
-#: places/templates/places/place_detail.html:259
-#: places/templates/places/place_detail.html:266
+#: places/templates/places/partials/place_list.html:186
+#: places/templates/places/partials/place_list.html:196
+#: places/templates/places/place_detail.html:499
+#: places/templates/places/place_detail.html:510
 msgid "Korean navigation app"
 msgstr "Koreys navigatsiya ilovasi"
 
-#: places/templates/places/place_detail.html:65
+#: places/templates/places/partials/place_list.html:216
+msgid "No places found"
+msgstr "Joylar topilmadi"
+
+#: places/templates/places/partials/place_list.html:219
+msgid ""
+"We couldn't find any places matching your search. Try adjusting your filters "
+"or search in a different area."
+msgstr ""
+"Qidiruvingizga mos hech qanday joy topilmadi. Filtrlarni o'zgartirib ko'ring "
+"yoki boshqa hudud bo'yicha qidiring."
+
+#: places/templates/places/partials/place_list.html:225
+msgid "Clear filters"
+msgstr "Filtrlarni tozalash"
+
+#: places/templates/places/partials/place_list.html:230
+msgid "Add a place"
+msgstr "Yangi joy qo'shish"
+
+#: places/templates/places/place_detail.html:185
 msgid "Breadcrumb"
 msgstr "Navigatsiya yo'li"
 
-#: places/templates/places/place_detail.html:134
+#: places/templates/places/place_detail.html:241
+msgid "Upload photos for this place"
+msgstr "Ushbu joy uchun fotolar yuklang"
+
+#: places/templates/places/place_detail.html:245
+#: places/templates/places/suggest_edit.html:608
+msgid "Add Photos"
+msgstr "Fotolar qo'shish"
+
+#: places/templates/places/place_detail.html:299
 msgid "Suggest edits or upload images for this place"
 msgstr "Bu joy uchun tahrirlar taklif qiling yoki rasmlar yuklang"
 
-#: places/templates/places/place_detail.html:136
+#: places/templates/places/place_detail.html:303
 #: places/templates/places/suggest_edit.html:5
 msgid "Suggest Edit"
 msgstr "Tahrir taklif qilish"
 
-#: places/templates/places/place_detail.html:164
-msgid "Important Notice:"
-msgstr "Muhim eslatma:"
+#: places/templates/places/place_detail.html:309
+msgid "Remove from favorites"
+msgstr "Sevimlilardan olib tashlash"
 
-#: places/templates/places/place_detail.html:164
+#: places/templates/places/place_detail.html:309
+msgid "Add to favorites"
+msgstr "Sevimlilarga qo'shildi"
+
+#: places/templates/places/place_detail.html:316
+msgid "Share this place"
+msgstr "Bu joyni ulashish"
+
+#: places/templates/places/place_detail.html:340
+#: places/templates/places/place_detail.html:362
 msgid ""
 "This place has been added by our community. While we strive to maintain "
 "accurate information, we recommend verifying the halal status directly with "
@@ -1900,245 +2058,216 @@ msgstr ""
 "halol holatini to'g'ridan-to'g'ri muassasa bilan tekshirishni tavsiya "
 "qilamiz."
 
-#: places/templates/places/place_detail.html:183
-msgid "No ratings yet"
-msgstr "Hali reytinglar yo'q"
+#: places/templates/places/place_detail.html:362
+msgid "Important Notice:"
+msgstr "Muhim eslatma:"
 
-#: places/templates/places/place_detail.html:183
+#: places/templates/places/place_detail.html:382
+msgid "review"
+msgstr "sharh"
+
+#: places/templates/places/place_detail.html:382
 msgid "reviews"
 msgstr "sharhlar"
 
-#: places/templates/places/place_detail.html:194
+#: places/templates/places/place_detail.html:408
 msgid "Last updated:"
 msgstr "Oxirgi yangilanish:"
 
-#: places/templates/places/place_detail.html:204
+#: places/templates/places/place_detail.html:418
 msgid "Copy address"
 msgstr "Manzilni nusxalash"
 
-#: places/templates/places/place_detail.html:220
+#: places/templates/places/place_detail.html:434
 msgid "Visit Website"
 msgstr "Veb-saytga tashrif buyurish"
 
-#: places/templates/places/place_detail.html:285
+#: places/templates/places/place_detail.html:446
+msgid "Navigate with:"
+msgstr "Xaritalar:"
+
+#: places/templates/places/place_detail.html:545
+#: places/templates/places/place_detail.html:594
+msgid "No photos yet"
+msgstr "Hali fotolar yo'q"
+
+#: places/templates/places/place_detail.html:548
+msgid "Help the community by sharing photos of this place"
+msgstr "Ushbu joydan rasmlar ulashib, jamiyatga yordam bering"
+
+#: places/templates/places/place_detail.html:559
+#: places/templates/places/place_detail.html:570
+msgid "Upload Photos"
+msgstr "Fotolar yuklash"
+
+#: places/templates/places/place_detail.html:597
+msgid "Share photos to help others"
+msgstr "Boshqalarga yordam berish uchun rasmlar ulashing"
+
+#: places/templates/places/place_detail.html:607
+#: places/templates/places/place_detail.html:615
+msgid "Upload"
+msgstr "Yuklash"
+
+#: places/templates/places/place_detail.html:629
 #: users/templates/users/profile.html:70
 msgid "Reviews"
 msgstr "Sharhlar"
 
-#: places/templates/places/place_detail.html:293
-#: places/templates/places/place_detail.html:354
-#: places/templates/places/place_detail.html:397
+#: places/templates/places/place_detail.html:637
+#: places/templates/places/place_detail.html:698
+#: places/templates/places/place_detail.html:741
 msgid "Your Review"
 msgstr "Sizning sharhingiz"
 
-#: places/templates/places/place_detail.html:302
+#: places/templates/places/place_detail.html:646
 msgid "Are you sure you want to delete your review?"
 msgstr "Sharhingizni o'chirishni xohlaysizmi?"
 
-#: places/templates/places/place_detail.html:333
+#: places/templates/places/place_detail.html:677
 msgid "Rating"
 msgstr "Reyting"
 
-#: places/templates/places/place_detail.html:363
+#: places/templates/places/place_detail.html:707
 msgid "Update Review"
 msgstr "Sharhni yangilash"
 
-#: places/templates/places/place_detail.html:368
-#: places/templates/places/suggest_edit.html:598
-#: places/templates/places/suggest_edit.html:669
-#: users/templates/users/edit_profile.html:121
+#: places/templates/places/place_detail.html:712
+#: places/templates/places/suggest_edit.html:234
+#: places/templates/places/suggest_edit.html:274
+#: places/templates/places/suggest_edit.html:317
+#: places/templates/places/suggest_edit.html:360
+#: places/templates/places/suggest_edit.html:415
+#: places/templates/places/suggest_edit.html:453
+#: places/templates/places/suggest_edit.html:510
+#: places/templates/places/suggest_edit.html:548
+#: places/templates/places/suggest_edit.html:586
+#: places/templates/places/suggest_edit.html:819
+#: templates/socialaccount/connection_confirm_disconnect.html:49
+#: users/templates/users/edit_profile.html:122
 msgid "Cancel"
 msgstr "Bekor qilish"
 
-#: places/templates/places/place_detail.html:382
+#: places/templates/places/place_detail.html:726
 msgid "Your Rating"
 msgstr "Sizning reytingingiz"
 
-#: places/templates/places/place_detail.html:401
+#: places/templates/places/place_detail.html:745
 msgid "Share your experience..."
 msgstr "Tajribangizni ulashing..."
 
-#: places/templates/places/place_detail.html:405
+#: places/templates/places/place_detail.html:749
 msgid "Submit Review"
 msgstr "Sharh yuborish"
 
-#: places/templates/places/place_detail.html:437
+#: places/templates/places/place_detail.html:781
 msgid "No reviews yet. Be the first to review!"
 msgstr "Hali sharhlar yo'q. Birinchi sharh yozuvchi bo'ling!"
 
-#: places/templates/places/place_detail.html:589
+#: places/templates/places/place_detail.html:981
 msgid "Network response was not ok"
 msgstr "Tarmoqda xatolik"
 
-#: places/templates/places/place_detail.html:602
+#: places/templates/places/place_detail.html:994
 msgid "Added to favorites"
 msgstr "Sevimlilarga qo'shildi"
 
-#: places/templates/places/place_detail.html:602
+#: places/templates/places/place_detail.html:994
 msgid "Removed from favorites"
 msgstr "Sevimlilardan olib tashlandi"
 
-#: places/templates/places/place_detail.html:615
+#: places/templates/places/place_detail.html:1007
 msgid "Error toggling favorite:"
 msgstr "Sevimli holatini o'zgartirishda xatolik:"
 
-#: places/templates/places/place_detail.html:622
+#: places/templates/places/place_detail.html:1014
 msgid "Could not update favorite status. Please try again."
 msgstr "Sevimli holatini yangilay olmadik. Iltimos, qayta urinib ko'ring."
 
-#: places/templates/places/place_detail.html:640
+#: places/templates/places/place_detail.html:1032
 #, python-format
 msgid "Check out %(place_name)s on %(site_name)s!"
 msgstr "%(site_name)s-da %(place_name)s-ni ko'ring!"
 
-#: places/templates/places/place_detail.html:651
+#: places/templates/places/place_detail.html:1043
 msgid "Link copied to clipboard!"
 msgstr "Havola nusxalandi!"
 
-#: places/templates/places/place_detail.html:661
+#: places/templates/places/place_detail.html:1053
 msgid "Error sharing:"
 msgstr "Ulashishda xatolik:"
 
-#: places/templates/places/place_detail.html:663
+#: places/templates/places/place_detail.html:1055
 msgid "Failed to share. Please try again."
 msgstr "Ulashish amalga oshmadi. Iltimos, qayta urinib ko'ring."
 
-#: places/templates/places/place_detail.html:726
+#: places/templates/places/place_detail.html:1118
 msgid "Address copied to clipboard!"
 msgstr "Manzil nusxalandi!"
 
-#: places/templates/places/place_detail.html:735
+#: places/templates/places/place_detail.html:1127
 msgid "Failed to copy address:"
 msgstr "Manzilni nusxalash amalga oshmadi:"
 
-#: places/templates/places/place_detail.html:737
+#: places/templates/places/place_detail.html:1129
 msgid "Failed to copy address. Please try again."
 msgstr "Manzilni nusxalash amalga oshmadi. Iltimos, qayta urinib ko'ring."
 
-#: places/templates/places/submit_place.html:36
-#: places/templates/places/submit_place.html:81
+#: places/templates/places/submit_place.html:73
+#: places/templates/places/submit_place.html:119
 msgid "Geocoding error:"
 msgstr "Geokodlash xatosi:"
 
-#: places/templates/places/submit_place.html:147
+#: places/templates/places/submit_place.html:186
 msgid "Submit a New Place"
 msgstr "Yangi joy qo'shish"
 
-#: places/templates/places/submit_place.html:148
+#: places/templates/places/submit_place.html:187
 msgid "Help others find halal places by submitting a new location"
 msgstr ""
 "Yangi joy qo'shish orqali boshqalarga halol joylarni topishga yordam bering"
 
-#: places/templates/places/submit_place.html:160
+#: places/templates/places/submit_place.html:198
+#: places/templates/places/submit_place.html:637
+#, fuzzy
+#| msgid "Please check the form for errors."
+msgid "Please correct the following errors:"
+msgstr "Iltimos, shakldagi xatolarni tekshiring."
+
+#: places/templates/places/submit_place.html:216
 msgid "Place Name"
 msgstr "Joy nomi"
 
-#: places/templates/places/submit_place.html:170
+#: places/templates/places/submit_place.html:228
 msgid "Enter place name"
 msgstr "Joy nomini kiriting"
 
-#: places/templates/places/submit_place.html:177
-#: places/templates/places/suggest_edit.html:166
+#: places/templates/places/submit_place.html:241
+#: places/templates/places/suggest_edit.html:257
 msgid "Category"
 msgstr "Toifa"
 
-#: places/templates/places/submit_place.html:187
+#: places/templates/places/submit_place.html:252
 msgid "Select a category"
 msgstr "Toifani tanlang"
 
-#: places/templates/places/submit_place.html:188
+#: places/templates/places/submit_place.html:253
 msgid "Restaurant"
 msgstr "Restoran"
 
-#: places/templates/places/submit_place.html:189
+#: places/templates/places/submit_place.html:254
 msgid "Market"
 msgstr "Do'kon"
 
-#: places/templates/places/submit_place.html:190
+#: places/templates/places/submit_place.html:255
 msgid "Mosque"
 msgstr "Masjid"
 
-#: places/templates/places/submit_place.html:191
+#: places/templates/places/submit_place.html:256
 msgid "Prayer Room"
 msgstr "Namoz xonasi"
 
-#: places/templates/places/submit_place.html:200
-#: places/templates/places/suggest_edit.html:195
-msgid "Description"
-msgstr "Tavsif"
-
-#: places/templates/places/submit_place.html:207
-msgid "Describe the place..."
-msgstr "Joyni tavsif bering..."
-
-#: places/templates/places/submit_place.html:224
-msgid "Click on the map to set the location"
-msgstr "Manzilni o'rnatish uchun xaritaga bosing"
-
-#: places/templates/places/submit_place.html:234
-#: places/templates/places/suggest_edit.html:227
-msgid "Address"
-msgstr "Manzil"
-
-#: places/templates/places/submit_place.html:244
-msgid "Enter address"
-msgstr "Manzilni kiriting"
-
-#: places/templates/places/submit_place.html:253
-#: places/templates/places/suggest_edit.html:263
-msgid "Phone Number"
-msgstr "Telefon raqami"
-
-#: places/templates/places/submit_place.html:262
-msgid "Enter phone number"
-msgstr "Telefon raqamini kiriting"
-
-#: places/templates/places/submit_place.html:273
-#: places/templates/places/suggest_edit.html:282
-msgid "Website"
-msgstr "Veb-sayt"
-
-#: places/templates/places/submit_place.html:282
-msgid "Enter website URL"
-msgstr "Veb-sayt URL manzilini kiriting"
-
-#: places/templates/places/submit_place.html:290
-msgid "Additional Map Links"
-msgstr "Qo'shimcha xarita havolalari"
-
-#: places/templates/places/submit_place.html:295
-msgid "Naver Maps Link"
-msgstr "Naver Maps havolasi"
-
-#: places/templates/places/submit_place.html:304
-msgid "Enter Naver Maps link"
-msgstr "Naver Maps havolasini kiriting"
-
-#: places/templates/places/submit_place.html:312
-msgid "Kakao Maps Link"
-msgstr "Kakao Maps havolasi"
-
-#: places/templates/places/submit_place.html:321
-msgid "Enter Kakao Maps link"
-msgstr "Kakao Maps havolasini kiriting"
-
-#: places/templates/places/submit_place.html:331
-msgid "Photos"
-msgstr "Fotolar"
-
-#: places/templates/places/submit_place.html:338
-msgid "Upload photos"
-msgstr "Fotolar yuklash"
-
-#: places/templates/places/submit_place.html:346
-msgid "or drag and drop"
-msgstr "yoki sudrab tashlang"
-
-#: places/templates/places/submit_place.html:349
-msgid "PNG, JPG, GIF up to 10MB each"
-msgstr "PNG, JPG, GIF har biri 10MB gacha"
-
-#: places/templates/places/submit_place.html:380
+#: places/templates/places/submit_place.html:265
 msgid ""
 "Note: <strong>Mosque</strong> is for dedicated Islamic centers, while "
 "<strong>Prayer Room</strong> is for designated prayer spaces in other "
@@ -2148,218 +2277,433 @@ msgstr ""
 "<strong>Namoz xonasi</strong> esa boshqa joylardagi belgilangan namoz "
 "joylari uchun."
 
-#: places/templates/places/submit_place.html:463
-msgid "Preview"
-msgstr "Ko'rish"
+#: places/templates/places/submit_place.html:273
+#: places/templates/places/suggest_edit.html:297
+msgid "Description"
+msgstr "Tavsif"
 
-#: places/templates/places/submit_place.html:514
+#: places/templates/places/submit_place.html:282
+msgid "Describe the place..."
+msgstr "Joyni tavsif bering..."
+
+#: places/templates/places/submit_place.html:302
+msgid ""
+"Tip: Mention cuisine type, halal certification, special features, or "
+"operating hours"
+msgstr ""
+"Maslahat: Taom turi, halol sertifikati, maxsus xususiyatlar yoki ish "
+"vaqtlarini ko'rsating"
+
+#: places/templates/places/submit_place.html:309
+msgid "Location"
+msgstr "Manzil"
+
+#: places/templates/places/submit_place.html:317
+#, fuzzy
+#| msgid "Could not get your location: "
+msgid "How to set location:"
+msgstr "Joylashuvni qanday o'rnatish:"
+
+#: places/templates/places/submit_place.html:319
+#, fuzzy
+#| msgid "Click on the map to set the location"
+msgid "Click on the map to place a marker"
+msgstr "Belgi qo'yish uchun xaritaga bosing"
+
+#: places/templates/places/submit_place.html:320
+#, fuzzy
+#| msgid "Click on the map to set the location"
+msgid "Drag the marker to adjust the position"
+msgstr "Joylashuvni sozlash uchun belgini sudrab boring"
+
+#: places/templates/places/submit_place.html:321
+msgid "Or type the address below to auto-locate"
+msgstr "Yoki manzilni pastga kiriting va joylashuvni avtomatik aniqlang"
+
+#: places/templates/places/submit_place.html:340
+#: places/templates/places/suggest_edit.html:340
+msgid "Address"
+msgstr "Manzil"
+
+#: places/templates/places/submit_place.html:351
+msgid "Enter address"
+msgstr "Manzilni kiriting"
+
+#: places/templates/places/submit_place.html:364
+#: places/templates/places/suggest_edit.html:397
+msgid "Phone Number"
+msgstr "Telefon raqami"
+
+#: places/templates/places/submit_place.html:364
+#: places/templates/places/submit_place.html:393
+#: places/templates/places/submit_place.html:422
+#: places/templates/places/submit_place.html:467
+#: places/templates/places/suggest_edit.html:383
+#: places/templates/places/suggest_edit.html:478
+#, fuzzy
+#| msgid "(Optional)"
+msgid "Optional"
+msgstr "(Ixtiyoriy)"
+
+#: places/templates/places/submit_place.html:373
+msgid "Enter phone number"
+msgstr "Telefon raqamini kiriting"
+
+#: places/templates/places/submit_place.html:384
+msgid "Include country code for international numbers (e.g., +82 for Korea)"
+msgstr "Xalqaro raqamlar uchun mamlakat kodini kiriting (masalan, Koreya uchun +82)"
+
+#: places/templates/places/submit_place.html:393
+#: places/templates/places/suggest_edit.html:435
+msgid "Website"
+msgstr "Veb-sayt"
+
+#: places/templates/places/submit_place.html:402
+msgid "Enter website URL"
+msgstr "Veb-sayt URL manzilini kiriting"
+
+#: places/templates/places/submit_place.html:413
+msgid "Full URL including https:// (e.g., https://example.com)"
+msgstr "To'liq URL manzilini, https:// qismi bilan birga kiriting (masalan, https://example.com)"
+
+#: places/templates/places/submit_place.html:421
+msgid "Additional Map Links"
+msgstr "Qo'shimcha xarita havolalari"
+
+#: places/templates/places/submit_place.html:425
+msgid ""
+"Korean users often prefer local map services. Adding these links improves "
+"accessibility."
+msgstr ""
+"Koreyada ko'pincha mahalliy xarita xizmatlaridan "
+"foydalanishadi. Ushbu havolalarni qo'shish qulaylikni oshiradi."
+
+#: places/templates/places/submit_place.html:431
+msgid "Naver Maps Link"
+msgstr "Naver Maps havolasi"
+
+#: places/templates/places/submit_place.html:440
+msgid "Enter Naver Maps link"
+msgstr "Naver Maps havolasini kiriting"
+
+#: places/templates/places/submit_place.html:448
+msgid "Kakao Maps Link"
+msgstr "Kakao Maps havolasi"
+
+#: places/templates/places/submit_place.html:457
+msgid "Enter Kakao Maps link"
+msgstr "Kakao Maps havolasini kiriting"
+
+#: places/templates/places/submit_place.html:467
+msgid "Photos"
+msgstr "Fotolar"
+
+#: places/templates/places/submit_place.html:474
+msgid "Upload photos"
+msgstr "Fotolar yuklash"
+
+#: places/templates/places/submit_place.html:482
+msgid "or drag and drop"
+msgstr "yoki sudrab tashlang"
+
+#: places/templates/places/submit_place.html:485
+msgid "PNG, JPG, GIF up to 10MB each"
+msgstr "PNG, JPG, GIF har biri 10MB gacha"
+
+#: places/templates/places/submit_place.html:492
+#: places/templates/places/submit_place.html:838
+msgid "photos selected"
+msgstr "ta rasm tanlandi"
+
+#: places/templates/places/submit_place.html:541
+#, fuzzy
+#| msgid "Please enter a valid name."
+msgid "Please enter a valid place name (at least 2 characters)"
+msgstr "Iltimos, to'g'ri ism kiriting."
+
+#: places/templates/places/submit_place.html:549
+#, fuzzy
+#| msgid "Select a category"
+msgid "Please select a category"
+msgstr "Toifani tanlang"
+
+#: places/templates/places/submit_place.html:557
+msgid "Please enter a description (at least 10 characters)"
+msgstr ""
+
+#: places/templates/places/submit_place.html:567
 msgid "Please select a location on the map"
 msgstr "Iltimos, xaritadan joylashuvni tanlang"
 
-#: places/templates/places/suggest_edit.html:78
+#: places/templates/places/submit_place.html:577
+msgid "Please enter a valid address (at least 5 characters)"
+msgstr ""
+
+#: places/templates/places/submit_place.html:600
+#: places/templates/places/suggest_edit.html:1462
+msgid "Submitting..."
+msgstr "Yuborilmoqda..."
+
+#: places/templates/places/submit_place.html:800
+msgid "Preview"
+msgstr "Ko'rish"
+
+#: places/templates/places/submit_place.html:807
+#: places/templates/places/submit_place.html:815
+msgid "Remove photo"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:160
 msgid "Back to place"
 msgstr "Joyga qaytish"
 
-#: places/templates/places/suggest_edit.html:82
-msgid "Editing"
-msgstr "Tahrirlash"
-
-#: places/templates/places/suggest_edit.html:89
+#: places/templates/places/suggest_edit.html:172
 msgid "Suggest Improvements"
 msgstr "Yaxshilanishlar taklif qilish"
 
-#: places/templates/places/suggest_edit.html:92
+#: places/templates/places/suggest_edit.html:175
+msgid "Editing"
+msgstr "Tahrirlash"
+
+#: places/templates/places/suggest_edit.html:182
 msgid "Help our community by suggesting better information or adding photos"
 msgstr ""
 "Yaxshiroq ma'lumot taklif qilish yoki fotolar qo'shish orqali jamiyatimizga "
 "yordam bering"
 
-#: places/templates/places/suggest_edit.html:109
-msgid "Min Impact"
-msgstr "Minimal ta'sir"
+#: places/templates/places/suggest_edit.html:185
+#, python-format
+msgid "Accurate edits keep %(site_name)s reliable for everyone."
+msgstr ""
 
-#: places/templates/places/suggest_edit.html:113
-msgid "Quality"
-msgstr "Sifat"
+#: places/templates/places/suggest_edit.html:202
+#, fuzzy
+#| msgid "Contact Information"
+msgid "Place Information"
+msgstr "Aloqa ma'lumotlari"
 
-#: places/templates/places/suggest_edit.html:126
-msgid "Edit Information"
-msgstr "Ma'lumotlarni tahrirlash"
+#: places/templates/places/suggest_edit.html:205
+msgid "Click on any field below to suggest improvements"
+msgstr ""
 
-#: places/templates/places/suggest_edit.html:129
-msgid "Click to edit any field"
-msgstr "Har qanday maydonni tahrirlash uchun bosing"
-
-#: places/templates/places/suggest_edit.html:140
+#: places/templates/places/suggest_edit.html:220
 msgid "Name"
 msgstr "Nomi"
 
-#: places/templates/places/suggest_edit.html:144
-#: places/templates/places/suggest_edit.html:170
-#: places/templates/places/suggest_edit.html:199
-#: places/templates/places/suggest_edit.html:231
-#: places/templates/places/suggest_edit.html:266
-#: places/templates/places/suggest_edit.html:285
-#: places/templates/places/suggest_edit.html:327
-#: places/templates/places/suggest_edit.html:347
-#: places/templates/places/suggest_edit.html:367
-#: places/templates/places/suggest_edit.html:660
-msgid "Edit"
-msgstr "Tahrirlash"
+#: places/templates/places/suggest_edit.html:221
+#: places/templates/places/suggest_edit.html:258
+#: places/templates/places/suggest_edit.html:298
+#: places/templates/places/suggest_edit.html:341
+#, fuzzy
+#| msgid "Click to edit any field"
+msgid "Click to edit"
+msgstr "Har qanday maydonni tahrirlash uchun bosing"
 
-#: places/templates/places/suggest_edit.html:148
-#: places/templates/places/suggest_edit.html:174
-#: places/templates/places/suggest_edit.html:203
-#: places/templates/places/suggest_edit.html:235
+#: places/templates/places/suggest_edit.html:230
 #: places/templates/places/suggest_edit.html:270
-#: places/templates/places/suggest_edit.html:289
-msgid "Current:"
-msgstr "Joriy:"
-
-#: places/templates/places/suggest_edit.html:153
-#: places/templates/places/suggest_edit.html:182
-#: places/templates/places/suggest_edit.html:214
-#: places/templates/places/suggest_edit.html:240
+#: places/templates/places/suggest_edit.html:313
+#: places/templates/places/suggest_edit.html:356
+#: places/templates/places/suggest_edit.html:411
+#: places/templates/places/suggest_edit.html:449
+#: places/templates/places/suggest_edit.html:506
+#: places/templates/places/suggest_edit.html:544
+#: places/templates/places/suggest_edit.html:582
 msgid "Your suggestion:"
 msgstr "Sizning taklifingiz:"
 
-#: places/templates/places/suggest_edit.html:208
+#: places/templates/places/suggest_edit.html:306
 msgid "No description available"
 msgstr "Tavsif mavjud emas"
 
-#: places/templates/places/suggest_edit.html:254
-#: places/templates/places/suggest_edit.html:313
-msgid "(Optional)"
-msgstr "(Ixtiyoriy)"
-
-#: places/templates/places/suggest_edit.html:294
+#: places/templates/places/suggest_edit.html:349
+#: places/templates/places/suggest_edit.html:404
+#: places/templates/places/suggest_edit.html:442
+#: places/templates/places/suggest_edit.html:499
+#: places/templates/places/suggest_edit.html:537
+#: places/templates/places/suggest_edit.html:575
 msgid "Not specified"
 msgstr "Ko'rsatilmagan"
 
-#: places/templates/places/suggest_edit.html:312
+#: places/templates/places/suggest_edit.html:383
+#, fuzzy
+#| msgid "Website"
+msgid "Phone & Website"
+msgstr "Veb-sayt"
+
+#: places/templates/places/suggest_edit.html:477
 msgid "Map Links"
 msgstr "Xarita havolalari"
 
-#: places/templates/places/suggest_edit.html:323
+#: places/templates/places/suggest_edit.html:478
+#, fuzzy
+#| msgid "Google Maps"
+msgid "Google Maps & Naver"
+msgstr "Google Maps"
+
+#: places/templates/places/suggest_edit.html:492
 msgid "Google Maps"
 msgstr "Google Maps"
 
-#: places/templates/places/suggest_edit.html:343
+#: places/templates/places/suggest_edit.html:530
 msgid "Kakao Maps"
 msgstr "Kakao Maps"
 
-#: places/templates/places/suggest_edit.html:363
+#: places/templates/places/suggest_edit.html:568
 msgid "Naver Maps"
 msgstr "Naver Maps"
 
-#: places/templates/places/suggest_edit.html:388
-msgid "Add Photos"
-msgstr "Fotolar qo'shish"
-
-#: places/templates/places/suggest_edit.html:391
+#: places/templates/places/suggest_edit.html:611
 msgid "Drag & drop or click to upload"
 msgstr "Sudrab tashlang yoki yuklash uchun bosing"
 
-#: places/templates/places/suggest_edit.html:400
+#: places/templates/places/suggest_edit.html:620
 msgid "Current Photos"
 msgstr "Joriy fotolar"
 
-#: places/templates/places/suggest_edit.html:435
+#: places/templates/places/suggest_edit.html:655
 msgid "Upload Images"
 msgstr "Rasmlar yuklash"
 
-#: places/templates/places/suggest_edit.html:437
+#: places/templates/places/suggest_edit.html:657
 msgid "Drag and drop your images here, or"
 msgstr "Rasmlaringizni bu yerga sudrab tashlang yoki"
 
-#: places/templates/places/suggest_edit.html:439
+#: places/templates/places/suggest_edit.html:659
 msgid "browse files"
 msgstr "fayllarni yuklang"
 
-#: places/templates/places/suggest_edit.html:456
+#: places/templates/places/suggest_edit.html:676
 msgid "Images to Upload"
 msgstr "Yuklanadigan rasmlar"
 
-#: places/templates/places/suggest_edit.html:471
+#: places/templates/places/suggest_edit.html:691
 msgid "Why These Changes?"
 msgstr "O'zgarishtirishlar sababi?"
 
-#: places/templates/places/suggest_edit.html:474
+#: places/templates/places/suggest_edit.html:694
 msgid "Help reviewers understand your suggestions"
 msgstr "Ko'rib chiqaruvchilarga takliflaringizni tushunishga yordam bering"
 
-#: places/templates/places/suggest_edit.html:478
+#: places/templates/places/suggest_edit.html:698
 msgid "Required"
 msgstr "Majburiy"
 
-#: places/templates/places/suggest_edit.html:487
+#: places/templates/places/suggest_edit.html:707
 msgid "Tips for a good explanation:"
 msgstr "Yaxshi tushuntirish uchun maslahatlar:"
 
-#: places/templates/places/suggest_edit.html:489
+#: places/templates/places/suggest_edit.html:709
 msgid "Mention what's incorrect or missing"
 msgstr "Nima noto'g'ri yoki yo'q ekanligini aytib bering"
 
-#: places/templates/places/suggest_edit.html:490
+#: places/templates/places/suggest_edit.html:710
 msgid "Provide source if possible (website, local knowledge, etc.)"
 msgstr "Iloji bo'lsa manba ko'rsating (veb-sayt, mahalliy bilim, va hokazo)"
 
-#: places/templates/places/suggest_edit.html:491
+#: places/templates/places/suggest_edit.html:711
 msgid "Be specific about why the change improves accuracy"
 msgstr "O'zgartirish nima uchun aniqlikni oshirishini ayting"
 
-#: places/templates/places/suggest_edit.html:492
+#: places/templates/places/suggest_edit.html:712
 msgid "One explanation covers all your changes and images"
 msgstr "Bir tushuntirish barcha o'zgarishlar va rasmlaringizni qamrab oladi"
 
-#: places/templates/places/suggest_edit.html:500
+#: places/templates/places/suggest_edit.html:720
 msgid "Explain your changes"
 msgstr "O'zgarishlaringizni tushuntiring"
 
-#: places/templates/places/suggest_edit.html:510
+#: places/templates/places/suggest_edit.html:730
 msgid ""
 "This explanation will apply to all your field changes and image uploads."
 msgstr ""
 "Bu tushuntirish barcha maydon o'zgarishlari va rasm yuklashlaringizga "
 "qo'llaniladi."
 
-#: places/templates/places/suggest_edit.html:529
+#: places/templates/places/suggest_edit.html:749
 msgid "Please fix these issues:"
 msgstr "Iltimos, bu muammolarni tuzating:"
 
-#: places/templates/places/suggest_edit.html:550
-#: places/templates/places/suggest_edit.html:573
+#: places/templates/places/suggest_edit.html:771
+#: places/templates/places/suggest_edit.html:794
 msgid "changes"
 msgstr "o'zgarishlar"
 
-#: places/templates/places/suggest_edit.html:560
-#: places/templates/places/suggest_edit.html:579
-#: places/templates/places/suggest_edit.html:866
-#: places/templates/places/suggest_edit.html:872
+#: places/templates/places/suggest_edit.html:781
+#: places/templates/places/suggest_edit.html:800
+#: places/templates/places/suggest_edit.html:1286
+#: places/templates/places/suggest_edit.html:1292
 msgid "Select fields to edit or upload images to create suggestions."
 msgstr ""
 "Takliflar yaratish uchun tahrirlash maydonlarini tanlang yoki rasmlar "
 "yuklang."
 
-#: places/templates/places/suggest_edit.html:569
+#: places/templates/places/suggest_edit.html:790
 msgid "Suggestion Summary"
 msgstr "Taklif xulosasi"
 
-#: places/templates/places/suggest_edit.html:591
+#: places/templates/places/suggest_edit.html:812
 msgid "Your suggestions will be reviewed by moderators"
 msgstr "Sizning takliflaringiz moderatorlar tomonidan ko'rib chiqiladi"
 
-#: places/templates/places/suggest_edit.html:603
+#: places/templates/places/suggest_edit.html:824
 msgid "Submit"
 msgstr "Yuborish"
 
-#: places/templates/places/suggest_edit.html:603
+#: places/templates/places/suggest_edit.html:824
 msgid "Suggestions"
 msgstr "Takliflar"
 
-#: places/templates/places/suggest_edit.html:920
-msgid "Submitting..."
-msgstr "Yuborilmoqda..."
+#: places/templates/places/suggest_edit.html:1303
+#, fuzzy
+#| msgid "Field Edits"
+msgid "Field edit"
+msgstr "Tahrirlar"
+
+#: places/templates/places/suggest_edit.html:1304
+#, fuzzy
+#| msgid "Field Edits"
+msgid "Field edits"
+msgstr "Tahrirlar"
+
+#: places/templates/places/suggest_edit.html:1305
+msgid "Photo upload"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:1306
+#, fuzzy
+#| msgid "Photos"
+msgid "Photo uploads"
+msgstr "Fotolar"
+
+#: places/templates/places/suggest_edit.html:1323
+msgid "Empty fields"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:1342
+msgid "Ready to submit"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:1353
+#, fuzzy
+#| msgid "Read"
+msgid "Ready"
+msgstr "O'qilgan"
+
+#: places/templates/places/suggest_edit.html:1437
+msgid "Please make at least one change or upload an image before submitting."
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:1445
+msgid "You have 1 empty field. Continue anyway?"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:1446
+msgid "You have"
+msgstr ""
+
+#: places/templates/places/suggest_edit.html:1446
+msgid "empty fields. Continue anyway?"
+msgstr ""
 
 #: prayer_times/templates/prayer_times/error.html:4
 msgid "Error"
@@ -2370,7 +2714,7 @@ msgid "Error Loading Prayer Times"
 msgstr "Namoz vaqtlarini yuklashda xatolik"
 
 #: prayer_times/templates/prayer_times/error.html:22
-#: prayer_times/templates/prayer_times/prayer_times.html:174
+#: prayer_times/templates/prayer_times/prayer_times.html:399
 msgid "Try Again"
 msgstr "Qayta urinib ko'ring"
 
@@ -2388,164 +2732,322 @@ msgstr ""
 "Biz sayohat rejalashtirish uchun mahalliy namoz vaqtlaringiz va Koreya "
 "vaqtlarini ko'rsatamiz."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:68
+#: prayer_times/templates/prayer_times/prayer_times.html:79
 msgid "Search city..."
 msgstr "Shaharni qidirish..."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:78
+#: prayer_times/templates/prayer_times/prayer_times.html:89
 msgid "Use Current Location"
 msgstr "Joriy manzildan foydalanish"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:113
-msgid "Prayer Calculation Settings"
+#: prayer_times/templates/prayer_times/prayer_times.html:130
+#, fuzzy
+#| msgid "Prayer Calculation Settings"
+msgid "Prayer Settings"
 msgstr "Namoz hisoblash sozlamalari"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:117
-msgid "Calculation Method"
-msgstr "Hisoblash usuli"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:121
-msgid "Jafari / Shia Ithna-Ashari"
-msgstr "Jafari / Shia Ithna-Ashari"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:122
-msgid "University of Islamic Sciences, Karachi"
-msgstr "Islom fanlari universiteti, Karachi"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:123
-msgid "Islamic Society of North America"
-msgstr "Shimoliy Amerika islom jamiyati"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:124
+#: prayer_times/templates/prayer_times/prayer_times.html:146
+#: prayer_times/templates/prayer_times/prayer_times.html:148
+#: prayer_times/templates/prayer_times/prayer_times.html:463
 msgid "Muslim World League"
 msgstr "Musulmonlar dunyo ligasi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:125
+#: prayer_times/templates/prayer_times/prayer_times.html:148
+#: prayer_times/templates/prayer_times/prayer_times.html:162
+msgid "Worldwide"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:149
+#: prayer_times/templates/prayer_times/prayer_times.html:462
+msgid "Islamic Society of North America"
+msgstr "Shimoliy Amerika islom jamiyati"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:149
+msgid "North America"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:150
+#: prayer_times/templates/prayer_times/prayer_times.html:464
 msgid "Umm Al-Qura University, Makkah"
 msgstr "Umm Al-Qura universiteti, Makka"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:126
+#: prayer_times/templates/prayer_times/prayer_times.html:150
+msgid "Saudi Arabia"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:151
+#: prayer_times/templates/prayer_times/prayer_times.html:465
 msgid "Egyptian General Authority of Survey"
 msgstr "Misr umumiy o'lchash boshqarmasi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:127
+#: prayer_times/templates/prayer_times/prayer_times.html:151
+msgid "Egypt"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:152
+#: prayer_times/templates/prayer_times/prayer_times.html:461
+msgid "University of Islamic Sciences, Karachi"
+msgstr "Islom fanlari universiteti, Karachi"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:152
+msgid "Pakistan"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:153
+#: prayer_times/templates/prayer_times/prayer_times.html:460
+msgid "Jafari / Shia Ithna-Ashari"
+msgstr "Jafari / Shia Ithna-Ashari"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:153
+#: prayer_times/templates/prayer_times/prayer_times.html:154
+msgid "Iran"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:154
+#: prayer_times/templates/prayer_times/prayer_times.html:466
 msgid "Institute of Geophysics, University of Tehran"
 msgstr "Geofizika instituti, Tehron universiteti"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:128
+#: prayer_times/templates/prayer_times/prayer_times.html:155
+#: prayer_times/templates/prayer_times/prayer_times.html:467
 msgid "Gulf Region"
 msgstr "Fors ko'rfazi mintaqasi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:129
+#: prayer_times/templates/prayer_times/prayer_times.html:155
+msgid "Gulf"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:156
+#: prayer_times/templates/prayer_times/prayer_times.html:468
 msgid "Kuwait"
 msgstr "Quvayt"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:130
+#: prayer_times/templates/prayer_times/prayer_times.html:157
+#: prayer_times/templates/prayer_times/prayer_times.html:469
 msgid "Qatar"
 msgstr "Qatar"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:131
-msgid "Majlis Ugama Islam Singapura, Singapore"
+#: prayer_times/templates/prayer_times/prayer_times.html:158
+#: prayer_times/templates/prayer_times/prayer_times.html:470
+#, fuzzy
+#| msgid "Majlis Ugama Islam Singapura, Singapore"
+msgid "Majlis Ugama Islam Singapura"
 msgstr "Majlis Ugama Islam Singapura, Singapur"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:132
+#: prayer_times/templates/prayer_times/prayer_times.html:158
+msgid "Singapore"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:159
+#: prayer_times/templates/prayer_times/prayer_times.html:471
 msgid "Union Organization islamic de France"
 msgstr "Fransiya islom tashkiloti"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:133
-msgid "Diyanet İşleri Başkanlığı, Turkey"
+#: prayer_times/templates/prayer_times/prayer_times.html:159
+#, fuzzy
+#| msgid "Cancel"
+msgid "France"
+msgstr "Bekor qilish"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:160
+#: prayer_times/templates/prayer_times/prayer_times.html:472
+#, fuzzy
+#| msgid "Diyanet İşleri Başkanlığı, Turkey"
+msgid "Diyanet İşleri Başkanlığı"
 msgstr "Diyanet İşleri Başkanlığı, Turkiya"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:134
+#: prayer_times/templates/prayer_times/prayer_times.html:160
+msgid "Turkey"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:161
+#: prayer_times/templates/prayer_times/prayer_times.html:473
 msgid "Spiritual Administration of Muslims of Russia"
 msgstr "Rossiya musulmonlarining ma'naviy boshqarmasi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:135
+#: prayer_times/templates/prayer_times/prayer_times.html:161
+msgid "Russia"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:162
+#: prayer_times/templates/prayer_times/prayer_times.html:474
 msgid "Moonsighting Committee Worldwide"
 msgstr "Dunyo bo'ylab oy ko'rish qo'mitasi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:136
-msgid "Dubai (experimental)"
+#: prayer_times/templates/prayer_times/prayer_times.html:163
+#: prayer_times/templates/prayer_times/prayer_times.html:475
+msgid "Dubai"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:163
+#, fuzzy
+#| msgid "Dubai (experimental)"
+msgid "UAE (experimental)"
 msgstr "Dubay (eksperimental)"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:137
-msgid "Jabatan Kemajuan Islam Malaysia (JAKIM)"
-msgstr "Malayziya islom taraqqiyoti boshqarmasi (JAKIM)"
+#: prayer_times/templates/prayer_times/prayer_times.html:164
+#: prayer_times/templates/prayer_times/prayer_times.html:476
+msgid "JAKIM"
+msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:138
+#: prayer_times/templates/prayer_times/prayer_times.html:164
+msgid "Malaysia"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:165
+#: prayer_times/templates/prayer_times/prayer_times.html:477
 msgid "Tunisia"
 msgstr "Tunisia"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:139
+#: prayer_times/templates/prayer_times/prayer_times.html:166
+#: prayer_times/templates/prayer_times/prayer_times.html:478
 msgid "Algeria"
 msgstr "Jazoir"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:140
-msgid "KEMENAG - Kementerian Agama Republik Indonesia"
-msgstr "KEMENAG - Indoneziya Respublikasi din vazirligi"
+#: prayer_times/templates/prayer_times/prayer_times.html:167
+#: prayer_times/templates/prayer_times/prayer_times.html:479
+msgid "KEMENAG"
+msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:141
+#: prayer_times/templates/prayer_times/prayer_times.html:167
+msgid "Indonesia"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:168
+#: prayer_times/templates/prayer_times/prayer_times.html:480
 msgid "Morocco"
 msgstr "Marokash"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:142
+#: prayer_times/templates/prayer_times/prayer_times.html:169
+#: prayer_times/templates/prayer_times/prayer_times.html:481
 msgid "Comunidade Islamica de Lisboa"
 msgstr "Lissabon islom jamiyati"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:143
-msgid "Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan"
-msgstr "Vaqflar, islom ishlari va muqaddas joylar vazirligi, Iordaniya"
+#: prayer_times/templates/prayer_times/prayer_times.html:169
+msgid "Portugal"
+msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:149
+#: prayer_times/templates/prayer_times/prayer_times.html:170
+#: prayer_times/templates/prayer_times/prayer_times.html:482
+msgid "Ministry of Awqaf"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:170
+msgid "Jordan"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:190
+msgid "Calculation Method"
+msgstr "Hisoblash usuli"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:219
+#, fuzzy
+#| msgid "Search city..."
+msgid "Search method..."
+msgstr "Shaharni qidirish..."
+
+#: prayer_times/templates/prayer_times/prayer_times.html:247
+msgid "Different regions use different calculation methods"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:258
 msgid "Asr Calculation"
 msgstr "Asr hisoblash"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:153
+#: prayer_times/templates/prayer_times/prayer_times.html:269
 msgid "Standard (Shafi)"
 msgstr "Standart (Shafi)"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:154
+#: prayer_times/templates/prayer_times/prayer_times.html:270
+msgid "Shadow = object length + noon shadow"
+msgstr ""
+
+#: prayer_times/templates/prayer_times/prayer_times.html:282
 msgid "Hanafi"
 msgstr "Hanafi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:165
-msgid "Loading prayer times..."
-msgstr "Namoz vaqtlari yuklanmoqda..."
+#: prayer_times/templates/prayer_times/prayer_times.html:283
+msgid "Shadow = 2x object length + noon shadow"
+msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:172
-#: prayer_times/templates/prayer_times/prayer_times.html:390
-msgid "Failed to load prayer times"
-msgstr "Namoz vaqtlarini yuklash amalga oshmadi"
+#: prayer_times/templates/prayer_times/prayer_times.html:294
+msgid "Changes apply immediately"
+msgstr ""
 
-#: prayer_times/templates/prayer_times/prayer_times.html:186
+#: prayer_times/templates/prayer_times/prayer_times.html:307
+#: prayer_times/templates/prayer_times/prayer_times.html:411
 msgid "Gregorian Date"
 msgstr "Grigorian sanasi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:191
+#: prayer_times/templates/prayer_times/prayer_times.html:312
+#: prayer_times/templates/prayer_times/prayer_times.html:416
 msgid "Current Time"
 msgstr "Joriy vaqt"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:195
+#: prayer_times/templates/prayer_times/prayer_times.html:316
+#: prayer_times/templates/prayer_times/prayer_times.html:420
 msgid "Hijri Date"
 msgstr "Hijriy sana"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:208
+#: prayer_times/templates/prayer_times/prayer_times.html:328
+#: prayer_times/templates/prayer_times/prayer_times.html:433
 msgid "Prayer"
 msgstr "Namoz"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:209
+#: prayer_times/templates/prayer_times/prayer_times.html:329
+#: prayer_times/templates/prayer_times/prayer_times.html:434
 msgid "Time"
 msgstr "Vaqt"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:217
+#: prayer_times/templates/prayer_times/prayer_times.html:334
+#: prayer_times/templates/prayer_times/prayer_times.html:638
+msgid "Fajr"
+msgstr "Bomdod"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:340
+#: prayer_times/templates/prayer_times/prayer_times.html:639
+msgid "Sunrise"
+msgstr "Quyosh chiqishi"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:346
+#: prayer_times/templates/prayer_times/prayer_times.html:640
+msgid "Dhuhr"
+msgstr "Peshin"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:352
+#: prayer_times/templates/prayer_times/prayer_times.html:641
+msgid "Asr"
+msgstr "Asr"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:358
+#: prayer_times/templates/prayer_times/prayer_times.html:642
+msgid "Maghrib"
+msgstr "Shom"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:364
+#: prayer_times/templates/prayer_times/prayer_times.html:643
+msgid "Isha"
+msgstr "Xufton"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:372
+#: prayer_times/templates/prayer_times/prayer_times.html:442
 msgid "Next Prayer"
 msgstr "Keyingi namoz"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:218
+#: prayer_times/templates/prayer_times/prayer_times.html:388
+msgid "Loading prayer times..."
+msgstr "Namoz vaqtlari yuklanmoqda..."
+
+#: prayer_times/templates/prayer_times/prayer_times.html:397
+#: prayer_times/templates/prayer_times/prayer_times.html:661
+msgid "Failed to load prayer times"
+msgstr "Namoz vaqtlarini yuklash amalga oshmadi"
+
+#: prayer_times/templates/prayer_times/prayer_times.html:443
 msgid "Calculating..."
 msgstr "Hisoblanmoqda..."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:227
+#: prayer_times/templates/prayer_times/prayer_times.html:452
 msgid ""
 "Prayer times are provided by <a href=\"https://aladhan.com/\" "
 "target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary-600 "
@@ -2555,80 +3057,166 @@ msgstr ""
 "rel=\"noopener\" class=\"underline hover:text-primary-600 dark:hover:text-"
 "primary-400\">aladhan.com</a> tomonidan taqdim etiladi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:286
+#: prayer_times/templates/prayer_times/prayer_times.html:549
 msgid "Fajr (Tomorrow)"
 msgstr "Bomdod (Ertaga)"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:310
+#: prayer_times/templates/prayer_times/prayer_times.html:573
 msgid "All prayer times have passed."
 msgstr "Barcha namoz vaqtlari o'tdi."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:367
-msgid "Fajr"
-msgstr "Bomdod"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:368
-msgid "Sunrise"
-msgstr "Quyosh chiqishi"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:369
-msgid "Dhuhr"
-msgstr "Peshin"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:370
-msgid "Asr"
-msgstr "Asr"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:371
-msgid "Maghrib"
-msgstr "Shom"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:372
-msgid "Isha"
-msgstr "Xufton"
-
-#: prayer_times/templates/prayer_times/prayer_times.html:393
+#: prayer_times/templates/prayer_times/prayer_times.html:664
 msgid "Error loading prayer times:"
 msgstr "Namoz vaqtlarini yuklashda xatolik:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:415
+#: prayer_times/templates/prayer_times/prayer_times.html:690
 msgid "Failed to update location:"
 msgstr "Manzilni yangilash amalga oshmadi:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:419
+#: prayer_times/templates/prayer_times/prayer_times.html:694
 msgid "Error updating location:"
 msgstr "Manzilni yangilashda xatolik:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:443
+#: prayer_times/templates/prayer_times/prayer_times.html:718
 msgid "Could not determine location. Please select a city manually."
 msgstr "Manzilni aniqlay olmadik. Iltimos, shaharni qo'lda tanlang."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:447
-#: prayer_times/templates/prayer_times/prayer_times.html:452
+#: prayer_times/templates/prayer_times/prayer_times.html:722
+#: prayer_times/templates/prayer_times/prayer_times.html:727
 msgid "Error getting location:"
 msgstr "Manzilni olishda xatolik:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:448
-#: prayer_times/templates/prayer_times/prayer_times.html:453
+#: prayer_times/templates/prayer_times/prayer_times.html:723
+#: prayer_times/templates/prayer_times/prayer_times.html:728
 msgid "Error getting your location. Please select a city manually."
 msgstr "Manzilingizni olishda xatolik. Iltimos, shaharni qo'lda tanlang."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:457
+#: prayer_times/templates/prayer_times/prayer_times.html:732
 msgid ""
 "Geolocation is not supported by your browser. Please select a city manually."
 msgstr ""
 "Geolokatsiya brauzeringiz tomonidan qo'llab-quvvatlanmaydi. Iltimos, "
 "shaharni qo'lda tanlang."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:477
-#: prayer_times/templates/prayer_times/prayer_times.html:501
+#: prayer_times/templates/prayer_times/prayer_times.html:752
+#: prayer_times/templates/prayer_times/prayer_times.html:776
 msgid "Failed to update settings:"
 msgstr "Sozlamalarni yangilash amalga oshmadi:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:481
-#: prayer_times/templates/prayer_times/prayer_times.html:505
+#: prayer_times/templates/prayer_times/prayer_times.html:756
+#: prayer_times/templates/prayer_times/prayer_times.html:780
 msgid "Error updating settings:"
 msgstr "Sozlamalarni yangilashda xatolik:"
+
+#: templates/socialaccount/account_disconnected.html:5
+msgid "Account Disconnected"
+msgstr "Hisob uzildi"
+
+#: templates/socialaccount/account_disconnected.html:18
+msgid "Account Successfully Disconnected"
+msgstr "Hisob muvaffaqiyatli uzildi"
+
+#: templates/socialaccount/account_disconnected.html:23
+msgid ""
+"Your social account has been successfully disconnected from your Halal Korea "
+"account."
+msgstr ""
+"Ijtimoiy tarmoq hisobingiz Halal Korea hisobingizdan muvaffaqiyatli uzildi."
+
+#: templates/socialaccount/account_disconnected.html:31
+#: templates/socialaccount/connections.html:26
+#: templates/socialaccount/connections.html:141
+msgid "Back to Profile Settings"
+msgstr "Profil sozlamalariga qaytish"
+
+#: templates/socialaccount/account_disconnected.html:37
+msgid "Manage Connections"
+msgstr "Ulanishlarni boshqarish"
+
+#: templates/socialaccount/account_disconnected.html:43
+#: templates/socialaccount/connections.html:147
+msgid "Go to Home"
+msgstr "Bosh sahifaga o'tish"
+
+#: templates/socialaccount/connection_confirm_disconnect.html:5
+msgid "Confirm Disconnect"
+msgstr "Uzishni tasdiqlash"
+
+#: templates/socialaccount/connection_confirm_disconnect.html:18
+msgid "Disconnect Social Account?"
+msgstr "Ijtimoiy tarmoq hisobini uzasizmi?"
+
+#: templates/socialaccount/connection_confirm_disconnect.html:24
+msgid "You are about to disconnect your"
+msgstr "Quyidagi hisobni uzmoqchisiz:"
+
+#: templates/socialaccount/connection_confirm_disconnect.html:26
+msgid "account."
+msgstr "hisobi."
+
+#: templates/socialaccount/connection_confirm_disconnect.html:29
+msgid ""
+"You will no longer be able to sign in using this account, but you can "
+"reconnect it later if needed."
+msgstr ""
+"Endi bu hisob orqali tizimga kira olmaysiz, lekin kerak bo'lsa keyinroq "
+"yana ulang."
+
+#: templates/socialaccount/connection_confirm_disconnect.html:42
+msgid "Yes, Disconnect Account"
+msgstr "Ha, hisobni uzish"
+
+#: templates/socialaccount/connections.html:6
+#: templates/socialaccount/connections.html:14
+msgid "Social Account Connections"
+msgstr "Ijtimoiy tarmoq hisoblari ulanganlari"
+
+#: templates/socialaccount/connections.html:17
+msgid "Manage your connected social accounts"
+msgstr "Ulangan ijtimoiy tarmoq hisoblaringizni boshqaring"
+
+#: templates/socialaccount/connections.html:33
+#: users/templates/users/edit_profile.html:135
+msgid "Connected Accounts"
+msgstr "Ulangan hisoblar"
+
+#: templates/socialaccount/connections.html:55
+msgid "Connected on"
+msgstr "Ulangan sana"
+
+#: templates/socialaccount/connections.html:67
+#: users/templates/users/edit_profile.html:179
+msgid "Disconnect"
+msgstr "Uzish"
+
+#: templates/socialaccount/connections.html:77
+msgid "No social accounts are currently connected."
+msgstr "Hozircha hech qanday ijtimoiy tarmoq hisobi ulangan emas."
+
+#: templates/socialaccount/connections.html:86
+#: users/templates/users/edit_profile.html:194
+msgid "Connect New Account"
+msgstr "Yangi hisobni ulash"
+
+#: templates/socialaccount/connections.html:100
+msgid "Connect Google"
+msgstr "Google hisobini ulash"
+
+#: templates/socialaccount/connections.html:110
+msgid "Connect GitHub"
+msgstr "GitHub hisobini ulash"
+
+#: templates/socialaccount/connections.html:124
+msgid "About Social Login"
+msgstr "Ijtimoiy tarmoq orqali kirish haqida"
+
+#: templates/socialaccount/connections.html:128
+msgid ""
+"Connecting social accounts allows you to sign in quickly using your existing "
+"accounts. You can disconnect them at any time."
+msgstr ""
+"Ijtimoiy tarmoq hisoblarini ulash orqali mavjud hisoblaringiz bilan tez "
+"kirishingiz mumkin. Ularni istalgan vaqtda uzib qo'yishingiz mumkin."
 
 #: users/decorators.py:16
 msgid ""
@@ -2709,59 +3297,83 @@ msgstr ""
 msgid "Resend Email"
 msgstr "Xabarni qayta yuborish"
 
-#: users/templates/users/edit_profile.html:5
-#: users/templates/users/edit_profile.html:12
+#: users/templates/users/edit_profile.html:6
+#: users/templates/users/edit_profile.html:13
 #: users/templates/users/profile.html:80
 msgid "Edit Profile"
 msgstr "Profilni tahrirlash"
 
-#: users/templates/users/edit_profile.html:13
+#: users/templates/users/edit_profile.html:14
 msgid "Update your profile information"
 msgstr "Profil ma'lumotlaringizni yangilang"
 
-#: users/templates/users/edit_profile.html:24
-#: users/templates/users/register.html:46
+#: users/templates/users/edit_profile.html:25
+#: users/templates/users/register.html:93
 msgid "First Name"
 msgstr "Ism"
 
-#: users/templates/users/edit_profile.html:30
+#: users/templates/users/edit_profile.html:31
 msgid "Enter your first name"
 msgstr "Ismingizni kiriting"
 
-#: users/templates/users/edit_profile.html:40
-#: users/templates/users/register.html:67
+#: users/templates/users/edit_profile.html:41
+#: users/templates/users/register.html:114
 msgid "Last Name"
 msgstr "Familiya"
 
-#: users/templates/users/edit_profile.html:46
+#: users/templates/users/edit_profile.html:47
 msgid "Enter your last name"
 msgstr "Familiyangizni kiriting"
 
-#: users/templates/users/edit_profile.html:56
-#: users/templates/users/login.html:24 users/templates/users/register.html:89
+#: users/templates/users/edit_profile.html:57
+#: users/templates/users/login.html:25 users/templates/users/register.html:136
 msgid "Username"
 msgstr "Foydalanuvchi nomi"
 
-#: users/templates/users/edit_profile.html:72
-#: users/templates/users/register.html:111
+#: users/templates/users/edit_profile.html:73
+#: users/templates/users/register.html:158
 msgid "Email"
 msgstr "Elektron pochta"
 
-#: users/templates/users/edit_profile.html:88
+#: users/templates/users/edit_profile.html:89
 msgid "Current Password"
 msgstr "Joriy parol"
 
-#: users/templates/users/edit_profile.html:103
+#: users/templates/users/edit_profile.html:104
 msgid "New Password"
 msgstr "Yangi parol"
 
-#: users/templates/users/edit_profile.html:110
+#: users/templates/users/edit_profile.html:111
 msgid "Leave blank to keep current password"
 msgstr "Joriy parolni saqlash uchun bo'sh qoldiring"
 
-#: users/templates/users/edit_profile.html:125
+#: users/templates/users/edit_profile.html:126
 msgid "Save Changes"
 msgstr "O'zgarishlarni saqlash"
+
+#: users/templates/users/edit_profile.html:138
+msgid ""
+"Link your social accounts for easy login and to import your profile "
+"information."
+msgstr ""
+"Oson kirish va profil ma'lumotlarini import qilish uchun ijtimoiy tarmoq "
+"hisoblaringizni ulang."
+
+#: users/templates/users/edit_profile.html:167
+msgid "Connected"
+msgstr "Ulangan"
+
+#: users/templates/users/edit_profile.html:178
+msgid "Are you sure you want to disconnect this account?"
+msgstr "Bu hisobni uzishni haqiqatan xohlaysizmi?"
+
+#: users/templates/users/edit_profile.html:187
+msgid "No social accounts connected yet."
+msgstr "Hozircha hech qanday ijtimoiy tarmoq hisobi ulangan emas."
+
+#: users/templates/users/edit_profile.html:218
+msgid "Connect"
+msgstr "Ulash"
 
 #: users/templates/users/email/activation_email.html:9
 msgid "Activate Your Account"
@@ -2867,9 +3479,9 @@ msgid ""
 "registration and start exploring halal places in Korea, please verify your "
 "email address by clicking the link below:"
 msgstr ""
-"Halal Korea bilan ro'yxatdan o'tganingiz uchun rahmat. Ro'yxatdan "
-"o'tishni tugatish va Koreyadagi halol joylarni kashf etishni boshlash uchun "
-"iltimos, quyidagi havolani bosib elektron pochta manzilingizni tasdiqlang:"
+"Halal Korea bilan ro'yxatdan o'tganingiz uchun rahmat. Ro'yxatdan o'tishni "
+"tugatish va Koreyadagi halol joylarni kashf etishni boshlash uchun iltimos, "
+"quyidagi havolani bosib elektron pochta manzilingizni tasdiqlang:"
 
 #: users/templates/users/email/activation_email.txt:10
 msgid "ACTIVATION LINK:"
@@ -2922,33 +3534,199 @@ msgstr "Xabar ushbu manzilga yuborildi:"
 msgid "Questions? Contact our support team"
 msgstr "Savollar? Qo'llab-quvvatlash jamoamiz bilan bog'laning"
 
-#: users/templates/users/login.html:8
+#: users/templates/users/login.html:9
 msgid "Welcome Back"
 msgstr "Xush kelibsiz"
 
-#: users/templates/users/login.html:35
+#: users/templates/users/login.html:36
 msgid "Enter your username"
 msgstr "Foydalanuvchi nomingizni kiriting"
 
-#: users/templates/users/login.html:45 users/templates/users/register.html:133
+#: users/templates/users/login.html:46 users/templates/users/register.html:180
 msgid "Password"
 msgstr "Parol"
 
-#: users/templates/users/login.html:56
+#: users/templates/users/login.html:57
 msgid "Enter your password"
 msgstr "Parolingizni kiriting"
 
-#: users/templates/users/login.html:73
+#: users/templates/users/login.html:74
 msgid "Remember me"
 msgstr "Eslab qolish"
 
-#: users/templates/users/login.html:79
+#: users/templates/users/login.html:80
 msgid "Forgot your password?"
 msgstr "Parolingizni unutdingizmi?"
 
-#: users/templates/users/login.html:99
+#: users/templates/users/login.html:101
+msgid "Or continue with"
+msgstr "Yoki quyidagilar orqali davom eting"
+
+#: users/templates/users/login.html:140
 msgid "Don't have an account?"
 msgstr "Hisobingiz yo'qmi?"
+
+#: users/templates/users/password_reset_confirm.html:4
+msgid "Set New Password"
+msgstr "Yangi parol o'rnatish"
+
+#: users/templates/users/password_reset_confirm.html:13
+msgid "Set new password"
+msgstr "Yangi parolni o'rnatish"
+
+#: users/templates/users/password_reset_confirm.html:16
+msgid "Enter your new password below"
+msgstr "Quyida yangi parolingizni kiriting"
+
+#: users/templates/users/password_reset_confirm.html:35
+msgid "New password"
+msgstr "Yangi parol"
+
+#: users/templates/users/password_reset_confirm.html:51
+msgid "Confirm new password"
+msgstr "Yangi parolni tasdiqlang"
+
+#: users/templates/users/password_reset_confirm.html:68
+msgid "Password requirements:"
+msgstr "Parol talablari:"
+
+#: users/templates/users/password_reset_confirm.html:71
+msgid "At least 8 characters long"
+msgstr "Kamida 8 ta belgidan iborat bo'lishi kerak"
+
+#: users/templates/users/password_reset_confirm.html:72
+msgid "Cannot be too similar to your other personal information"
+msgstr "Boshqa shaxsiy ma'lumotlaringizga juda o'xshash bo'lmasligi kerak"
+
+#: users/templates/users/password_reset_confirm.html:73
+msgid "Cannot be a commonly used password"
+msgstr "Juda ko'p ishlatiladigan odatiy parol bo'lmasligi kerak"
+
+#: users/templates/users/password_reset_confirm.html:74
+msgid "Cannot be entirely numeric"
+msgstr "Faqat raqamlardan iborat bo'lmasligi kerak"
+
+#: users/templates/users/password_reset_confirm.html:85
+msgid "Update password"
+msgstr "Parolni yangilash"
+
+#: users/templates/users/password_reset_invalid.html:4
+msgid "Invalid Reset Link"
+msgstr "Noto'g'ri parolni tiklash havolasi"
+
+#: users/templates/users/password_reset_invalid.html:13
+msgid "Invalid reset link"
+msgstr "Noto'g'ri tiklash havolasi"
+
+#: users/templates/users/password_reset_invalid.html:27
+msgid "Reset link is invalid or expired"
+msgstr "Parolni tiklash havolasi noto'g'ri yoki muddati tugagan"
+
+#: users/templates/users/password_reset_invalid.html:31
+msgid ""
+"The password reset link you clicked is invalid or has expired. This could "
+"happen if:"
+msgstr ""
+"Bosgan parolni tiklash havolangiz noto'g'ri yoki muddati tugagan. Bu "
+"quyidagi hollarda yuz berishi mumkin:"
+
+#: users/templates/users/password_reset_invalid.html:43
+msgid "Common reasons:"
+msgstr "Eng ko'p uchraydigan sabablar:"
+
+#: users/templates/users/password_reset_invalid.html:47
+msgid "The link is older than 24 hours"
+msgstr "Havola 24 soatdan eski"
+
+#: users/templates/users/password_reset_invalid.html:48
+msgid "The link has already been used"
+msgstr "Bu havola allaqachon ishlatilgan"
+
+#: users/templates/users/password_reset_invalid.html:49
+msgid "The link was copied incorrectly"
+msgstr "Havola noto'g'ri nusxalangan"
+
+#: users/templates/users/password_reset_invalid.html:50
+msgid "Your password was already changed"
+msgstr "Parolingiz allaqachon o'zgartirilgan"
+
+#: users/templates/users/password_reset_invalid.html:59
+msgid "Request new reset link"
+msgstr "Yangi tiklash havolasini so'rash"
+
+#: users/templates/users/password_reset_invalid.html:63
+#: users/templates/users/password_reset_request.html:62
+#: users/templates/users/password_reset_sent.html:60
+msgid "Back to login"
+msgstr "Kirishga qaytish"
+
+#: users/templates/users/password_reset_request.html:4
+msgid "Reset Password"
+msgstr "Parolni tiklash"
+
+#: users/templates/users/password_reset_request.html:13
+msgid "Reset your password"
+msgstr "Parolingizni tiklang"
+
+#: users/templates/users/password_reset_request.html:16
+msgid ""
+"Enter your email address and we'll send you a link to reset your password."
+msgstr ""
+"Elektron pochta manzilingizni kiriting va biz sizga parolni tiklash "
+"havolasini yuboramiz."
+
+#: users/templates/users/password_reset_request.html:35
+msgid "Email address"
+msgstr "Elektron pochta manzili"
+
+#: users/templates/users/password_reset_request.html:56
+msgid "Send reset link"
+msgstr "Tiklash havolasini yuborish"
+
+#: users/templates/users/password_reset_sent.html:4
+msgid "Password Reset Email Sent"
+msgstr "Parolni tiklash xabari yuborildi"
+
+#: users/templates/users/password_reset_sent.html:13
+msgid "Check your email"
+msgstr "Elektron pochtangizni tekshiring"
+
+#: users/templates/users/password_reset_sent.html:27
+msgid "Password reset email sent"
+msgstr "Parolni tiklash xabari yuborildi"
+
+#: users/templates/users/password_reset_sent.html:31
+#, python-format
+msgid ""
+"\n"
+"                    If an account with the email address <strong>%(email)s</"
+"strong> exists, we've sent you a password reset link.\n"
+"                    "
+msgstr ""
+"\n"
+"Agar <strong>%(email)s</strong> elektron pochta manzili bilan hisob "
+"mavjud bo'lsa, biz sizga parolni tiklash havolasini yubordik.\n"
+"                    "
+
+#: users/templates/users/password_reset_sent.html:45
+msgid "What to do next:"
+msgstr "Keyin nima qilish kerak:"
+
+#: users/templates/users/password_reset_sent.html:49
+msgid "Check your email inbox (and spam folder)"
+msgstr "Elektron pochtangiz kiruvchi xabarlar (va spam) qutisini tekshiring"
+
+#: users/templates/users/password_reset_sent.html:50
+msgid "Click the reset link in the email"
+msgstr "Xabardagi tiklash havolasini bosing"
+
+#: users/templates/users/password_reset_sent.html:51
+msgid "The link will expire in 24 hours"
+msgstr "Havolaning muddati 24 soatdan keyin tugaydi"
+
+#: users/templates/users/password_reset_sent.html:64
+msgid "Send another reset email"
+msgstr "Yana bir tiklash xabarini yuborish"
 
 #: users/templates/users/profile.html:5
 msgid "My Profile"
@@ -3015,57 +3793,69 @@ msgstr "Bu sahifa avtomatik ravishda "
 msgid "seconds"
 msgstr "soniyada yangilanadi"
 
-#: users/templates/users/register.html:14
+#: users/templates/users/register.html:15
 msgid "Create an Account"
 msgstr "Hisob yaratish"
 
-#: users/templates/users/register.html:16
+#: users/templates/users/register.html:17
 msgid "Join our community and discover halal places"
 msgstr "Jamiyatimizga qo'shiling va halol joylarni kashf eting"
 
-#: users/templates/users/register.html:56
+#: users/templates/users/register.html:39
+#, fuzzy
+#| msgid "Sign up"
+msgid "Sign up with"
+msgstr "Ro'yxatdan o'tish"
+
+#: users/templates/users/register.html:77
+#, fuzzy
+#| msgid "Create an account"
+msgid "Or create account manually"
+msgstr "Hisob yarating"
+
+#: users/templates/users/register.html:103
 msgid "John"
 msgstr "Ali"
 
-#: users/templates/users/register.html:77
+#: users/templates/users/register.html:124
 msgid "Doe"
 msgstr "Aliyev"
 
-#: users/templates/users/register.html:100
+#: users/templates/users/register.html:147
 msgid "johndoe123"
 msgstr "ali123"
 
-#: users/templates/users/register.html:122
+#: users/templates/users/register.html:169
 msgid "john@example.com"
 msgstr "ali@namuna.com"
 
-#: users/templates/users/register.html:144
+#: users/templates/users/register.html:191
 msgid "Create a strong password"
 msgstr "Kuchli parol yarating"
 
-#: users/templates/users/register.html:156
+#: users/templates/users/register.html:203
 msgid "Password must be at least 8 characters with letters and numbers"
 msgstr ""
 "Parol kamida 8 ta belgidan iborat bo'lishi va harflar va raqamlarni o'z "
 "ichiga olishi kerak"
 
-#: users/templates/users/register.html:168
+#: users/templates/users/register.html:215
 msgid "Confirm Password"
 msgstr "Parolni tasdiqlash"
 
-#: users/templates/users/register.html:179
+#: users/templates/users/register.html:226
 msgid "Confirm your password"
 msgstr "Parolingizni tasdiqlang"
 
-#: users/templates/users/register.html:199
+#: users/templates/users/register.html:246
 msgid "Create Account"
 msgstr "Hisob yaratish"
 
-#: users/templates/users/register.html:213
+#: users/templates/users/register.html:262
 msgid "Already have an account?"
 msgstr "Hisobingiz bormi?"
 
-#: users/templates/users/register.html:224
+#: users/templates/users/register.html:273
 msgid "Sign In"
 msgstr "Kirish"
 
@@ -3101,19 +3891,67 @@ msgstr "Elektron pochta manzilingizni kiriting"
 msgid "Back to Login"
 msgstr "Kirishga qaytish"
 
-#: utils/context_processors.py:26
-#| msgid "Discover halal places across Korea"
+#: utils/context_processors.py:27
 msgid "Find halal food and services across South Korea"
 msgstr "Koreya bo'ylab halol joylarni kashf eting"
 
-#: utils/context_processors.py:27
+#: utils/context_processors.py:28
 msgid ""
 "Find halal food and services across South Korea. Join our community and "
 "discover verified halal places."
 msgstr ""
-"Butun Janubiy Koreya bo'ylab halol ovqat va xizmatlarni toping. Hamjamiyatimizga qo'shiling va tasdiqlangan halol joylarni kashf eting."
+"Butun Janubiy Koreya bo'ylab halol ovqat va xizmatlarni toping. "
+"Hamjamiyatimizga qo'shiling va tasdiqlangan halol joylarni kashf eting."
 
-#: utils/context_processors.py:30
+#: utils/context_processors.py:31
 #, python-brace-format
 msgid "© {year} Halal Korea. All rights reserved."
 msgstr "© {year} Halal Korea. Barcha huquqlar himoyalangan."
+
+#~ msgid "Error loading contact form. Please refresh the page."
+#~ msgstr "Aloqa shaklini yuklashda xatolik. Iltimos, sahifani yangilang."
+
+#~ msgid "Your location:"
+#~ msgstr "Sizning manzilingiz:"
+
+#~ msgid "Location:"
+#~ msgstr "Manzil:"
+
+#~ msgid "View Map"
+#~ msgstr "Xaritani ko'rish"
+
+#~ msgid "Map"
+#~ msgstr "Xarita"
+
+#~ msgid "All Cities"
+#~ msgstr "Barcha shaharlar"
+
+#~ msgid "Stay Updated with Prayer Times"
+#~ msgstr "Namoz vaqtlaridan xabardor bo'ling"
+
+#~ msgid "No ratings yet"
+#~ msgstr "Hali reytinglar yo'q"
+
+#~ msgid "Min Impact"
+#~ msgstr "Minimal ta'sir"
+
+#~ msgid "Quality"
+#~ msgstr "Sifat"
+
+#~ msgid "Edit Information"
+#~ msgstr "Ma'lumotlarni tahrirlash"
+
+#~ msgid "Edit"
+#~ msgstr "Tahrirlash"
+
+#~ msgid "Current:"
+#~ msgstr "Joriy:"
+
+#~ msgid "Jabatan Kemajuan Islam Malaysia (JAKIM)"
+#~ msgstr "Malayziya islom taraqqiyoti boshqarmasi (JAKIM)"
+
+#~ msgid "KEMENAG - Kementerian Agama Republik Indonesia"
+#~ msgstr "KEMENAG - Indoneziya Respublikasi din vazirligi"
+
+#~ msgid "Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan"
+#~ msgstr "Vaqflar, islom ishlari va muqaddas joylar vazirligi, Iordaniya"
