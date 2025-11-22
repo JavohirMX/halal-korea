@@ -19,17 +19,19 @@ import uuid
 import re
 import socket
 import threading
-from typing import Any, Callable
-from django.http import HttpRequest
-from django.contrib.auth.models import AbstractUser
-from django.conf import settings
+from typing import Any, Callable, TYPE_CHECKING
 import contextvars
+
+# TYPE_CHECKING is False at runtime, True during type checking
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+    from django.contrib.auth.models import AbstractUser
 
 # Context variable for request correlation
 request_context = contextvars.ContextVar('request_context', default={})
 
 
-def get_request_id(request: HttpRequest = None) -> str:
+def get_request_id(request: 'HttpRequest' = None) -> str:
     """Get or generate correlation ID for request tracing."""
     if request and hasattr(request, 'id'):
         return request.id
@@ -43,7 +45,7 @@ def get_request_id(request: HttpRequest = None) -> str:
     return str(uuid.uuid4())
 
 
-def set_request_context(request: HttpRequest):
+def set_request_context(request: 'HttpRequest'):
     """Set request context for automatic log enrichment."""
     context = {
         'request_id': get_request_id(request),
@@ -57,7 +59,7 @@ def set_request_context(request: HttpRequest):
     return context
 
 
-def get_client_info(request: HttpRequest) -> dict:
+def get_client_info(request: 'HttpRequest') -> dict:
     """Extract client information from request for logging."""
     info = {
         'ip': request.META.get('REMOTE_ADDR', 'unknown'),
@@ -76,8 +78,8 @@ def get_client_info(request: HttpRequest) -> dict:
     return info
 
 
-def log_user_action(logger: logging.Logger, action: str, user: AbstractUser, 
-                   request: HttpRequest = None, extra_data: dict = None):
+def log_user_action(logger: logging.Logger, action: str, user: 'AbstractUser', 
+                   request: 'HttpRequest' = None, extra_data: dict = None):
     """Log user actions with consistent format."""
     log_data = {
         'action': action,
@@ -94,8 +96,8 @@ def log_user_action(logger: logging.Logger, action: str, user: AbstractUser,
     logger.info(f"User action: {action}", extra=log_data)
 
 
-def log_security_event(logger: logging.Logger, event: str, request: HttpRequest = None, 
-                      user: AbstractUser = None, severity: str = 'warning', 
+def log_security_event(logger: logging.Logger, event: str, request: 'HttpRequest' = None, 
+                      user: 'AbstractUser' = None, severity: str = 'warning', 
                       extra_data: dict = None):
     """Log security-related events."""
     log_data = {
@@ -292,7 +294,12 @@ class ContextEnrichmentFilter(logging.Filter):
         
         # Add deployment info
         record.hostname = socket.gethostname()
-        record.environment = getattr(settings, 'ENVIRONMENT', 'unknown')
+        # Lazy import settings to avoid circular dependency
+        try:
+            from django.conf import settings
+            record.environment = getattr(settings, 'ENVIRONMENT', 'unknown')
+        except ImportError:
+            record.environment = 'unknown'
         record.thread_name = threading.current_thread().name
         
         return True
@@ -306,12 +313,12 @@ class LoggerMixin:
         """Get logger for the current class."""
         return logging.getLogger(f"{self.__class__.__module__}.{self.__class__.__name__}")
     
-    def log_action(self, action: str, request: HttpRequest = None, extra_data: dict = None):
+    def log_action(self, action: str, request: 'HttpRequest' = None, extra_data: dict = None):
         """Log an action performed by this view."""
         user = getattr(request, 'user', None) if request else None
         log_user_action(self.logger, action, user, request, extra_data)
     
-    def log_error(self, error: str, request: HttpRequest = None, exception: Exception = None):
+    def log_error(self, error: str, request: 'HttpRequest' = None, exception: Exception = None):
         """Log an error that occurred in this view."""
         extra_data = {}
         if request:
@@ -324,18 +331,29 @@ class LoggerMixin:
 
 
 # Configurable log sampling per logger
-LOG_SAMPLE_RATES = getattr(settings, 'LOG_SAMPLE_RATES', {
-    'places.views': 0.1,      # 10% sampling for high-volume places
-    'utils.location': 0.01,   # 1% sampling for location lookups
-    'prayer_times': 0.1,      # 10% sampling for prayer times
-})
+def _get_sample_rates():
+    """Lazy load sample rates from settings to avoid circular dependency."""
+    try:
+        from django.conf import settings
+        return getattr(settings, 'LOG_SAMPLE_RATES', {
+            'places.views': 0.1,      # 10% sampling for high-volume places
+            'utils.location': 0.01,   # 1% sampling for location lookups
+            'prayer_times': 0.1,      # 10% sampling for prayer times
+        })
+    except ImportError:
+        return {
+            'places.views': 0.1,
+            'utils.location': 0.01,
+            'prayer_times': 0.1,
+        }
 
 
 def should_sample_log(logger_name: str) -> bool:
     """Determine if a log should be sampled based on configuration."""
     import random
     
-    sample_rate = LOG_SAMPLE_RATES.get(logger_name, 1.0)  # Default: log everything
+    sample_rates = _get_sample_rates()
+    sample_rate = sample_rates.get(logger_name, 1.0)  # Default: log everything
     return random.random() < sample_rate
 
 
