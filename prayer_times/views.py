@@ -3,6 +3,7 @@ from .utils import get_prayer_times, get_prayer_times_ll
 from utils.location_manager import get_user_location_context, get_default_korea_location, update_user_location, get_korea_location_from_coordinates, clear_user_location
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from utils.logging_utils import log_user_action, log_execution
 import json
 import logging
 
@@ -10,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 
+@log_execution(level='info', sample=True)  # High-volume endpoint with sampling
 def prayer_times(request):
     """Main view for prayer times page"""
     try:
@@ -19,6 +21,20 @@ def prayer_times(request):
         
         # Get location context (includes is_in_korea detection)
         location_context = get_user_location_context(request)
+        
+        # Log prayer times page access
+        log_user_action(
+            logger,
+            'prayer_times_page_accessed',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={
+                'calculation_method': calculation_method,
+                'asr_method': asr_method,
+                'is_in_korea': location_context.get('is_in_korea'),
+                'user_type': location_context.get('user_type')
+            }
+        )
         
         # Initial context with loading state
         context = {
@@ -32,13 +48,22 @@ def prayer_times(request):
         
         return render(request, 'prayer_times/prayer_times.html', context)
     except Exception as e:
-        logger.error(f"Error in prayer_times view: {str(e)}")
+        logger.error(
+            "Error in prayer_times view",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e),
+                'user': request.user.username if request.user.is_authenticated else None
+            },
+            exc_info=True
+        )
         return render(request, 'prayer_times/error.html', {
             'error': 'Unable to load prayer times',
             'details': str(e)
         })
 
 @require_http_methods(["GET"])
+@log_execution(level='info', sample=True)  # High-volume API with sampling
 def get_prayer_times_data(request):
     """API endpoint to get prayer times data - now supports international users"""
     try:
@@ -47,6 +72,21 @@ def get_prayer_times_data(request):
         location_context = get_user_location_context(request)
         location = location_context['location']
         is_in_korea = location_context['is_in_korea']
+        
+        # Log API request
+        log_user_action(
+            logger,
+            'api_prayer_times_data_requested',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={
+                'calculation_method': calculation_method,
+                'asr_method': asr_method,
+                'is_in_korea': is_in_korea,
+                'has_coordinates': 'lat' in location and 'lng' in location,
+                'has_city': bool(location.get('city'))
+            }
+        )
         
         # Primary prayer times - user's actual location
         primary_data = None
@@ -150,11 +190,28 @@ def get_prayer_times_data(request):
                 'data': korea_data["data"],
                 'location': korea_location_info
             }
+        
+        logger.info(
+            "Prayer times data retrieved successfully",
+            extra={
+                'is_in_korea': is_in_korea,
+                'has_korea_reference': not is_in_korea and korea_data is not None,
+                'location_type': 'coordinates' if primary_location_info and 'latitude' in primary_location_info else 'city'
+            }
+        )
             
         return JsonResponse(response_data)
         
     except Exception as e:
-        logger.error(f"Error in get_prayer_times_data: {str(e)}", exc_info=True)
+        logger.error(
+            "Error in get_prayer_times_data",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e),
+                'user': request.user.username if request.user.is_authenticated else None
+            },
+            exc_info=True
+        )
         return JsonResponse({
             'success': False,
             'error': 'An unexpected error occurred. Please try again later.',
@@ -162,6 +219,7 @@ def get_prayer_times_data(request):
         }, status=500)
 
 @require_http_methods(["POST"])
+@log_execution(level='info', sample=True)  # API endpoint with sampling
 def get_location_from_coords(request):
     """API endpoint to get location data from coordinates"""
     try:
@@ -170,7 +228,19 @@ def get_location_from_coords(request):
         lng = data.get('longitude')
         
         if not lat or not lng:
+            logger.warning("Missing coordinates in get_location_from_coords request")
             return JsonResponse({'error': 'Missing coordinates'}, status=400)
+        
+        log_user_action(
+            logger,
+            'api_location_from_coords_requested',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={
+                'has_latitude': bool(lat),
+                'has_longitude': bool(lng)
+            }
+        )
             
         # Get prayer times directly using coordinates
         prayer_data = get_prayer_times_ll(float(lat), float(lng))
@@ -189,7 +259,14 @@ def get_location_from_coords(request):
                     'city': reverse_geo.get('city', 'Unknown'),
                     'country': reverse_geo.get('country', 'Unknown')
                 }
-                logger.info(f"Enhanced location data from reverse geocoding: {location_info}")
+                logger.info(
+                    "Enhanced location data from reverse geocoding",
+                    extra={
+                        'city': location_info.get('city'),
+                        'country': location_info.get('country'),
+                        'has_coordinates': True
+                    }
+                )
             else:
                 # Fallback to timezone-based city extraction
                 timezone = prayer_data["data"].get("meta", {}).get("timezone", "")
@@ -199,10 +276,21 @@ def get_location_from_coords(request):
                     'lng': lng,
                     'city': city
                 }
-                logger.debug(f"Fallback location data from timezone: {location_info}")
+                logger.debug(
+                    "Fallback location data from timezone",
+                    extra={'city': city, 'timezone': timezone}
+                )
             
             # Update location in session with enhanced data
             update_user_location(request, location_info)
+            
+            logger.info(
+                "Location from coordinates retrieved successfully",
+                extra={
+                    'geocoding_used': bool(reverse_geo),
+                    'city': location_info.get('city')
+                }
+            )
             
             return JsonResponse({
                 'success': True,
@@ -212,19 +300,35 @@ def get_location_from_coords(request):
                 'longitude': lng
             })
         else:
+            logger.warning("Could not get prayer times for provided coordinates")
             return JsonResponse({
                 'success': False,
                 'error': 'Could not get prayer times for location'
             }, status=404)
             
+    except json.JSONDecodeError as e:
+        logger.error(
+            "Invalid JSON in get_location_from_coords",
+            extra={'error': str(e)},
+            exc_info=True
+        )
+        return JsonResponse({'error': 'Invalid request data'}, status=400)
     except Exception as e:
-        logger.error(f"Error in get_location_from_coords: {str(e)}")
+        logger.error(
+            "Error in get_location_from_coords",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e)
+            },
+            exc_info=True
+        )
         return JsonResponse({
             'success': False,
             'error': str(e)
         }, status=500)
 
 @require_http_methods(["POST"])
+@log_execution(level='info')  # User preference change - no sampling
 def update_prayer_settings(request):
     """API endpoint to update prayer calculation settings"""
     try:
@@ -236,16 +340,42 @@ def update_prayer_settings(request):
             request.session['calculation_method'] = int(calculation_method)
         if asr_method is not None:
             request.session['asr_method'] = int(asr_method)
+        
+        log_user_action(
+            logger,
+            'prayer_settings_updated',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={
+                'calculation_method': calculation_method,
+                'asr_method': asr_method
+            }
+        )
             
         return JsonResponse({'success': True})
+    except json.JSONDecodeError as e:
+        logger.error(
+            "Invalid JSON in update_prayer_settings",
+            extra={'error': str(e)},
+            exc_info=True
+        )
+        return JsonResponse({'success': False, 'error': 'Invalid request data'}, status=400)
     except Exception as e:
-        logger.error(f"Error in update_prayer_settings: {str(e)}")
+        logger.error(
+            "Error in update_prayer_settings",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e)
+            },
+            exc_info=True
+        )
         return JsonResponse({
             'success': False,
             'error': str(e)
         }, status=500)
 
 @require_http_methods(["POST"])
+@log_execution(level='info', sample=True)  # Location updates with sampling
 def update_location(request):
     """API endpoint to update location"""
     try:
@@ -254,6 +384,7 @@ def update_location(request):
         country = data.get('country')  # Optional country parameter
         
         if not city:
+            logger.warning("Missing city in update_location request")
             return JsonResponse({
                 'success': False,
                 'error': 'Missing city'
@@ -263,27 +394,70 @@ def update_location(request):
         location_data = {'city': city}
         if country:
             location_data['country'] = country
+        
+        log_user_action(
+            logger,
+            'location_updated_manually',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={
+                'city': city,
+                'country': country,
+                'method': 'manual'
+            }
+        )
             
         # Update location in session
         update_user_location(request, location_data)
             
         return JsonResponse({'success': True})
+    except json.JSONDecodeError as e:
+        logger.error(
+            "Invalid JSON in update_location",
+            extra={'error': str(e)},
+            exc_info=True
+        )
+        return JsonResponse({'success': False, 'error': 'Invalid request data'}, status=400)
     except Exception as e:
-        logger.error(f"Error in update_location: {str(e)}")
+        logger.error(
+            "Error in update_location",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e)
+            },
+            exc_info=True
+        )
         return JsonResponse({
             'success': False,
             'error': str(e)
         }, status=500)
 
 @require_http_methods(["POST"])
+@log_execution(level='info')  # Location clearing - no sampling
 def clear_location(request):
     """API endpoint to clear user location from session"""
     try:
         clear_user_location(request)
+        
+        log_user_action(
+            logger,
+            'location_cleared',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={'action': 'clear_location'}
+        )
+        
         logger.info("User location cleared from session")
         return JsonResponse({'success': True, 'message': 'Location cleared successfully'})
     except Exception as e:
-        logger.error(f"Error in clear_location: {str(e)}")
+        logger.error(
+            "Error in clear_location",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e)
+            },
+            exc_info=True
+        )
         return JsonResponse({
             'success': False,
             'error': str(e)

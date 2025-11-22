@@ -3,6 +3,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Case, When, IntegerField
 from django.http import Http404
 from django.utils import translation
+from utils.logging_utils import log_user_action, log_execution
 import logging
 
 from .models import BlogPost, Category, Tag
@@ -10,11 +11,24 @@ from .models import BlogPost, Category, Tag
 logger = logging.getLogger(__name__)
 
 
+@log_execution(level='info', sample=True)  # High-traffic page with sampling
 def blog_home(request):
     """Blog home page with latest posts"""
     try:
         # Get current language
         current_language = translation.get_language() or 'en'
+        
+        # Log blog home access
+        log_user_action(
+            logger,
+            'blog_home_accessed',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={
+                'current_language': current_language,
+                'page': request.GET.get('page', 1)
+            }
+        )
         
         # Get all published posts (all languages)
         posts = BlogPost.objects.filter(
@@ -44,6 +58,16 @@ def blog_home(request):
         # Add language information
         language_choices = dict(BlogPost.LANGUAGE_CHOICES)
         
+        logger.info(
+            "Blog home rendered successfully",
+            extra={
+                'total_posts': posts.count(),
+                'page_number': posts_page.number,
+                'has_featured': bool(featured_post),
+                'categories_count': categories.count()
+            }
+        )
+        
         context = {
             'featured_post': featured_post,
             'recent_posts': recent_posts,
@@ -54,11 +78,18 @@ def blog_home(request):
             'language_choices': language_choices,
         }
         
-        logger.info(f"Blog home page accessed by user: {request.user.username if request.user.is_authenticated else 'anonymous'}")
         return render(request, 'blog/home.html', context)
         
     except Exception as e:
-        logger.error(f"Error in blog home view: {str(e)}", exc_info=True)
+        logger.error(
+            "Error in blog home view",
+            extra={
+                'error_type': type(e).__name__,
+                'error_message': str(e),
+                'user': request.user.username if request.user.is_authenticated else None
+            },
+            exc_info=True
+        )
         return render(request, 'blog/home.html', {
             'posts': [],
             'categories': [],
@@ -66,6 +97,7 @@ def blog_home(request):
         })
 
 
+@log_execution(level='info', sample=True)  # High-traffic with sampling
 def post_detail(request, slug):
     """Individual blog post detail view"""
     try:
@@ -76,6 +108,21 @@ def post_detail(request, slug):
             BlogPost,
             slug=slug,
             status='published'
+        )
+        
+        # Log post view
+        log_user_action(
+            logger,
+            'blog_post_viewed',
+            request.user if request.user.is_authenticated else None,
+            request,
+            extra_data={
+                'post_id': post.id,
+                'post_slug': slug,
+                'post_language': post.language,
+                'post_category': post.category.name if post.category else None,
+                'current_language': current_language
+            }
         )
         
         # Increment view count
