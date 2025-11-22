@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'utils',
     'blog',
     'contact',
+    'feedback',
     
 ]
 
