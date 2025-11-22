@@ -100,6 +100,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Required for django-allauth
+    'utils.logging_middleware.RequestIDMiddleware',  # Request ID injection (must be early)
     'users.social_rate_limiting.SocialAuthRateLimitMiddleware',  # Social auth rate limiting
     'config.language_middleware.SmartLanguageMiddleware',  # Enhanced language detection (replaces LocaleMiddleware)
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -228,6 +229,10 @@ LOGGING = {
         'json': {
             'format': '{"level": "%(levelname)s", "time": "%(asctime)s", "module": "%(module)s", "message": "%(message)s"}',
         },
+        'structured': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'format': '%(asctime)s %(name)s %(levelname)s %(message)s %(request_id)s %(user_id)s %(username)s %(hostname)s',
+        },
     },
     'filters': {
         'require_debug_true': {
@@ -236,16 +241,20 @@ LOGGING = {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse',
         },
+        'context_enrichment': {
+            '()': 'utils.logging_utils.ContextEnrichmentFilter',
+        },
     },
     'handlers': {
         'console': {
             'level': 'INFO',
-            'filters': ['require_debug_true'],
+            'filters': ['require_debug_true', 'context_enrichment'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
         'file': {
             'level': 'INFO',
+            'filters': ['context_enrichment'],
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': LOGS_DIR / 'django.log',
             'maxBytes': 1024*1024*10,  # 10 MB
@@ -254,6 +263,7 @@ LOGGING = {
         },
         'error_file': {
             'level': 'ERROR',
+            'filters': ['context_enrichment'],
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': LOGS_DIR / 'django_errors.log',
             'maxBytes': 1024*1024*10,  # 10 MB
@@ -262,6 +272,7 @@ LOGGING = {
         },
         'security_file': {
             'level': 'INFO',
+            'filters': ['context_enrichment'],
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': LOGS_DIR / 'security.log',
             'maxBytes': 1024*1024*5,  # 5 MB
@@ -270,6 +281,7 @@ LOGGING = {
         },
         'api_file': {
             'level': 'INFO',
+            'filters': ['context_enrichment'],
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': LOGS_DIR / 'api.log',
             'maxBytes': 1024*1024*5,  # 5 MB
@@ -278,6 +290,7 @@ LOGGING = {
         },
         'database_file': {
             'level': 'WARNING',
+            'filters': ['context_enrichment'],
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': LOGS_DIR / 'database.log',
             'maxBytes': 1024*1024*5,  # 5 MB
@@ -357,6 +370,16 @@ LOGGING = {
         'handlers': ['console', 'file'],
         'level': 'INFO',
     },
+}
+
+# Enhanced Logging Configuration
+ENVIRONMENT = config('ENVIRONMENT', default='development')  # development, staging, production
+
+# Log sampling rates per logger (for high-volume endpoints)
+LOG_SAMPLE_RATES = {
+    'places.views': config('LOG_SAMPLE_RATE_PLACES', default=0.1, cast=float),      # 10%
+    'utils.location': config('LOG_SAMPLE_RATE_LOCATION', default=0.01, cast=float), # 1%
+    'prayer_times': config('LOG_SAMPLE_RATE_PRAYER', default=0.1, cast=float),      # 10%
 }
 
 # Override logging level based on DEBUG setting
