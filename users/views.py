@@ -21,6 +21,10 @@ from django.views.decorators.http import require_POST
 from django.db.models import Avg
 from django.db.models.functions import Round
 import logging
+from utils.logging_utils import (
+    log_user_action, log_security_event, sanitize_sensitive_data,
+    get_request_id, log_execution
+)
 
 logger = logging.getLogger(__name__)
 
@@ -88,14 +92,32 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user_ip = request.META.get('REMOTE_ADDR')
         
-        logger.info(f"Login attempt for username: {username} from IP: {user_ip}")
+        # Enhanced security logging with request ID
+        log_security_event(
+            logger, 
+            'login_attempt',
+            request=request,
+            severity='info',
+            extra_data={
+                'username': username,
+                'request_id': get_request_id(request)
+            }
+        )
         
         # Check login rate limiting
         allowed, error_msg = check_login_rate_limit(request)
         if not allowed:
-            logger.warning(f"Login rate limited for username: {username} from IP: {user_ip}. {error_msg}")
+            log_security_event(
+                logger,
+                'login_rate_limited',
+                request=request,
+                severity='warning',
+                extra_data={
+                    'username': username,
+                    'error': error_msg
+                }
+            )
             return redirect(f"/users/rate-limited/?error={error_msg}")
         
         # Record the login attempt
@@ -106,19 +128,43 @@ def login_view(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                logger.info(f"Successful login for user: {username} from IP: {user_ip}")
+                
+                # Enhanced success logging
+                log_security_event(
+                    logger,
+                    'login_successful',
+                    request=request,
+                    user=user,
+                    severity='info',
+                    extra_data={'username': username}
+                )
                 
                 # Get the next URL from either POST data or GET parameters
                 next_url = request.POST.get('next') or request.GET.get('next')
                 if next_url:
-                    logger.debug(f"Redirecting user {username} to: {next_url}")
+                    logger.debug(
+                        f"Redirecting user {username} to: {next_url}",
+                        extra={'username': username, 'redirect_url': next_url}
+                    )
                     return redirect(next_url)
                 return redirect('places:home')
             else:
-                logger.warning(f"Login attempt for inactive user: {username} from IP: {user_ip}")
+                log_security_event(
+                    logger,
+                    'login_attempt_inactive_account',
+                    request=request,
+                    severity='warning',
+                    extra_data={'username': username}
+                )
                 messages.error(request, 'Your account is inactive. Please contact support.')
         else:
-            logger.warning(f"Failed login attempt for username: {username} from IP: {user_ip}")
+            log_security_event(
+                logger,
+                'login_failed_invalid_credentials',
+                request=request,
+                severity='warning',
+                extra_data={'username': username}
+            )
             messages.error(request, 'Invalid username or password.')
     
     return render(request, 'users/login.html', {
@@ -126,27 +172,43 @@ def login_view(request):
     })
 
 def logout_view(request):
-    """User logout view with logging"""
+    """User logout view with enhanced logging"""
     if request.user.is_authenticated:
-        username = request.user.username
-        user_ip = request.META.get('REMOTE_ADDR')
-        logger.info(f"User logout: {username} from IP: {user_ip}")
+        log_security_event(
+            logger,
+            'user_logout',
+            request=request,
+            user=request.user,
+            severity='info'
+        )
     
     logout(request)
     return redirect('places:home')
 
 def register_view(request):
-    """User registration view with email activation"""
+    """User registration view with email activation and enhanced logging"""
     if request.method == 'POST':
-        user_ip = request.META.get('REMOTE_ADDR')
         username = request.POST.get('username', 'unknown')
         
-        logger.info(f"Registration attempt for username: {username} from IP: {user_ip}")
+        # Enhanced security logging
+        log_security_event(
+            logger,
+            'registration_attempt',
+            request=request,
+            severity='info',
+            extra_data={'username': username}
+        )
         
         # Check rate limiting
         allowed, error_msg = check_registration_rate_limit(request)
         if not allowed:
-            logger.warning(f"Registration rate limited for username: {username} from IP: {user_ip}. {error_msg}")
+            log_security_event(
+                logger,
+                'registration_rate_limited',
+                request=request,
+                severity='warning',
+                extra_data={'username': username, 'error': error_msg}
+            )
             return redirect(f"/users/rate-limited/?error={error_msg}")
         
         form = UserRegistrationForm(request.POST)
@@ -161,7 +223,18 @@ def register_view(request):
                 user.email_verified = False  # But email is not verified yet
                 user.save()
                 
-                logger.info(f"User created (active, email unverified): {user.username} from IP: {user_ip}")
+                # Enhanced logging for user creation
+                log_security_event(
+                    logger,
+                    'user_created',
+                    request=request,
+                    user=user,
+                    severity='info',
+                    extra_data={
+                        'email_verified': False,
+                        'username': user.username
+                    }
+                )
                 
                 # Check email rate limiting before sending
                 email_allowed, email_error_msg = check_email_rate_limit(request, user)
@@ -170,29 +243,60 @@ def register_view(request):
                     if send_activation_email(user, request):
                         # Record the email attempt
                         record_email_attempt(request, user)
-                        logger.info(f"Activation email sent for user: {user.username}")
+                        logger.info(
+                            f"Activation email sent for user: {user.username}",
+                            extra={'user_id': user.id, 'username': user.username}
+                        )
                         # Auto-login the user
                         login(request, user)
-                        logger.info(f"Auto-login after registration for user: {user.username}")
+                        logger.info(
+                            f"Auto-login after registration for user: {user.username}",
+                            extra={'user_id': user.id}
+                        )
                         return render(request, 'users/check_email.html', {'email': user.email})
                     else:
-                        logger.error(f"Failed to send activation email for user: {user.username}")
+                        logger.error(
+                            f"Failed to send activation email for user: {user.username}",
+                            extra={'user_id': user.id}
+                        )
                         # Still login the user even if email fails
                         login(request, user)
                         messages.warning(request, 'Account created successfully, but we could not send the verification email. You can request a new one from your profile.')
                         return redirect('places:home')
                 else:
                     # Email rate limited - still create account but warn user
-                    logger.warning(f"Email rate limited during registration for user: {user.username}. {email_error_msg}")
+                    log_security_event(
+                        logger,
+                        'email_rate_limited_registration',
+                        request=request,
+                        user=user,
+                        severity='warning',
+                        extra_data={'error': email_error_msg}
+                    )
                     login(request, user)
                     messages.warning(request, f'Account created successfully, but verification email was not sent due to rate limiting: {email_error_msg}')
                     return redirect('places:home')
                     
             except Exception as e:
-                logger.error(f"Error during registration for username: {username} from IP: {user_ip}: {str(e)}")
+                log_security_event(
+                    logger,
+                    'registration_error',
+                    request=request,
+                    severity='error',
+                    extra_data={
+                        'username': username,
+                        'error_type': type(e).__name__,
+                        'error_message': str(e)
+                    }
+                )
                 messages.error(request, 'An error occurred during registration. Please try again.')
         else:
-            logger.warning(f"Invalid registration form for username: {username} from IP: {user_ip}: {form.errors}")
+            # Sanitize form errors before logging
+            safe_errors = sanitize_sensitive_data({'errors': form.errors.as_data()})
+            logger.warning(
+                f"Invalid registration form for username: {username}",
+                extra=safe_errors
+            )
     else:
         form = UserRegistrationForm()
     
