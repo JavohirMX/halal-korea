@@ -168,6 +168,8 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **Error Tracking**: Sentry SDK 2.46.0 for production monitoring
 - **Admin Theme**: Django Jazzmin 3.0.1 with Cyborg dark theme
 - **Deployment**: Docker + Gunicorn 23.0.0
+- **Email**: Brevo (Sendinblue) SMTP for transactional emails
+- **DNS/CDN**: Cloudflare for DNS, CDN, and email routing
 - **Notifications**: Telegram Bot API integration
 - **Logging**: Python JSON Logger 2.0.7 for structured logging
 
@@ -490,7 +492,35 @@ services:
 | `WATERMARK_ENABLED` | Enable image watermarking | `True` |
 | `WATERMARK_OPACITY` | Watermark opacity (0.0-1.0) | `0.25` |
 | `EMAIL_BACKEND` | Email backend class | Console in dev |
-| `EMAIL_HOST` | SMTP server host | `smtp.gmail.com` |
+| `EMAIL_HOST` | SMTP server host | `smtp-relay.brevo.com` |
+| `EMAIL_PORT` | SMTP port | `587` |
+| `EMAIL_HOST_USER` | Brevo SMTP login | N/A |
+| `EMAIL_HOST_PASSWORD` | Brevo SMTP key | N/A |
+
+### Email Infrastructure
+
+The project uses a dual-service email setup:
+
+**Sending Emails (Brevo/Sendinblue)**
+- Transactional emails (password reset, verification, notifications)
+- SMTP relay via `smtp-relay.brevo.com:587`
+- Requires Brevo account with SMTP credentials
+
+**Receiving Emails (Cloudflare Email Routing)**
+- Cloudflare handles inbound email routing
+- Custom domain email addresses (e.g., `contact@halal-korea.com`)
+- Forwards to designated mailboxes
+
+```env
+# Email Configuration (Production)
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp-relay.brevo.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=your-brevo-smtp-login
+EMAIL_HOST_PASSWORD=your-brevo-smtp-key
+DEFAULT_FROM_EMAIL=Halal Korea <noreply@halal-korea.com>
+```
 
 ## 📱 Apps & Modules
 
