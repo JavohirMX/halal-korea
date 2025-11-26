@@ -64,6 +64,7 @@ SITE_URL = config('SITE_URL', default='http://localhost:8000')
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',  # Must be before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -691,3 +692,203 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# ============================================================================
+# JAZZMIN ADMIN THEME CONFIGURATION
+# ============================================================================
+
+JAZZMIN_SETTINGS = {
+    # Title on the login screen
+    "site_title": "Halal Korea Admin",
+    
+    # Title on the brand (top left)
+    "site_header": "Halal Korea",
+    
+    # Title in the browser tab
+    "site_brand": "Halal Korea",
+    
+    # Logo to use for your site
+    "site_logo": "images/logo-square.png",
+    
+    # Logo to use for login page
+    "login_logo": "images/logo-square.png",
+    
+    # CSS classes that are applied to the logo
+    "site_logo_classes": "img-rounded",
+    
+    # Welcome text on the login screen
+    "welcome_sign": "Welcome to Halal Korea Admin",
+    
+    # Copyright on the footer
+    "copyright": "Halal Korea",
+    
+    # The model admin to search from the search bar
+    "search_model": ["auth.User", "places.HalalPlace", "blog.BlogPost"],
+    
+    # Field name on user model that contains avatar
+    "user_avatar": None,
+    
+    #############
+    # Side Menu #
+    #############
+    
+    # Whether to display the side menu
+    "show_sidebar": True,
+    
+    # Whether to auto expand the menu
+    "navigation_expanded": True,
+    
+    # Hide these apps from the sidebar
+    "hide_apps": [],
+    
+    # Hide these models from the sidebar
+    "hide_models": [],
+    
+    # Order of apps and models in the sidebar
+    "order_with_respect_to": [
+        "auth",
+        "places",
+        "reviews",
+        "blog",
+        "prayer_times",
+        "users",
+        "contact",
+        "feedback",
+    ],
+    
+    # Custom icons for apps/models
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.User": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "places": "fas fa-map-marked-alt",
+        "places.HalalPlace": "fas fa-map-marker-alt",
+        "places.PlaceEditSuggestion": "fas fa-edit",
+        "places.PlaceImageSuggestion": "fas fa-image",
+        "reviews": "fas fa-star-half-alt",
+        "reviews.Review": "fas fa-star",
+        "blog": "fas fa-newspaper",
+        "blog.BlogPost": "fas fa-blog",
+        "blog.Category": "fas fa-tags",
+        "blog.Tag": "fas fa-hashtag",
+        "blog.RelatedPlace": "fas fa-link",
+        "prayer_times": "fas fa-mosque",
+        "prayer_times.PrayerTime": "fas fa-clock",
+        # Users app
+        "users": "fas fa-user-circle",
+        "users.User": "fas fa-id-card",
+        # Contact app
+        "contact": "fas fa-envelope-open-text",
+        "contact.ContactMessage": "fas fa-envelope",
+        # Feedback app
+        "feedback": "fas fa-comments",
+        "feedback.FeedbackResponse": "fas fa-comment-dots",
+        # Utils/Utilities app
+        "utils": "fas fa-tools",
+        "utils.SystemMetric": "fas fa-chart-line",
+        "utils.RequestLog": "fas fa-file-alt",
+        "utils.AdminAction": "fas fa-user-shield",
+        "utils.ContentModerationLog": "fas fa-shield-alt",
+        "utils.SecurityEvent": "fas fa-exclamation-triangle",
+        "utils.AdminNotification": "fas fa-bell",
+        "utils.AlertRule": "fas fa-bell-slash",
+        # Sites and social accounts
+        "sites.Site": "fas fa-globe",
+        "socialaccount": "fas fa-share-alt-square",
+        "socialaccount.SocialAccount": "fas fa-share-alt",
+        "socialaccount.SocialApp": "fas fa-plug",
+        "socialaccount.SocialToken": "fas fa-key",
+        "account": "fas fa-user-check",
+        "account.EmailAddress": "fas fa-at",
+    },
+    
+    # Default icon for apps/models not listed
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    
+    #############
+    # UI Tweaks #
+    #############
+    
+    # Relative paths to custom CSS/JS
+    "custom_css": None,
+    "custom_js": None,
+    
+    # Whether to show the UI customizer on the sidebar
+    "show_ui_builder": True,
+    
+    ###############
+    # Change view #
+    ###############
+    
+    # Render out the change view as a single form, or in tabs
+    "changeform_format": "horizontal_tabs",
+    
+    # Override changeform for specific models
+    "changeform_format_overrides": {
+        "auth.User": "collapsible",
+        "auth.Group": "vertical_tabs",
+    },
+    
+    #################
+    # Related Modal #
+    #################
+    
+    # Use modals for related items
+    "related_modal_active": True,
+    
+    #############
+    # Top Menu  #
+    #############
+    
+    # Links to put along the top menu
+    "topmenu_links": [
+        {"name": "View Site", "url": "/", "new_window": False},
+        {"name": "Monitoring", "url": "/admin/monitoring/", "new_window": False},
+        {"name": "Analytics", "url": "https://analytics.google.com/", "new_window": True, "icon": "fas fa-chart-bar"},
+        {"name": "Sentry", "url": "https://sentry.io/", "new_window": True, "icon": "fas fa-bug"},
+    ],
+    
+    #############
+    # User Menu #
+    #############
+    
+    # Additional links to include in the user menu
+    "usermenu_links": [
+        {"name": "View Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},
+    ],
+}
+
+# Jazzmin UI Tweaks Configuration
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-dark",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "cyborg",
+    "dark_mode_theme": "cyborg",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+    "actions_sticky_top": True,
+}
