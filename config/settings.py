@@ -39,10 +39,18 @@ if not DEBUG and config('SENTRY_DSN', default=''):
         dsn=config('SENTRY_DSN'),
         integrations=[DjangoIntegration()],
         traces_sample_rate=config('SENTRY_TRACES_SAMPLE_RATE', default=0.1, cast=float),
+        # Set profile_session_sample_rate to 1.0 to profile 100%
+        # of profile sessions.
+        profile_session_sample_rate=1.0,
+        # Set profile_lifecycle to "trace" to automatically
+        # run the profiler on when there is an active transaction
+        profile_lifecycle="trace",
         send_default_pii=False,  # Privacy: don't send personally identifiable information
         environment=config('SENTRY_ENVIRONMENT', default='production'),
         # Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
         # We recommend adjusting this value in production.
+        enable_logs=True,
+        
     )
 
 # CSRF Settings for production

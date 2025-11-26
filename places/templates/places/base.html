@@ -7,11 +7,11 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-B2JK0XRW1Q"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-    gtag('config', 'G-B2JK0XRW1Q');
+        gtag('config', 'G-B2JK0XRW1Q');
     </script>
     <!-- Meta Tags -->
     <meta charset="UTF-8">
@@ -82,48 +82,48 @@
     <!-- JSON-LD Structured Data -->
     {% block structured_data %}
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "{{ STATIC_INFO.site_name }}",
-        "alternateName": "Halal Korea",
-        "url": "{{ request.scheme }}://{{ request.get_host }}",
-        "description": "{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}",
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}?search={search_term_string}"
-            },
-            "query-input": "required name=search_term_string"
-        },
-        "publisher": {
-            "@type": "Organization",
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
             "name": "{{ STATIC_INFO.site_name }}",
+            "alternateName": "Halal Korea",
             "url": "{{ request.scheme }}://{{ request.get_host }}",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}",
-                "width": {{ STATIC_INFO.default_og_image_width }},
-                "height": {{ STATIC_INFO.default_og_image_height }}
+            "description": "{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": {
+                    "@type": "EntryPoint",
+                    "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}?search={search_term_string}"
+                },
+                "query-input": "required name=search_term_string"
             },
-            "contactPoint": {
-                "@type": "ContactPoint",
-                "email": "{{ STATIC_INFO.email }}",
-                "contactType": "customer support"
+            "publisher": {
+                "@type": "Organization",
+                "name": "{{ STATIC_INFO.site_name }}",
+                "url": "{{ request.scheme }}://{{ request.get_host }}",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}",
+                    "width": {{ STATIC_INFO.default_og_image_width }},
+                    "height": {{ STATIC_INFO.default_og_image_height }}
+                },
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "email": "{{ STATIC_INFO.email }}",
+                    "contactType": "customer support"
+                },
+                "sameAs": [
+                    {% if STATIC_INFO.twitter %}"{{ STATIC_INFO.twitter }}"{% if STATIC_INFO.instagram or STATIC_INFO.facebook %},{% endif %}{% endif %}
+                    {% if STATIC_INFO.instagram %}"{{ STATIC_INFO.instagram }}"{% if STATIC_INFO.facebook %},{% endif %}{% endif %}
+                    {% if STATIC_INFO.facebook %}"{{ STATIC_INFO.facebook }}"{% endif %}
+                ]
             },
-            "sameAs": [
-                {% if STATIC_INFO.twitter %}"{{ STATIC_INFO.twitter }}"{% if STATIC_INFO.instagram or STATIC_INFO.facebook %},{% endif %}{% endif %}
-                {% if STATIC_INFO.instagram %}"{{ STATIC_INFO.instagram }}"{% if STATIC_INFO.facebook %},{% endif %}{% endif %}
-                {% if STATIC_INFO.facebook %}"{{ STATIC_INFO.facebook }}"{% endif %}
-            ]
-        },
-        "inLanguage": ["en-US", "ko-KR", "uz-UZ"],
-        "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
+            "inLanguage": ["en-US", "ko-KR", "uz-UZ"],
+            "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
+            }
         }
-    }
     </script>
     {% endblock structured_data %}
 
@@ -202,6 +202,10 @@
             }
         })();
     </script>
+    <script
+        src="https://js.sentry-cdn.com/160eca2c83c8178bb83d4af1eaa39f35.min.js"
+        crossorigin="anonymous"
+    ></script>
 </head>
 
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
