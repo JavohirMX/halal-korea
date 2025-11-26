@@ -3,8 +3,10 @@
 **Find Halal Places in Korea** - A comprehensive Django web application for discovering halal restaurants, markets, mosques, and prayer rooms across South Korea.
 
 [![Django](https://img.shields.io/badge/Django-5.1.6-092E20?style=flat-square&logo=django)](https://djangoproject.com/)
-[![PostGIS](https://img.shields.io/badge/PostGIS-Enabled-4169E1?style=flat-square&logo=postgresql)](https://postgis.net/)
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python)](https://python.org/)
+[![PostGIS](https://img.shields.io/badge/PostGIS-15--3.3-4169E1?style=flat-square&logo=postgresql)](https://postgis.net/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://docker.com/)
+[![Sentry](https://img.shields.io/badge/Sentry-Enabled-362D59?style=flat-square&logo=sentry)](https://sentry.io/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](#)
 
 ## 📋 Table of Contents
@@ -45,10 +47,12 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **📱 Responsive Design** - Mobile-first design with Tailwind CSS
 - **📝 Blog System** - Full-featured blog with rich text editing and categories
 - **💬 Contact Forms** - Integrated contact system with Telegram notifications
-- **🔐 Social Login** - Google and GitHub OAuth integration
+- **� Feedback Widget** - Floating feedback collection with user behavior analytics
+- **�🔐 Social Login** - Google and GitHub OAuth integration
 - **🖼️ Image Watermarking** - Automatic branding for uploaded images
-- **📊 Admin Monitoring** - Real-time dashboards for performance and security
+- **� Admin Monitoring** - Real-time dashboards for performance and security
 - **✏️ Community Suggestions** - Edit and image suggestions for existing places
+- **🗺️ SEO Sitemaps** - Auto-generated XML sitemaps for search engines
 
 ## ✨ Features
 
@@ -108,6 +112,17 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **Universal Access**: Available to both authenticated and anonymous users
 - **Message Tracking**: Read status and response tracking
 
+### 📊 Feedback System
+
+- **Floating Widget**: Non-intrusive feedback widget on all pages
+- **5-Star Rating**: Quick rating collection with optional comments
+- **User Behavior Tracking**: Time on site/page, scroll depth, pages visited
+- **Context Awareness**: Captures page type, URL, language, and device
+- **Low Rating Alerts**: Telegram notifications for negative feedback (1-2 stars)
+- **Rate Limiting**: IP-based spam protection for feedback submissions
+- **Admin Categorization**: Categorize feedback (UI/UX, Bug, Feature Request, etc.)
+- **Anonymous Support**: Works for both authenticated and anonymous users
+
 ### 📝 Blog & Content Management
 
 - **Rich Text Editor**: TinyMCE integration with image uploads
@@ -121,36 +136,40 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 
 ### 📊 Admin Monitoring System
 
-- **Real-time Dashboards**: 5 comprehensive monitoring dashboards
+- **Real-time Dashboards**: 6 comprehensive monitoring dashboards
   - Main Dashboard: Overview of key system metrics
   - Performance Dashboard: Slow queries, response times, throughput
   - Security Dashboard: Failed logins, suspicious activity, authentication events
   - Content Operations: Pending submissions, moderation queue
   - Analytics Dashboard: User engagement, popular content, trends
+  - Logs Dashboard: Real-time log viewing and filtering
 - **Request Logging**: Sampled request tracking with performance data
 - **Admin Actions Audit**: Complete audit trail of all admin operations
 - **Security Event Tracking**: Log authentication failures and suspicious activity
-- **Alert System**: Configurable alerts via Telegram and email
+- **Content Moderation Logs**: Track approval/rejection workflows
+- **Alert System**: Configurable alert rules with Telegram and email notifications
+- **Admin Notifications**: In-app notification system for admins
 - **Data Retention**: Automatic cleanup of old monitoring data
+- **Jazzmin Admin Theme**: Modern, customizable admin interface with dark mode
 
 ## 🏗️ Architecture
 
 ### Technology Stack
 
 - **Framework**: Django 5.1.6 with Python 3.12
-- **Database**: PostgreSQL with PostGIS extension
-- **Caching**: Django session-based caching (Redis-ready)
+- **Database**: PostgreSQL 15+ with PostGIS 3.3 extension
+- **Caching**: Django Local Memory Cache (Redis-ready)
 - **Frontend**: HTML5, Tailwind CSS, Alpine.js, Vanilla JavaScript
-- **Maps**: Google Maps JavaScript API
+- **Maps**: Google Maps JavaScript API with custom markers
 - **Rich Text**: TinyMCE 4.1.0 for blog editing
 - **Authentication**: Django AllAuth 0.57.0 (Google & GitHub OAuth)
-- **Image Processing**: Pillow 11.3.0 with watermarking
+- **Image Processing**: Pillow 11.3.0 with automatic watermarking
 - **Translation**: Django Rosetta 0.10.2 for i18n management
-- **Error Tracking**: Sentry SDK 1.40.0 for production monitoring
+- **Error Tracking**: Sentry SDK 2.46.0 for production monitoring
+- **Admin Theme**: Django Jazzmin 3.0.1 with Cyborg dark theme
 - **Deployment**: Docker + Gunicorn 23.0.0
-- **Task Queue**: Django management commands
-- **Monitoring**: Custom middleware with request/performance tracking
 - **Notifications**: Telegram Bot API integration
+- **Logging**: Python JSON Logger 2.0.7 for structured logging
 
 ### Project Structure
 
@@ -159,31 +178,31 @@ halal-korea/
 ├── config/                 # Django settings and main configuration
 │   ├── settings.py        # Main settings with environment variables
 │   ├── urls.py           # Root URL configuration
+│   ├── sitemaps.py       # SEO sitemap generation
+│   ├── middleware.py     # Custom middleware (admin access)
+│   ├── language_middleware.py  # Smart language detection
 │   └── static_info.py    # Site metadata and branding
 ├── places/                # Core app for halal places
-│   ├── models.py         # HalalPlace model with PostGIS
+│   ├── models.py         # HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 │   ├── views.py          # Place discovery and submission views
 │   ├── forms.py          # Place submission forms
+│   ├── management/       # Commands: create_test_data, clear_place_images
 │   └── templates/        # HTML templates
 ├── users/                 # User authentication and profiles
-│   ├── models.py         # Custom User model
+│   ├── models.py         # Custom User model with social auth
 │   ├── views.py          # Auth and profile views
+│   ├── adapters.py       # Custom AllAuth adapters
+│   ├── decorators.py     # email_verification_required decorator
 │   └── templates/        # User interface templates
 ├── reviews/              # Review and rating system
 │   ├── models.py         # Review model with rating constraints
 │   └── views.py          # Review CRUD operations
 ├── prayer_times/         # Islamic prayer times feature
-│   ├── models.py         # Prayer time caching model
+│   ├── models.py         # PrayerTimeCache model
 │   ├── utils.py          # Prayer calculation utilities
 │   └── views.py          # Prayer time API views
-├── contact/              # Contact form system
-│   ├── models.py         # ContactMessage model
-│   ├── forms.py          # Contact form with validation
-│   ├── views.py          # AJAX form submission
-│   ├── rate_limiting.py  # Spam protection utilities
-│   └── templates/        # Contact form templates
 ├── blog/                 # Blog and content management
-│   ├── models.py         # BlogPost, Category, Tag models
+│   ├── models.py         # BlogPost, Category, Tag, RelatedPlace
 │   ├── views.py          # Blog views and article display
 │   ├── upload_views.py   # TinyMCE image upload handler
 │   └── templates/        # Blog templates
@@ -192,18 +211,28 @@ halal-korea/
 │   ├── views.py          # AJAX form submission
 │   ├── rate_limiting.py  # Spam protection utilities
 │   └── templates/        # Contact form templates
+├── feedback/             # Floating feedback widget
+│   ├── models.py         # FeedbackResponse with behavior metrics
+│   ├── views.py          # AJAX feedback submission
+│   └── rate_limiting.py  # Feedback spam protection
 ├── utils/                # Shared utilities and monitoring
-│   ├── location_manager.py  # Location detection and management
-│   ├── logging_utils.py     # Custom logging utilities
-│   ├── watermark.py         # Image watermarking utilities
-│   ├── models.py            # Monitoring models (SystemMetric, RequestLog, etc.)
-│   ├── admin_views.py       # Monitoring dashboard views
+│   ├── models.py         # SystemMetric, RequestLog, AdminAction, SecurityEvent, etc.
+│   ├── admin_views.py    # Monitoring dashboard views
 │   ├── monitoring_middleware.py  # Request tracking middleware
-│   └── management/          # Custom Django commands
+│   ├── logging_middleware.py    # Request ID injection
+│   ├── logging_utils.py         # Custom logging decorators
+│   ├── location_manager.py      # Location detection and management
+│   ├── watermark.py             # Image watermarking utilities
+│   ├── telegram_notifications.py # Telegram bot integration
+│   ├── context_processors.py    # Global template context
+│   ├── language_utils.py        # Language context processor
+│   ├── language_views.py        # Language switching views
+│   └── management/              # Custom Django commands
 ├── static/               # Static assets (CSS, JS, images)
 ├── media/                # User-uploaded content
-├── locale/               # Translation files (en, ko, uz)
+├── locale/               # Translation files (ko, uz)
 ├── logs/                 # Application logs
+├── templates/            # Global templates (account, socialaccount)
 └── readme/               # Technical documentation
 ```
 
@@ -212,8 +241,7 @@ halal-korea/
 ### Prerequisites
 
 - Python 3.12+
-- PostgreSQL 15+ with PostGIS extension
-- Node.js (for frontend asset management, optional)
+- PostgreSQL 15+ with PostGIS 3.3+ extension
 - Docker & Docker Compose (for containerized deployment)
 
 ### 1. Clone Repository
@@ -324,8 +352,51 @@ Visit `http://localhost:8000` to access the application.
 # Build and start services
 docker-compose up --build
 
-# Run in production mode
-docker-compose -f docker-compose.prod.yml up -d
+# Run in detached mode
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f web
+
+# Stop services
+docker-compose down
+```
+
+### Docker Configuration
+
+The project includes:
+- `Dockerfile` - Python 3.12-slim with PostGIS/GDAL dependencies
+- `docker-compose.yaml` - Development setup with PostgreSQL/PostGIS
+
+```yaml
+# docker-compose.yaml
+version: '3.9'
+services:
+  web:
+    build: .
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes:
+      - .:/app
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgis/postgis:15-3.3
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
 ```
 
 ### Manual Docker Build
@@ -401,6 +472,7 @@ services:
 | `TELEGRAM_BOT_TOKEN` | Telegram bot token for backups/notifications | N/A |
 | `TELEGRAM_CHAT_ID` | Telegram chat ID for notifications | N/A |
 | `TELEGRAM_NOTIFICATIONS_ENABLED` | Enable Telegram notifications | `False` |
+| `SITE_URL` | Base URL for admin links in notifications | `http://localhost:8000` |
 | `GOOGLE_OAUTH_CLIENT_ID` | Google OAuth client ID | N/A |
 | `GOOGLE_OAUTH_CLIENT_SECRET` | Google OAuth client secret | N/A |
 | `GITHUB_CLIENT_ID` | GitHub OAuth client ID | N/A |
@@ -411,6 +483,10 @@ services:
 | `MONITORING_ENABLED` | Enable monitoring system | `True` |
 | `MONITORING_SAMPLE_RATE` | Request sampling rate | `0.01` |
 | `MONITORING_SLOW_THRESHOLD_MS` | Slow query threshold | `1000` |
+| `MONITORING_RETENTION_DAYS` | Days to keep monitoring data | `30` |
+| `ALERT_TELEGRAM_ENABLED` | Enable Telegram alerts | `True` |
+| `ALERT_EMAIL_ENABLED` | Enable email alerts | `True` |
+| `ALERT_EMAIL_RECIPIENTS` | Comma-separated alert emails | N/A |
 | `WATERMARK_ENABLED` | Enable image watermarking | `True` |
 | `WATERMARK_OPACITY` | Watermark opacity (0.0-1.0) | `0.25` |
 | `EMAIL_BACKEND` | Email backend class | Console in dev |
@@ -460,16 +536,18 @@ services:
 
 ### Utils App (`utils/`)
 
-**Shared utilities and helper functions**
+**Shared utilities, monitoring, and helper functions**
 
-- **Location Manager**: IP-based location detection
-- **Logging Utilities**: Custom logging decorators and helpers
+- **Monitoring Models**: SystemMetric, RequestLog, AdminAction, SecurityEvent, ContentModerationLog, AdminNotification, AlertRule
+- **Admin Dashboards**: 6 comprehensive monitoring dashboards
+- **Middleware**: Request tracking, performance monitoring, cache statistics, request ID injection
+- **Location Manager**: IP-based location detection with Korea/international detection
+- **Logging Utilities**: Custom logging decorators, context enrichment, sampling
 - **Watermarking**: Automatic watermark application to uploaded images
-- **Monitoring Models**: SystemMetric, RequestLog, AdminAction, SecurityEvent
-- **Admin Dashboards**: 5 comprehensive monitoring dashboards
-- **Middleware**: Request tracking, performance monitoring, cache statistics
+- **Telegram Notifications**: Integration for admin alerts and backups
 - **Context Processors**: Global template context variables
-- **Management Commands**: Custom Django commands for maintenance
+- **Language Utilities**: Enhanced language switching and preferences
+- **Management Commands**: Database backup, monitoring, translation tools
 
 ### Blog App (`blog/`)
 
@@ -478,8 +556,9 @@ services:
 - **Models**: BlogPost, Category, Tag, RelatedPlace
 - **Rich Text Editing**: TinyMCE integration with image uploads
 - **Publishing Workflow**: Draft → Published → Archived
-- **Multi-language**: Per-post language selection
-- **Features**: Featured images, excerpts, slug generation
+- **Multi-language**: Per-post language selection (en, ko, uz)
+- **SEO Fields**: Meta title, meta description, auto-generated slugs
+- **Features**: Featured images, excerpts, view count tracking
 - **Related Content**: Link blog posts to halal places
 
 ### Contact App (`contact/`)
@@ -491,6 +570,18 @@ services:
 - **Rate Limiting**: IP and user-based spam protection
 - **Telegram Integration**: Instant notifications for new messages
 - **Admin Management**: Full contact message management in admin panel
+
+### Feedback App (`feedback/`)
+
+**Floating feedback widget system**
+
+- **Models**: FeedbackResponse with detailed behavior metrics
+- **Widget**: Non-intrusive floating feedback button on all pages
+- **Behavior Tracking**: Time on site, time on page, scroll depth, pages visited
+- **Context Capture**: Page URL, page type, language, device type, browser
+- **Rate Limiting**: IP-based spam protection
+- **Telegram Alerts**: Notifications for low ratings (1-2 stars)
+- **Admin Categorization**: UI/UX, Bug, Feature Request, Positive, Complaint
 
 ## 🗄️ Database Schema
 
@@ -608,6 +699,9 @@ class BlogPost(models.Model):
     tags = ManyToManyField(Tag)
     status = CharField(choices=['draft', 'published', 'archived'])
     language = CharField(choices=LANGUAGE_CHOICES)
+    meta_title = CharField(max_length=60, optional)  # SEO title
+    meta_description = CharField(max_length=160, optional)  # SEO description
+    view_count = PositiveIntegerField(default=0)  # Analytics
     published_at = DateTimeField(optional)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
@@ -635,7 +729,7 @@ class ContactMessage(models.Model):
 class SystemMetric(models.Model):
     """Aggregate metrics by hour/day for system monitoring"""
     timestamp = DateTimeField()
-    metric_type = CharField(choices=['hourly', 'daily'])
+    metric_type = CharField(choices=METRIC_TYPE_CHOICES)
     metric_name = CharField(max_length=100)
     value = FloatField()
     metadata = JSONField(optional)
@@ -646,10 +740,12 @@ class RequestLog(models.Model):
     method = CharField(max_length=10)
     status_code = IntegerField()
     response_time_ms = FloatField()
-    ip_hash = CharField(max_length=64)
-    user_agent_hash = CharField(max_length=64)
-    timestamp = DateTimeField(auto_now_add=True)
+    ip_hash = CharField(max_length=16)  # Privacy-protected
+    user_agent_hash = CharField(max_length=16)
     user = ForeignKey(User, optional)
+    db_query_count = IntegerField(default=0)
+    cache_hits = IntegerField(default=0)
+    timestamp = DateTimeField(auto_now_add=True)
 
 class AdminAction(models.Model):
     """Audit trail for admin operations"""
@@ -658,19 +754,78 @@ class AdminAction(models.Model):
     content_type = ForeignKey(ContentType)
     object_id = PositiveIntegerField()
     object_repr = CharField(max_length=200)
-    changes = JSONField()
+    changes = JSONField()  # Before/after values
     timestamp = DateTimeField(auto_now_add=True)
-    ip_hash = CharField(max_length=64)
+    ip_hash = CharField(max_length=16)
+
+class ContentModerationLog(models.Model):
+    """Track moderation workflow for content approval/rejection"""
+    moderator = ForeignKey(User)
+    content_type = CharField(choices=CONTENT_TYPE_CHOICES)
+    object_id = PositiveIntegerField()
+    action = CharField(choices=['approved', 'rejected', 'archived', 'pending'])
+    time_in_queue_hours = FloatField(optional)
+    reason = TextField(optional)
+    timestamp = DateTimeField(auto_now_add=True)
 
 class SecurityEvent(models.Model):
     """Security incidents and suspicious activity tracking"""
     event_type = CharField(choices=EVENT_TYPE_CHOICES)
     severity = CharField(choices=['low', 'medium', 'high', 'critical'])
-    description = TextField()
-    ip_hash = CharField(max_length=64)
+    ip_hash = CharField(max_length=16)
     user = ForeignKey(User, optional)
-    metadata = JSONField()
+    details = JSONField()
+    resolved = BooleanField(default=False)
     timestamp = DateTimeField(auto_now_add=True)
+
+class AdminNotification(models.Model):
+    """In-app notifications for admin users"""
+    recipient = ForeignKey(User, optional)  # Null = all admins
+    title = CharField(max_length=200)
+    message = TextField()
+    severity = CharField(choices=['info', 'warning', 'error', 'critical'])
+    link = CharField(max_length=500, optional)
+    read = BooleanField(default=False)
+    dismissed = BooleanField(default=False)
+    timestamp = DateTimeField(auto_now_add=True)
+
+class AlertRule(models.Model):
+    """Configurable alert rules for monitoring"""
+    name = CharField(max_length=200, unique=True)
+    condition = CharField(choices=CONDITION_CHOICES)
+    threshold = FloatField()
+    window_minutes = IntegerField(default=10)
+    alert_channels = JSONField()  # ['telegram', 'email', 'in_app']
+    enabled = BooleanField(default=True)
+    cooldown_minutes = IntegerField(default=60)
+    last_triggered = DateTimeField(optional)
+```
+
+#### FeedbackResponse Model
+
+```python
+class FeedbackResponse(models.Model):
+    user = ForeignKey(User, optional)
+    session_id = CharField(max_length=100)
+    rating = IntegerField(choices=1-5)
+    comment = TextField(max_length=500, optional)
+    page_url = CharField(max_length=500)
+    page_type = CharField(choices=PAGE_TYPE_CHOICES)
+    page_title = CharField(max_length=200, optional)
+    time_on_site = IntegerField()  # Seconds
+    time_on_page = IntegerField()  # Seconds
+    pages_visited = IntegerField(default=1)
+    scroll_depth = IntegerField(optional)  # 0-100%
+    language = CharField(max_length=5)
+    device_type = CharField(choices=['mobile', 'tablet', 'desktop'])
+    browser = CharField(max_length=50, optional)
+    screen_resolution = CharField(max_length=20, optional)
+    ip_address = GenericIPAddressField()
+    user_agent = TextField(optional)
+    referrer = CharField(max_length=500, optional)
+    admin_category = CharField(choices=CATEGORY_CHOICES, optional)
+    admin_notes = TextField(optional)
+    created_at = DateTimeField(default=timezone.now)
 ```
 
 ### Relationships
@@ -688,14 +843,17 @@ class SecurityEvent(models.Model):
 - **BlogPosts** belong to one **Category** and can have multiple **Tags**
 - **Prayer Times** are cached per location and calculation method
 - **ContactMessages** can be linked to **Users** (optional)
+- **FeedbackResponses** capture user behavior and ratings
 - **AdminActions** track all admin operations on content
 - **SecurityEvents** log authentication and security-related events
+- **ContentModerationLogs** track approval/rejection workflows
+- **AlertRules** define configurable monitoring alerts
 
 ## 🔧 Management Commands
 
 ### Available Commands
 
-#### Database Backup
+#### Database & Backup Commands
 
 ```bash
 # Create and send backup to Telegram
@@ -706,9 +864,28 @@ python manage.py backup_database --force
 
 # Local backup only (no Telegram)
 python manage.py backup_database --local-only
+
+# Test Telegram notifications
+python manage.py test_telegram
 ```
 
-#### Test Data Creation
+#### Monitoring & Alerts
+
+```bash
+# Aggregate monitoring metrics
+python manage.py aggregate_metrics
+
+# Check and trigger alert rules
+python manage.py check_alerts
+
+# Verify monitoring system health
+python manage.py check_monitoring_health
+
+# Send daily digest report
+python manage.py send_daily_digest
+```
+
+#### Test Data & Debugging
 
 ```bash
 # Create sample places for development
@@ -716,27 +893,31 @@ python manage.py create_test_data
 
 # Create specific number of test places
 python manage.py create_test_data --count 50
-```
 
-#### Image Watermarking Test
+# Clear all place images
+python manage.py clear_place_images
 
-```bash
 # Test watermark application
 python manage.py test_watermark path/to/image.jpg
-```
 
-#### Monitoring System Cleanup
-
-```bash
-# Clean old monitoring data
-python manage.py cleanup_monitoring --days 30
-```
-
-#### Logging Test
-
-```bash
 # Test logging system functionality
 python manage.py test_logging
+```
+
+#### Translation Management
+
+```bash
+# Check translation consistency across languages
+python manage.py check_translation_consistency
+
+# Get translation status report
+python manage.py translation_status
+
+# Validate translation files
+python manage.py validate_translations
+
+# AI-assisted translation helper
+python manage.py translation_assistant
 ```
 
 ### Custom Command Examples
@@ -770,6 +951,15 @@ logs/
 └── database.log       # Database operations (5MB, 3 backups)
 ```
 
+### Logging Features
+
+- **Request ID Tracking**: Unique ID for each request for tracing
+- **Context Enrichment**: Automatic user ID, username, hostname injection
+- **Structured JSON Logging**: Using python-json-logger for machine-readable logs
+- **Log Sampling**: Configurable sampling rates for high-volume endpoints
+- **Security Logging**: Separate logger for authentication and security events
+- **API Logging**: Track external API calls and latencies
+
 ### Logging Levels by Environment
 
 - **Development**: INFO level and above to console and files
@@ -780,16 +970,24 @@ logs/
 
 ```python
 import logging
+from utils.logging_utils import log_user_action, log_execution
 
 # Get logger for your app
 logger = logging.getLogger(__name__)
 
-# Log different levels
-logger.debug("Detailed debugging information")
-logger.info("General information about app flow")
-logger.warning("Something unexpected happened")
-logger.error("A serious error occurred")
-logger.critical("Critical system failure")
+# Use decorator for automatic execution logging with sampling
+@log_execution(level='info', sample=True)
+def my_view(request):
+    pass
+
+# Log user actions with context
+log_user_action(
+    logger,
+    'action_name',
+    request.user,
+    request,
+    extra_data={'key': 'value'}
+)
 
 # Security logging
 security_logger = logging.getLogger('security')
@@ -800,7 +998,7 @@ security_logger.info(f"User {user.username} logged in from {ip_address}")
 
 - **Automatic rotation** when files reach size limits
 - **Backup retention** policy (3-5 backup files per log type)
-- **Compressed backups** to save disk space
+- **Configurable sample rates** per logger for high-volume endpoints
 
 ## 💾 Backup System
 
@@ -948,6 +1146,34 @@ GET /admin/monitoring/api/stats/?period=today
 GET /admin/monitoring/api/performance/?days=7
 ```
 
+### SEO Endpoints
+
+```http
+GET /sitemap.xml          # Auto-generated XML sitemap
+GET /robots.txt           # Robots exclusion file
+```
+
+### Feedback API
+
+```http
+POST /feedback/submit/
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Great website!",
+  "page_url": "/places/explore/",
+  "page_type": "explore",
+  "session_id": "abc123",
+  "time_on_site": 120,
+  "time_on_page": 30,
+  "pages_visited": 3,
+  "scroll_depth": 75,
+  "language": "en",
+  "device_type": "desktop"
+}
+```
+
 ## 🎨 Frontend & UI
 
 ### Design System
@@ -1004,6 +1230,7 @@ GET /admin/monitoring/api/performance/?days=7
 - **Toastify**: Non-intrusive notification system
 - **Dark Mode Toggle**: Persistent theme preferences
 - **Infinite Scroll**: Pagination without page reloads (where applicable)
+- **Feedback Widget**: Floating feedback button with behavior tracking
 
 ### Accessibility
 
@@ -1051,9 +1278,6 @@ python manage.py compilemessages
 
 ```
 locale/
-├── en/LC_MESSAGES/
-│   ├── django.po
-│   └── django.mo
 ├── ko/LC_MESSAGES/
 │   ├── django.po
 │   └── django.mo
@@ -1061,6 +1285,8 @@ locale/
     ├── django.po
     └── django.mo
 ```
+
+Note: English (`en`) is the source language and does not require translation files.
 
 ### Language Switching
 
@@ -1125,14 +1351,16 @@ All security-related events are logged to `logs/security.log` in JSON format:
 - Rate limit violations
 - Social authentication events
 - Account merging operations
+- CSRF failures and invalid tokens
 
 ### Monitoring & Alerts
 
 - **Real-time Security Dashboard**: Monitor authentication failures and suspicious activity
-- **Automated Alerts**: Email and Telegram notifications for critical security events
+- **Automated Alerts**: Configurable alert rules with Telegram and email notifications
 - **Audit Trail**: Complete history of admin actions with before/after values
 - **Security Event Tracking**: Categorized by severity (low, medium, high, critical)
 - **IP-based Tracking**: Hashed IP addresses for privacy-preserving security monitoring
+- **Content Moderation Logs**: Track approval/rejection workflows with timing
 
 ## 📈 Performance
 
@@ -1201,6 +1429,9 @@ coverage html
 - **API Tests**: JSON endpoint functionality
 - **Authentication Tests**: User login and permission checks
 - **Geographic Tests**: PostGIS location queries
+- **Blog Tests**: Blog models, views, TinyMCE uploads, admin
+- **Contact Tests**: Contact form and rate limiting
+- **Prayer Times Tests**: Cache and API integration
 
 ### Test Data
 
@@ -1303,6 +1534,8 @@ class PlaceTestCase(TestCase):
   - `EXTERNAL_LOGIN_IMPLEMENTATION.md` - Social authentication setup and configuration
   - `EXTERNAL_LOGIN_SETUP.md` - Step-by-step OAuth setup guide
   - `LOGGING_SYSTEM.md` - Comprehensive logging system documentation
+  - `LOGGING_ENHANCEMENTS.md` - Advanced logging features and decorators
+  - `LOGGING_QUICK_REFERENCE.md` - Quick reference for logging usage
   - `MONITORING_SYSTEM.md` - Admin monitoring dashboards and features
   - `MONITORING_FEATURES_IMPLEMENTED.md` - Detailed monitoring implementation
   - `MONITORING_IMPLEMENTATION_SUMMARY.md` - Quick reference for monitoring
@@ -1312,6 +1545,8 @@ class PlaceTestCase(TestCase):
   - `TESTING.md` - Testing guidelines and test coverage
   - `TRANSLATION_GUIDELINES.md` - i18n and localization best practices
   - `WATERMARK_FEATURE.md` - Image watermarking system documentation
+  - `BASE_HTML_IMPROVEMENTS.md` - Base template enhancements
+  - `APP_LOGGING_SUMMARY.md` - Per-app logging configuration
 - **API Documentation**: Available in this README
 - **Deployment Guides**: Docker and production deployment instructions
 - **PROJECT_CONTEXT.md**: Comprehensive project context and coding guidelines
@@ -1342,12 +1577,14 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) file for 
 - **Django Community** for the excellent web framework
 - **PostGIS** for powerful geographic capabilities
 - **OpenStreetMap** for geographic data
-- **Prayer Times API** for accurate Islamic prayer calculations
+- **Prayer Times API** (Aladhan) for accurate Islamic prayer calculations
 - **Tailwind CSS** for the utility-first CSS framework
+- **Jazzmin** for the modern Django admin theme
+- **Sentry** for error tracking and monitoring
 - **Contributors** who have helped improve this project
 
 ---
 
 **Built with ❤️ for the Muslim community in Korea**
 
-For more information, visit our website or contact our team.
+*Last updated: November 2025*
