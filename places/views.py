@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Avg, Q, Value, FloatField
+from django.db.models import Avg, Q, Value, FloatField, Count
 from django.contrib.auth import get_user_model
 from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 from reviews.models import Review
@@ -62,7 +62,8 @@ def home(request):
         featured_places = HalalPlace.objects.filter(
             status='approved'
         ).annotate(
-            average_rating=Round(Avg('reviews__rating'), 1)
+            average_rating=Round(Avg('reviews__rating'), 1),
+            reviews_count=Count('reviews')
         )
 
         # Different sorting logic based on user location
@@ -167,9 +168,10 @@ def explore(request):
             Q(address__icontains=search_query)
         )
     
-    # Annotate with average rating
+    # Annotate with average rating and reviews count to avoid N+1 queries
     places = places.annotate(
-        average_rating=Round(Avg('reviews__rating'), 1)
+        average_rating=Round(Avg('reviews__rating'), 1),
+        reviews_count=Count('reviews')
     )
     
     # Enhanced sorting logic for international users
