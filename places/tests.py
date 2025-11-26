@@ -45,7 +45,8 @@ class HalalPlaceViewTest(TestCase):
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
-            password='testpass123'
+            password='testpass123',
+            email_verified=True  # Required for submit_place view
         )
         self.place = HalalPlace.objects.create(
             name='Test Restaurant',
