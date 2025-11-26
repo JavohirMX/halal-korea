@@ -10,7 +10,7 @@
 {% block og_title %}{{ post.meta_title|default:post.title }} - {{ STATIC_INFO.site_name }}{% endblock %}
 {% block og_description %}{{ post.meta_description|default:post.excerpt }}{% endblock %}
 {% block og_type %}article{% endblock %}
-{% block og_url %}{{ request.build_absolute_uri }}{{ post.get_absolute_url }}{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}{% endblock %}
 {% block og_image %}{% if post.featured_image %}{{ request.scheme }}://{{ request.get_host }}{{ post.featured_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
 {% block og_image_alt %}{% if post.featured_image %}{{ post.title }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
@@ -19,7 +19,7 @@
 {% block twitter_image %}{% if post.featured_image %}{{ request.scheme }}://{{ request.get_host }}{{ post.featured_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
 {% block twitter_image_alt %}{% if post.featured_image %}{{ post.title }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
-{% block canonical_url %}{{ request.build_absolute_uri }}{{ post.get_absolute_url }}{% endblock %}
+{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}{% endblock %}
 
 {% block extra_head %}
 <!-- Article-specific meta tags -->
@@ -37,9 +37,9 @@
 
 <!-- Hreflang tags for SEO -->
 {% for code, name in language_choices.items %}
-<link rel="alternate" hreflang="{{ code }}" href="{{ request.build_absolute_uri }}{{ post.get_absolute_url }}">
+<link rel="alternate" hreflang="{{ code }}" href="{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}">
 {% endfor %}
-<link rel="alternate" hreflang="x-default" href="{{ request.build_absolute_uri }}{{ post.get_absolute_url }}">
+<link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}">
 
 <!-- Open Graph Language -->
 <meta property="og:locale:alternate" content="en_US">
@@ -73,9 +73,9 @@
     "dateModified": "{{ post.updated_at|date:'c' }}",
     "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "{{ request.build_absolute_uri }}{{ post.get_absolute_url }}"
+        "@id": "{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}"
     },
-    "url": "{{ request.build_absolute_uri }}{{ post.get_absolute_url }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}",
     "keywords": "{{ post.category.name }}{% for tag in post.tags.all %}, {{ tag.name }}{% endfor %}",
     "articleSection": "{{ post.category.name }}",
     "inLanguage": "{{ post.language }}",
