@@ -755,13 +755,13 @@ JAZZMIN_SETTINGS = {
     # Order of apps and models in the sidebar
     "order_with_respect_to": [
         "auth",
+        "users",
         "places",
         "reviews",
         "blog",
-        "prayer_times",
-        "users",
         "contact",
         "feedback",
+        "prayer_times",
     ],
     
     # Custom icons for apps/models
