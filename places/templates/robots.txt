@@ -1,17 +1,40 @@
+# Halal Korea Robots.txt
+# https://halal-korea.com
+
 User-agent: *
 Allow: /
 
-# Sitemap
+# Sitemap location
 Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
 
 # Disallow admin and private areas
 Disallow: /admin/
 Disallow: /rosetta/
 Disallow: /tinymce/
+Disallow: /users/profile/
+Disallow: /users/edit-profile/
+Disallow: /users/password-reset/
+Disallow: /users/login/
+Disallow: /users/register/
+Disallow: /accounts/
 
-# Allow specific paths
+# Allow important assets
 Allow: /static/
 Allow: /media/
 
-# Crawl delay (optional - be nice to servers)
+# Rate limiting pages
+Disallow: /contact/rate-limited/
+Disallow: /feedback/rate-limited/
+
+# Crawl delay - be respectful to the server
+Crawl-delay: 1
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing specific  
+User-agent: Bingbot
+Allow: /
 Crawl-delay: 1

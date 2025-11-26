@@ -7,6 +7,51 @@
 {% blocktranslate with category_name=category.name %}Explore articles in {{ category_name }} category. Discover insights about halal lifestyle in Korea.{% endblocktranslate %}
 {% endblock %}
 
+{% block meta_keywords %}{{ category.name }}, halal blog Korea, {{ category.name|lower }} articles, Muslim lifestyle Korea{% endblock %}
+
+{% block og_title %}{{ category.name }} - {% translate "Blog" %} - {{ STATIC_INFO.site_name }}{% endblock %}
+{% block og_description %}{% blocktranslate with category_name=category.name %}Explore articles in {{ category_name }} category. Discover insights about halal lifestyle in Korea.{% endblocktranslate %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "{{ category.name }}",
+    "description": "{% blocktranslate with category_name=category.name %}Explore articles in {{ category_name }} category.{% endblocktranslate %}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{{ category.get_absolute_url }}",
+    "isPartOf": {
+        "@type": "Blog",
+        "name": "{{ STATIC_INFO.site_name }} Blog",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'blog:home' %}"
+    },
+    "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "{% translate 'Home' %}",
+                "item": "{{ request.scheme }}://{{ request.get_host }}"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "{% translate 'Blog' %}",
+                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'blog:home' %}"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "{{ category.name }}",
+                "item": "{{ request.scheme }}://{{ request.get_host }}{{ category.get_absolute_url }}"
+            }
+        ]
+    }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

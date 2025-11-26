@@ -20,12 +20,20 @@
     <meta name="keywords" content="{% block meta_keywords %}{{ STATIC_INFO.meta_keywords }}{% endblock %}">
     <meta name="author" content="{{ STATIC_INFO.author }}">
     <meta name="theme-color" content="{{ STATIC_INFO.meta_theme_color }}">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
     <meta name="language" content="{{ LANGUAGE_CODE }}">
     <meta name="revisit-after" content="7 days">
+    <meta name="geo.region" content="KR">
+    <meta name="geo.placename" content="South Korea">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    
+    <!-- Hreflang Tags for International SEO -->
+    <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="ko" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="uz" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:site_name" content="{{ STATIC_INFO.site_name }}">
@@ -34,6 +42,9 @@
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
     <meta property="og:locale" content="{{ LANGUAGE_CODE }}_{{ LANGUAGE_CODE|upper }}">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:locale:alternate" content="ko_KR">
+    <meta property="og:locale:alternate" content="uz_UZ">
     <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endblock %}">
     <meta property="og:image:width" content="{% block og_image_width %}{{ STATIC_INFO.default_og_image_width }}{% endblock %}">
     <meta property="og:image:height" content="{% block og_image_height %}{{ STATIC_INFO.default_og_image_height }}{% endblock %}">

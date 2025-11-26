@@ -4,13 +4,41 @@
 {% block title %}{{ page_title }} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block meta_description %}
-{{ meta_description|default:"Discover halal lifestyle tips, guides, and updates for living in Korea. Latest articles about halal food, places, and community insights." }}
+{{ meta_description|default:"Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea. Latest articles about halal food, places, and cultural insights." }}
+{% endblock %}
+
+{% block meta_keywords %}halal blog Korea, Muslim lifestyle Korea, halal food tips, Korea travel guide Muslim, halal Korea articles{% endblock %}
+
+{% block og_title %}{{ page_title }} - {{ STATIC_INFO.site_name }}{% endblock %}
+{% block og_description %}{{ meta_description|default:"Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea." }}{% endblock %}
+
+{% block twitter_title %}{{ page_title }} - {{ STATIC_INFO.site_name }}{% endblock %}
+{% block twitter_description %}{{ meta_description|default:"Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea." }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "{{ page_title }}",
+    "description": "{{ meta_description|default:'Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea.' }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'blog:home' %}",
+    "publisher": {
+        "@type": "Organization",
+        "name": "{{ STATIC_INFO.site_name }}",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}"
+        }
+    },
+    "inLanguage": ["en", "ko", "uz"]
+}
+</script>
 {% endblock %}
 
 {% block extra_head %}
 <!-- Language Meta Tags -->
 <meta name="language" content="{{ current_language }}">
-<link rel="canonical" href="{{ request.build_absolute_uri }}">
 {% endblock %}
 
 {% block content %}

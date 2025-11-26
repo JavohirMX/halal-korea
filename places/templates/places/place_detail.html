@@ -54,7 +54,7 @@
     "telephone": "{{ place.phone }}",
     {% endif %}
     {% if place.website %}
-    "url": "{{ place.website }}",
+    "sameAs": "{{ place.website }}",
     {% endif %}
     "aggregateRating": {
         "@type": "AggregateRating",
@@ -62,8 +62,7 @@
         "reviewCount": {{ place.reviews_count|default:0 }},
         "bestRating": 5,
         "worstRating": 1
-    },
-    
+    }
 }
 </script>
 {% endblock structured_data %}

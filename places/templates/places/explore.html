@@ -118,6 +118,49 @@
 
 {% block title %}{% translate "Explore Halal Places" %} - {{ STATIC_INFO.site_name }}{% endblock %}
 
+{% block meta_description %}{% translate "Explore and discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Filter by city, type, and halal certification level." %}{% endblock %}
+{% block meta_keywords %}explore halal Korea, halal restaurants map, halal places Seoul, Muslim food Korea, halal markets Korea, prayer spaces Korea, halal certified Korea{% endblock %}
+
+{% block og_title %}{% translate "Explore Halal Places in Korea" %} - {{ STATIC_INFO.site_name }}{% endblock %}
+{% block og_description %}{% translate "Explore and discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Interactive map with filters." %}{% endblock %}
+
+{% block twitter_title %}{% translate "Explore Halal Places in Korea" %} - {{ STATIC_INFO.site_name }}{% endblock %}
+{% block twitter_description %}{% translate "Explore and discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Interactive map with filters." %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "{% translate 'Explore Halal Places in Korea' %}",
+    "description": "{% translate 'Explore and discover halal restaurants, markets, mosques, and prayer spaces across South Korea.' %}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}",
+    "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ STATIC_INFO.site_name }}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}"
+    },
+    "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "{% translate 'Home' %}",
+                "item": "{{ request.scheme }}://{{ request.get_host }}"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "{% translate 'Explore' %}",
+                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}"
+            }
+        ]
+    }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Hidden CSRF Token Form -->
 <form id="csrf-form" style="display: none;">

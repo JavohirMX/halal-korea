@@ -3,6 +3,13 @@
 
 {% block title %}{{ page_title }} - {{ STATIC_INFO.site_name }}{% endblock %}
 
+{% block meta_description %}{% translate "Browse the Halal Korea blog archive. Find past articles about halal lifestyle, travel guides, and community updates for Muslims in Korea." %}{% endblock %}
+
+{% block meta_keywords %}blog archive, halal Korea articles, Muslim lifestyle Korea, past articles{% endblock %}
+
+{% block og_title %}{{ page_title }} - {{ STATIC_INFO.site_name }}{% endblock %}
+{% block og_description %}{% translate "Browse the Halal Korea blog archive. Find past articles about halal lifestyle and travel guides." %}{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
