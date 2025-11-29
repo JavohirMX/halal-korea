@@ -202,6 +202,29 @@
             }
         })();
     </script>
+    <!-- Sentry Browser SDK - Configure before loading -->
+    <script>
+        // Configure Sentry Loader to unmask text in replays
+        // See: https://docs.sentry.io/platforms/javascript/session-replay/privacy/
+        window.SENTRY_RELEASE = { id: '{{ STATIC_INFO.version|default:"1.0.0" }}' };
+        window.sentryOnLoad = function() {
+            Sentry.init({
+                // Unmask all text content in replays (except inputs which remain masked for privacy)
+                replaysSessionSampleRate: 0.1,
+                replaysOnErrorSampleRate: 1.0,
+                integrations: [
+                    Sentry.replayIntegration({
+                        // Unmask all text by default
+                        maskAllText: false,
+                        // Keep inputs masked for privacy (passwords, emails, etc.)
+                        maskAllInputs: true,
+                        // Block media for performance
+                        blockAllMedia: false,
+                    }),
+                ],
+            });
+        };
+    </script>
     <script
         src="https://js.sentry-cdn.com/160eca2c83c8178bb83d4af1eaa39f35.min.js"
         crossorigin="anonymous"
