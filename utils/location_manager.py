@@ -12,8 +12,8 @@ def is_user_in_korea(location_data):
     """
     logger.debug(f"Checking if user is in Korea with data: {location_data}")
     
-    if not location_data or location_data.get("error"):
-        logger.debug("No location data or error present, assuming international user")
+    if not location_data or location_data.get("error") or location_data.get("lookup_failed"):
+        logger.debug("No location data or lookup failed, assuming international user")
         return False  # If we can't determine location, assume international
     
     # Method 1: Check country code first (most reliable)
@@ -100,7 +100,7 @@ def get_user_location(request):
     location = get_ip_location(ip)
     
     # Enhanced fallback logic for international users
-    if not location or location.get("error") or not location.get("city"):
+    if not location or location.get("error") or location.get("lookup_failed") or not location.get("city"):
         logger.warning(f"Failed to get location from IP {ip}, using fallback")
         # For development/unknown cases, provide a neutral fallback
         location = {

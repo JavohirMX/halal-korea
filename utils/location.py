@@ -1,8 +1,31 @@
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from django.core.cache import cache
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Constants for IP geolocation
+IP_LOCATION_CACHE_TIMEOUT = 3600  # 1 hour for successful lookups
+IP_LOCATION_FAILURE_CACHE_TIMEOUT = 300  # 5 minutes for failed lookups (prevents hammering)
+IP_API_TIMEOUT = 5  # Reduced timeout for faster failover
+
+
+def _create_session_with_retries(retries=2, backoff_factor=0.3):
+    """Create a requests session with retry logic for transient failures."""
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
 
 def get_client_ip(request):
     """Extracts the client's IP address from the request."""
@@ -40,55 +63,127 @@ def get_client_ip(request):
     return ip
 
 def get_ip_location(ip):
-    """Fetches location details for the given IP address using an external API, with caching."""
+    """
+    Fetches location details for the given IP address using external APIs, with caching.
     
-    # Check if IP location is already cached
-    cached_location = cache.get(f'ip_location_{ip}')
-    if cached_location:
+    Features:
+    - Caches successful lookups for 1 hour
+    - Caches failures for 5 minutes to prevent hammering failing services
+    - Retries with exponential backoff on transient failures
+    - Falls back to alternative API if primary fails
+    - Returns graceful default on complete failure
+    """
+    
+    # Check if IP location is already cached (success or failure)
+    cache_key = f'ip_location_{ip}'
+    cached_location = cache.get(cache_key)
+    if cached_location is not None:
+        if cached_location.get('_cached_failure'):
+            logger.debug(f"IP location failure cache hit for IP: {ip}, skipping lookup")
+            return _get_default_location(ip)
         logger.debug(f"IP location cache hit for IP: {ip} -> {cached_location.get('city', 'Unknown')}, {cached_location.get('country', 'Unknown')}")
-        return cached_location  # Return cached result
+        return cached_location
     
     logger.info(f"Fetching location for IP: {ip} (cache miss)")
     
+    # Try primary API (ip-api.com)
+    location_data = _fetch_from_ip_api(ip)
+    
+    # If primary fails, try fallback API (ipwho.is - free, HTTPS, no rate limit issues)
+    if location_data is None:
+        logger.info(f"Primary API failed for IP {ip}, trying fallback API")
+        location_data = _fetch_from_ipwhois(ip)
+    
+    # If all APIs fail, cache the failure and return default
+    if location_data is None:
+        logger.warning(f"All geolocation APIs failed for IP: {ip}, caching failure")
+        cache.set(cache_key, {'_cached_failure': True}, timeout=IP_LOCATION_FAILURE_CACHE_TIMEOUT)
+        return _get_default_location(ip)
+    
+    # Cache successful result
+    cache.set(cache_key, location_data, timeout=IP_LOCATION_CACHE_TIMEOUT)
+    logger.info(f"Location data fetched successfully for IP {ip}: {location_data.get('city', 'Unknown')}, {location_data.get('country', 'Unknown')}")
+    
+    return location_data
+
+
+def _fetch_from_ip_api(ip):
+    """Fetch location from ip-api.com (primary service)."""
     try:
+        session = _create_session_with_retries(retries=1, backoff_factor=0.2)
         logger.debug(f"Making API call to ip-api.com for IP: {ip}")
-        response = requests.get(f'http://ip-api.com/json/{ip}', timeout=10)
+        response = session.get(f'http://ip-api.com/json/{ip}', timeout=IP_API_TIMEOUT)
         data = response.json()
         
         logger.debug(f"IP API response status: {data.get('status')} for IP: {ip}")
         
-        if data["status"] == "success":
-            location_data = {
+        if data.get("status") == "success":
+            return {
                 "ip": ip,
                 "country": data.get("country"),
-                "country_code": data.get("countryCode"),  # Add ISO country code
+                "country_code": data.get("countryCode"),
                 "region": data.get("regionName"),
                 "city": data.get("city"),
                 "lat": data.get("lat"),
                 "lng": data.get("lon"),
                 "isp": data.get("isp"),
             }
-            
-            # Cache the result for 1 hour (3600 seconds)
-            cache.set(f'ip_location_{ip}', location_data, timeout=3600)
-            
-            logger.info(f"Location data fetched successfully for IP {ip}: {location_data['city']}, {location_data['country']} ({location_data.get('country_code', 'N/A')})")
-            logger.debug(f"Full location data for IP {ip}: lat={location_data.get('lat')}, lng={location_data.get('lng')}, region={location_data.get('region')}, isp={location_data.get('isp')}")
-            
-            return location_data
         else:
             error_msg = data.get('message', 'Unknown error')
-            logger.warning(f"IP location API returned error for IP {ip}: {error_msg}")
-            return {"error": f"API error: {error_msg}"}
+            logger.warning(f"ip-api.com returned error for IP {ip}: {error_msg}")
+            return None
     except requests.RequestException as e:
-        logger.error(f"Network error while fetching location for IP {ip}: {str(e)}")
-        return {"error": "Could not retrieve location data"}
+        logger.warning(f"Network error with ip-api.com for IP {ip}: {str(e)}")
+        return None
     except Exception as e:
-        logger.error(f"Unexpected error while processing location for IP {ip}: {str(e)}")
-        return {"error": "Processing error"}
-    
-    logger.warning(f"Failed to get valid location data for IP: {ip}")
-    return {"error": "Invalid IP or failed lookup"}
+        logger.warning(f"Unexpected error with ip-api.com for IP {ip}: {str(e)}")
+        return None
+
+
+def _fetch_from_ipwhois(ip):
+    """Fetch location from ipwho.is (fallback service - free, HTTPS, generous limits)."""
+    try:
+        session = _create_session_with_retries(retries=1, backoff_factor=0.2)
+        logger.debug(f"Making API call to ipwho.is for IP: {ip}")
+        response = session.get(f'https://ipwho.is/{ip}', timeout=IP_API_TIMEOUT)
+        data = response.json()
+        
+        if data.get("success", False):
+            return {
+                "ip": ip,
+                "country": data.get("country"),
+                "country_code": data.get("country_code"),
+                "region": data.get("region"),
+                "city": data.get("city"),
+                "lat": data.get("latitude"),
+                "lng": data.get("longitude"),
+                "isp": data.get("connection", {}).get("isp"),
+            }
+        else:
+            error_msg = data.get('message', 'Unknown error')
+            logger.warning(f"ipwho.is returned error for IP {ip}: {error_msg}")
+            return None
+    except requests.RequestException as e:
+        logger.warning(f"Network error with ipwho.is for IP {ip}: {str(e)}")
+        return None
+    except Exception as e:
+        logger.warning(f"Unexpected error with ipwho.is for IP {ip}: {str(e)}")
+        return None
+
+
+def _get_default_location(ip):
+    """Return a default location object when all lookups fail."""
+    return {
+        "ip": ip,
+        "country": None,
+        "country_code": None,
+        "region": None,
+        "city": None,
+        "lat": None,
+        "lng": None,
+        "isp": None,
+        "lookup_failed": True,
+    }
 
 
 if __name__ == '__main__':
