@@ -460,6 +460,19 @@
     let hasNextPage = {% if places.has_next %}true{% else %}false{% endif %};
     let allPlaces = [];
     let sharedInfoWindow = null; // Single shared info window for all markers
+
+    // Helper function to safely get map color scheme
+    function safeGetMapColorScheme() {
+        if (typeof getMapColorScheme === 'function') {
+            return getMapColorScheme();
+        }
+        // Fallback if base.js hasn't loaded yet
+        if (typeof google !== 'undefined' && google.maps && google.maps.ColorScheme) {
+            const isDark = document.documentElement.classList.contains('dark');
+            return isDark ? google.maps.ColorScheme.DARK : google.maps.ColorScheme.LIGHT;
+        }
+        return null;
+    }
     
     // Initialize Google Map
     async function initMap() {
@@ -482,7 +495,7 @@
             zoom: 12,
             center: center,
             mapId: '{{ STATIC_INFO.google_maps_id }}',
-            colorScheme: getMapColorScheme(),
+            colorScheme: safeGetMapColorScheme(),
         });
 
         // Add map click listener once to close info window when clicking elsewhere

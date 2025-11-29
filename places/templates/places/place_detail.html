@@ -824,6 +824,19 @@
     let mapsLibraryLoaded = false;
     let GoogleMap, GoogleMarker;
 
+    // Helper function to safely get map color scheme
+    function safeGetMapColorScheme() {
+        if (typeof getMapColorScheme === 'function') {
+            return getMapColorScheme();
+        }
+        // Fallback if base.js hasn't loaded yet
+        if (typeof google !== 'undefined' && google.maps && google.maps.ColorScheme) {
+            const isDark = document.documentElement.classList.contains('dark');
+            return isDark ? google.maps.ColorScheme.DARK : google.maps.ColorScheme.LIGHT;
+        }
+        return null;
+    }
+
     async function initMaps() {
         const location = { lat: {{ place.location.y|unlocalize }}, lng: {{ place.location.x|unlocalize }} };
         
@@ -851,7 +864,7 @@
                     zoom: 15,
                     center: location,
                     mapId: '{{ STATIC_INFO.google_maps_id }}',
-                    colorScheme: getMapColorScheme(),
+                    colorScheme: safeGetMapColorScheme(),
                 });
 
                 const sidebarMarker = new GoogleMarker({
@@ -879,7 +892,7 @@
                     zoom: 15,
                     center: location,
                     mapId: '{{ STATIC_INFO.google_maps_id }}',
-                    colorScheme: getMapColorScheme(),
+                    colorScheme: safeGetMapColorScheme(),
                 });
 
                 const inlineMarker = new GoogleMarker({
