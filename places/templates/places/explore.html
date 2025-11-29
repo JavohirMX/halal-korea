@@ -1250,13 +1250,20 @@
 <script>
 // Seoul Default Button AJAX (only for international users)
 {% if not location_context.is_in_korea %}
-// Seoul button
-document.getElementById('set-seoul-btn').onclick = function() {
-    setSeoulLocation();
-};
-document.getElementById('set-seoul-btn-mobile').onclick = function() {
-    setSeoulLocation();
-};
+// Seoul button - check if elements exist before attaching handlers
+const seoulBtn = document.getElementById('set-seoul-btn');
+if (seoulBtn) {
+    seoulBtn.onclick = function() {
+        setSeoulLocation();
+    };
+}
+
+const seoulBtnMobile = document.getElementById('set-seoul-btn-mobile');
+if (seoulBtnMobile) {
+    seoulBtnMobile.onclick = function() {
+        setSeoulLocation();
+    };
+}
 
 // Shared Seoul location function
 function setSeoulLocation() {
@@ -1292,15 +1299,21 @@ function setSeoulLocation() {
 }
 {% endif %}
 
-// Update Location Button AJAX (Mobile)
-document.getElementById('update-location-btn-mobile').onclick = function() {
-    updateLocation();
-};
+// Update Location Button AJAX (Mobile) - check if element exists
+const mobileLocationBtn = document.getElementById('update-location-btn-mobile');
+if (mobileLocationBtn) {
+    mobileLocationBtn.onclick = function() {
+        updateLocation();
+    };
+}
 
-// Update Location Button AJAX (Desktop)
-document.getElementById('update-location-btn-desktop').onclick = function() {
-    updateLocation();
-};
+// Update Location Button AJAX (Desktop) - check if element exists
+const desktopLocationBtn = document.getElementById('update-location-btn-desktop');
+if (desktopLocationBtn) {
+    desktopLocationBtn.onclick = function() {
+        updateLocation();
+    };
+}
 
 // Shared location update function
 function updateLocation() {
