@@ -649,9 +649,20 @@ SOCIALACCOUNT_PROVIDERS['github']['APP'] = {
 
 # Monitoring System
 MONITORING_ENABLED = config('MONITORING_ENABLED', default=True, cast=bool)
-MONITORING_SAMPLE_RATE = config('MONITORING_SAMPLE_RATE', default=0.01, cast=float)  # 1% sampling
+MONITORING_SAMPLE_RATE = config('MONITORING_SAMPLE_RATE', default=0.1, cast=float)  # 10% sampling (good for small sites)
 MONITORING_SLOW_THRESHOLD_MS = config('MONITORING_SLOW_THRESHOLD_MS', default=1000, cast=int)  # 1 second
-MONITORING_RETENTION_DAYS = config('MONITORING_RETENTION_DAYS', default=30, cast=int)
+MONITORING_RETENTION_DAYS = config('MONITORING_RETENTION_DAYS', default=7, cast=int)  # 7 days retention for small site
+
+# Google Analytics Configuration (for dashboard metrics - uses GA4 Data API)
+# To enable GA integration:
+# 1. Create a Google Cloud project and enable the Analytics Data API
+# 2. Create a service account with "Viewer" role
+# 3. Add the service account email as a user in GA4 property settings
+# 4. Download the JSON key file and set GA_CREDENTIALS_FILE path
+# 5. Set GA_PROPERTY_ID to your GA4 property ID (numeric, e.g., '123456789')
+GA_PROPERTY_ID = config('GA_PROPERTY_ID', default='')  # GA4 Property ID (numeric, not measurement ID)
+GA_CREDENTIALS_FILE = config('GA_CREDENTIALS_FILE', default='')  # Path to service account JSON key file
+
 
 # Sentry Error Tracking (to be configured in Phase 1.3)
 SENTRY_DSN = config('SENTRY_DSN', default='')

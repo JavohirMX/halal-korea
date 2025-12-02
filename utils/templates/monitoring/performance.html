@@ -1,20 +1,67 @@
 {% extends 'monitoring/base.html' %}
 
 {% block content %}
+<!-- Time Period Selector -->
+<div class="mb-6">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+        <h2 class="section-heading">Performance Metrics</h2>
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Period:</span>
+            <a href="?days=1" class="px-3 py-1 rounded-md text-sm {% if days == 1 %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600{% endif %}">24h</a>
+            <a href="?days=7" class="px-3 py-1 rounded-md text-sm {% if days == 7 %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600{% endif %}">7d</a>
+            <a href="?days=30" class="px-3 py-1 rounded-md text-sm {% if days == 30 %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600{% endif %}">30d</a>
+        </div>
+    </div>
+</div>
+
+<!-- Response Time Stats with Percentiles -->
 <div class="mb-8">
     <h2 class="section-heading mb-4">Response Time Statistics (Last {{ days }} Days)</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div class="stat-card">
             <div class="stat-value text-blue-600">{{ response_time_stats.avg|floatformat:0|default:0 }}ms</div>
-            <div class="stat-label">Average Response Time</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-orange-600">{{ response_time_stats.max|floatformat:0|default:0 }}ms</div>
-            <div class="stat-label">Max Response Time</div>
+            <div class="stat-label">Average</div>
         </div>
         <div class="stat-card">
             <div class="stat-value text-green-600">{{ response_time_stats.min|floatformat:0|default:0 }}ms</div>
-            <div class="stat-label">Min Response Time</div>
+            <div class="stat-label">Min</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-yellow-600">{{ percentile_stats.p50|floatformat:0|default:0 }}ms</div>
+            <div class="stat-label">P50 (Median)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ percentile_stats.p95|floatformat:0|default:0 }}ms</div>
+            <div class="stat-label">P95</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">95% faster than this</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-red-600">{{ percentile_stats.p99|floatformat:0|default:0 }}ms</div>
+            <div class="stat-label">P99</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">99% faster than this</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-red-700">{{ response_time_stats.max|floatformat:0|default:0 }}ms</div>
+            <div class="stat-label">Max</div>
+        </div>
+    </div>
+</div>
+
+<!-- Response Time & Error Rate Trend Charts -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Trends (Last {{ days }} Days)</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="stat-card">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">Response Time Trend</h3>
+            <div class="h-64">
+                <canvas id="responseTimeChart"></canvas>
+            </div>
+        </div>
+        <div class="stat-card">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">Error Rate Trend</h3>
+            <div class="h-64">
+                <canvas id="errorRateChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -37,24 +84,24 @@
 
 <div class="mb-8">
     <h2 class="section-heading mb-4">Slowest Endpoints</h2>
-    <div class="content-container">
+    <div class="content-container overflow-x-auto">
         {% if slow_endpoints %}
         <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
             <thead class="bg-gray-50 dark:bg-dark-bg">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Endpoint</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Avg Time</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Max Time</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Requests</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Endpoint</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Avg Time</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase hidden sm:table-cell">Max Time</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Requests</th>
                 </tr>
             </thead>
             <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
                 {% for endpoint in slow_endpoints %}
                 <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                    <td class="px-6 py-4 text-sm font-mono text-gray-900 dark:text-dark-text">{{ endpoint.path|truncatechars:60 }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ endpoint.avg_time|floatformat:0 }}ms</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ endpoint.max_time|floatformat:0 }}ms</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-dark-muted">{{ endpoint.count }}</td>
+                    <td class="px-4 py-4 text-sm font-mono text-gray-900 dark:text-dark-text max-w-xs truncate">{{ endpoint.path|truncatechars:50 }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm {% if endpoint.avg_time > 1000 %}text-red-600 font-semibold{% else %}text-gray-900 dark:text-dark-text{% endif %}">{{ endpoint.avg_time|floatformat:0 }}ms</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text hidden sm:table-cell">{{ endpoint.max_time|floatformat:0 }}ms</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-dark-muted">{{ endpoint.count }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -64,38 +111,141 @@
         {% endif %}
     </div>
 </div>
-
-<div class="mt-4">
-    <canvas id="responseTimeChart" height="80"></canvas>
-</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Placeholder for response time chart
-const ctx = document.getElementById('responseTimeChart');
-if (ctx) {
-    new Chart(ctx, {
+// Response Time Trend Chart with real data
+const responseTimeData = {
+    labels: {{ response_time_trend.labels|safe }},
+    avgTimes: {{ response_time_trend.avg_times|safe }},
+    maxTimes: {{ response_time_trend.max_times|safe }}
+};
+
+const rtCtx = document.getElementById('responseTimeChart');
+if (rtCtx && responseTimeData.labels.length > 0) {
+    new Chart(rtCtx, {
         type: 'line',
         data: {
-            labels: ['Hour 1', 'Hour 2', 'Hour 3', 'Hour 4', 'Hour 5', 'Hour 6'],
-            datasets: [{
-                label: 'Response Time (ms)',
-                data: [120, 150, 180, 140, 160, 130],
-                borderColor: 'rgb(59, 130, 246)',
-                tension: 0.1
-            }]
+            labels: responseTimeData.labels,
+            datasets: [
+                {
+                    label: 'Average (ms)',
+                    data: responseTimeData.avgTimes,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Max (ms)',
+                    data: responseTimeData.maxTimes,
+                    borderColor: '#dc2626',
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                    fill: false,
+                    tension: 0.3,
+                    borderDash: [5, 5]
+                }
+            ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                title: {
-                    display: true,
-                    text: 'Response Time Trend (Last 6 Hours)'
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563',
+                        callback: function(value) {
+                            return value + 'ms';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
+                    }
                 }
             }
         }
     });
+} else if (rtCtx) {
+    rtCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>';
+}
+
+// Error Rate Trend Chart with real data
+const errorRateData = {
+    labels: {{ error_rate_trend.labels|safe }},
+    rates: {{ error_rate_trend.rates|safe }}
+};
+
+const erCtx = document.getElementById('errorRateChart');
+if (erCtx && errorRateData.labels.length > 0) {
+    new Chart(erCtx, {
+        type: 'line',
+        data: {
+            labels: errorRateData.labels,
+            datasets: [{
+                label: 'Error Rate (%)',
+                data: errorRateData.rates,
+                borderColor: '#dc2626',
+                backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: Math.max(5, Math.max(...errorRateData.rates) * 1.2),
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
+                    }
+                }
+            }
+        }
+    });
+} else if (erCtx) {
+    erCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>';
 }
 </script>
 {% endblock %}

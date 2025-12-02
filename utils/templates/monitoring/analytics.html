@@ -1,9 +1,221 @@
 {% extends 'monitoring/base.html' %}
 
 {% block content %}
+<!-- Time Period Selector -->
+<div class="mb-6">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+        <h2 class="section-heading">Analytics Dashboard</h2>
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Period:</span>
+            <a href="?days=7" class="px-3 py-1 rounded-md text-sm {% if days == 7 %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600{% endif %}">7d</a>
+            <a href="?days=14" class="px-3 py-1 rounded-md text-sm {% if days == 14 %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600{% endif %}">14d</a>
+            <a href="?days=30" class="px-3 py-1 rounded-md text-sm {% if days == 30 %}bg-blue-600 text-white{% else %}bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600{% endif %}">30d</a>
+        </div>
+    </div>
+</div>
+
+<!-- GA Overview -->
+{% if ga_available and ga_stats.is_available %}
 <div class="mb-8">
-    <h2 class="section-heading mb-4">User Engagement (Last {{ days }} Days)</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <h2 class="section-heading mb-4 flex items-center">
+        <span class="mr-2">📊</span> Google Analytics Overview
+    </h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="stat-card">
+            <div class="stat-value text-blue-600">{{ ga_stats.active_users }}</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-green-600">{{ ga_stats.sessions }}</div>
+            <div class="stat-label">Sessions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-purple-600">{{ ga_stats.page_views }}</div>
+            <div class="stat-label">Page Views</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-orange-600">{{ ga_stats.bounce_rate|floatformat:1 }}%</div>
+            <div class="stat-label">Bounce Rate</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-teal-600">{{ ga_stats.avg_session_duration|floatformat:0 }}s</div>
+            <div class="stat-label">Avg Session</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-indigo-600">{{ ga_stats.new_users }}</div>
+            <div class="stat-label">New Users</div>
+        </div>
+    </div>
+</div>
+
+<!-- Traffic Trend Chart -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">Traffic Trend (Last {{ days }} Days)</h2>
+    <div class="stat-card">
+        <div class="h-64">
+            <canvas id="trafficTrendChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Device & Traffic Sources -->
+<div class="mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Device Breakdown -->
+        <div class="stat-card">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">📱 Device Breakdown</h3>
+            {% if ga_devices %}
+            <div class="space-y-3">
+                {% for device in ga_devices %}
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        {% if device.device == 'Mobile' %}
+                        <span class="text-xl mr-2">📱</span>
+                        {% elif device.device == 'Desktop' %}
+                        <span class="text-xl mr-2">💻</span>
+                        {% else %}
+                        <span class="text-xl mr-2">📟</span>
+                        {% endif %}
+                        <span class="text-gray-900 dark:text-dark-text">{{ device.device }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-gray-600 dark:text-gray-400 mr-2">{{ device.users }} users</span>
+                        <span class="font-semibold text-blue-600">{{ device.percentage }}%</span>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ device.percentage }}%"></div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center text-gray-500 dark:text-gray-400 py-8">No device data available</div>
+            {% endif %}
+        </div>
+
+        <!-- Traffic Sources -->
+        <div class="stat-card">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">🔗 Traffic Sources</h3>
+            {% if ga_sources %}
+            <div class="space-y-3">
+                {% for source in ga_sources %}
+                <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                    <span class="text-gray-900 dark:text-dark-text">{{ source.source }}</span>
+                    <div class="text-right">
+                        <span class="font-semibold text-blue-600">{{ source.sessions }}</span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400 ml-1">sessions</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center text-gray-500 dark:text-gray-400 py-8">No traffic source data available</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Geographic Distribution -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">🌍 Geographic Distribution</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- By Country -->
+        <div class="content-container">
+            <h3 class="px-4 py-3 font-semibold text-gray-900 dark:text-dark-text bg-gray-50 dark:bg-dark-bg border-b dark:border-gray-700">Top Countries</h3>
+            {% if geographic_distribution.countries %}
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                    {% for country in geographic_distribution.countries %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">{{ country.name }}</td>
+                        <td class="px-4 py-3 text-sm text-right font-semibold text-blue-600">{{ country.users }} users</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="p-6 text-center text-gray-500 dark:text-gray-400">No country data available</div>
+            {% endif %}
+        </div>
+
+        <!-- By City -->
+        <div class="content-container">
+            <h3 class="px-4 py-3 font-semibold text-gray-900 dark:text-dark-text bg-gray-50 dark:bg-dark-bg border-b dark:border-gray-700">Top Cities</h3>
+            {% if geographic_distribution.cities %}
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                    {% for city in geographic_distribution.cities %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">{{ city.name }}</td>
+                        <td class="px-4 py-3 text-sm text-right font-semibold text-blue-600">{{ city.users }} users</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="p-6 text-center text-gray-500 dark:text-gray-400">No city data available</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Top Pages -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">📄 Top Pages</h2>
+    <div class="content-container overflow-x-auto">
+        {% if ga_top_pages %}
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead class="bg-gray-50 dark:bg-dark-bg">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Page Path</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Views</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase hidden sm:table-cell">Avg Time</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                {% for page in ga_top_pages %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                    <td class="px-4 py-3 text-sm font-mono text-gray-900 dark:text-dark-text max-w-xs truncate">{{ page.path|truncatechars:50 }}</td>
+                    <td class="px-4 py-3 text-sm font-semibold text-blue-600">{{ page.views }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted hidden sm:table-cell">{{ page.avg_time|floatformat:0 }}s</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No page data available</div>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<!-- GA Not Configured Banner -->
+<div class="mb-8">
+    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+        <div class="flex items-start">
+            <span class="text-3xl mr-4">📊</span>
+            <div>
+                <h3 class="font-semibold text-blue-800 dark:text-blue-200 text-lg">Enable Google Analytics Integration</h3>
+                <p class="text-sm text-blue-600 dark:text-blue-300 mt-2">
+                    To see real-time analytics from Google Analytics 4, configure the following environment variables:
+                </p>
+                <ul class="mt-3 space-y-1 text-sm text-blue-700 dark:text-blue-300">
+                    <li>• <code class="bg-blue-100 dark:bg-blue-800 px-1 rounded">GA_PROPERTY_ID</code> - Your GA4 property ID (e.g., 123456789)</li>
+                    <li>• <code class="bg-blue-100 dark:bg-blue-800 px-1 rounded">GA_CREDENTIALS_FILE</code> - Path to service account JSON file</li>
+                </ul>
+                <a href="https://developers.google.com/analytics/devguides/reporting/data/v1/quickstart-client-libraries" 
+                   target="_blank" class="inline-block mt-3 text-blue-600 dark:text-blue-400 underline">
+                    View Setup Guide →
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Internal User Stats -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">👥 Registered Users (Last {{ days }} Days)</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="stat-card">
             <div class="stat-value text-blue-600">{{ user_engagement.total_users|default:0 }}</div>
             <div class="stat-label">Total Users</div>
@@ -18,79 +230,77 @@
         </div>
         <div class="stat-card">
             <div class="stat-value text-orange-600">{{ user_engagement.dau|default:0 }}</div>
-            <div class="stat-label">Daily Active Users</div>
+            <div class="stat-label">Daily Active</div>
         </div>
     </div>
 </div>
 
+<!-- Content Stats -->
 <div class="mb-8">
-    <h2 class="section-heading mb-4">Popular Categories</h2>
-    <div class="content-container">
-        {% if content_usage.popular_categories %}
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
-            <thead class="bg-gray-50 dark:bg-dark-bg">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Category</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Count</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
-                {% for cat in content_usage.popular_categories %}
-                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">{{ cat.category|title }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ cat.count }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
-        {% endif %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Popular Categories -->
+        <div class="content-container">
+            <h3 class="px-4 py-3 font-semibold text-gray-900 dark:text-dark-text bg-gray-50 dark:bg-dark-bg border-b dark:border-gray-700">📁 Popular Categories</h3>
+            {% if content_usage.popular_categories %}
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                    {% for cat in content_usage.popular_categories %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">{{ cat.category|title }}</td>
+                        <td class="px-4 py-3 text-sm text-right font-semibold text-blue-600">{{ cat.count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
+            {% endif %}
+        </div>
+
+        <!-- Most Reviewed Places -->
+        <div class="content-container">
+            <h3 class="px-4 py-3 font-semibold text-gray-900 dark:text-dark-text bg-gray-50 dark:bg-dark-bg border-b dark:border-gray-700">⭐ Most Reviewed Places</h3>
+            {% if content_usage.most_reviewed %}
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                    {% for place in content_usage.most_reviewed %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">{{ place.name|truncatechars:30 }}</td>
+                        <td class="px-4 py-3 text-sm text-right font-semibold text-blue-600">{{ place.review_count }} reviews</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
+            {% endif %}
+        </div>
     </div>
 </div>
 
+<!-- Language Preferences -->
 <div class="mb-8">
-    <h2 class="section-heading mb-4">Most Reviewed Places</h2>
-    <div class="content-container">
-        {% if content_usage.most_reviewed %}
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
-            <thead class="bg-gray-50 dark:bg-dark-bg">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Place</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Reviews</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
-                {% for place in content_usage.most_reviewed %}
-                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">{{ place.name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ place.review_count }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
-        {% endif %}
-    </div>
-</div>
-
-<div class="mb-8">
-    <h2 class="section-heading mb-4">Language Preferences</h2>
-    <div class="content-container">
+    <h2 class="section-heading mb-4">🌐 Language Preferences</h2>
+    <div class="content-container overflow-x-auto">
         {% if language_preferences %}
         <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
             <thead class="bg-gray-50 dark:bg-dark-bg">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Language</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Users</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Language</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Users</th>
                 </tr>
             </thead>
             <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
                 {% for lang in language_preferences %}
                 <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text">{{ lang.preferred_language|upper }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">{{ lang.count }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">
+                        {% if lang.preferred_language == 'ko' %}🇰🇷 Korean
+                        {% elif lang.preferred_language == 'en' %}🇺🇸 English
+                        {% elif lang.preferred_language == 'uz' %}🇺🇿 Uzbek
+                        {% else %}{{ lang.preferred_language|upper }}
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-sm font-semibold text-blue-600">{{ lang.count }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -100,5 +310,91 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% if ga_available and ga_trends %}
+// Traffic Trend Chart
+const trendData = {
+    labels: {{ ga_trends.labels|safe }},
+    users: {{ ga_trends.users|safe }},
+    sessions: {{ ga_trends.sessions|safe }},
+    pageViews: {{ ga_trends.page_views|safe }}
+};
+
+const trendCtx = document.getElementById('trafficTrendChart');
+if (trendCtx && trendData.labels.length > 0) {
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: trendData.labels,
+            datasets: [
+                {
+                    label: 'Users',
+                    data: trendData.users,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Sessions',
+                    data: trendData.sessions,
+                    borderColor: '#16a34a',
+                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: 'Page Views',
+                    data: trendData.pageViews,
+                    borderColor: '#9333ea',
+                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                    fill: false,
+                    tension: 0.3,
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+                    },
+                    ticks: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
+                    }
+                }
+            }
+        }
+    });
+}
+{% endif %}
+</script>
 {% endblock %}
 

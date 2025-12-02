@@ -340,11 +340,22 @@
     <header class="bg-white dark:bg-dark-card shadow-sm border-b dark:border-dark-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-dark-text">{{ title }}</h1>
-                    <p class="text-sm text-gray-600 dark:text-dark-muted">Halal Korea Monitoring System</p>
+                <div class="min-w-0 flex-1">
+                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-dark-text truncate">{{ title }}</h1>
+                    <p class="text-sm text-gray-600 dark:text-dark-muted hidden sm:block">Halal Korea Monitoring System</p>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <!-- Notification Bell -->
+                    {% if unread_notifications %}
+                    <a href="/admin/utils/adminnotification/?read__exact=0" class="relative p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" title="Notifications">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            {{ unread_notifications }}
+                        </span>
+                    </a>
+                    {% endif %}
                     <!-- Dark Mode Toggle -->
                     <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
                         <svg class="dark-mode-icon sun-icon absolute" fill="currentColor" viewBox="0 0 20 20">
@@ -354,8 +365,8 @@
                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
                         </svg>
                     </button>
-                    <span class="text-sm text-gray-600 dark:text-dark-muted">{{ request.user.username }}</span>
-                    <a href="/admin/" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">← Back to Admin</a>
+                    <span class="text-sm text-gray-600 dark:text-dark-muted hidden sm:inline">{{ request.user.username }}</span>
+                    <a href="/admin/" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">← <span class="hidden sm:inline">Back to </span>Admin</a>
                 </div>
             </div>
         </div>
@@ -364,31 +375,31 @@
     <!-- Navigation -->
     <nav class="bg-white dark:bg-dark-card shadow-sm border-b dark:border-dark-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-2 py-3 overflow-x-auto scrollbar-hide">
-                <a href="{% url 'monitoring_dashboard' %}" class="nav-link {% if request.path == '/admin/monitoring/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    📊 Overview
+            <div class="flex space-x-1 sm:space-x-2 py-3 overflow-x-auto scrollbar-hide">
+                <a href="{% url 'monitoring_dashboard' %}" class="nav-link whitespace-nowrap {% if request.path == '/admin/monitoring/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <span class="sm:hidden">📊</span><span class="hidden sm:inline">📊 Overview</span>
                 </a>
-                <a href="{% url 'monitoring_performance' %}" class="nav-link {% if 'performance' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    ⚡ Performance
+                <a href="{% url 'monitoring_performance' %}" class="nav-link whitespace-nowrap {% if 'performance' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <span class="sm:hidden">⚡</span><span class="hidden sm:inline">⚡ Performance</span>
                 </a>
-                <a href="{% url 'monitoring_security' %}" class="nav-link {% if 'security' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    🔒 Security
+                <a href="{% url 'monitoring_security' %}" class="nav-link whitespace-nowrap {% if 'security' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <span class="sm:hidden">🔒</span><span class="hidden sm:inline">🔒 Security</span>
                 </a>
-                <a href="{% url 'monitoring_content' %}" class="nav-link {% if 'content' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    📝 Content Ops
+                <a href="{% url 'monitoring_content' %}" class="nav-link whitespace-nowrap {% if 'content' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <span class="sm:hidden">📝</span><span class="hidden sm:inline">📝 Content</span>
                 </a>
-                <a href="{% url 'monitoring_analytics' %}" class="nav-link {% if 'analytics' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    📈 Analytics
+                <a href="{% url 'monitoring_analytics' %}" class="nav-link whitespace-nowrap {% if 'analytics' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <span class="sm:hidden">📈</span><span class="hidden sm:inline">📈 Analytics</span>
                 </a>
-                <a href="{% url 'monitoring_logs' %}" class="nav-link {% if 'logs' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    📋 Logs
+                <a href="{% url 'monitoring_logs' %}" class="nav-link whitespace-nowrap {% if 'logs' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <span class="sm:hidden">📋</span><span class="hidden sm:inline">📋 Logs</span>
                 </a>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {% block content %}{% endblock %}
     </main>
 
@@ -428,8 +439,8 @@
                 Chart.defaults.color = isDark ? '#94a3b8' : '#6b7280';
                 Chart.defaults.borderColor = isDark ? '#334155' : '#e5e7eb';
                 
-                // Re-render all charts
-                Chart.instances.forEach(chart => {
+                // Re-render all charts (Chart.js 3.x+ uses object, not array)
+                Object.values(Chart.instances || {}).forEach(chart => {
                     if (chart.options.scales) {
                         Object.keys(chart.options.scales).forEach(scaleKey => {
                             const scale = chart.options.scales[scaleKey];

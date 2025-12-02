@@ -24,4 +24,5 @@ polib==1.2.0
 django-allauth==0.57.0
 Pillow==11.3.0
 sentry-sdk==2.46.0
-python-json-logger==2.0.7  # Enhanced structured JSON logging
+python-json-logger==2.0.7
+google-analytics-data

@@ -113,3 +113,9 @@ logs/backup.log
 # Ignore secret config files
 secrets.json
 config/secrets.json
+
+# Google Cloud service account keys
+*-credentials.json
+*-service-account.json
+ga-*.json
+google-*.json

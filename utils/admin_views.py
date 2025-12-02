@@ -6,12 +6,16 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Count, Avg, Q, Sum, Max, Min
+from django.db.models.functions import TruncHour, TruncDate
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.core.cache import cache
+from django.db import connection
 from utils.models import (
     RequestLog, SystemMetric, AdminAction, ContentModerationLog,
-    SecurityEvent
+    SecurityEvent, AdminNotification
 )
+from utils.google_analytics import ga_service
 from places.models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 from reviews.models import Review
 from blog.models import BlogPost
@@ -28,10 +32,14 @@ def monitoring_dashboard(request):
     context = {
         'title': 'Monitoring Dashboard',
         'today_stats': _get_today_stats(),
+        'yesterday_stats': _get_yesterday_stats(),
         'recent_errors': _get_recent_errors(),
         'recent_security_events': _get_recent_security_events(),
         'pending_content': _get_pending_content(),
         'active_users': _get_active_users(),
+        'system_health': _get_system_health(),
+        'unread_notifications': _get_unread_notification_count(request.user),
+        'ga_stats': ga_service.get_overview_stats(),
     }
     return render(request, 'monitoring/dashboard.html', context)
 
@@ -46,8 +54,11 @@ def performance_dashboard(request):
         'days': days,
         'slow_endpoints': _get_slow_endpoints(days),
         'response_time_stats': _get_response_time_stats(days),
+        'percentile_stats': _get_percentile_stats(days),
         'db_query_stats': _get_db_query_stats(days),
         'cache_stats': _get_cache_stats(days),
+        'error_rate_trend': _get_error_rate_trend(days),
+        'response_time_trend': _get_response_time_trend(days),
     }
     return render(request, 'monitoring/performance.html', context)
 
@@ -83,13 +94,28 @@ def analytics_dashboard(request):
     """Product analytics dashboard."""
     days = int(request.GET.get('days', 30))
     
+    # Get Google Analytics data
+    ga_overview = ga_service.get_overview_stats(days)
+    ga_geo = ga_service.get_geographic_data(days)
+    ga_devices = ga_service.get_device_breakdown(days)
+    ga_sources = ga_service.get_traffic_sources(days)
+    ga_trends = ga_service.get_daily_trends(days)
+    ga_top_pages = ga_service.get_top_pages(days)
+    
     context = {
         'title': 'Analytics Dashboard',
         'days': days,
         'user_engagement': _get_user_engagement(days),
         'content_usage': _get_content_usage(days),
-        'geographic_distribution': _get_geographic_distribution(),
+        'geographic_distribution': ga_geo,
         'language_preferences': _get_language_preferences(),
+        # Google Analytics data
+        'ga_stats': ga_overview,
+        'ga_devices': ga_devices,
+        'ga_sources': ga_sources,
+        'ga_trends': ga_trends,
+        'ga_top_pages': ga_top_pages,
+        'ga_available': ga_service.is_available,
     }
     return render(request, 'monitoring/analytics.html', context)
 
@@ -260,6 +286,53 @@ def api_performance(request):
     }
     
     return JsonResponse(data)
+
+
+@staff_member_required
+def api_chart_data(request):
+    """API endpoint for real-time chart data (last 24h)."""
+    now = timezone.now()
+    last_24h = now - timezone.timedelta(hours=24)
+    
+    # Requests & Errors per hour
+    hourly_stats = RequestLog.objects.filter(
+        timestamp__gte=last_24h
+    ).annotate(
+        hour=TruncHour('timestamp')
+    ).values('hour').annotate(
+        count=Count('id'),
+        errors=Count('id', filter=Q(status_code__gte=500))
+    ).order_by('hour')
+    
+    # Error distribution
+    error_dist = RequestLog.objects.filter(
+        timestamp__gte=last_24h,
+        status_code__gte=400
+    ).values('status_code').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
+    # Format for Chart.js
+    labels = []
+    requests_data = []
+    errors_data = []
+    
+    for stat in hourly_stats:
+        labels.append(stat['hour'].strftime('%H:%M'))
+        requests_data.append(stat['count'])
+        errors_data.append(stat['errors'])
+        
+    return JsonResponse({
+        'traffic': {
+            'labels': labels,
+            'requests': requests_data,
+            'errors': errors_data
+        },
+        'errors': {
+            'labels': [str(e['status_code']) for e in error_dist],
+            'data': [e['count'] for e in error_dist]
+        }
+    })
 
 
 # ============================================================================
@@ -551,3 +624,191 @@ def _get_language_preferences():
         ).order_by('-count')
     )
 
+
+# ============================================================================
+# New Helper Functions for Enhanced Dashboard
+# ============================================================================
+
+def _get_yesterday_stats():
+    """Get yesterday's statistics for comparison."""
+    yesterday_start = (timezone.now() - timezone.timedelta(days=1)).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    yesterday_end = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    total_requests = RequestLog.objects.filter(
+        timestamp__gte=yesterday_start,
+        timestamp__lt=yesterday_end
+    ).count()
+    
+    error_count = RequestLog.objects.filter(
+        timestamp__gte=yesterday_start,
+        timestamp__lt=yesterday_end,
+        status_code__gte=500
+    ).count()
+    
+    avg_response = RequestLog.objects.filter(
+        timestamp__gte=yesterday_start,
+        timestamp__lt=yesterday_end
+    ).aggregate(avg=Avg('response_time_ms'))
+    
+    return {
+        'total_requests': total_requests,
+        'error_count': error_count,
+        'error_rate': (error_count / total_requests * 100) if total_requests > 0 else 0,
+        'avg_response_time': avg_response['avg'] or 0,
+    }
+
+
+def _get_system_health():
+    """Get overall system health status."""
+    now = timezone.now()
+    last_hour = now - timezone.timedelta(hours=1)
+    
+    # Check error rate
+    recent_requests = RequestLog.objects.filter(timestamp__gte=last_hour).count()
+    recent_errors = RequestLog.objects.filter(
+        timestamp__gte=last_hour,
+        status_code__gte=500
+    ).count()
+    error_rate = (recent_errors / recent_requests * 100) if recent_requests > 0 else 0
+    
+    # Check response time
+    avg_response = RequestLog.objects.filter(
+        timestamp__gte=last_hour
+    ).aggregate(avg=Avg('response_time_ms'))['avg'] or 0
+    
+    # Check unresolved security events
+    critical_events = SecurityEvent.objects.filter(
+        resolved=False,
+        severity__in=['critical', 'high']
+    ).count()
+    
+    # Check database connectivity
+    db_healthy = True
+    try:
+        connection.ensure_connection()
+    except Exception:
+        db_healthy = False
+    
+    # Check cache connectivity
+    cache_healthy = True
+    try:
+        cache.set('_health_check', 'ok', 1)
+        cache_healthy = cache.get('_health_check') == 'ok'
+    except Exception:
+        cache_healthy = False
+    
+    # Determine overall status
+    if not db_healthy or not cache_healthy or critical_events > 0 or error_rate > 10:
+        status = 'critical'
+        status_text = 'Critical Issues'
+    elif error_rate > 5 or avg_response > 2000:
+        status = 'warning'
+        status_text = 'Degraded Performance'
+    else:
+        status = 'healthy'
+        status_text = 'All Systems Operational'
+    
+    return {
+        'status': status,
+        'status_text': status_text,
+        'error_rate': round(error_rate, 1),
+        'avg_response_time': round(avg_response, 0),
+        'critical_events': critical_events,
+        'db_healthy': db_healthy,
+        'cache_healthy': cache_healthy,
+        'checks': [
+            {'name': 'Database', 'healthy': db_healthy},
+            {'name': 'Cache', 'healthy': cache_healthy},
+            {'name': 'Error Rate', 'healthy': error_rate < 5},
+            {'name': 'Response Time', 'healthy': avg_response < 1000},
+            {'name': 'Security', 'healthy': critical_events == 0},
+        ]
+    }
+
+
+def _get_unread_notification_count(user):
+    """Get count of unread notifications for the user."""
+    return AdminNotification.objects.filter(
+        Q(recipient=user) | Q(recipient__isnull=True),
+        read=False,
+        dismissed=False
+    ).count()
+
+
+def _get_percentile_stats(days):
+    """Get P50, P95, P99 response time percentiles."""
+    start_time = timezone.now() - timezone.timedelta(days=days)
+    
+    # Get all response times for the period
+    response_times = list(
+        RequestLog.objects.filter(
+            timestamp__gte=start_time
+        ).values_list('response_time_ms', flat=True).order_by('response_time_ms')
+    )
+    
+    if not response_times:
+        return {'p50': 0, 'p95': 0, 'p99': 0}
+    
+    def percentile(data, p):
+        n = len(data)
+        k = (n - 1) * p / 100
+        f = int(k)
+        c = f + 1 if f + 1 < n else f
+        return data[f] + (k - f) * (data[c] - data[f]) if f != c else data[f]
+    
+    return {
+        'p50': round(percentile(response_times, 50), 0),
+        'p95': round(percentile(response_times, 95), 0),
+        'p99': round(percentile(response_times, 99), 0),
+    }
+
+
+def _get_error_rate_trend(days):
+    """Get error rate trend over time."""
+    start_time = timezone.now() - timezone.timedelta(days=days)
+    
+    daily_stats = RequestLog.objects.filter(
+        timestamp__gte=start_time
+    ).annotate(
+        date=TruncDate('timestamp')
+    ).values('date').annotate(
+        total=Count('id'),
+        errors=Count('id', filter=Q(status_code__gte=500))
+    ).order_by('date')
+    
+    labels = []
+    rates = []
+    
+    for stat in daily_stats:
+        labels.append(stat['date'].strftime('%m/%d'))
+        rate = (stat['errors'] / stat['total'] * 100) if stat['total'] > 0 else 0
+        rates.append(round(rate, 2))
+    
+    return {'labels': labels, 'rates': rates}
+
+
+def _get_response_time_trend(days):
+    """Get response time trend over time."""
+    start_time = timezone.now() - timezone.timedelta(days=days)
+    
+    daily_stats = RequestLog.objects.filter(
+        timestamp__gte=start_time
+    ).annotate(
+        date=TruncDate('timestamp')
+    ).values('date').annotate(
+        avg_time=Avg('response_time_ms'),
+        max_time=Max('response_time_ms')
+    ).order_by('date')
+    
+    labels = []
+    avg_times = []
+    max_times = []
+    
+    for stat in daily_stats:
+        labels.append(stat['date'].strftime('%m/%d'))
+        avg_times.append(round(stat['avg_time'] or 0, 0))
+        max_times.append(round(stat['max_time'] or 0, 0))
+    
+    return {'labels': labels, 'avg_times': avg_times, 'max_times': max_times}
