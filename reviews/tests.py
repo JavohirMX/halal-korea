@@ -59,7 +59,8 @@ class ReviewViewTest(TestCase):
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
-            password='testpass123'
+            password='testpass123',
+            email_verified=True
         )
         self.place = HalalPlace.objects.create(
             name='Test Restaurant',
