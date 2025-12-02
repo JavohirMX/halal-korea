@@ -590,12 +590,12 @@ SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens (privacy)
 # Login/Logout URLs (integrate with existing system)
 ACCOUNT_LOGIN_URL = '/users/login/'
 ACCOUNT_LOGOUT_URL = '/users/logout/'
-ACCOUNT_LOGIN_REDIRECT_URL = '/places/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/places/'
+ACCOUNT_LOGIN_REDIRECT_URL = '/explore/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
 # Account Management
-ACCOUNT_SIGNUP_REDIRECT_URL = '/places/'
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/places/'
+ACCOUNT_SIGNUP_REDIRECT_URL = '/explore/'
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/users/login/'
 
 # Social Account Connection URLs
