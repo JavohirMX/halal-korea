@@ -13,6 +13,7 @@ urlpatterns = [
     path('legal/', views.legal, name='legal'),
     path('set-location/', views.set_location, name='set_location'),
     path('api/places/', views.get_places_json, name='places_json'),
+    path('api/places/map/', views.get_all_places_for_map, name='places_map_json'),
     # Search API endpoints
     path('api/search/autocomplete/', views.search_autocomplete, name='search_autocomplete'),
     path('api/search/log/', views.log_search, name='log_search'),

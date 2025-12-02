@@ -522,6 +522,100 @@ def get_places_json(request):
     return response
 
 
+@log_execution(level='info', sample=True)
+def get_all_places_for_map(request):
+    """
+    Optimized API endpoint to get ALL places for map display.
+    Returns minimal data needed for markers (id, name, category, location, rating).
+    Supports filtering but no pagination - designed for map clustering.
+    """
+    from .search import build_search_query, parse_proximity_phrase
+    
+    # Get filter parameters
+    category = request.GET.get('category')
+    search_query = request.GET.get('q', '')
+    
+    # Get user location for distance calculation
+    location = get_user_location_context(request)['location']
+    user_location = None
+    
+    if 'lat' in location and 'lng' in location and not location.get('is_fallback'):
+        user_location = Point(location['lng'], location['lat'], srid=4326)
+
+    # Parse proximity phrases from search query
+    cleaned_query = search_query
+    if search_query:
+        cleaned_query, proximity_location, _ = parse_proximity_phrase(search_query)
+        if proximity_location:
+            user_location = Point(proximity_location[1], proximity_location[0], srid=4326)
+
+    # Base queryset - only approved places
+    places = HalalPlace.objects.filter(status='approved')
+    
+    # Apply category filter
+    if category:
+        if category == 'mosque' or category == 'prayer_room':
+            places = places.filter(Q(category='mosque') | Q(category='prayer_room'))
+        else:
+            places = places.filter(category=category)
+    
+    # Apply search filter
+    if cleaned_query:
+        q_filter, _, _ = build_search_query(cleaned_query)
+        places = places.filter(q_filter)
+    
+    # Annotate with average rating
+    places = places.annotate(
+        average_rating=Round(Avg('reviews__rating'), 1)
+    )
+    
+    # Add distance if user location available
+    if user_location:
+        places = places.annotate(distance=Distance('location', user_location))
+    
+    # Select only necessary fields for performance
+    places = places.only('id', 'name', 'category', 'location')
+    
+    # Build minimal response data for map markers
+    places_data = []
+    for place in places:
+        place_data = {
+            'id': place.id,
+            'name': place.name,
+            'category': place.category,
+            'location': {
+                'lat': float(place.location.y),
+                'lng': float(place.location.x)
+            },
+            'average_rating': float(place.average_rating) if place.average_rating else None,
+        }
+        
+        if hasattr(place, 'distance') and place.distance:
+            place_data['distance'] = {
+                'm': float(place.distance.m),
+                'km': float(place.distance.km)
+            }
+            
+        places_data.append(place_data)
+    
+    logger.info(
+        "API get_all_places_for_map completed",
+        extra={
+            'total_places': len(places_data),
+            'filters_applied': bool(category or search_query)
+        }
+    )
+    
+    # Return JSON response with caching (data doesn't change often)
+    response = JsonResponse({
+        'places': places_data,
+        'total_count': len(places_data),
+    })
+    # Cache for 5 minutes since place data doesn't change frequently
+    response['Cache-Control'] = 'public, max-age=300'
+    return response
+
+
 def search_autocomplete(request):
     """API endpoint for search autocomplete suggestions"""
     from .search import get_autocomplete_suggestions, log_search_query
