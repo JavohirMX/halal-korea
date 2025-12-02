@@ -925,6 +925,9 @@
         const refreshIcon = document.getElementById('refresh-icon');
         const refreshText = document.getElementById('refresh-text');
         
+        // Exit if required elements don't exist
+        if (!placesContainer || !indicator || !refreshIcon || !refreshText) return;
+        
         let startY = 0;
         let currentY = 0;
         let isPulling = false;
@@ -1005,6 +1008,9 @@
         const refreshIcon = document.getElementById('refresh-icon');
         const refreshText = document.getElementById('refresh-text');
         
+        // Exit if required elements don't exist
+        if (!indicator || !refreshIcon || !refreshText) return;
+        
         // Update user location and refresh places
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -1045,6 +1051,9 @@
         function finishRefresh() {
             // Reset indicator
             setTimeout(() => {
+                // Check elements still exist (page might have navigated)
+                if (!indicator || !refreshIcon || !refreshText) return;
+                
                 indicator.style.opacity = '0';
                 indicator.style.transform = 'translateY(-3rem)';
                 refreshIcon.classList.remove('fa-spinner', 'fa-spin');
