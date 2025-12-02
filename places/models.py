@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.contrib.gis.db import models
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.urls import reverse
 
 
@@ -18,11 +20,11 @@ class HalalPlace(models.Model):
         ('archived', 'Archived'),
         
     ]
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, db_index=True)
     description = models.TextField()
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     location = models.PointField()
-    address = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, db_index=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     google_map_link = models.URLField(blank=True, null=True)
@@ -38,12 +40,45 @@ class HalalPlace(models.Model):
         null=True,
         related_name='submitted_places'
     )
+    
+    # Search optimization fields
+    name_romanized = models.CharField(max_length=500, blank=True, null=True, db_index=True,
+                                      help_text="Romanized version of Korean name for search")
+    name_korean = models.CharField(max_length=500, blank=True, null=True, db_index=True,
+                                   help_text="Korean transliteration of English name for search")
+    search_vector = SearchVectorField(null=True, blank=True,
+                                      help_text="Full-text search vector for efficient searching")
+    
+    class Meta:
+        indexes = [
+            GinIndex(fields=['search_vector'], name='places_search_vector_idx'),
+        ]
 
     def __str__(self):
         return self.name
     
     def get_absolute_url(self):
         return reverse('places:place_detail', kwargs={'pk': self.pk})
+    
+    def update_search_vector(self):
+        """Update the search vector field with weighted content"""
+        from django.contrib.postgres.search import SearchVector
+        from django.db.models import Value
+        
+        # Build search content including transliterations
+        name_content = self.name or ''
+        if self.name_romanized:
+            name_content += ' ' + self.name_romanized
+        if self.name_korean:
+            name_content += ' ' + self.name_korean
+        
+        HalalPlace.objects.filter(pk=self.pk).update(
+            search_vector=(
+                SearchVector(Value(name_content), weight='A', config='simple') +
+                SearchVector('description', weight='B', config='simple') +
+                SearchVector('address', weight='C', config='simple')
+            )
+        )
 
 
 # Place Edit Suggestion model for field changes
@@ -284,3 +319,122 @@ class PlaceImageSuggestion(models.Model):
             logger = logging.getLogger(__name__)
             logger.error(f"Error reapplying watermark: {str(e)}", exc_info=True)
             return False
+
+
+# Search Query Analytics model
+class SearchQuery(models.Model):
+    """Track search queries for analytics and improving search results"""
+    query = models.CharField(max_length=255, db_index=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='search_queries'
+    )
+    session_key = models.CharField(max_length=40, blank=True, null=True, db_index=True)
+    results_count = models.PositiveIntegerField(default=0)
+    category_filter = models.CharField(max_length=20, blank=True, null=True)
+    clicked_place = models.ForeignKey(
+        HalalPlace,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='search_clicks',
+        help_text="Place the user clicked from search results"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Search Query'
+        verbose_name_plural = 'Search Queries'
+    
+    def __str__(self):
+        return f'"{self.query}" ({self.results_count} results)'
+
+
+class ProximityLocation(models.Model):
+    """
+    Known locations for proximity search (e.g., "near Hongdae", "in Gangnam").
+    These are searchable area names with their center coordinates.
+    """
+    name = models.CharField(
+        max_length=100, 
+        unique=True, 
+        db_index=True,
+        help_text="Location name in English (lowercase, e.g., 'hongdae', 'gangnam')"
+    )
+    name_korean = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True,
+        db_index=True,
+        help_text="Location name in Korean (e.g., '홍대', '강남')"
+    )
+    aliases = models.JSONField(
+        default=list, 
+        blank=True,
+        help_text="Alternative names/spellings as JSON list (e.g., ['hongik', 'hongik university'])"
+    )
+    latitude = models.FloatField(help_text="Center latitude of this area")
+    longitude = models.FloatField(help_text="Center longitude of this area")
+    is_active = models.BooleanField(default=True, help_text="Whether this location is searchable")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Proximity Location'
+        verbose_name_plural = 'Proximity Locations'
+    
+    def __str__(self):
+        if self.name_korean:
+            return f"{self.name} ({self.name_korean})"
+        return self.name
+    
+    @property
+    def coordinates(self):
+        """Return (latitude, longitude) tuple"""
+        return (self.latitude, self.longitude)
+    
+    @classmethod
+    def get_locations_dict(cls):
+        """
+        Get all active locations as a dictionary for search.
+        Cached for performance.
+        """
+        from django.core.cache import cache
+        
+        cache_key = 'proximity_locations_dict'
+        locations = cache.get(cache_key)
+        
+        if locations is None:
+            locations = {}
+            for loc in cls.objects.filter(is_active=True):
+                coords = (loc.latitude, loc.longitude)
+                # Add main name
+                locations[loc.name.lower()] = coords
+                # Add Korean name if exists
+                if loc.name_korean:
+                    locations[loc.name_korean] = coords
+                # Add aliases
+                for alias in (loc.aliases or []):
+                    locations[alias.lower()] = coords
+            
+            # Cache for 5 minutes
+            cache.set(cache_key, locations, 300)
+        
+        return locations
+    
+    def save(self, *args, **kwargs):
+        # Clear cache when location is saved
+        from django.core.cache import cache
+        cache.delete('proximity_locations_dict')
+        super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        # Clear cache when location is deleted
+        from django.core.cache import cache
+        cache.delete('proximity_locations_dict')
+        super().delete(*args, **kwargs)

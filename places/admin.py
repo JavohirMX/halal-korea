@@ -13,7 +13,7 @@ from django.core.exceptions import ValidationError
 import json
 import logging
 
-from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
+from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion, SearchQuery, ProximityLocation
 
 logger = logging.getLogger(__name__)
 
@@ -969,3 +969,93 @@ class PlaceImageSuggestionAdmin(admin.ModelAdmin):
             logger = logging.getLogger(__name__)
             logger.error(f"Error applying image suggestion {suggestion.pk}: {str(e)}", exc_info=True)
             return False
+
+
+@admin.register(SearchQuery)
+class SearchQueryAdmin(admin.ModelAdmin):
+    """Admin for search analytics"""
+    list_display = ['query', 'results_count', 'category_filter', 'user', 'created_at']
+    list_filter = ['category_filter', 'created_at']
+    search_fields = ['query', 'user__username', 'user__email']
+    readonly_fields = ['query', 'user', 'session_key', 'results_count', 'category_filter', 
+                       'clicked_place', 'created_at']
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    def changelist_view(self, request, extra_context=None):
+        # Add analytics summary to changelist
+        from django.db.models import Count
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        last_7_days = timezone.now() - timedelta(days=7)
+        last_30_days = timezone.now() - timedelta(days=30)
+        
+        # Popular searches
+        popular = (
+            SearchQuery.objects
+            .filter(created_at__gte=last_7_days, results_count__gt=0)
+            .values('query')
+            .annotate(count=Count('id'))
+            .order_by('-count')[:10]
+        )
+        
+        # Zero result searches
+        zero_results = (
+            SearchQuery.objects
+            .filter(created_at__gte=last_30_days, results_count=0)
+            .values('query')
+            .annotate(count=Count('id'))
+            .order_by('-count')[:10]
+        )
+        
+        extra_context = extra_context or {}
+        extra_context['popular_searches'] = list(popular)
+        extra_context['zero_result_searches'] = list(zero_results)
+        
+        return super().changelist_view(request, extra_context=extra_context)
+
+
+@admin.register(ProximityLocation)
+class ProximityLocationAdmin(admin.ModelAdmin):
+    """Admin for managing proximity search locations"""
+    list_display = ['name', 'name_korean', 'latitude', 'longitude', 'aliases_display', 'is_active', 'updated_at']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['name', 'name_korean', 'aliases']
+    list_editable = ['is_active']
+    ordering = ['name']
+    
+    fieldsets = (
+        ('Location Info', {
+            'fields': ('name', 'name_korean', 'aliases'),
+            'description': 'Enter the location name in English and Korean. Aliases should be comma-separated alternative names (e.g., "sincheon, 신천동").'
+        }),
+        ('Coordinates', {
+            'fields': ('latitude', 'longitude'),
+            'description': 'Center coordinates for this location. Used for proximity searches.'
+        }),
+        ('Status', {
+            'fields': ('is_active',),
+        }),
+    )
+    
+    def aliases_display(self, obj):
+        """Display aliases in a truncated format"""
+        if obj.aliases:
+            aliases = obj.aliases[:50] + '...' if len(obj.aliases) > 50 else obj.aliases
+            return aliases
+        return '-'
+    aliases_display.short_description = 'Aliases'
+    
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Clear the cached locations so new data is used
+        from django.core.cache import cache
+        cache.delete('proximity_locations')
+        messages.success(request, 'Proximity location saved. Cache cleared.')

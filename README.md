@@ -67,6 +67,17 @@ Halal Korea is a location-based web application designed to help Muslims and hal
 - **Image Contributions**: Users can upload additional images for places
 - **Watermarked Images**: Automatic watermark application to protect content
 
+### 🔍 Advanced Search
+
+- **Full-Text Search**: PostgreSQL-powered weighted search (name > description > address)
+- **Korean↔English Transliteration**: Search "bibimbap" to find "비빔밥" and vice versa
+- **Autocomplete Suggestions**: Real-time suggestions with keyboard navigation
+- **Recent Searches**: Session and localStorage-based search history
+- **Synonym Expansion**: "masjid" finds mosques, "halal" finds restaurants
+- **Proximity Phrases**: "near Hongdae" or "Itaewon area" for location-based search
+- **Search Analytics**: Track popular and zero-result queries in admin dashboard
+- **GIN Index**: Fast full-text lookups with PostgreSQL GIN indexing
+
 ### 👤 User Experience
 
 - **Authentication**: Custom user model with enhanced profiles
@@ -1168,6 +1179,48 @@ Content-Type: application/json
 }
 ```
 
+#### Search Autocomplete API
+
+```http
+GET /places/api/search/autocomplete/?q=halal&limit=5
+```
+
+**Parameters:**
+
+- `q` (required): Search query (min 2 characters)
+- `limit` (optional): Max results (default: 5, max: 10)
+
+**Response:**
+
+```json
+{
+  "suggestions": [
+    {
+      "id": 123,
+      "name": "Halal Guys",
+      "category": "restaurant",
+      "category_display": "Restaurant",
+      "address": "Itaewon, Seoul"
+    }
+  ],
+  "recent": ["halal food", "mosque"]
+}
+```
+
+#### Recent Searches API
+
+```http
+GET /places/api/search/recent/
+```
+
+**Response:**
+
+```json
+{
+  "recent_searches": ["halal", "mosque", "korean food"]
+}
+```
+
 #### Monitoring API Endpoints (Admin Only)
 
 ```http
@@ -1571,6 +1624,7 @@ class PlaceTestCase(TestCase):
   - `MONITORING_IMPLEMENTATION_SUMMARY.md` - Quick reference for monitoring
   - `PAGES_OVERVIEW.md` - Complete list of all pages and endpoints
   - `PASSWORD_RESET_IMPLEMENTATION.md` - Password reset flow documentation
+  - `SEARCH_IMPROVEMENTS.md` - Advanced search with transliteration, autocomplete, and analytics
   - `TELEGRAM_NOTIFICATIONS.md` - Telegram bot integration guide
   - `TESTING.md` - Testing guidelines and test coverage
   - `TRANSLATION_GUIDELINES.md` - i18n and localization best practices

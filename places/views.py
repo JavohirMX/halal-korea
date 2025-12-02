@@ -114,6 +114,8 @@ def home(request):
 
 @log_execution(level='info', sample=True)  # High-volume endpoint with sampling
 def explore(request):
+    from .search import build_search_query, parse_proximity_phrase, log_search_query
+    
     # Get filter parameters
     category = request.GET.get('category')
     search_query = request.GET.get('q', '')
@@ -146,6 +148,19 @@ def explore(request):
     if 'lat' in location and 'lng' in location and not location.get('is_fallback'):
         user_location = Point(location['lng'], location['lat'], srid=4326)
 
+    # Parse proximity phrases from search query (e.g., "near Hongdae")
+    cleaned_query = search_query
+    is_location_only_search = False
+    if search_query:
+        cleaned_query, proximity_location, is_location_only_search = parse_proximity_phrase(search_query)
+        if proximity_location:
+            # Use proximity location for distance calculations
+            user_location = Point(proximity_location[1], proximity_location[0], srid=4326)
+            # For location-only search, force distance sorting
+            if is_location_only_search:
+                sort = 'distance'
+                is_in_korea = True  # Treat as in-Korea for sorting
+
     # Base queryset
     places = HalalPlace.objects.filter(status='approved')
     
@@ -161,12 +176,67 @@ def explore(request):
     if city_filter:
         places = places.filter(address__icontains=city_filter)
     
-    if search_query:
-        places = places.filter(
-            Q(name__icontains=search_query) |
-            Q(description__icontains=search_query) |
-            Q(address__icontains=search_query)
-        )
+    # Enhanced search with transliteration and synonyms
+    used_fuzzy_search = False
+    if cleaned_query:
+        words = cleaned_query.split()
+        
+        # For multi-word queries, try strict (AND) matching first for better relevance
+        if len(words) > 1:
+            from .search import build_search_query_strict
+            strict_filter = build_search_query_strict(cleaned_query)
+            strict_places = places.filter(strict_filter)
+            
+            if strict_places.exists():
+                # Strict match found - all words present
+                places = strict_places
+            else:
+                # Fall back to OR matching (any word matches)
+                q_filter, expanded_queries, synonyms_used = build_search_query(cleaned_query)
+                filtered_places = places.filter(q_filter)
+                
+                if filtered_places.exists():
+                    places = filtered_places
+                else:
+                    # Still no results - try fuzzy matching
+                    from .search import search_places_fuzzy
+                    try:
+                        fuzzy_places = search_places_fuzzy(cleaned_query, places, threshold=0.25)
+                        if fuzzy_places.exists():
+                            places = fuzzy_places
+                            used_fuzzy_search = True
+                        else:
+                            places = filtered_places  # Keep empty result
+                    except Exception:
+                        places = filtered_places
+        else:
+            # Single word query - use regular search
+            q_filter, expanded_queries, synonyms_used = build_search_query(cleaned_query)
+            filtered_places = places.filter(q_filter)
+            
+            if not filtered_places.exists():
+                from .search import search_places_fuzzy
+                try:
+                    fuzzy_places = search_places_fuzzy(cleaned_query, places, threshold=0.3)
+                    if fuzzy_places.exists():
+                        places = fuzzy_places
+                        used_fuzzy_search = True
+                    else:
+                        places = filtered_places
+                except Exception:
+                    places = filtered_places
+            else:
+                places = filtered_places
+        
+        # Log search for analytics (only for first page)
+        if page == 1 or page == '1':
+            log_search_query(
+                query=search_query,
+                results_count=places.count(),
+                user=request.user if request.user.is_authenticated else None,
+                session_key=request.session.session_key,
+                category_filter=category,
+            )
     
     # Annotate with average rating and reviews count to avoid N+1 queries
     places = places.annotate(
@@ -263,6 +333,8 @@ def explore(request):
 @log_execution(level='info', sample=True)  # High-volume API endpoint with sampling
 def get_places_json(request):
     """API endpoint to get places as JSON for map and dynamic loading"""
+    from .search import build_search_query, parse_proximity_phrase
+    
     # Get filter parameters
     category = request.GET.get('category')
     search_query = request.GET.get('q', '')
@@ -290,6 +362,18 @@ def get_places_json(request):
     if 'lat' in location and 'lng' in location and not location.get('is_fallback'):
         user_location = Point(location['lng'], location['lat'], srid=4326)
 
+    # Parse proximity phrases from search query (e.g., "near Hongdae")
+    cleaned_query = search_query
+    is_location_only_search = False
+    if search_query:
+        cleaned_query, proximity_location, is_location_only_search = parse_proximity_phrase(search_query)
+        if proximity_location:
+            # Use proximity location for distance calculations
+            user_location = Point(proximity_location[1], proximity_location[0], srid=4326)
+            # For location-only search, force distance sorting
+            if is_location_only_search:
+                sort = 'distance'
+
     # Base queryset
     places = HalalPlace.objects.filter(status='approved')
     
@@ -301,12 +385,53 @@ def get_places_json(request):
         else:
             places = places.filter(category=category)
     
-    if search_query:
-        places = places.filter(
-            Q(name__icontains=search_query) |
-            Q(description__icontains=search_query) |
-            Q(address__icontains=search_query)
-        )
+    # Enhanced search with transliteration and synonyms
+    if cleaned_query:
+        words = cleaned_query.split()
+        
+        # For multi-word queries, try strict (AND) matching first
+        if len(words) > 1:
+            from .search import build_search_query_strict
+            strict_filter = build_search_query_strict(cleaned_query)
+            strict_places = places.filter(strict_filter)
+            
+            if strict_places.exists():
+                places = strict_places
+            else:
+                # Fall back to OR matching
+                q_filter, expanded_queries, synonyms_used = build_search_query(cleaned_query)
+                filtered_places = places.filter(q_filter)
+                
+                if filtered_places.exists():
+                    places = filtered_places
+                else:
+                    # Try fuzzy matching
+                    from .search import search_places_fuzzy
+                    try:
+                        fuzzy_places = search_places_fuzzy(cleaned_query, places, threshold=0.25)
+                        if fuzzy_places.exists():
+                            places = fuzzy_places
+                        else:
+                            places = filtered_places
+                    except Exception:
+                        places = filtered_places
+        else:
+            # Single word query
+            q_filter, expanded_queries, synonyms_used = build_search_query(cleaned_query)
+            filtered_places = places.filter(q_filter)
+            
+            if not filtered_places.exists():
+                from .search import search_places_fuzzy
+                try:
+                    fuzzy_places = search_places_fuzzy(cleaned_query, places, threshold=0.3)
+                    if fuzzy_places.exists():
+                        places = fuzzy_places
+                    else:
+                        places = filtered_places
+                except Exception:
+                    places = filtered_places
+            else:
+                places = filtered_places
     
     # Annotate with average rating
     places = places.annotate(
@@ -395,6 +520,79 @@ def get_places_json(request):
     })
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     return response
+
+
+def search_autocomplete(request):
+    """API endpoint for search autocomplete suggestions"""
+    from .search import get_autocomplete_suggestions, log_search_query
+    
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse({'suggestions': [], 'recent': []})
+    
+    # Get autocomplete suggestions
+    suggestions = get_autocomplete_suggestions(query, limit=6)
+    
+    # Get recent searches from session
+    recent_searches = request.session.get('recent_searches', [])[:5]
+    
+    response = JsonResponse({
+        'suggestions': suggestions,
+        'recent': recent_searches,
+    })
+    response['Cache-Control'] = 'private, max-age=60'
+    return response
+
+
+def log_search(request):
+    """API endpoint to log a search query for analytics"""
+    from .search import log_search_query
+    
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        query = data.get('query', '').strip()
+        results_count = data.get('results_count', 0)
+        category = data.get('category')
+        
+        if query:
+            # Log to analytics
+            log_search_query(
+                query=query,
+                results_count=results_count,
+                user=request.user if request.user.is_authenticated else None,
+                session_key=request.session.session_key,
+                category_filter=category,
+            )
+            
+            # Store in recent searches (session-based)
+            recent = request.session.get('recent_searches', [])
+            if query not in recent:
+                recent.insert(0, query)
+                request.session['recent_searches'] = recent[:10]  # Keep last 10
+        
+        return JsonResponse({'success': True})
+    except Exception as e:
+        logger.warning(f"Failed to log search: {e}")
+        return JsonResponse({'success': False})
+
+
+def get_recent_searches(request):
+    """API endpoint to get user's recent searches"""
+    recent_searches = request.session.get('recent_searches', [])[:8]
+    return JsonResponse({'recent': recent_searches})
+
+
+def clear_recent_searches(request):
+    """API endpoint to clear recent searches"""
+    if request.method == 'POST':
+        request.session['recent_searches'] = []
+        return JsonResponse({'success': True})
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
 
 @log_execution(level='info', sample=True)  # High-volume endpoint with sampling
 def place_detail(request, pk):
