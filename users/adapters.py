@@ -4,6 +4,7 @@ Handles account merging, profile data import, and social authentication logic
 """
 
 import logging
+import uuid
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from allauth.account.adapter import DefaultAccountAdapter
@@ -99,6 +100,11 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         # Import basic profile data
         self._import_profile_data(sociallogin, user)
         
+        # CRITICAL: Ensure username is set before saving to avoid IntegrityError
+        # This must be called after _import_profile_data in case it sets basic username
+        if not user.username:
+            self.populate_username(request, user)
+        
         # Set email as verified for trusted providers
         if sociallogin.account.provider in ['google', 'github']:
             user.email_verified = True
@@ -131,13 +137,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
                     if len(name_parts) > 1:
                         user.last_name = name_parts[1][:30]
             
-            # Set username if not already set
-            if not user.username:
-                username = user_username(sociallogin.user)
-                if username:
-                    user.username = username
-            
-            logger.info(f"Imported profile data from {provider} for user {user.username}")
+            logger.info(f"Imported profile data from {provider} for user")
             
         except Exception as e:
             logger.error(f"Error importing profile data from {provider}: {str(e)}")
@@ -209,15 +209,21 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def populate_username(self, request, user):
         """
         Generate username for social accounts
+        Ensures a unique username is always set before user is saved
         """
         username = user_username(user)
         if not username:
-            # Generate username from email or social account data
+            # Generate username from email or use UUID fallback
             email = user_email(user)
             if email:
+                # Use email prefix as base username
                 username = email.split('@')[0]
-            else:
-                username = f"user_{user.pk}"
+                # Clean username: remove invalid characters, limit length
+                username = ''.join(c for c in username if c.isalnum() or c in '_-')[:30]
+            
+            # If still empty or just special chars, use UUID
+            if not username:
+                username = f"user_{uuid.uuid4().hex[:8]}"
         
         # Ensure username is unique
         base_username = username
@@ -226,5 +232,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             username = f"{base_username}_{counter}"
             counter += 1
         
-        user_username(user, username)
+        # Set username directly on user object
+        user.username = username
         return username
