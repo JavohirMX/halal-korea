@@ -356,6 +356,12 @@ class AlertRule(models.Model):
         ('db_slow_queries', 'Database Slow Queries'),
         ('cache_hit_rate_below', 'Cache Hit Rate Below Threshold'),
         ('api_failure', 'External API Failure'),
+        # Health check thresholds (used by check_monitoring_health and dashboard)
+        ('health_min_requests', 'Minimum Request Logs per Hour'),
+        ('health_error_rate_warning', 'Health Check Error Rate Warning'),
+        ('health_error_rate_critical', 'Health Check Error Rate Critical'),
+        ('health_response_time_warning', 'Health Check Response Time Warning (ms)'),
+        ('health_security_events_warning', 'Health Check Unresolved Security Events Warning'),
     ]
     
     name = models.CharField(max_length=200, unique=True)

@@ -5,9 +5,33 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.conf import settings
 from datetime import timedelta
-from utils.models import RequestLog, SecurityEvent, SystemMetric
+from utils.models import RequestLog, SecurityEvent, SystemMetric, AlertRule
 from utils.monitoring_emails import send_critical_alert
 from utils.telegram_notifications import send_telegram_notification
+
+
+# Default thresholds from settings (can be overridden via AlertRules)
+DEFAULT_THRESHOLDS = {
+    'health_min_requests': getattr(settings, 'MONITORING_HEALTH_MIN_REQUESTS', 10),
+    'health_error_rate_warning': getattr(settings, 'MONITORING_HEALTH_ERROR_RATE_WARNING', 5.0),
+    'health_error_rate_critical': getattr(settings, 'MONITORING_HEALTH_ERROR_RATE_CRITICAL', 10.0),
+    'health_response_time_warning': getattr(settings, 'MONITORING_HEALTH_RESPONSE_TIME_WARNING', 2000),
+    'health_security_events_warning': getattr(settings, 'MONITORING_HEALTH_SECURITY_EVENTS_WARNING', 5),
+}
+
+
+def get_health_threshold(condition):
+    """
+    Get threshold value from AlertRule if configured, otherwise use settings default.
+    Health thresholds can be configured in AlertRule or settings.py.
+    """
+    try:
+        rule = AlertRule.objects.filter(condition=condition, enabled=True).first()
+        if rule:
+            return rule.threshold
+    except Exception:
+        pass
+    return DEFAULT_THRESHOLDS.get(condition, 0)
 
 
 class Command(BaseCommand):
@@ -99,12 +123,14 @@ class Command(BaseCommand):
         cutoff = timezone.now() - timedelta(hours=hours)
         recent_count = RequestLog.objects.filter(timestamp__gte=cutoff).count()
         
+        min_logs = int(get_health_threshold('health_min_requests'))
+        
         if recent_count == 0:
             return {
                 'status': 'error',
                 'message': f'No request logs in the last {hours} hour(s) - Monitoring may be disabled'
             }
-        elif recent_count < 10:
+        elif recent_count < min_logs:
             return {
                 'status': 'warning',
                 'message': f'Very few request logs ({recent_count}) in the last {hours} hour(s)'
@@ -127,12 +153,15 @@ class Command(BaseCommand):
         errors = recent_logs.filter(status_code__gte=500).count()
         error_rate = (errors / total) * 100
         
-        if error_rate > 10:
+        critical_threshold = get_health_threshold('health_error_rate_critical')
+        warning_threshold = get_health_threshold('health_error_rate_warning')
+        
+        if error_rate > critical_threshold:
             return {
                 'status': 'error',
                 'message': f'High error rate: {error_rate:.1f}% ({errors}/{total} requests)'
             }
-        elif error_rate > 5:
+        elif error_rate > warning_threshold:
             return {
                 'status': 'warning',
                 'message': f'Elevated error rate: {error_rate:.1f}% ({errors}/{total} requests)'
@@ -149,12 +178,14 @@ class Command(BaseCommand):
         critical_unresolved = unresolved.filter(severity='critical').count()
         high_unresolved = unresolved.filter(severity='high').count()
         
+        high_events_threshold = int(get_health_threshold('health_security_events_warning'))
+        
         if critical_unresolved > 0:
             return {
                 'status': 'error',
                 'message': f'{critical_unresolved} critical security event(s) unresolved'
             }
-        elif high_unresolved > 5:
+        elif high_unresolved > high_events_threshold:
             return {
                 'status': 'warning',
                 'message': f'{high_unresolved} high-severity security event(s) unresolved'

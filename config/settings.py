@@ -653,6 +653,13 @@ MONITORING_SAMPLE_RATE = config('MONITORING_SAMPLE_RATE', default=0.1, cast=floa
 MONITORING_SLOW_THRESHOLD_MS = config('MONITORING_SLOW_THRESHOLD_MS', default=1000, cast=int)  # 1 second
 MONITORING_RETENTION_DAYS = config('MONITORING_RETENTION_DAYS', default=7, cast=int)  # 7 days retention for small site
 
+# Health Check Thresholds (can be overridden via AlertRules in database)
+MONITORING_HEALTH_MIN_REQUESTS = config('MONITORING_HEALTH_MIN_REQUESTS', default=10, cast=int)  # Min logs/hour before warning
+MONITORING_HEALTH_ERROR_RATE_WARNING = config('MONITORING_HEALTH_ERROR_RATE_WARNING', default=5.0, cast=float)  # Error rate % warning
+MONITORING_HEALTH_ERROR_RATE_CRITICAL = config('MONITORING_HEALTH_ERROR_RATE_CRITICAL', default=10.0, cast=float)  # Error rate % critical
+MONITORING_HEALTH_RESPONSE_TIME_WARNING = config('MONITORING_HEALTH_RESPONSE_TIME_WARNING', default=2000, cast=int)  # Response time ms warning
+MONITORING_HEALTH_SECURITY_EVENTS_WARNING = config('MONITORING_HEALTH_SECURITY_EVENTS_WARNING', default=5, cast=int)  # Unresolved high-severity events
+
 # Google Analytics Configuration (for dashboard metrics - uses GA4 Data API)
 # To enable GA integration:
 # 1. Create a Google Cloud project and enable the Analytics Data API

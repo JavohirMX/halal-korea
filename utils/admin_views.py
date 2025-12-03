@@ -13,7 +13,7 @@ from django.core.cache import cache
 from django.db import connection
 from utils.models import (
     RequestLog, SystemMetric, AdminAction, ContentModerationLog,
-    SecurityEvent, AdminNotification
+    SecurityEvent, AdminNotification, AlertRule
 )
 from utils.google_analytics import ga_service
 from places.models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
@@ -804,10 +804,36 @@ def _get_yesterday_stats():
     }
 
 
+def _get_health_threshold(condition):
+    """
+    Get threshold value from AlertRule if configured, otherwise use settings default.
+    """
+    # Default thresholds from settings
+    defaults = {
+        'health_error_rate_warning': getattr(settings, 'MONITORING_HEALTH_ERROR_RATE_WARNING', 5.0),
+        'health_error_rate_critical': getattr(settings, 'MONITORING_HEALTH_ERROR_RATE_CRITICAL', 10.0),
+        'health_response_time_warning': getattr(settings, 'MONITORING_HEALTH_RESPONSE_TIME_WARNING', 2000),
+        'response_time_above': getattr(settings, 'MONITORING_SLOW_THRESHOLD_MS', 1000),
+    }
+    try:
+        rule = AlertRule.objects.filter(condition=condition, enabled=True).first()
+        if rule:
+            return rule.threshold
+    except Exception:
+        pass
+    return defaults.get(condition, 0)
+
+
 def _get_system_health():
     """Get overall system health status."""
     now = timezone.now()
     last_hour = now - timezone.timedelta(hours=1)
+    
+    # Get configurable thresholds from AlertRule or settings
+    error_rate_critical = _get_health_threshold('health_error_rate_critical')
+    error_rate_warning = _get_health_threshold('health_error_rate_warning')
+    response_time_warning = _get_health_threshold('health_response_time_warning')
+    response_time_healthy = _get_health_threshold('response_time_above')
     
     # Check error rate
     recent_requests = RequestLog.objects.filter(timestamp__gte=last_hour).count()
@@ -844,10 +870,10 @@ def _get_system_health():
         cache_healthy = False
     
     # Determine overall status
-    if not db_healthy or not cache_healthy or critical_events > 0 or error_rate > 10:
+    if not db_healthy or not cache_healthy or critical_events > 0 or error_rate > error_rate_critical:
         status = 'critical'
         status_text = 'Critical Issues'
-    elif error_rate > 5 or avg_response > 2000:
+    elif error_rate > error_rate_warning or avg_response > response_time_warning:
         status = 'warning'
         status_text = 'Degraded Performance'
     else:
@@ -865,8 +891,8 @@ def _get_system_health():
         'checks': [
             {'name': 'Database', 'healthy': db_healthy},
             {'name': 'Cache', 'healthy': cache_healthy},
-            {'name': 'Error Rate', 'healthy': error_rate < 5},
-            {'name': 'Response Time', 'healthy': avg_response < 1000},
+            {'name': 'Error Rate', 'healthy': error_rate < error_rate_warning},
+            {'name': 'Response Time', 'healthy': avg_response < response_time_healthy},
             {'name': 'Security', 'healthy': critical_events == 0},
         ]
     }
