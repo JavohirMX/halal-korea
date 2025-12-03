@@ -23,23 +23,10 @@ from django.views.generic import TemplateView
 from blog.upload_views import tinymce_upload_view
 from utils.language_views import set_language, set_language_ajax, get_user_language_preferences
 from config.sitemaps import sitemaps
-from utils import admin_views
 
 urlpatterns = [
     # --- Monitoring Dashboard URLs (MUST come before admin URLs) ---
-    path('admin/monitoring/', admin_views.monitoring_dashboard, name='monitoring_dashboard'),
-    path('admin/monitoring/performance/', admin_views.performance_dashboard, name='monitoring_performance'),
-    path('admin/monitoring/security/', admin_views.security_dashboard, name='monitoring_security'),
-    path('admin/monitoring/content/', admin_views.content_operations_dashboard, name='monitoring_content'),
-    path('admin/monitoring/analytics/', admin_views.analytics_dashboard, name='monitoring_analytics'),
-    path('admin/monitoring/logs/', admin_views.logs_dashboard, name='monitoring_logs'),
-    
-    # --- Monitoring API Endpoints ---
-    path('admin/monitoring/api/metrics/', admin_views.api_metrics, name='monitoring_api_metrics'),
-    path('admin/monitoring/api/stats/', admin_views.api_stats, name='monitoring_api_stats'),
-    path('admin/monitoring/api/performance/', admin_views.api_performance, name='monitoring_api_performance'),
-    path('admin/monitoring/api/charts/', admin_views.api_chart_data, name='monitoring_api_charts'),
-    path('admin/monitoring/api/analytics/', admin_views.api_analytics_data, name='monitoring_api_analytics'),
+    path('admin/monitoring/', include('utils.monitoring_urls', namespace='monitoring')),
     
     # --- Admin URLs ---
     path('admin/', admin.site.urls),

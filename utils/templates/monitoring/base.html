@@ -412,22 +412,22 @@
     <nav class="bg-white dark:bg-dark-card shadow-sm border-b dark:border-dark-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex space-x-1 sm:space-x-2 py-3 overflow-x-auto scrollbar-hide">
-                <a href="{% url 'monitoring_dashboard' %}" class="nav-link whitespace-nowrap {% if request.path == '/admin/monitoring/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                <a href="{% url 'monitoring:dashboard' %}" class="nav-link whitespace-nowrap {% if request.path == '/admin/monitoring/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
                     <span class="sm:hidden">📊</span><span class="hidden sm:inline">📊 Overview</span>
                 </a>
-                <a href="{% url 'monitoring_performance' %}" class="nav-link whitespace-nowrap {% if 'performance' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                <a href="{% url 'monitoring:performance' %}" class="nav-link whitespace-nowrap {% if 'performance' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
                     <span class="sm:hidden">⚡</span><span class="hidden sm:inline">⚡ Performance</span>
                 </a>
-                <a href="{% url 'monitoring_security' %}" class="nav-link whitespace-nowrap {% if 'security' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                <a href="{% url 'monitoring:security' %}" class="nav-link whitespace-nowrap {% if 'security' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
                     <span class="sm:hidden">🔒</span><span class="hidden sm:inline">🔒 Security</span>
                 </a>
-                <a href="{% url 'monitoring_content' %}" class="nav-link whitespace-nowrap {% if 'content' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                <a href="{% url 'monitoring:content' %}" class="nav-link whitespace-nowrap {% if 'content' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
                     <span class="sm:hidden">📝</span><span class="hidden sm:inline">📝 Content</span>
                 </a>
-                <a href="{% url 'monitoring_analytics' %}" class="nav-link whitespace-nowrap {% if 'analytics' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                <a href="{% url 'monitoring:analytics' %}" class="nav-link whitespace-nowrap {% if 'analytics' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
                     <span class="sm:hidden">📈</span><span class="hidden sm:inline">📈 Analytics</span>
                 </a>
-                <a href="{% url 'monitoring_logs' %}" class="nav-link whitespace-nowrap {% if 'logs' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                <a href="{% url 'monitoring:logs' %}" class="nav-link whitespace-nowrap {% if 'logs' in request.path %}nav-link-active{% else %}nav-link-inactive{% endif %}">
                     <span class="sm:hidden">📋</span><span class="hidden sm:inline">📋 Logs</span>
                 </a>
             </div>

@@ -109,6 +109,7 @@ def logs_dashboard(request):
     log_type = request.GET.get('log_type', 'django')
     lines = int(request.GET.get('lines', 100))
     search = request.GET.get('search', '')
+    level = request.GET.get('level', '')  # Log level filter
     
     # Get log files from settings
     logs_dir = settings.BASE_DIR / 'logs'
@@ -125,6 +126,7 @@ def logs_dashboard(request):
     log_content = []
     log_size = 0
     log_exists = False
+    log_stats = {'debug': 0, 'info': 0, 'warning': 0, 'error': 0, 'critical': 0}
     
     if log_type in log_files:
         log_path = log_files[log_type]
@@ -137,8 +139,26 @@ def logs_dashboard(request):
                 with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
                     all_lines = f.readlines()
                     
-                    # Get last N lines
+                    # Get last N lines for display
                     last_lines = all_lines[-lines:] if len(all_lines) > lines else all_lines
+                    
+                    # Calculate log level statistics from visible lines
+                    for line in last_lines:
+                        line_upper = line.upper()
+                        if 'CRITICAL' in line_upper:
+                            log_stats['critical'] += 1
+                        elif 'ERROR' in line_upper:
+                            log_stats['error'] += 1
+                        elif 'WARNING' in line_upper:
+                            log_stats['warning'] += 1
+                        elif 'INFO' in line_upper:
+                            log_stats['info'] += 1
+                        elif 'DEBUG' in line_upper:
+                            log_stats['debug'] += 1
+                    
+                    # Filter by log level if provided
+                    if level:
+                        last_lines = [line for line in last_lines if level.upper() in line.upper()]
                     
                     # Filter by search term if provided
                     if search:
@@ -177,10 +197,100 @@ def logs_dashboard(request):
         'log_exists': log_exists,
         'lines': lines,
         'search': search,
+        'level': level,
         'log_file_info': log_file_info,
         'available_logs': list(log_files.keys()),
+        'log_stats': log_stats,
     }
     return render(request, 'monitoring/logs.html', context)
+
+
+@staff_member_required
+def api_logs(request):
+    """API endpoint for fetching log content via AJAX."""
+    log_type = request.GET.get('log_type', 'django')
+    lines = int(request.GET.get('lines', 100))
+    search = request.GET.get('search', '')
+    level = request.GET.get('level', '')
+    
+    logs_dir = settings.BASE_DIR / 'logs'
+    
+    log_files = {
+        'django': logs_dir / 'django.log',
+        'error': logs_dir / 'django_errors.log',
+        'security': logs_dir / 'security.log',
+        'api': logs_dir / 'api.log',
+        'database': logs_dir / 'database.log',
+    }
+    
+    result = {
+        'success': False,
+        'log_content': [],
+        'log_exists': False,
+        'log_size': 0,
+        'log_size_mb': 0,
+        'line_count': 0,
+        'log_stats': {'debug': 0, 'info': 0, 'warning': 0, 'error': 0, 'critical': 0},
+        'log_file_info': {},
+    }
+    
+    if log_type not in log_files:
+        return JsonResponse(result)
+    
+    log_path = log_files[log_type]
+    
+    if log_path.exists():
+        result['log_exists'] = True
+        result['log_size'] = log_path.stat().st_size
+        result['log_size_mb'] = round(result['log_size'] / (1024 * 1024), 2)
+        
+        try:
+            with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
+                all_lines = f.readlines()
+                
+                last_lines = all_lines[-lines:] if len(all_lines) > lines else all_lines
+                
+                # Calculate stats
+                for line in last_lines:
+                    line_upper = line.upper()
+                    if 'CRITICAL' in line_upper:
+                        result['log_stats']['critical'] += 1
+                    elif 'ERROR' in line_upper:
+                        result['log_stats']['error'] += 1
+                    elif 'WARNING' in line_upper:
+                        result['log_stats']['warning'] += 1
+                    elif 'INFO' in line_upper:
+                        result['log_stats']['info'] += 1
+                    elif 'DEBUG' in line_upper:
+                        result['log_stats']['debug'] += 1
+                
+                # Filter by level
+                if level:
+                    last_lines = [line for line in last_lines if level.upper() in line.upper()]
+                
+                # Filter by search
+                if search:
+                    last_lines = [line for line in last_lines if search.lower() in line.lower()]
+                
+                result['log_content'] = [line.rstrip('\n') for line in last_lines]
+                result['line_count'] = len(result['log_content'])
+                result['success'] = True
+        except Exception as e:
+            result['log_content'] = [f"Error reading log file: {str(e)}"]
+    
+    # Get file info for all logs
+    for name, path in log_files.items():
+        if path.exists():
+            size_bytes = path.stat().st_size
+            result['log_file_info'][name] = {
+                'size_bytes': size_bytes,
+                'size_mb': round(size_bytes / (1024 * 1024), 2),
+                'exists': True
+            }
+        else:
+            result['log_file_info'][name] = {'size_bytes': 0, 'size_mb': 0, 'exists': False}
+    
+    return JsonResponse(result)
 
 
 # ============================================================================

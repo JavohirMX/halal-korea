@@ -4,8 +4,8 @@
 <!-- Log Controls -->
 <div class="mb-6">
     <div class="content-container p-6">
-        <form method="get" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form method="get" id="logFilterForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <!-- Log Type Selection -->
                 <div>
                     <label for="log_type" class="block text-sm font-medium text-gray-700 dark:text-dark-muted mb-2">Log File</label>
@@ -30,6 +30,19 @@
                     </select>
                 </div>
                 
+                <!-- Log Level Filter -->
+                <div>
+                    <label for="level" class="block text-sm font-medium text-gray-700 dark:text-dark-muted mb-2">Log Level</label>
+                    <select name="level" id="level" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-dark-bg text-gray-900 dark:text-dark-text">
+                        <option value="" {% if not level %}selected{% endif %}>All Levels</option>
+                        <option value="DEBUG" {% if level == 'DEBUG' %}selected{% endif %}>DEBUG</option>
+                        <option value="INFO" {% if level == 'INFO' %}selected{% endif %}>INFO</option>
+                        <option value="WARNING" {% if level == 'WARNING' %}selected{% endif %}>WARNING</option>
+                        <option value="ERROR" {% if level == 'ERROR' %}selected{% endif %}>ERROR</option>
+                        <option value="CRITICAL" {% if level == 'CRITICAL' %}selected{% endif %}>CRITICAL</option>
+                    </select>
+                </div>
+                
                 <!-- Search Input -->
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 dark:text-dark-muted mb-2">Search</label>
@@ -43,19 +56,89 @@
                     </button>
                 </div>
             </div>
+            
+            <!-- Auto-refresh and Level Filter Toggles -->
+            <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-200 dark:border-dark-border">
+                <!-- Auto Refresh -->
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium text-gray-700 dark:text-dark-muted">Auto-refresh:</label>
+                    <select id="autoRefresh" class="px-2 py-1 text-sm border border-gray-300 dark:border-dark-border rounded-md bg-white dark:bg-dark-bg text-gray-900 dark:text-dark-text">
+                        <option value="0">Off</option>
+                        <option value="5">5s</option>
+                        <option value="10">10s</option>
+                        <option value="30">30s</option>
+                        <option value="60">1m</option>
+                    </select>
+                    <span id="refreshCountdown" class="text-xs text-gray-500 dark:text-dark-muted hidden"></span>
+                </div>
+                
+                <!-- Quick Level Filters -->
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm font-medium text-gray-700 dark:text-dark-muted">Quick filter:</span>
+                    <button type="button" onclick="filterLevel('')" class="px-2 py-1 text-xs rounded {% if not level %}bg-gray-600 text-white{% else %}bg-gray-200 dark:bg-dark-border text-gray-700 dark:text-dark-muted{% endif %} hover:opacity-80 transition-opacity">All</button>
+                    <button type="button" onclick="filterLevel('ERROR')" class="px-2 py-1 text-xs rounded {% if level == 'ERROR' %}bg-orange-600 text-white{% else %}bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300{% endif %} hover:opacity-80 transition-opacity">Errors</button>
+                    <button type="button" onclick="filterLevel('WARNING')" class="px-2 py-1 text-xs rounded {% if level == 'WARNING' %}bg-yellow-600 text-white{% else %}bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300{% endif %} hover:opacity-80 transition-opacity">Warnings</button>
+                    <button type="button" onclick="filterLevel('CRITICAL')" class="px-2 py-1 text-xs rounded {% if level == 'CRITICAL' %}bg-red-600 text-white{% else %}bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300{% endif %} hover:opacity-80 transition-opacity">Critical</button>
+                </div>
+                
+                <!-- Highlight toggle -->
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="highlightLevels" checked class="rounded border-gray-300 dark:border-dark-border text-blue-600 focus:ring-blue-500">
+                    <label for="highlightLevels" class="text-sm text-gray-700 dark:text-dark-muted">Highlight levels</label>
+                </div>
+            </div>
         </form>
     </div>
 </div>
+
+<!-- Log Statistics -->
+{% if log_stats %}
+<div class="mb-6">
+    <h2 class="section-heading mb-4">Log Level Distribution</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Level Counts -->
+        <div class="content-container p-6">
+            <div class="grid grid-cols-5 gap-3">
+                <div class="text-center p-3 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" data-stat="debug">{{ log_stats.debug }}</div>
+                    <div class="text-xs text-blue-700 dark:text-blue-300">DEBUG</div>
+                </div>
+                <div class="text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800">
+                    <div class="text-2xl font-bold text-green-600 dark:text-green-400" data-stat="info">{{ log_stats.info }}</div>
+                    <div class="text-xs text-green-700 dark:text-green-300">INFO</div>
+                </div>
+                <div class="text-center p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800">
+                    <div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400" data-stat="warning">{{ log_stats.warning }}</div>
+                    <div class="text-xs text-yellow-700 dark:text-yellow-300">WARNING</div>
+                </div>
+                <div class="text-center p-3 rounded-lg bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800">
+                    <div class="text-2xl font-bold text-orange-600 dark:text-orange-400" data-stat="error">{{ log_stats.error }}</div>
+                    <div class="text-xs text-orange-700 dark:text-orange-300">ERROR</div>
+                </div>
+                <div class="text-center p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
+                    <div class="text-2xl font-bold text-red-600 dark:text-red-400" data-stat="critical">{{ log_stats.critical }}</div>
+                    <div class="text-xs text-red-700 dark:text-red-300">CRITICAL</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart -->
+        <div class="content-container p-6">
+            <canvas id="logLevelChart" height="120"></canvas>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- Log File Stats -->
 <div class="mb-6">
     <h2 class="section-heading mb-4">Log File Information</h2>
     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         {% for name, info in log_file_info.items %}
-        <div class="stat-card {% if name == log_type %}ring-2 ring-blue-500{% endif %}">
+        <a href="?log_type={{ name }}&lines={{ lines }}" data-log-file="{{ name }}" class="stat-card {% if name == log_type %}ring-2 ring-blue-500{% endif %} cursor-pointer hover:scale-105 transition-transform">
             <div class="text-sm font-medium text-gray-600 dark:text-dark-muted mb-1">{{ name|title }}</div>
             {% if info.exists %}
-                <div class="stat-value text-lg {% if info.size_mb > 5 %}text-orange-600{% else %}text-blue-600{% endif %}">
+                <div class="stat-value text-lg file-size {% if info.size_mb > 5 %}text-orange-600{% else %}text-blue-600{% endif %}">
                     {{ info.size_mb }} MB
                 </div>
                 <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">
@@ -64,29 +147,41 @@
             {% else %}
                 <div class="text-sm text-gray-400 dark:text-dark-muted">No file</div>
             {% endif %}
-        </div>
+        </a>
         {% endfor %}
     </div>
 </div>
 
 <!-- Current Log Display -->
 <div class="mb-8">
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="section-heading">{{ log_type|title }} Log</h2>
-        <div class="flex items-center space-x-2">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+        <h2 class="section-heading flex items-center gap-2">
+            {{ log_type|title }} Log
+            <span id="liveIndicator" class="hidden items-center gap-1 text-xs font-normal text-green-600 dark:text-green-400">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Live
+            </span>
+        </h2>
+        <div class="flex flex-wrap items-center gap-2">
             {% if log_exists %}
                 <span class="text-sm text-gray-600 dark:text-dark-muted">
                     Size: {{ log_size_mb }} MB
                 </span>
                 <span class="text-sm text-gray-400 dark:text-dark-muted">•</span>
                 <span class="text-sm text-gray-600 dark:text-dark-muted">
-                    Showing {{ log_content|length }} line{{ log_content|length|pluralize }}
+                    Showing <span id="lineCount">{{ log_content|length }}</span> line{{ log_content|length|pluralize }}
                 </span>
-                <button onclick="refreshLog()" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                    🔄 Refresh
+                <button onclick="refreshLog()" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center gap-1">
+                    <span id="refreshIcon">🔄</span> Refresh
                 </button>
                 <button onclick="copyLog()" class="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">
                     📋 Copy
+                </button>
+                <button onclick="downloadLog()" class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                    ⬇️ Download
+                </button>
+                <button onclick="toggleAutoScroll()" id="autoScrollBtn" class="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors">
+                    📍 Auto-scroll: ON
                 </button>
             {% endif %}
         </div>
@@ -95,13 +190,28 @@
     <div class="content-container">
         {% if log_exists %}
             {% if log_content %}
-                <div class="p-4 bg-gray-900 dark:bg-black rounded-lg overflow-x-auto" style="max-height: 70vh;">
-                    <pre id="logContent" class="text-xs font-mono text-green-400 whitespace-pre-wrap break-words"><code>{% for line in log_content %}{{ line }}{% endfor %}</code></pre>
+                <div id="logContainer" class="p-4 bg-gray-900 dark:bg-black rounded-lg overflow-auto" style="max-height: 70vh;">
+                    <div id="logContent" class="text-xs font-mono whitespace-pre-wrap break-words">
+                        {% for line in log_content %}
+<div class="log-line px-1 hover:bg-gray-800 transition-colors {% if 'CRITICAL' in line %}log-critical{% elif 'ERROR' in line %}log-error{% elif 'WARNING' in line %}log-warning{% elif 'INFO' in line %}log-info{% elif 'DEBUG' in line %}log-debug{% else %}text-gray-400{% endif %}">{{ line }}</div>{% endfor %}
+                    </div>
                 </div>
+                    </div>
+                </div>
+                
+                <!-- Search highlight info -->
+                {% if search %}
+                <div class="mt-2 text-sm text-gray-600 dark:text-dark-muted">
+                    🔍 Showing results matching: "<span class="font-semibold text-blue-600 dark:text-blue-400">{{ search }}</span>"
+                    <a href="?log_type={{ log_type }}&lines={{ lines }}" class="ml-2 text-red-500 hover:text-red-700">✕ Clear</a>
+                </div>
+                {% endif %}
             {% else %}
                 <div class="p-6 text-center text-gray-500 dark:text-dark-muted">
                     {% if search %}
                         No log entries match your search: "{{ search }}"
+                    {% elif level %}
+                        No {{ level }} level entries found
                     {% else %}
                         Log file is empty
                     {% endif %}
@@ -144,42 +254,540 @@
     </div>
 </div>
 
+<!-- Keyboard Shortcuts -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">⌨️ Keyboard Shortcuts</h2>
+    <div class="content-container p-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-gray-200 dark:bg-dark-border rounded text-xs">R</kbd>
+                <span class="text-gray-600 dark:text-dark-muted">Refresh logs</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-gray-200 dark:bg-dark-border rounded text-xs">G</kbd>
+                <span class="text-gray-600 dark:text-dark-muted">Go to top</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-gray-200 dark:bg-dark-border rounded text-xs">Shift+G</kbd>
+                <span class="text-gray-600 dark:text-dark-muted">Go to bottom</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-gray-200 dark:bg-dark-border rounded text-xs">/</kbd>
+                <span class="text-gray-600 dark:text-dark-muted">Focus search</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-gray-200 dark:bg-dark-border rounded text-xs">S</kbd>
+                <span class="text-gray-600 dark:text-dark-muted">Toggle auto-scroll</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-gray-200 dark:bg-dark-border rounded text-xs">D</kbd>
+                <span class="text-gray-600 dark:text-dark-muted">Download logs</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-gray-200 dark:bg-dark-border rounded text-xs">C</kbd>
+                <span class="text-gray-600 dark:text-dark-muted">Copy logs</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-gray-200 dark:bg-dark-border rounded text-xs">Esc</kbd>
+                <span class="text-gray-600 dark:text-dark-muted">Clear search</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Tips -->
 <div class="content-container p-6">
     <h3 class="text-lg font-semibold text-gray-900 dark:text-dark-text mb-3">💡 Tips</h3>
     <ul class="space-y-2 text-sm text-gray-600 dark:text-dark-muted">
         <li>• Use the search filter to find specific errors or events</li>
-        <li>• Increase the number of lines to see more historical data</li>
+        <li>• Enable auto-refresh to monitor logs in real-time</li>
+        <li>• Filter by log level to focus on errors or warnings only</li>
         <li>• Check the <strong>Error</strong> log for quick access to error-level messages only</li>
         <li>• Security log uses JSON format for structured event data</li>
         <li>• Log files are automatically rotated when they reach 10MB (5MB for security/api)</li>
+        <li>• Use keyboard shortcuts for faster navigation</li>
     </ul>
 </div>
 
-<script>
-function refreshLog() {
-    window.location.reload();
-}
-
-function copyLog() {
-    const logContent = document.getElementById('logContent');
-    if (logContent) {
-        const text = logContent.textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Log content copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-            alert('Failed to copy log content');
-        });
+<style>
+    /* Log level colors */
+    .log-debug { color: #60a5fa; }
+    .log-info { color: #34d399; }
+    .log-warning { color: #fbbf24; }
+    .log-error { color: #f97316; }
+    .log-critical { color: #ef4444; font-weight: bold; background-color: rgba(239, 68, 68, 0.1); }
+    
+    /* When highlighting is disabled */
+    .no-highlight .log-line {
+        color: #9ca3af !important;
+        background-color: transparent !important;
     }
-}
+    
+    /* Keyboard shortcut style */
+    kbd {
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+    }
+    
+    /* Search highlight */
+    .search-highlight {
+        background-color: #fef08a;
+        color: #000;
+        padding: 0 2px;
+        border-radius: 2px;
+    }
+    .dark .search-highlight {
+        background-color: #ca8a04;
+        color: #fff;
+    }
+</style>
 
-// Auto-scroll to bottom of log
-window.addEventListener('load', () => {
-    const logContainer = document.querySelector('.overflow-x-auto');
-    if (logContainer) {
-        logContainer.scrollTop = logContainer.scrollHeight;
+<script>
+// State
+let autoScrollEnabled = true;
+let autoRefreshInterval = null;
+let countdownInterval = null;
+let countdownValue = 0;
+let isLoading = false;
+let currentLogType = '{{ log_type }}';
+let logChart = null;
+
+// API URL for fetching logs
+const API_URL = '{% url "monitoring:api_logs" %}';
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    // Scroll to bottom initially
+    scrollToBottom();
+    
+    // Initialize Chart.js if stats available
+    initLogChart();
+    
+    // Highlight search terms
+    highlightSearchTerms();
+    
+    // Setup auto-refresh from localStorage
+    const savedRefresh = localStorage.getItem('logAutoRefresh');
+    if (savedRefresh) {
+        document.getElementById('autoRefresh').value = savedRefresh;
+        if (parseInt(savedRefresh) > 0) {
+            startAutoRefresh(parseInt(savedRefresh));
+        }
+    }
+    
+    // Setup highlight preference
+    const highlightPref = localStorage.getItem('logHighlight');
+    if (highlightPref === 'false') {
+        document.getElementById('highlightLevels').checked = false;
+        toggleHighlight(false);
     }
 });
+
+// Auto-refresh functionality
+document.getElementById('autoRefresh').addEventListener('change', function() {
+    const seconds = parseInt(this.value);
+    localStorage.setItem('logAutoRefresh', seconds);
+    
+    if (seconds > 0) {
+        startAutoRefresh(seconds);
+    } else {
+        stopAutoRefresh();
+    }
+});
+
+function startAutoRefresh(seconds) {
+    stopAutoRefresh();
+    countdownValue = seconds;
+    
+    document.getElementById('liveIndicator').classList.remove('hidden');
+    document.getElementById('liveIndicator').classList.add('flex');
+    
+    updateCountdown();
+    countdownInterval = setInterval(() => {
+        countdownValue--;
+        updateCountdown();
+        if (countdownValue <= 0) {
+            countdownValue = seconds;
+            refreshLog();
+        }
+    }, 1000);
+}
+
+function stopAutoRefresh() {
+    if (countdownInterval) clearInterval(countdownInterval);
+    document.getElementById('liveIndicator').classList.add('hidden');
+    document.getElementById('refreshCountdown').classList.add('hidden');
+}
+
+function updateCountdown() {
+    const el = document.getElementById('refreshCountdown');
+    el.textContent = `(${countdownValue}s)`;
+    el.classList.remove('hidden');
+}
+
+// Get log level class for a line
+function getLogLevelClass(line) {
+    const upperLine = line.toUpperCase();
+    if (upperLine.includes('CRITICAL')) return 'log-critical';
+    if (upperLine.includes('ERROR')) return 'log-error';
+    if (upperLine.includes('WARNING')) return 'log-warning';
+    if (upperLine.includes('INFO')) return 'log-info';
+    if (upperLine.includes('DEBUG')) return 'log-debug';
+    return 'text-gray-400';
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Refresh log via AJAX
+async function refreshLog() {
+    if (isLoading) return;
+    isLoading = true;
+    
+    const icon = document.getElementById('refreshIcon');
+    icon.style.animation = 'spin 1s linear infinite';
+    
+    const logType = document.getElementById('log_type').value;
+    const lines = document.getElementById('lines').value;
+    const search = document.getElementById('search').value;
+    const level = document.getElementById('level').value;
+    
+    const params = new URLSearchParams({
+        log_type: logType,
+        lines: lines,
+        search: search,
+        level: level
+    });
+    
+    try {
+        const response = await fetch(`${API_URL}?${params}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update log content
+            const logContent = document.getElementById('logContent');
+            const searchTerm = search.toLowerCase();
+            
+            if (data.log_content.length > 0) {
+                logContent.innerHTML = data.log_content.map(line => {
+                    let displayLine = escapeHtml(line);
+                    
+                    // Highlight search term if present
+                    if (search) {
+                        const regex = new RegExp(`(${search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                        displayLine = displayLine.replace(regex, '<mark class="search-highlight">$1</mark>');
+                    }
+                    
+                    return `<div class="log-line px-1 hover:bg-gray-800 transition-colors ${getLogLevelClass(line)}">${displayLine}</div>`;
+                }).join('');
+                
+                // Show container if it was hidden
+                const container = document.getElementById('logContainer');
+                if (container) {
+                    container.style.display = 'block';
+                }
+            } else {
+                logContent.innerHTML = `<div class="p-6 text-center text-gray-500">
+                    ${search ? `No log entries match your search: "${escapeHtml(search)}"` : 
+                      level ? `No ${level} level entries found` : 'Log file is empty'}
+                </div>`;
+            }
+            
+            // Update line count
+            document.getElementById('lineCount').textContent = data.line_count;
+            
+            // Update stats
+            updateLogStats(data.log_stats);
+            
+            // Update file info
+            updateFileInfo(data.log_file_info, logType);
+            
+            // Update chart
+            updateLogChart(data.log_stats);
+            
+            // Scroll to bottom if auto-scroll is enabled
+            scrollToBottom();
+            
+            // Apply highlight preference
+            const highlightEnabled = document.getElementById('highlightLevels')?.checked ?? true;
+            toggleHighlight(highlightEnabled);
+            
+            showToast('Logs refreshed');
+        } else {
+            showToast('Failed to fetch logs', 'error');
+        }
+    } catch (error) {
+        console.error('Error fetching logs:', error);
+        showToast('Error fetching logs', 'error');
+    } finally {
+        isLoading = false;
+        icon.style.animation = '';
+    }
+}
+
+// Update log statistics display
+function updateLogStats(stats) {
+    const statElements = {
+        debug: document.querySelector('[data-stat="debug"]'),
+        info: document.querySelector('[data-stat="info"]'),
+        warning: document.querySelector('[data-stat="warning"]'),
+        error: document.querySelector('[data-stat="error"]'),
+        critical: document.querySelector('[data-stat="critical"]')
+    };
+    
+    for (const [level, el] of Object.entries(statElements)) {
+        if (el) {
+            el.textContent = stats[level] || 0;
+        }
+    }
+}
+
+// Update file info display
+function updateFileInfo(fileInfo, currentType) {
+    for (const [name, info] of Object.entries(fileInfo)) {
+        const card = document.querySelector(`[data-log-file="${name}"]`);
+        if (card) {
+            const sizeEl = card.querySelector('.file-size');
+            if (sizeEl && info.exists) {
+                sizeEl.textContent = `${info.size_mb} MB`;
+            }
+            
+            // Update active state
+            if (name === currentType) {
+                card.classList.add('ring-2', 'ring-blue-500');
+            } else {
+                card.classList.remove('ring-2', 'ring-blue-500');
+            }
+        }
+    }
+}
+
+// Update chart with new data
+function updateLogChart(stats) {
+    if (logChart) {
+        logChart.data.datasets[0].data = [
+            stats.debug || 0,
+            stats.info || 0,
+            stats.warning || 0,
+            stats.error || 0,
+            stats.critical || 0
+        ];
+        logChart.update('none');
+    }
+}
+
+// Copy log content
+function copyLog() {
+    const logLines = document.querySelectorAll('.log-line');
+    const text = Array.from(logLines).map(el => el.textContent).join('\n');
+    
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('Log content copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        showToast('Failed to copy log content', 'error');
+    });
+}
+
+// Download log
+function downloadLog() {
+    const logLines = document.querySelectorAll('.log-line');
+    const text = Array.from(logLines).map(el => el.textContent).join('\n');
+    const logType = document.getElementById('log_type').value;
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+    
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${logType}-log-${timestamp}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('Log file downloaded!');
+}
+
+// Toggle auto-scroll
+function toggleAutoScroll() {
+    autoScrollEnabled = !autoScrollEnabled;
+    const btn = document.getElementById('autoScrollBtn');
+    btn.textContent = `📍 Auto-scroll: ${autoScrollEnabled ? 'ON' : 'OFF'}`;
+    btn.classList.toggle('bg-purple-600', autoScrollEnabled);
+    btn.classList.toggle('bg-gray-600', !autoScrollEnabled);
+}
+
+// Scroll to bottom
+function scrollToBottom() {
+    if (autoScrollEnabled) {
+        const container = document.getElementById('logContainer');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+}
+
+// Filter by level (uses AJAX now)
+function filterLevel(level) {
+    document.getElementById('level').value = level;
+    
+    // Update quick filter button styles
+    document.querySelectorAll('[onclick^="filterLevel"]').forEach(btn => {
+        btn.classList.remove('bg-gray-600', 'bg-orange-600', 'bg-yellow-600', 'bg-red-600', 'text-white');
+    });
+    
+    refreshLog();
+    
+    // Update URL without reload
+    const url = new URL(window.location);
+    if (level) {
+        url.searchParams.set('level', level);
+    } else {
+        url.searchParams.delete('level');
+    }
+    window.history.replaceState({}, '', url);
+}
+
+// Toggle highlight
+document.getElementById('highlightLevels')?.addEventListener('change', function() {
+    localStorage.setItem('logHighlight', this.checked);
+    toggleHighlight(this.checked);
+});
+
+function toggleHighlight(enabled) {
+    const container = document.getElementById('logContent');
+    if (container) {
+        container.classList.toggle('no-highlight', !enabled);
+    }
+}
+
+// Highlight search terms
+function highlightSearchTerms() {
+    const search = '{{ search|escapejs }}';
+    if (!search) return;
+    
+    const logLines = document.querySelectorAll('.log-line');
+    const regex = new RegExp(`(${search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    
+    logLines.forEach(line => {
+        line.innerHTML = line.textContent.replace(regex, '<mark class="search-highlight">$1</mark>');
+    });
+}
+
+// Initialize log level chart
+function initLogChart() {
+    const canvas = document.getElementById('logLevelChart');
+    if (!canvas) return;
+    
+    const stats = {
+        debug: {{ log_stats.debug|default:0 }},
+        info: {{ log_stats.info|default:0 }},
+        warning: {{ log_stats.warning|default:0 }},
+        error: {{ log_stats.error|default:0 }},
+        critical: {{ log_stats.critical|default:0 }}
+    };
+    
+    logChart = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+            datasets: [{
+                data: [stats.debug, stats.info, stats.warning, stats.error, stats.critical],
+                backgroundColor: ['#3b82f6', '#22c55e', '#eab308', '#f97316', '#ef4444'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#374151',
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Toast notification
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-white text-sm z-50 transition-opacity duration-300 ${
+        type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    // Don't trigger if typing in input
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+        if (e.key === 'Escape') {
+            e.target.blur();
+        }
+        return;
+    }
+    
+    switch(e.key.toLowerCase()) {
+        case 'r':
+            e.preventDefault();
+            refreshLog();
+            break;
+        case 'g':
+            e.preventDefault();
+            const container = document.getElementById('logContainer');
+            if (container) {
+                if (e.shiftKey) {
+                    container.scrollTop = container.scrollHeight;
+                } else {
+                    container.scrollTop = 0;
+                }
+            }
+            break;
+        case '/':
+            e.preventDefault();
+            document.getElementById('search').focus();
+            break;
+        case 's':
+            e.preventDefault();
+            toggleAutoScroll();
+            break;
+        case 'd':
+            e.preventDefault();
+            downloadLog();
+            break;
+        case 'c':
+            e.preventDefault();
+            copyLog();
+            break;
+        case 'escape':
+            const search = document.getElementById('search');
+            if (search.value) {
+                search.value = '';
+                refreshLog();
+            }
+            break;
+    }
+});
+
+// Add CSS animation for spinner
+const style = document.createElement('style');
+style.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
+document.head.appendChild(style);
 </script>
 {% endblock %}
