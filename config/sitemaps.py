@@ -8,23 +8,26 @@ from places.models import HalalPlace
 class StaticViewSitemap(Sitemap):
     """Sitemap for static pages"""
     priority = 0.8
-    changefreq = 'daily'
+    changefreq = 'weekly'
     protocol = 'https'
 
     def items(self):
         return [
-            'places:home',
-            'places:explore', 
-            'places:about',
-            'places:donate',
-            'places:submit_place',
-            'places:legal',
-            'blog:home',
-            'prayer_times:prayer_times',
+            ('places:home', 1.0),
+            ('places:explore', 0.9),
+            ('places:about', 0.6),
+            ('places:donate', 0.5),
+            ('places:submit_place', 0.6),
+            ('places:legal', 0.3),
+            ('blog:home', 0.7),
+            ('prayer_times:prayer_times', 0.8),
         ]
 
     def location(self, item):
-        return reverse(item)
+        return reverse(item[0])
+
+    def priority(self, item):
+        return item[1]
 
     def lastmod(self, item):
         # Return None for static pages as they don't have lastmod
@@ -34,11 +37,12 @@ class StaticViewSitemap(Sitemap):
 class PlaceSitemap(Sitemap):
     """Sitemap for halal places"""
     changefreq = 'weekly'
-    priority = 0.9
+    priority = 0.8
     protocol = 'https'
+    limit = 1000  # Split sitemap into chunks for large sites
 
     def items(self):
-        return HalalPlace.objects.filter(status='approved').order_by('-updated_at')
+        return HalalPlace.objects.filter(status='approved').select_related().order_by('-updated_at')
 
     def lastmod(self, obj):
         return obj.updated_at

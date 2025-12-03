@@ -52,12 +52,12 @@
 {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "{{ post.title }}",
-    "description": "{{ post.meta_description|default:post.excerpt }}",
+    "headline": "{{ post.title|escapejs }}",
+    "description": "{{ post.meta_description|default:post.excerpt|escapejs }}",
     "image": {% if post.featured_image %}"{{ request.scheme }}://{{ request.get_host }}{{ post.featured_image.url }}"{% else %}"{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}"{% endif %},
     "author": {
         "@type": "Person",
-        "name": "{{ post.author.get_full_name|default:post.author.username }}"
+        "name": "{{ post.author.get_full_name|default:post.author.username|escapejs }}"
     },
     "publisher": {
         "@type": "Organization",
@@ -76,10 +76,9 @@
         "@id": "{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}"
     },
     "url": "{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}",
-    "keywords": "{{ post.category.name }}{% for tag in post.tags.all %}, {{ tag.name }}{% endfor %}",
-    "articleSection": "{{ post.category.name }}",
-    "inLanguage": "{{ post.language }}",
-    "wordCount": {{ post.content|length|floatformat:0 }}
+    "keywords": "{{ post.category.name|escapejs }}{% for tag in post.tags.all %}, {{ tag.name|escapejs }}{% endfor %}",
+    "articleSection": "{{ post.category.name|escapejs }}",
+    "inLanguage": "{{ post.language }}"
 }
 </script>
 {% endblock structured_data %}

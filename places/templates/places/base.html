@@ -74,7 +74,8 @@
     
     <!-- Favicon and app icons -->
     <link rel="icon" type="image/svg+xml" href="{% static STATIC_INFO.logo_square %}">
-    <link rel="apple-touch-icon" href="{% static STATIC_INFO.logo_square %}">
+    <link rel="icon" type="image/png" href="{% static STATIC_INFO.default_og_image %}">
+    <link rel="apple-touch-icon" href="{% static STATIC_INFO.default_og_image %}">
     
     <!-- Preload key static assets -->
     <link rel="preload" href="{% static STATIC_INFO.logo_marker %}" as="image" type="image/svg+xml">
@@ -88,41 +89,47 @@
             "name": "{{ STATIC_INFO.site_name }}",
             "alternateName": "Halal Korea",
             "url": "{{ request.scheme }}://{{ request.get_host }}",
-            "description": "{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}",
+            "description": "Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.",
             "potentialAction": {
                 "@type": "SearchAction",
                 "target": {
                     "@type": "EntryPoint",
-                    "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}?search={search_term_string}"
+                    "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}?q={search_term_string}"
                 },
                 "query-input": "required name=search_term_string"
             },
             "publisher": {
-                "@type": "Organization",
-                "name": "{{ STATIC_INFO.site_name }}",
-                "url": "{{ request.scheme }}://{{ request.get_host }}",
-                "logo": {
-                    "@type": "ImageObject",
-                    "url": "{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}",
-                    "width": {{ STATIC_INFO.default_og_image_width }},
-                    "height": {{ STATIC_INFO.default_og_image_height }}
-                },
-                "contactPoint": {
-                    "@type": "ContactPoint",
-                    "email": "{{ STATIC_INFO.email }}",
-                    "contactType": "customer support"
-                },
-                "sameAs": [
-                    {% if STATIC_INFO.twitter %}"{{ STATIC_INFO.twitter }}"{% if STATIC_INFO.instagram or STATIC_INFO.facebook %},{% endif %}{% endif %}
-                    {% if STATIC_INFO.instagram %}"{{ STATIC_INFO.instagram }}"{% if STATIC_INFO.facebook %},{% endif %}{% endif %}
-                    {% if STATIC_INFO.facebook %}"{{ STATIC_INFO.facebook }}"{% endif %}
-                ]
+                "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization"
             },
-            "inLanguage": ["en-US", "ko-KR", "uz-UZ"],
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
-            }
+            "inLanguage": ["en-US", "ko-KR", "uz-UZ"]
+        }
+    </script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization",
+            "name": "{{ STATIC_INFO.site_name }}",
+            "url": "{{ request.scheme }}://{{ request.get_host }}",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}",
+                "width": {{ STATIC_INFO.default_og_image_width }},
+                "height": {{ STATIC_INFO.default_og_image_height }},
+                "caption": "{{ STATIC_INFO.site_name }}"
+            },
+            "image": "{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image }}",
+            "email": "{{ STATIC_INFO.email }}",
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "email": "{{ STATIC_INFO.email }}",
+                "contactType": "customer support"
+            },
+            "sameAs": [
+                {% if STATIC_INFO.twitter %}"{{ STATIC_INFO.twitter }}"{% if STATIC_INFO.instagram or STATIC_INFO.facebook %},{% endif %}{% endif %}
+                {% if STATIC_INFO.instagram %}"{{ STATIC_INFO.instagram }}"{% if STATIC_INFO.facebook %},{% endif %}{% endif %}
+                {% if STATIC_INFO.facebook %}"{{ STATIC_INFO.facebook }}"{% endif %}
+            ]
         }
     </script>
     {% endblock structured_data %}

@@ -5,7 +5,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+Sitemap: https://halal-korea.com/sitemap.xml
 
 # Disallow admin and private areas
 Disallow: /admin/
@@ -17,10 +17,12 @@ Disallow: /users/password-reset/
 Disallow: /users/login/
 Disallow: /users/register/
 Disallow: /accounts/
+Disallow: /i18n/
 
 # Allow important assets
 Allow: /static/
 Allow: /media/
+Allow: /static/images/
 
 # Rate limiting pages
 Disallow: /contact/rate-limited/
@@ -29,12 +31,16 @@ Disallow: /feedback/rate-limited/
 # Crawl delay - be respectful to the server
 Crawl-delay: 1
 
-# Google specific
+# Google specific - no crawl delay for faster indexing
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 0
 
 # Bing specific  
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 1
+
+# Google Images
+User-agent: Googlebot-Image
+Allow: /media/
+Allow: /static/images/

@@ -17,8 +17,8 @@
 {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "{{ category.name }}",
-    "description": "{% blocktranslate with category_name=category.name %}Explore articles in {{ category_name }} category.{% endblocktranslate %}",
+    "name": "{{ category.name|escapejs }}",
+    "description": "Explore articles in {{ category.name|escapejs }} category.",
     "url": "{{ request.scheme }}://{{ request.get_host }}{{ category.get_absolute_url }}",
     "isPartOf": {
         "@type": "Blog",
@@ -31,19 +31,19 @@
             {
                 "@type": "ListItem",
                 "position": 1,
-                "name": "{% translate 'Home' %}",
+                "name": "Home",
                 "item": "{{ request.scheme }}://{{ request.get_host }}"
             },
             {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "{% translate 'Blog' %}",
+                "name": "Blog",
                 "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'blog:home' %}"
             },
             {
                 "@type": "ListItem",
                 "position": 3,
-                "name": "{{ category.name }}",
+                "name": "{{ category.name|escapejs }}",
                 "item": "{{ request.scheme }}://{{ request.get_host }}{{ category.get_absolute_url }}"
             }
         ]

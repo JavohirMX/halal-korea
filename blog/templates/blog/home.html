@@ -20,8 +20,8 @@
 {
     "@context": "https://schema.org",
     "@type": "Blog",
-    "name": "{{ page_title }}",
-    "description": "{{ meta_description|default:'Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea.' }}",
+    "name": "{{ page_title|escapejs }}",
+    "description": "{{ meta_description|default:'Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea.'|escapejs }}",
     "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'blog:home' %}",
     "publisher": {
         "@type": "Organization",

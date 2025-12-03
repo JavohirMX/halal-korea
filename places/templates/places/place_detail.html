@@ -6,18 +6,18 @@
 
 {% block title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
 
-{% block meta_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_place_type_display|lower }} in {{ place.location }}, South Korea.{% endif %}{% endblock %}
-{% block meta_keywords %}{{ place.name }}, halal {{ place.get_place_type_display|lower }}, {{ place.location }}, {{ place.city }}, South Korea, {{ STATIC_INFO.meta_keywords }}{% endblock %}
+{% block meta_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_category_display|lower }} in {{ place.address }}, South Korea.{% endif %}{% endblock %}
+{% block meta_keywords %}{{ place.name }}, halal {{ place.get_category_display|lower }}, {{ place.address }}, South Korea, {{ STATIC_INFO.meta_keywords }}{% endblock %}
 
 {% block og_title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
-{% block og_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_place_type_display|lower }} in {{ place.location }}, South Korea.{% endif %}{% endblock %}
+{% block og_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_category_display|lower }} in {{ place.address }}, South Korea.{% endif %}{% endblock %}
 {% block og_type %}place{% endblock %}
 {% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}{% endblock %}
 {% block og_image %}{% if place.images.first %}{{ request.scheme }}://{{ request.get_host }}{{ place.images.first.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
 {% block og_image_alt %}{% if place.images.first %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
 {% block twitter_title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
-{% block twitter_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_place_type_display|lower }} in {{ place.location }}, South Korea.{% endif %}{% endblock %}
+{% block twitter_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_category_display|lower }} in {{ place.address }}, South Korea.{% endif %}{% endblock %}
 {% block twitter_image %}{% if place.images.first %}{{ request.scheme }}://{{ request.get_host }}{{ place.images.first.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
 {% block twitter_image_alt %}{% if place.images.first %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
@@ -27,42 +27,59 @@
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "{% if place.place_type == 'restaurant' %}Restaurant{% elif place.place_type == 'market' %}Store{% elif place.place_type == 'mosque' %}PlaceOfWorship{% else %}LocalBusiness{% endif %}",
-    "name": "{{ place.name }}",
-    "description": "{% if place.description %}{{ place.description|escape }}{% else %}{{ place.name }} - Find halal {{ place.get_place_type_display|lower }} in {{ place.location }}, South Korea.{% endif %}",
+    "@type": "{% if place.category == 'restaurant' %}Restaurant{% elif place.category == 'market' %}GroceryStore{% elif place.category == 'mosque' %}Mosque{% elif place.category == 'prayer_room' %}PlaceOfWorship{% else %}LocalBusiness{% endif %}",
+    "@id": "{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}#place",
+    "name": "{{ place.name|escapejs }}",
+    "description": "{% if place.description %}{{ place.description|escapejs }}{% else %}{{ place.name|escapejs }} - Halal {{ place.get_category_display|lower }} in {{ place.address|escapejs }}, South Korea.{% endif %}",
     "url": "{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}",
     "image": {% if place.images.first %}"{{ request.scheme }}://{{ request.get_host }}{{ place.images.first.image.url }}"{% else %}"{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}"{% endif %},
     "address": {
         "@type": "PostalAddress",
-        "streetAddress": "{{ place.location }}",
-        "addressLocality": "{{ place.city }}",
+        "streetAddress": "{{ place.address|escapejs }}",
         "addressCountry": "KR"
     },
     "geo": {
         "@type": "GeoCoordinates",
-        "latitude": {{ place.latitude }},
-        "longitude": {{ place.longitude }}
+        "latitude": {{ place.location.y|unlocalize }},
+        "longitude": {{ place.location.x|unlocalize }}
     },
-    {% if place.place_type == 'restaurant' %}
-    "servesCuisine": "Halal",
-    "priceRange": "{% if place.price_range %}{{ place.get_price_range_display }}{% else %}$${% endif %}",
-    {% endif %}
-    {% if place.opening_hours %}
-    "openingHours": "{{ place.opening_hours }}",
-    {% endif %}
-    {% if place.phone %}
-    "telephone": "{{ place.phone }}",
-    {% endif %}
-    {% if place.website %}
-    "sameAs": "{{ place.website }}",
-    {% endif %}
+    "isAccessibleForFree": true{% if place.category == 'restaurant' %},
+    "servesCuisine": ["Halal", "Halal Food"]{% endif %}{% if place.phone_number %},
+    "telephone": "{{ place.phone_number|escapejs }}"{% endif %}{% if place.website %},
+    "sameAs": "{{ place.website }}"{% endif %}{% if reviews.count > 0 %},
     "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": {{ place.average_rating|default:0 }},
-        "reviewCount": {{ place.reviews_count|default:0 }},
+        "ratingValue": {{ place.average_rating }},
+        "reviewCount": {{ reviews.count }},
         "bestRating": 5,
         "worstRating": 1
-    }
+    }{% endif %}
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ request.scheme }}://{{ request.get_host }}"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Explore",
+            "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "{{ place.name|escapejs }}",
+            "item": "{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}"
+        }
+    ]
 }
 </script>
 {% endblock structured_data %}
