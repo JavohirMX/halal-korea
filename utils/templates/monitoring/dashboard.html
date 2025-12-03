@@ -147,14 +147,38 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="stat-card lg:col-span-2">
             <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">Requests vs Errors</h3>
-            <div class="h-64">
-                <canvas id="trafficChart"></canvas>
+            <div class="h-64" id="traffic-chart-container">
+                <!-- Skeleton for line chart -->
+                <div id="traffic-skeleton" class="chart-skeleton">
+                    <div class="skeleton bar" style="height: 40%"></div>
+                    <div class="skeleton bar" style="height: 65%"></div>
+                    <div class="skeleton bar" style="height: 45%"></div>
+                    <div class="skeleton bar" style="height: 80%"></div>
+                    <div class="skeleton bar" style="height: 55%"></div>
+                    <div class="skeleton bar" style="height: 70%"></div>
+                    <div class="skeleton bar" style="height: 90%"></div>
+                    <div class="skeleton bar" style="height: 60%"></div>
+                    <div class="skeleton bar" style="height: 75%"></div>
+                    <div class="skeleton bar" style="height: 50%"></div>
+                    <div class="skeleton bar" style="height: 85%"></div>
+                    <div class="skeleton bar" style="height: 35%"></div>
+                </div>
+                <canvas id="trafficChart" class="hidden"></canvas>
             </div>
         </div>
         <div class="stat-card">
             <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">Error Distribution</h3>
-            <div class="h-64">
-                <canvas id="errorChart"></canvas>
+            <div class="h-64" id="error-chart-container">
+                <!-- Skeleton for doughnut chart -->
+                <div id="error-skeleton" class="flex items-center justify-center h-full">
+                    <div class="relative">
+                        <div class="skeleton w-32 h-32 rounded-full"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-16 h-16 rounded-full bg-white dark:bg-dark-card"></div>
+                        </div>
+                    </div>
+                </div>
+                <canvas id="errorChart" class="hidden"></canvas>
             </div>
         </div>
     </div>
@@ -216,7 +240,7 @@
                 {% for error in recent_errors %}
                 <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">
-                        {{ error.timestamp|date:"H:i:s" }}
+                        {{ error.timestamp|date:"Y-m-d H:i" }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900 dark:text-dark-text font-mono">
                         {{ error.path|truncatechars:50 }}
@@ -365,17 +389,36 @@
             updateErrorChart(data.errors);
         } catch (error) {
             console.error('Error fetching chart data:', error);
+            showChartError();
+        }
+    }
+
+    function showChartError() {
+        const trafficSkeleton = document.getElementById('traffic-skeleton');
+        const errorSkeleton = document.getElementById('error-skeleton');
+        
+        if (trafficSkeleton) {
+            trafficSkeleton.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">Failed to load chart data</div>';
+        }
+        if (errorSkeleton) {
+            errorSkeleton.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">Failed to load chart data</div>';
         }
     }
 
     function updateTrafficChart(data) {
-        const ctx = document.getElementById('trafficChart').getContext('2d');
+        const ctx = document.getElementById('trafficChart');
+        const skeleton = document.getElementById('traffic-skeleton');
+        
+        // Hide skeleton and show canvas
+        if (skeleton) skeleton.classList.add('hidden');
+        ctx.classList.remove('hidden');
+        ctx.classList.add('fade-in');
         
         if (trafficChart) {
             trafficChart.destroy();
         }
 
-        trafficChart = new Chart(ctx, {
+        trafficChart = new Chart(ctx.getContext('2d'), {
             type: 'line',
             data: {
                 labels: data.labels,
@@ -403,13 +446,19 @@
     }
 
     function updateErrorChart(data) {
-        const ctx = document.getElementById('errorChart').getContext('2d');
+        const ctx = document.getElementById('errorChart');
+        const skeleton = document.getElementById('error-skeleton');
+        
+        // Hide skeleton and show canvas
+        if (skeleton) skeleton.classList.add('hidden');
+        ctx.classList.remove('hidden');
+        ctx.classList.add('fade-in');
         
         if (errorChart) {
             errorChart.destroy();
         }
 
-        errorChart = new Chart(ctx, {
+        errorChart = new Chart(ctx.getContext('2d'), {
             type: 'doughnut',
             data: {
                 labels: data.labels,

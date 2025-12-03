@@ -53,14 +53,40 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="stat-card">
             <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">Response Time Trend</h3>
-            <div class="h-64">
-                <canvas id="responseTimeChart"></canvas>
+            <div class="h-64" id="response-time-container">
+                <!-- Skeleton for line chart -->
+                <div id="response-time-skeleton" class="chart-skeleton">
+                    <div class="skeleton bar" style="height: 45%"></div>
+                    <div class="skeleton bar" style="height: 60%"></div>
+                    <div class="skeleton bar" style="height: 40%"></div>
+                    <div class="skeleton bar" style="height: 75%"></div>
+                    <div class="skeleton bar" style="height: 55%"></div>
+                    <div class="skeleton bar" style="height: 85%"></div>
+                    <div class="skeleton bar" style="height: 50%"></div>
+                    <div class="skeleton bar" style="height: 70%"></div>
+                    <div class="skeleton bar" style="height: 65%"></div>
+                    <div class="skeleton bar" style="height: 80%"></div>
+                </div>
+                <canvas id="responseTimeChart" class="hidden"></canvas>
             </div>
         </div>
         <div class="stat-card">
             <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">Error Rate Trend</h3>
-            <div class="h-64">
-                <canvas id="errorRateChart"></canvas>
+            <div class="h-64" id="error-rate-container">
+                <!-- Skeleton for line chart -->
+                <div id="error-rate-skeleton" class="chart-skeleton">
+                    <div class="skeleton bar" style="height: 30%"></div>
+                    <div class="skeleton bar" style="height: 45%"></div>
+                    <div class="skeleton bar" style="height: 25%"></div>
+                    <div class="skeleton bar" style="height: 55%"></div>
+                    <div class="skeleton bar" style="height: 35%"></div>
+                    <div class="skeleton bar" style="height: 40%"></div>
+                    <div class="skeleton bar" style="height: 50%"></div>
+                    <div class="skeleton bar" style="height: 30%"></div>
+                    <div class="skeleton bar" style="height: 60%"></div>
+                    <div class="skeleton bar" style="height: 45%"></div>
+                </div>
+                <canvas id="errorRateChart" class="hidden"></canvas>
             </div>
         </div>
     </div>
@@ -115,6 +141,17 @@
 
 {% block extra_js %}
 <script>
+// Helper function to show chart and hide skeleton
+function showChart(canvasId, skeletonId) {
+    const canvas = document.getElementById(canvasId);
+    const skeleton = document.getElementById(skeletonId);
+    if (skeleton) skeleton.classList.add('hidden');
+    if (canvas) {
+        canvas.classList.remove('hidden');
+        canvas.classList.add('fade-in');
+    }
+}
+
 // Response Time Trend Chart with real data
 const responseTimeData = {
     labels: {{ response_time_trend.labels|safe }},
@@ -124,6 +161,7 @@ const responseTimeData = {
 
 const rtCtx = document.getElementById('responseTimeChart');
 if (rtCtx && responseTimeData.labels.length > 0) {
+    showChart('responseTimeChart', 'response-time-skeleton');
     new Chart(rtCtx, {
         type: 'line',
         data: {
@@ -184,7 +222,8 @@ if (rtCtx && responseTimeData.labels.length > 0) {
         }
     });
 } else if (rtCtx) {
-    rtCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>';
+    const skeleton = document.getElementById('response-time-skeleton');
+    if (skeleton) skeleton.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>';
 }
 
 // Error Rate Trend Chart with real data
@@ -195,6 +234,7 @@ const errorRateData = {
 
 const erCtx = document.getElementById('errorRateChart');
 if (erCtx && errorRateData.labels.length > 0) {
+    showChart('errorRateChart', 'error-rate-skeleton');
     new Chart(erCtx, {
         type: 'line',
         data: {
@@ -245,7 +285,8 @@ if (erCtx && errorRateData.labels.length > 0) {
         }
     });
 } else if (erCtx) {
-    erCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>';
+    const skeleton = document.getElementById('error-rate-skeleton');
+    if (skeleton) skeleton.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">No data available</div>';
 }
 </script>
 {% endblock %}
