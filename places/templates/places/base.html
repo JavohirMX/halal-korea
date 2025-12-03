@@ -120,6 +120,11 @@
             },
             "image": "{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image }}",
             "email": "{{ STATIC_INFO.email }}",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Seoul",
+                "addressCountry": "KR"
+            },
             "contactPoint": {
                 "@type": "ContactPoint",
                 "email": "{{ STATIC_INFO.email }}",
