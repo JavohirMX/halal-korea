@@ -39,6 +39,7 @@ urlpatterns = [
     path('admin/monitoring/api/stats/', admin_views.api_stats, name='monitoring_api_stats'),
     path('admin/monitoring/api/performance/', admin_views.api_performance, name='monitoring_api_performance'),
     path('admin/monitoring/api/charts/', admin_views.api_chart_data, name='monitoring_api_charts'),
+    path('admin/monitoring/api/analytics/', admin_views.api_analytics_data, name='monitoring_api_analytics'),
     
     # --- Admin URLs ---
     path('admin/', admin.site.urls),

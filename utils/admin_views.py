@@ -91,31 +91,14 @@ def content_operations_dashboard(request):
 
 @staff_member_required
 def analytics_dashboard(request):
-    """Product analytics dashboard."""
+    """Product analytics dashboard with lazy loading."""
     days = int(request.GET.get('days', 30))
     
-    # Get Google Analytics data
-    ga_overview = ga_service.get_overview_stats(days)
-    ga_geo = ga_service.get_geographic_data(days)
-    ga_devices = ga_service.get_device_breakdown(days)
-    ga_sources = ga_service.get_traffic_sources(days)
-    ga_trends = ga_service.get_daily_trends(days)
-    ga_top_pages = ga_service.get_top_pages(days)
-    
+    # Only pass minimal context - data loads via AJAX
     context = {
         'title': 'Analytics Dashboard',
         'days': days,
-        'user_engagement': _get_user_engagement(days),
-        'content_usage': _get_content_usage(days),
-        'geographic_distribution': ga_geo,
-        'language_preferences': _get_language_preferences(),
-        # Google Analytics data
-        'ga_stats': ga_overview,
-        'ga_devices': ga_devices,
-        'ga_sources': ga_sources,
-        'ga_trends': ga_trends,
-        'ga_top_pages': ga_top_pages,
-        'ga_available': ga_service.is_available,
+        'ga_configured': bool(ga_service.is_available),
     }
     return render(request, 'monitoring/analytics.html', context)
 
@@ -286,6 +269,33 @@ def api_performance(request):
     }
     
     return JsonResponse(data)
+
+
+@staff_member_required
+def api_analytics_data(request):
+    """API endpoint for analytics data (lazy loading)."""
+    days = int(request.GET.get('days', 30))
+    
+    # Get all GA data (cached)
+    ga_data = ga_service.get_all_analytics_data(days)
+    
+    # Get local analytics (cached)
+    user_engagement = _get_user_engagement(days)
+    content_usage = _get_content_usage(days)
+    language_preferences = _get_language_preferences()
+    
+    return JsonResponse({
+        'ga_available': ga_data.get('is_available', False),
+        'ga_stats': ga_data.get('overview', {}),
+        'ga_devices': ga_data.get('devices', []),
+        'ga_sources': ga_data.get('sources', []),
+        'ga_trends': ga_data.get('trends', {}),
+        'ga_top_pages': ga_data.get('top_pages', []),
+        'geographic_distribution': ga_data.get('geo', {'countries': [], 'cities': []}),
+        'user_engagement': user_engagement,
+        'content_usage': content_usage,
+        'language_preferences': language_preferences,
+    })
 
 
 @staff_member_required
@@ -569,13 +579,18 @@ def _get_quality_metrics():
 
 def _get_user_engagement(days):
     """Get user engagement metrics."""
+    cache_key = f"user_engagement_{days}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    
     start_time = timezone.now() - timezone.timedelta(days=days)
     
     total_users = User.objects.count()
     active_users = User.objects.filter(last_login__gte=start_time).count()
     new_users = User.objects.filter(created_at__gte=start_time).count()
     
-    return {
+    result = {
         'total_users': total_users,
         'active_users': active_users,
         'new_users': new_users,
@@ -584,10 +599,18 @@ def _get_user_engagement(days):
         ).count(),
         'mau': active_users if days >= 30 else None,
     }
+    
+    cache.set(cache_key, result, 300)  # Cache for 5 minutes
+    return result
 
 
 def _get_content_usage(days):
     """Get content usage statistics."""
+    cache_key = f"content_usage_{days}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    
     start_time = timezone.now() - timezone.timedelta(days=days)
     
     most_viewed_places = HalalPlace.objects.filter(
@@ -598,7 +621,7 @@ def _get_content_usage(days):
         review_count=Count('reviews')
     ).order_by('-review_count')[:10]
     
-    return {
+    result = {
         'most_reviewed': list(most_reviewed.values('name', 'review_count')),
         'popular_categories': list(
             HalalPlace.objects.values('category').annotate(
@@ -606,6 +629,9 @@ def _get_content_usage(days):
             ).order_by('-count')
         ),
     }
+    
+    cache.set(cache_key, result, 300)  # Cache for 5 minutes
+    return result
 
 
 def _get_geographic_distribution():
@@ -618,11 +644,19 @@ def _get_geographic_distribution():
 
 def _get_language_preferences():
     """Get language preference distribution."""
-    return list(
+    cache_key = "language_preferences"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+    
+    result = list(
         User.objects.values('preferred_language').annotate(
             count=Count('id')
         ).order_by('-count')
     )
+    
+    cache.set(cache_key, result, 300)  # Cache for 5 minutes
+    return result
 
 
 # ============================================================================

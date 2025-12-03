@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - Halal Korea Monitoring</title>
     
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/logo-square.svg' %}">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -334,6 +335,8 @@
             display: none;  /* Chrome, Safari and Opera */
         }
     </style>
+    {% block extra_head %}{% endblock %}
+    {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50 dark:bg-dark-bg min-h-screen"  data-dark-mode="false">
     <!-- Header -->

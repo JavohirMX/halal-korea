@@ -14,37 +14,20 @@
     </div>
 </div>
 
-<!-- GA Overview -->
-{% if ga_available and ga_stats.is_available %}
-<div class="mb-8">
+{% if ga_configured %}
+<!-- GA Overview Section -->
+<div class="mb-8" id="ga-overview-section">
     <h2 class="section-heading mb-4 flex items-center">
         <span class="mr-2">📊</span> Google Analytics Overview
     </h2>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div class="stat-card">
-            <div class="stat-value text-blue-600">{{ ga_stats.active_users }}</div>
-            <div class="stat-label">Active Users</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-green-600">{{ ga_stats.sessions }}</div>
-            <div class="stat-label">Sessions</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-purple-600">{{ ga_stats.page_views }}</div>
-            <div class="stat-label">Page Views</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-orange-600">{{ ga_stats.bounce_rate|floatformat:1 }}%</div>
-            <div class="stat-label">Bounce Rate</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-teal-600">{{ ga_stats.avg_session_duration|floatformat:0 }}s</div>
-            <div class="stat-label">Avg Session</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-indigo-600">{{ ga_stats.new_users }}</div>
-            <div class="stat-label">New Users</div>
-        </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" id="ga-stats-grid">
+        <!-- Skeleton Cards -->
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-16 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-16 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-16 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-16 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-16 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-16 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
     </div>
 </div>
 
@@ -52,8 +35,23 @@
 <div class="mb-8">
     <h2 class="section-heading mb-4">Traffic Trend (Last {{ days }} Days)</h2>
     <div class="stat-card">
-        <div class="h-64">
-            <canvas id="trafficTrendChart"></canvas>
+        <div class="h-64" id="chart-container">
+            <!-- Skeleton Chart -->
+            <div id="chart-skeleton" class="h-full flex items-end justify-center space-x-2 px-4 pb-4">
+                <div class="skeleton flex-1 rounded-t" style="height: 40%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 65%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 45%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 80%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 55%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 70%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 90%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 60%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 75%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 50%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 85%"></div>
+                <div class="skeleton flex-1 rounded-t" style="height: 35%"></div>
+            </div>
+            <canvas id="trafficTrendChart" class="hidden"></canvas>
         </div>
     </div>
 </div>
@@ -62,55 +60,29 @@
 <div class="mb-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Device Breakdown -->
-        <div class="stat-card">
+        <div class="stat-card" id="devices-section">
             <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">📱 Device Breakdown</h3>
-            {% if ga_devices %}
-            <div class="space-y-3">
-                {% for device in ga_devices %}
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        {% if device.device == 'Mobile' %}
-                        <span class="text-xl mr-2">📱</span>
-                        {% elif device.device == 'Desktop' %}
-                        <span class="text-xl mr-2">💻</span>
-                        {% else %}
-                        <span class="text-xl mr-2">📟</span>
-                        {% endif %}
-                        <span class="text-gray-900 dark:text-dark-text">{{ device.device }}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-gray-600 dark:text-gray-400 mr-2">{{ device.users }} users</span>
-                        <span class="font-semibold text-blue-600">{{ device.percentage }}%</span>
-                    </div>
+            <div id="devices-content">
+                <div class="space-y-4">
+                    <div><div class="flex justify-between mb-2"><div class="skeleton skeleton-text w-24 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div><div class="skeleton w-full h-2 rounded-full"></div></div>
+                    <div><div class="flex justify-between mb-2"><div class="skeleton skeleton-text w-24 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div><div class="skeleton w-full h-2 rounded-full"></div></div>
+                    <div><div class="flex justify-between mb-2"><div class="skeleton skeleton-text w-24 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div><div class="skeleton w-full h-2 rounded-full"></div></div>
                 </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ device.percentage }}%"></div>
-                </div>
-                {% endfor %}
             </div>
-            {% else %}
-            <div class="text-center text-gray-500 dark:text-gray-400 py-8">No device data available</div>
-            {% endif %}
         </div>
 
         <!-- Traffic Sources -->
-        <div class="stat-card">
+        <div class="stat-card" id="sources-section">
             <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-dark-text">🔗 Traffic Sources</h3>
-            {% if ga_sources %}
-            <div class="space-y-3">
-                {% for source in ga_sources %}
-                <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
-                    <span class="text-gray-900 dark:text-dark-text">{{ source.source }}</span>
-                    <div class="text-right">
-                        <span class="font-semibold text-blue-600">{{ source.sessions }}</span>
-                        <span class="text-sm text-gray-500 dark:text-gray-400 ml-1">sessions</span>
-                    </div>
+            <div id="sources-content">
+                <div class="space-y-3">
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700"><div class="skeleton skeleton-text w-32 h-4"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700"><div class="skeleton skeleton-text w-32 h-4"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700"><div class="skeleton skeleton-text w-32 h-4"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+                    <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700"><div class="skeleton skeleton-text w-32 h-4"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+                    <div class="flex justify-between py-2"><div class="skeleton skeleton-text w-32 h-4"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
                 </div>
-                {% endfor %}
             </div>
-            {% else %}
-            <div class="text-center text-gray-500 dark:text-gray-400 py-8">No traffic source data available</div>
-            {% endif %}
         </div>
     </div>
 </div>
@@ -119,42 +91,29 @@
 <div class="mb-8">
     <h2 class="section-heading mb-4">🌍 Geographic Distribution</h2>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- By Country -->
-        <div class="content-container">
+        <div class="content-container" id="countries-section">
             <h3 class="px-4 py-3 font-semibold text-gray-900 dark:text-dark-text bg-gray-50 dark:bg-dark-bg border-b dark:border-gray-700">Top Countries</h3>
-            {% if geographic_distribution.countries %}
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
-                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
-                    {% for country in geographic_distribution.countries %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">{{ country.name }}</td>
-                        <td class="px-4 py-3 text-sm text-right font-semibold text-blue-600">{{ country.users }} users</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="p-6 text-center text-gray-500 dark:text-gray-400">No country data available</div>
-            {% endif %}
+            <div id="countries-content" class="p-4">
+                <div class="space-y-3">
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-28 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-28 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-28 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-28 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-28 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                </div>
+            </div>
         </div>
-
-        <!-- By City -->
-        <div class="content-container">
+        <div class="content-container" id="cities-section">
             <h3 class="px-4 py-3 font-semibold text-gray-900 dark:text-dark-text bg-gray-50 dark:bg-dark-bg border-b dark:border-gray-700">Top Cities</h3>
-            {% if geographic_distribution.cities %}
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
-                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
-                    {% for city in geographic_distribution.cities %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">{{ city.name }}</td>
-                        <td class="px-4 py-3 text-sm text-right font-semibold text-blue-600">{{ city.users }} users</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="p-6 text-center text-gray-500 dark:text-gray-400">No city data available</div>
-            {% endif %}
+            <div id="cities-content" class="p-4">
+                <div class="space-y-3">
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-24 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-24 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-24 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-24 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                    <div class="flex justify-between"><div class="skeleton skeleton-text w-24 h-4"></div><div class="skeleton skeleton-text w-16 h-4"></div></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -162,8 +121,7 @@
 <!-- Top Pages -->
 <div class="mb-8">
     <h2 class="section-heading mb-4">📄 Top Pages</h2>
-    <div class="content-container overflow-x-auto">
-        {% if ga_top_pages %}
+    <div class="content-container overflow-x-auto" id="pages-section">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
             <thead class="bg-gray-50 dark:bg-dark-bg">
                 <tr>
@@ -172,21 +130,28 @@
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase hidden sm:table-cell">Avg Time</th>
                 </tr>
             </thead>
-            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
-                {% for page in ga_top_pages %}
-                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                    <td class="px-4 py-3 text-sm font-mono text-gray-900 dark:text-dark-text max-w-xs truncate">{{ page.path|truncatechars:50 }}</td>
-                    <td class="px-4 py-3 text-sm font-semibold text-blue-600">{{ page.views }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted hidden sm:table-cell">{{ page.avg_time|floatformat:0 }}s</td>
-                </tr>
-                {% endfor %}
+            <tbody id="pages-content" class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
+                <tr><td class="px-4 py-3"><div class="skeleton skeleton-text w-48 h-4"></div></td><td class="px-4 py-3"><div class="skeleton skeleton-text w-12 h-4"></div></td><td class="px-4 py-3 hidden sm:table-cell"><div class="skeleton skeleton-text w-10 h-4"></div></td></tr>
+                <tr><td class="px-4 py-3"><div class="skeleton skeleton-text w-48 h-4"></div></td><td class="px-4 py-3"><div class="skeleton skeleton-text w-12 h-4"></div></td><td class="px-4 py-3 hidden sm:table-cell"><div class="skeleton skeleton-text w-10 h-4"></div></td></tr>
+                <tr><td class="px-4 py-3"><div class="skeleton skeleton-text w-48 h-4"></div></td><td class="px-4 py-3"><div class="skeleton skeleton-text w-12 h-4"></div></td><td class="px-4 py-3 hidden sm:table-cell"><div class="skeleton skeleton-text w-10 h-4"></div></td></tr>
+                <tr><td class="px-4 py-3"><div class="skeleton skeleton-text w-48 h-4"></div></td><td class="px-4 py-3"><div class="skeleton skeleton-text w-12 h-4"></div></td><td class="px-4 py-3 hidden sm:table-cell"><div class="skeleton skeleton-text w-10 h-4"></div></td></tr>
+                <tr><td class="px-4 py-3"><div class="skeleton skeleton-text w-48 h-4"></div></td><td class="px-4 py-3"><div class="skeleton skeleton-text w-12 h-4"></div></td><td class="px-4 py-3 hidden sm:table-cell"><div class="skeleton skeleton-text w-10 h-4"></div></td></tr>
             </tbody>
         </table>
-        {% else %}
-        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No page data available</div>
-        {% endif %}
     </div>
 </div>
+
+<!-- User Engagement -->
+<div class="mb-8">
+    <h2 class="section-heading mb-4">👥 User Engagement</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="engagement-grid">
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-12 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-12 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-12 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+        <div class="stat-card skeleton-card"><div class="skeleton skeleton-text w-12 h-8 mb-2"></div><div class="skeleton skeleton-text w-20 h-4"></div></div>
+    </div>
+</div>
+
 {% else %}
 <!-- GA Not Configured Banner -->
 <div class="mb-8">
@@ -198,203 +163,207 @@
                 <p class="text-sm text-blue-600 dark:text-blue-300 mt-2">
                     To see real-time analytics from Google Analytics 4, configure the following environment variables:
                 </p>
-                <ul class="mt-3 space-y-1 text-sm text-blue-700 dark:text-blue-300">
-                    <li>• <code class="bg-blue-100 dark:bg-blue-800 px-1 rounded">GA_PROPERTY_ID</code> - Your GA4 property ID (e.g., 123456789)</li>
-                    <li>• <code class="bg-blue-100 dark:bg-blue-800 px-1 rounded">GA_CREDENTIALS_FILE</code> - Path to service account JSON file</li>
-                </ul>
-                <a href="https://developers.google.com/analytics/devguides/reporting/data/v1/quickstart-client-libraries" 
-                   target="_blank" class="inline-block mt-3 text-blue-600 dark:text-blue-400 underline">
-                    View Setup Guide →
-                </a>
+                <div class="mt-4 bg-gray-900 dark:bg-gray-950 rounded-md p-4 text-sm font-mono text-green-400 overflow-x-auto">
+                    <div>GA_PROPERTY_ID=your_property_id</div>
+                    <div>GA_CREDENTIALS_FILE=/path/to/credentials.json</div>
+                </div>
+                <p class="text-sm text-blue-600 dark:text-blue-300 mt-4">
+                    See the documentation for detailed setup instructions.
+                </p>
             </div>
         </div>
     </div>
 </div>
 {% endif %}
+{% endblock %}
 
-<!-- Internal User Stats -->
-<div class="mb-8">
-    <h2 class="section-heading mb-4">👥 Registered Users (Last {{ days }} Days)</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="stat-card">
-            <div class="stat-value text-blue-600">{{ user_engagement.total_users|default:0 }}</div>
-            <div class="stat-label">Total Users</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-green-600">{{ user_engagement.active_users|default:0 }}</div>
-            <div class="stat-label">Active Users</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-purple-600">{{ user_engagement.new_users|default:0 }}</div>
-            <div class="stat-label">New Users</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value text-orange-600">{{ user_engagement.dau|default:0 }}</div>
-            <div class="stat-label">Daily Active</div>
-        </div>
-    </div>
-</div>
-
-<!-- Content Stats -->
-<div class="mb-8">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Popular Categories -->
-        <div class="content-container">
-            <h3 class="px-4 py-3 font-semibold text-gray-900 dark:text-dark-text bg-gray-50 dark:bg-dark-bg border-b dark:border-gray-700">📁 Popular Categories</h3>
-            {% if content_usage.popular_categories %}
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
-                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
-                    {% for cat in content_usage.popular_categories %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">{{ cat.category|title }}</td>
-                        <td class="px-4 py-3 text-sm text-right font-semibold text-blue-600">{{ cat.count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
-            {% endif %}
-        </div>
-
-        <!-- Most Reviewed Places -->
-        <div class="content-container">
-            <h3 class="px-4 py-3 font-semibold text-gray-900 dark:text-dark-text bg-gray-50 dark:bg-dark-bg border-b dark:border-gray-700">⭐ Most Reviewed Places</h3>
-            {% if content_usage.most_reviewed %}
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
-                <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
-                    {% for place in content_usage.most_reviewed %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">{{ place.name|truncatechars:30 }}</td>
-                        <td class="px-4 py-3 text-sm text-right font-semibold text-blue-600">{{ place.review_count }} reviews</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<!-- Language Preferences -->
-<div class="mb-8">
-    <h2 class="section-heading mb-4">🌐 Language Preferences</h2>
-    <div class="content-container overflow-x-auto">
-        {% if language_preferences %}
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
-            <thead class="bg-gray-50 dark:bg-dark-bg">
-                <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Language</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Users</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-dark-card divide-y divide-gray-200 dark:divide-dark-border">
-                {% for lang in language_preferences %}
-                <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
-                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text">
-                        {% if lang.preferred_language == 'ko' %}🇰🇷 Korean
-                        {% elif lang.preferred_language == 'en' %}🇺🇸 English
-                        {% elif lang.preferred_language == 'uz' %}🇺🇿 Uzbek
-                        {% else %}{{ lang.preferred_language|upper }}
-                        {% endif %}
-                    </td>
-                    <td class="px-4 py-3 text-sm font-semibold text-blue-600">{{ lang.count }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="p-6 text-center text-gray-500 dark:text-dark-muted">No data available</div>
-        {% endif %}
-    </div>
-</div>
+{% block extra_css %}
+<style>
+    .skeleton {
+        background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+        background-size: 200% 100%;
+        animation: skeleton-loading 1.5s ease-in-out infinite;
+        border-radius: 4px;
+    }
+    .dark .skeleton {
+        background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+        background-size: 200% 100%;
+    }
+    @keyframes skeleton-loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    .skeleton-text { height: 1rem; }
+    .skeleton-card { min-height: 80px; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-{% if ga_available and ga_trends %}
-// Traffic Trend Chart
-const trendData = {
-    labels: {{ ga_trends.labels|safe }},
-    users: {{ ga_trends.users|safe }},
-    sessions: {{ ga_trends.sessions|safe }},
-    pageViews: {{ ga_trends.page_views|safe }}
-};
+const DAYS = {{ days }};
+let trafficChart = null;
 
-const trendCtx = document.getElementById('trafficTrendChart');
-if (trendCtx && trendData.labels.length > 0) {
-    new Chart(trendCtx, {
+async function loadAnalyticsData() {
+    try {
+        const response = await fetch(`/admin/monitoring/api/analytics/?days=${DAYS}`);
+        const data = await response.json();
+        
+        renderGAStats(data.ga_stats, data.ga_available);
+        renderDevices(data.ga_devices);
+        renderSources(data.ga_sources);
+        renderGeo(data.geographic_distribution);
+        renderTopPages(data.ga_top_pages);
+        renderEngagement(data.user_engagement);
+        renderChart(data.ga_trends);
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+        showError();
+    }
+}
+
+function renderGAStats(stats, available) {
+    if (!available || !stats) {
+        document.getElementById('ga-stats-grid').innerHTML = '<div class="col-span-6 text-center text-gray-500 py-8 fade-in">GA data not available</div>';
+        return;
+    }
+    document.getElementById('ga-stats-grid').innerHTML = `
+        <div class="stat-card fade-in"><div class="stat-value text-blue-600">${stats.active_users || 0}</div><div class="stat-label">Active Users</div></div>
+        <div class="stat-card fade-in"><div class="stat-value text-green-600">${stats.sessions || 0}</div><div class="stat-label">Sessions</div></div>
+        <div class="stat-card fade-in"><div class="stat-value text-purple-600">${stats.page_views || 0}</div><div class="stat-label">Page Views</div></div>
+        <div class="stat-card fade-in"><div class="stat-value text-orange-600">${(stats.bounce_rate || 0).toFixed(1)}%</div><div class="stat-label">Bounce Rate</div></div>
+        <div class="stat-card fade-in"><div class="stat-value text-teal-600">${Math.round(stats.avg_session_duration || 0)}s</div><div class="stat-label">Avg Session</div></div>
+        <div class="stat-card fade-in"><div class="stat-value text-indigo-600">${stats.new_users || 0}</div><div class="stat-label">New Users</div></div>
+    `;
+}
+
+function renderDevices(devices) {
+    const container = document.getElementById('devices-content');
+    if (!devices || devices.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 fade-in">No device data</div>';
+        return;
+    }
+    const icons = { 'Mobile': '📱', 'Desktop': '💻', 'Tablet': '📟' };
+    container.innerHTML = `<div class="space-y-3 fade-in">` + devices.map(d => `
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center"><span class="text-xl mr-2">${icons[d.device] || '📟'}</span><span class="text-gray-900 dark:text-dark-text">${d.device}</span></div>
+                <div><span class="text-gray-600 dark:text-gray-400 mr-2">${d.users} users</span><span class="font-semibold text-blue-600">${d.percentage}%</span></div>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2"><div class="bg-blue-600 h-2 rounded-full" style="width: ${d.percentage}%"></div></div>
+        </div>
+    `).join('') + '</div>';
+}
+
+function renderSources(sources) {
+    const container = document.getElementById('sources-content');
+    if (!sources || sources.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-8 fade-in">No source data</div>';
+        return;
+    }
+    container.innerHTML = `<div class="space-y-3 fade-in">` + sources.map(s => `
+        <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+            <span class="text-gray-900 dark:text-dark-text">${s.source}</span>
+            <div class="text-right"><span class="font-semibold text-blue-600">${s.sessions}</span><span class="text-sm text-gray-500 ml-1">sessions</span></div>
+        </div>
+    `).join('') + '</div>';
+}
+
+function renderGeo(geo) {
+    const countries = document.getElementById('countries-content');
+    const cities = document.getElementById('cities-content');
+    
+    if (!geo || !geo.countries || geo.countries.length === 0) {
+        countries.innerHTML = '<div class="text-center text-gray-500 py-4 fade-in">No country data</div>';
+    } else {
+        countries.innerHTML = `<table class="min-w-full fade-in"><tbody class="divide-y divide-gray-200 dark:divide-dark-border">` + geo.countries.map(c => `
+            <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg"><td class="py-2 text-sm text-gray-900 dark:text-dark-text">${c.name}</td><td class="py-2 text-sm text-right font-semibold text-blue-600">${c.users} users</td></tr>
+        `).join('') + '</tbody></table>';
+    }
+    
+    if (!geo || !geo.cities || geo.cities.length === 0) {
+        cities.innerHTML = '<div class="text-center text-gray-500 py-4 fade-in">No city data</div>';
+    } else {
+        cities.innerHTML = `<table class="min-w-full fade-in"><tbody class="divide-y divide-gray-200 dark:divide-dark-border">` + geo.cities.map(c => `
+            <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg"><td class="py-2 text-sm text-gray-900 dark:text-dark-text">${c.name}</td><td class="py-2 text-sm text-right font-semibold text-blue-600">${c.users} users</td></tr>
+        `).join('') + '</tbody></table>';
+    }
+}
+
+function renderTopPages(pages) {
+    const container = document.getElementById('pages-content');
+    if (!pages || pages.length === 0) {
+        container.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-gray-500 fade-in">No page data</td></tr>';
+        return;
+    }
+    container.innerHTML = pages.map(p => `
+        <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg fade-in">
+            <td class="px-4 py-3 text-sm font-mono text-gray-900 dark:text-dark-text max-w-xs truncate">${p.path}</td>
+            <td class="px-4 py-3 text-sm font-semibold text-blue-600">${p.views}</td>
+            <td class="px-4 py-3 text-sm text-gray-500 hidden sm:table-cell">${Math.round(p.avg_time || 0)}s</td>
+        </tr>
+    `).join('');
+}
+
+function renderEngagement(engagement) {
+    const container = document.getElementById('engagement-grid');
+    if (!engagement) {
+        container.innerHTML = '<div class="col-span-4 text-center text-gray-500 py-8 fade-in">No data</div>';
+        return;
+    }
+    container.innerHTML = `
+        <div class="stat-card fade-in"><div class="stat-value text-blue-600">${engagement.total_users || 0}</div><div class="stat-label">Total Users</div></div>
+        <div class="stat-card fade-in"><div class="stat-value text-green-600">${engagement.active_users || 0}</div><div class="stat-label">Active Users</div></div>
+        <div class="stat-card fade-in"><div class="stat-value text-purple-600">${engagement.new_users || 0}</div><div class="stat-label">New Users</div></div>
+        <div class="stat-card fade-in"><div class="stat-value text-orange-600">${engagement.dau || 0}</div><div class="stat-label">Daily Active</div></div>
+    `;
+}
+
+function renderChart(trends) {
+    const skeleton = document.getElementById('chart-skeleton');
+    const canvas = document.getElementById('trafficTrendChart');
+    
+    if (!trends || !trends.labels || trends.labels.length === 0) {
+        skeleton.innerHTML = '<div class="text-gray-500 dark:text-gray-400 h-full flex items-center justify-center">No trend data available</div>';
+        return;
+    }
+    
+    skeleton.classList.add('hidden');
+    canvas.classList.remove('hidden');
+    
+    const isDark = document.documentElement.classList.contains('dark');
+    trafficChart = new Chart(canvas, {
         type: 'line',
         data: {
-            labels: trendData.labels,
+            labels: trends.labels,
             datasets: [
-                {
-                    label: 'Users',
-                    data: trendData.users,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                },
-                {
-                    label: 'Sessions',
-                    data: trendData.sessions,
-                    borderColor: '#16a34a',
-                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
-                    fill: false,
-                    tension: 0.3
-                },
-                {
-                    label: 'Page Views',
-                    data: trendData.pageViews,
-                    borderColor: '#9333ea',
-                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                    fill: false,
-                    tension: 0.3,
-                    borderDash: [5, 5]
-                }
+                { label: 'Users', data: trends.users, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.3 },
+                { label: 'Sessions', data: trends.sessions, borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.1)', fill: false, tension: 0.3 },
+                { label: 'Page Views', data: trends.page_views, borderColor: '#9333ea', backgroundColor: 'rgba(147,51,234,0.1)', fill: false, tension: 0.3, borderDash: [5,5] }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false,
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
-                    }
-                }
-            },
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'top', labels: { color: isDark ? '#9ca3af' : '#4b5563' } } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
-                    },
-                    ticks: {
-                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
-                    }
-                },
-                x: {
-                    grid: {
-                        color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
-                    },
-                    ticks: {
-                        color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563'
-                    }
-                }
+                y: { beginAtZero: true, grid: { color: isDark ? '#374151' : '#e5e7eb' }, ticks: { color: isDark ? '#9ca3af' : '#4b5563' } },
+                x: { grid: { color: isDark ? '#374151' : '#e5e7eb' }, ticks: { color: isDark ? '#9ca3af' : '#4b5563' } }
             }
         }
     });
 }
-{% endif %}
+
+function showError() {
+    document.querySelectorAll('.skeleton').forEach(el => {
+        el.classList.remove('skeleton');
+        el.style.background = 'transparent';
+        el.innerHTML = '<span class="text-red-500 text-xs">Error</span>';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', loadAnalyticsData);
 </script>
 {% endblock %}
-

@@ -401,6 +401,42 @@ class GoogleAnalyticsService:
             'is_available': False,
         }
 
+    def get_all_analytics_data(self, days=30):
+        """
+        Get all analytics data in a single cached call.
+        This is optimized for the analytics dashboard to avoid multiple API calls.
+        """
+        cache_key = f"ga_all_analytics_{days}"
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        
+        if not self.is_available:
+            return {
+                'overview': self._get_fallback_stats(),
+                'geo': {'countries': [], 'cities': []},
+                'devices': [],
+                'sources': [],
+                'trends': {'labels': [], 'users': [], 'sessions': [], 'page_views': []},
+                'top_pages': [],
+                'is_available': False,
+            }
+        
+        # Fetch all data (these are individually cached too)
+        data = {
+            'overview': self.get_overview_stats(days),
+            'geo': self.get_geographic_data(days),
+            'devices': self.get_device_breakdown(days),
+            'sources': self.get_traffic_sources(days),
+            'trends': self.get_daily_trends(days),
+            'top_pages': self.get_top_pages(days),
+            'is_available': True,
+        }
+        
+        # Cache the combined result for 5 minutes
+        cache.set(cache_key, data, self.CACHE_TTL)
+        return data
+
 
 # Singleton instance
 ga_service = GoogleAnalyticsService()
