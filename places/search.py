@@ -2,6 +2,7 @@
 Advanced Search Service for Halal Places
 
 Provides full-text search with:
+- PostgreSQL full-text search using search_vector (GIN indexed)
 - Weighted field ranking (name > description > address)
 - Korean ↔ English transliteration support
 - Synonym expansion
@@ -17,7 +18,7 @@ from dataclasses import dataclass
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from django.contrib.postgres.search import (
-    SearchQuery, SearchRank, SearchVector, TrigramSimilarity
+    SearchQuery, SearchRank, SearchVector, TrigramSimilarity, SearchHeadline
 )
 from django.db.models import Q, F, Value, FloatField
 from django.db.models.functions import Coalesce, Greatest
@@ -318,6 +319,100 @@ def build_search_query_strict(query: str) -> Q:
             q_all = word_q
     
     return q_all
+
+
+def search_places_fulltext(query: str, queryset=None, min_rank: float = 0.0):
+    """
+    Perform full-text search using PostgreSQL's search_vector field.
+    
+    This is much faster than icontains queries because it uses the GIN index.
+    The search_vector is pre-computed and indexed, making searches O(log n).
+    
+    Args:
+        query: Search query string
+        queryset: Base queryset to filter (defaults to approved places)
+        min_rank: Minimum search rank threshold (0-1, default 0.0)
+    
+    Returns:
+        Queryset filtered by full-text search, annotated with search_rank
+    """
+    if queryset is None:
+        queryset = HalalPlace.objects.filter(status='approved')
+    
+    # Expand query with transliterations and synonyms
+    expanded_queries = expand_search_query(query)
+    words = query.lower().split()
+    for term in words:
+        term_synonyms = get_synonyms(term)
+        expanded_queries.extend(term_synonyms)
+    
+    # Build a combined search query using OR
+    combined_search = None
+    for q in set(expanded_queries):
+        search = SearchQuery(q, config='simple', search_type='plain')
+        if combined_search is None:
+            combined_search = search
+        else:
+            combined_search = combined_search | search
+    
+    if combined_search is None:
+        # No valid search terms
+        return queryset.none()
+    
+    # Filter by search_vector and rank results
+    queryset = queryset.filter(
+        search_vector=combined_search
+    ).annotate(
+        search_rank=SearchRank(F('search_vector'), combined_search)
+    )
+    
+    if min_rank > 0:
+        queryset = queryset.filter(search_rank__gte=min_rank)
+    
+    return queryset.order_by('-search_rank')
+
+
+def search_places_hybrid(query: str, queryset=None, use_fulltext_first: bool = True):
+    """
+    Hybrid search that tries full-text search first, falls back to icontains.
+    
+    This provides the best of both worlds:
+    - Fast full-text search when search_vector is populated
+    - Fallback to icontains when full-text returns no results
+    
+    Args:
+        query: Search query string
+        queryset: Base queryset to filter
+        use_fulltext_first: Try full-text search before icontains (default True)
+    
+    Returns:
+        Tuple of (queryset, search_method_used)
+    """
+    if queryset is None:
+        queryset = HalalPlace.objects.filter(status='approved')
+    
+    if use_fulltext_first:
+        # Try full-text search first
+        fts_results = search_places_fulltext(query, queryset)
+        if list(fts_results[:1]):  # Check if any results
+            logger.debug(f"Full-text search returned results for: {query}")
+            return fts_results, 'fulltext'
+    
+    # Fall back to icontains
+    q_filter, expanded_queries, synonyms_used = build_search_query(query)
+    icontains_results = queryset.filter(q_filter)
+    
+    if list(icontains_results[:1]):
+        logger.debug(f"icontains search returned results for: {query}")
+        return icontains_results, 'icontains'
+    
+    # Try fuzzy as last resort
+    fuzzy_results = search_places_fuzzy(query, queryset, threshold=0.3)
+    if list(fuzzy_results[:1]):
+        logger.debug(f"Fuzzy search returned results for: {query}")
+        return fuzzy_results, 'fuzzy'
+    
+    return queryset.none(), 'none'
 
 
 def search_places_fuzzy(query: str, queryset=None, threshold: float = 0.3):

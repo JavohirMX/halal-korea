@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Avg, Q, Value, FloatField, Count, Prefetch
+from django.db.models import Avg, Q, Value, FloatField, Count, Prefetch, IntegerField, DecimalField
 from django.http import Http404
 from django.contrib.auth import get_user_model
 from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
@@ -20,6 +20,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 import json
 import logging
+import hashlib
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
 from utils.telegram_notifications import send_new_place_notification
 from utils.watermark import apply_watermark_to_uploaded_file
 from utils.logging_utils import log_user_action, log_execution, sanitize_sensitive_data
@@ -60,11 +63,21 @@ def home(request):
             )
 
         # Get featured places with different logic for Korea vs international users
+        # Use cached rating fields for better performance, with fallback to annotation
         featured_places = HalalPlace.objects.filter(
             status='approved'
         ).annotate(
-            average_rating=Round(Avg('reviews__rating'), 1),
-            reviews_count=Count('reviews')
+            # Use cached values if available, otherwise calculate from reviews
+            average_rating=Coalesce(
+                'cached_average_rating',
+                Round(Avg('reviews__rating'), 1),
+                output_field=DecimalField(max_digits=3, decimal_places=1)
+            ),
+            reviews_count=Coalesce(
+                'cached_reviews_count',
+                Count('reviews'),
+                output_field=IntegerField()
+            )
         )
 
         # Different sorting logic based on user location
@@ -113,6 +126,28 @@ def home(request):
             'details': str(e)
         })
 
+def _get_explore_cache_key(request, category, search_query, city_filter, sort, page, location_context):
+    """Generate a cache key for explore view based on query parameters and location."""
+    is_in_korea = location_context.get('is_in_korea', False)
+    location = location_context.get('location', {})
+    # Round coordinates to reduce cache fragmentation
+    lat = round(location.get('lat', 0), 2) if location.get('lat') else 0
+    lng = round(location.get('lng', 0), 2) if location.get('lng') else 0
+    
+    cache_parts = [
+        'explore',
+        category or '',
+        search_query or '',
+        city_filter or '',
+        sort or 'distance',
+        str(page),
+        str(is_in_korea),
+        f"{lat},{lng}"
+    ]
+    cache_string = ':'.join(cache_parts)
+    return f"explore_{hashlib.md5(cache_string.encode()).hexdigest()}"
+
+
 @log_execution(level='info', sample=True)  # High-volume endpoint with sampling
 def explore(request):
     from .search import build_search_query, parse_proximity_phrase, log_search_query
@@ -123,6 +158,21 @@ def explore(request):
     city_filter = request.GET.get('city', '')  # New city filter
     sort = request.GET.get('sort', 'distance')  # Default to distance sorting
     page = request.GET.get('page', 1)
+    
+    # Get location context early for cache key
+    location_context = get_user_location_context(request)
+    
+    # Try to get cached response for anonymous users (non-AJAX only)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    cache_key = None
+    if not request.user.is_authenticated and not is_ajax:
+        cache_key = _get_explore_cache_key(
+            request, category, search_query, city_filter, sort, page, location_context
+        )
+        cached_response = cache.get(cache_key)
+        if cached_response:
+            logger.debug("Explore page served from cache", extra={'cache_key': cache_key})
+            return cached_response
     
     # Log explore action with filters
     log_user_action(
@@ -140,8 +190,7 @@ def explore(request):
         }
     )
     
-    # Get user location context
-    location_context = get_user_location_context(request)
+    # Location context already fetched for cache key; use existing data
     location = location_context['location']
     is_in_korea = location_context['is_in_korea']
     user_location = None
@@ -178,6 +227,7 @@ def explore(request):
         places = places.filter(address__icontains=city_filter)
     
     # Enhanced search with transliteration and synonyms
+    # Use slice-based checks instead of .exists() to reduce database queries
     used_fuzzy_search = False
     if cleaned_query:
         words = cleaned_query.split()
@@ -188,7 +238,9 @@ def explore(request):
             strict_filter = build_search_query_strict(cleaned_query)
             strict_places = places.filter(strict_filter)
             
-            if strict_places.exists():
+            # Use slice check instead of .exists() - single query that also gives results
+            strict_sample = list(strict_places[:1])
+            if strict_sample:
                 # Strict match found - all words present
                 places = strict_places
             else:
@@ -196,14 +248,16 @@ def explore(request):
                 q_filter, expanded_queries, synonyms_used = build_search_query(cleaned_query)
                 filtered_places = places.filter(q_filter)
                 
-                if filtered_places.exists():
+                filtered_sample = list(filtered_places[:1])
+                if filtered_sample:
                     places = filtered_places
                 else:
                     # Still no results - try fuzzy matching
                     from .search import search_places_fuzzy
                     try:
                         fuzzy_places = search_places_fuzzy(cleaned_query, places, threshold=0.25)
-                        if fuzzy_places.exists():
+                        fuzzy_sample = list(fuzzy_places[:1])
+                        if fuzzy_sample:
                             places = fuzzy_places
                             used_fuzzy_search = True
                         else:
@@ -215,11 +269,13 @@ def explore(request):
             q_filter, expanded_queries, synonyms_used = build_search_query(cleaned_query)
             filtered_places = places.filter(q_filter)
             
-            if not filtered_places.exists():
+            filtered_sample = list(filtered_places[:1])
+            if not filtered_sample:
                 from .search import search_places_fuzzy
                 try:
                     fuzzy_places = search_places_fuzzy(cleaned_query, places, threshold=0.3)
-                    if fuzzy_places.exists():
+                    fuzzy_sample = list(fuzzy_places[:1])
+                    if fuzzy_sample:
                         places = fuzzy_places
                         used_fuzzy_search = True
                     else:
@@ -230,19 +286,23 @@ def explore(request):
                 places = filtered_places
         
         # Log search for analytics (only for first page)
+        # Use paginator.count after pagination to avoid extra count() query
         if page == 1 or page == '1':
-            log_search_query(
-                query=search_query,
-                results_count=places.count(),
-                user=request.user if request.user.is_authenticated else None,
-                session_key=request.session.session_key,
-                category_filter=category,
-            )
+            # Defer count until after pagination is set up
+            pass  # Will log after pagination
     
-    # Annotate with average rating and reviews count to avoid N+1 queries
+    # Use cached rating fields for better performance, with fallback to annotation
     places = places.annotate(
-        average_rating=Round(Avg('reviews__rating'), 1),
-        reviews_count=Count('reviews')
+        average_rating=Coalesce(
+            'cached_average_rating',
+            Round(Avg('reviews__rating'), 1),
+            output_field=DecimalField(max_digits=3, decimal_places=1)
+        ),
+        reviews_count=Coalesce(
+            'cached_reviews_count',
+            Count('reviews'),
+            output_field=IntegerField()
+        )
     )
     
     # Enhanced sorting logic for international users
@@ -280,8 +340,18 @@ def explore(request):
         # If page is out of range, deliver last page of results
         paginated_places = paginator.page(paginator.num_pages)
     
+    # Log search analytics after pagination (use paginator.count to avoid extra query)
+    if cleaned_query and (page == 1 or page == '1'):
+        log_search_query(
+            query=search_query,
+            results_count=paginator.count,  # Use paginator's cached count
+            user=request.user if request.user.is_authenticated else None,
+            session_key=request.session.session_key,
+            category_filter=category,
+        )
+    
     # Check if this is an AJAX request
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    if is_ajax:
         places_html = render_to_string('places/partials/place_list.html', {
             'places': paginated_places,
             'user_location': user_location,
@@ -291,7 +361,7 @@ def explore(request):
         logger.info(
             "AJAX explore request completed",
             extra={
-                'results_count': paginated_places.paginator.count,
+                'results_count': paginator.count,
                 'page_number': paginated_places.number,
                 'has_next': paginated_places.has_next(),
                 'filters_applied': bool(category or search_query or city_filter)
@@ -317,8 +387,8 @@ def explore(request):
             'filters_applied': bool(category or search_query or city_filter)
         }
     )
-        
-    return render(request, 'places/explore.html', {
+    
+    response = render(request, 'places/explore.html', {
         'places': paginated_places,
         'current_filters': {
             'category': category,
@@ -330,6 +400,12 @@ def explore(request):
         'user_location': user_location,
         'location_context': location_context,
     })
+    
+    # Cache response for anonymous users (5 minutes)
+    if cache_key and not request.user.is_authenticated:
+        cache.set(cache_key, response, 300)
+    
+    return response
 
 @log_execution(level='info', sample=True)  # High-volume API endpoint with sampling
 def get_places_json(request):
@@ -387,6 +463,7 @@ def get_places_json(request):
             places = places.filter(category=category)
     
     # Enhanced search with transliteration and synonyms
+    # Use slice-based checks instead of .exists() to reduce database queries
     if cleaned_query:
         words = cleaned_query.split()
         
@@ -396,21 +473,24 @@ def get_places_json(request):
             strict_filter = build_search_query_strict(cleaned_query)
             strict_places = places.filter(strict_filter)
             
-            if strict_places.exists():
+            strict_sample = list(strict_places[:1])
+            if strict_sample:
                 places = strict_places
             else:
                 # Fall back to OR matching
                 q_filter, expanded_queries, synonyms_used = build_search_query(cleaned_query)
                 filtered_places = places.filter(q_filter)
                 
-                if filtered_places.exists():
+                filtered_sample = list(filtered_places[:1])
+                if filtered_sample:
                     places = filtered_places
                 else:
                     # Try fuzzy matching
                     from .search import search_places_fuzzy
                     try:
                         fuzzy_places = search_places_fuzzy(cleaned_query, places, threshold=0.25)
-                        if fuzzy_places.exists():
+                        fuzzy_sample = list(fuzzy_places[:1])
+                        if fuzzy_sample:
                             places = fuzzy_places
                         else:
                             places = filtered_places
@@ -421,11 +501,13 @@ def get_places_json(request):
             q_filter, expanded_queries, synonyms_used = build_search_query(cleaned_query)
             filtered_places = places.filter(q_filter)
             
-            if not filtered_places.exists():
+            filtered_sample = list(filtered_places[:1])
+            if not filtered_sample:
                 from .search import search_places_fuzzy
                 try:
                     fuzzy_places = search_places_fuzzy(cleaned_query, places, threshold=0.3)
-                    if fuzzy_places.exists():
+                    fuzzy_sample = list(fuzzy_places[:1])
+                    if fuzzy_sample:
                         places = fuzzy_places
                     else:
                         places = filtered_places
@@ -434,9 +516,13 @@ def get_places_json(request):
             else:
                 places = filtered_places
     
-    # Annotate with average rating
+    # Use cached rating fields for better performance
     places = places.annotate(
-        average_rating=Round(Avg('reviews__rating'), 1)
+        average_rating=Coalesce(
+            'cached_average_rating',
+            Round(Avg('reviews__rating'), 1),
+            output_field=DecimalField(max_digits=3, decimal_places=1)
+        )
     )
     
     # Location-based sorting

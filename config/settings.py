@@ -171,29 +171,46 @@ DATABASES = {
 
 # Cache Configuration
 # https://docs.djangoproject.com/en/5.1/topics/cache/
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-        'TIMEOUT': 3600,  # 1 hour default timeout
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000,
-            'CULL_FREQUENCY': 3,
+# Use Redis in production for persistent caching across restarts
+REDIS_URL = config('REDIS_URL', default='')
+
+if REDIS_URL and not DEBUG:
+    # Production: Use Redis for better performance and persistence
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+            'TIMEOUT': 3600,  # 1 hour default timeout
+            'KEY_PREFIX': 'halal_korea',
+            'OPTIONS': {
+                'socket_connect_timeout': 5,
+                'socket_timeout': 5,
+                'retry_on_timeout': True,
+            }
         }
     }
-}
+else:
+    # Development: Use local memory cache
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+            'TIMEOUT': 3600,  # 1 hour default timeout
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000,
+                'CULL_FREQUENCY': 3,
+            }
+        }
+    }
 
-# For production, consider using Redis:
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': config('REDIS_URL', default='redis://127.0.0.1:6379/1'),
-#         'TIMEOUT': 3600,
-#         'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#         }
-#     }
-# }
+# Cache timeouts for different types of data
+CACHE_TIMEOUTS = {
+    'explore_page': 300,      # 5 minutes for explore listings
+    'place_detail': 600,      # 10 minutes for individual places
+    'home_featured': 300,     # 5 minutes for home page featured places
+    'search_results': 180,    # 3 minutes for search results
+    'proximity_locations': 3600,  # 1 hour for location data
+}
 
 # Rate Limiting Configuration
 # These settings define the rate limits for various actions
