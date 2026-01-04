@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Avg, Q, Value, FloatField, Count
+from django.db.models import Avg, Q, Value, FloatField, Count, Prefetch
+from django.http import Http404
 from django.contrib.auth import get_user_model
 from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 from reviews.models import Review
@@ -690,15 +691,32 @@ def clear_recent_searches(request):
 
 @log_execution(level='info', sample=True)  # High-volume endpoint with sampling
 def place_detail(request, pk):
-    place = get_object_or_404(HalalPlace, pk=pk, status='approved')
-    reviews = place.reviews.all().select_related('user').order_by('-created_at')
+    # Single optimized query with all annotations and prefetches
+    place = HalalPlace.objects.filter(
+        pk=pk,
+        status='approved'
+    ).annotate(
+        average_rating=Round(Avg('reviews__rating'), 1),
+        reviews_count=Count('reviews')
+    ).prefetch_related(
+        Prefetch(
+            'reviews',
+            queryset=Review.objects.select_related('user').order_by('-created_at')
+        )
+    ).first()
     
-    # Check if user has already reviewed
+    if not place:
+        raise Http404("Place not found")
+    
+    # Check if user has reviewed (use prefetched reviews, no extra query)
     user_has_reviewed = False
     if request.user.is_authenticated:
-        user_has_reviewed = reviews.filter(user=request.user).exists()
+        user_has_reviewed = any(review.user_id == request.user.id for review in place.reviews.all())
     
-    # Log place view with context
+    # Use reviews_count from annotation instead of .count()
+    reviews_count = place.reviews_count
+    
+    # Log with pre-computed values (no extra queries)
     log_user_action(
         logger,
         'place_detail_viewed',
@@ -709,22 +727,23 @@ def place_detail(request, pk):
             'place_name': place.name,
             'place_category': place.category,
             'user_has_reviewed': user_has_reviewed,
-            'reviews_count': reviews.count()
+            'reviews_count': reviews_count
         }
     )
-        
-    # Annotate with average rating
-    place = HalalPlace.objects.annotate(
-        average_rating=Round(Avg('reviews__rating'), 1)
-    ).get(pk=place.pk)
     
     # Get user location context for proper map link styling
     location_context = get_user_location_context(request)
     
+    # Check if place is favorited (optimized single query)
+    is_favorited = False
+    if request.user.is_authenticated:
+        is_favorited = request.user.favorite_places.filter(pk=place.pk).exists()
+    
     return render(request, 'places/place_detail.html', {
         'place': place,
-        'reviews': reviews,
+        'reviews': place.reviews.all(),  # Already prefetched
         'user_has_reviewed': user_has_reviewed,
+        'is_favorited': is_favorited,  # Pass as context variable
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
         'location_context': location_context,
     })

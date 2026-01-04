@@ -52,6 +52,7 @@ class HalalPlace(models.Model):
     class Meta:
         indexes = [
             GinIndex(fields=['search_vector'], name='places_search_vector_idx'),
+            models.Index(fields=['status', 'created_at'], name='place_status_created_idx'),
         ]
 
     def __str__(self):

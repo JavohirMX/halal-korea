@@ -13,13 +13,13 @@
 {% block og_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_category_display|lower }} in {{ place.address }}, South Korea.{% endif %}{% endblock %}
 {% block og_type %}place{% endblock %}
 {% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}{% endblock %}
-{% block og_image %}{% if place.images.first %}{{ request.scheme }}://{{ request.get_host }}{{ place.images.first.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
-{% block og_image_alt %}{% if place.images.first %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
+{% block og_image %}{% if place.photo_urls.0 %}{{ request.scheme }}://{{ request.get_host }}{{ place.photo_urls.0 }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
+{% block og_image_alt %}{% if place.photo_urls.0 %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
 {% block twitter_title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
 {% block twitter_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_category_display|lower }} in {{ place.address }}, South Korea.{% endif %}{% endblock %}
-{% block twitter_image %}{% if place.images.first %}{{ request.scheme }}://{{ request.get_host }}{{ place.images.first.image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
-{% block twitter_image_alt %}{% if place.images.first %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
+{% block twitter_image %}{% if place.photo_urls.0 %}{{ request.scheme }}://{{ request.get_host }}{{ place.photo_urls.0 }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
+{% block twitter_image_alt %}{% if place.photo_urls.0 %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
 {% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}{% endblock %}
 
@@ -32,7 +32,7 @@
     "name": "{{ place.name|escapejs }}",
     "description": "{% if place.description %}{{ place.description|escapejs }}{% else %}{{ place.name|escapejs }} - Halal {{ place.get_category_display|lower }} in {{ place.address|escapejs }}, South Korea.{% endif %}",
     "url": "{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}",
-    "image": {% if place.images.first %}"{{ request.scheme }}://{{ request.get_host }}{{ place.images.first.image.url }}"{% else %}"{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}"{% endif %},
+    "image": {% if place.photo_urls.0 %}"{{ request.scheme }}://{{ request.get_host }}{{ place.photo_urls.0 }}"{% else %}"{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}"{% endif %},
     "address": {
         "@type": "PostalAddress",
         "streetAddress": "{{ place.address|escapejs }}",
@@ -46,11 +46,11 @@
     "isAccessibleForFree": true{% if place.category == 'restaurant' %},
     "servesCuisine": ["Halal", "Halal Food"]{% endif %}{% if place.phone_number %},
     "telephone": "{{ place.phone_number|escapejs }}"{% endif %}{% if place.website %},
-    "sameAs": "{{ place.website }}"{% endif %}{% if reviews.count > 0 %},
+    "sameAs": "{{ place.website }}"{% endif %}{% if place.reviews_count > 0 %},
     "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": {{ place.average_rating }},
-        "reviewCount": {{ reviews.count }},
+        "reviewCount": {{ place.reviews_count }},
         "bestRating": 5,
         "worstRating": 1
     }{% endif %}
@@ -322,8 +322,8 @@
                         <button id="favorite-button" 
                                 data-place-id="{{ place.id }}"
                                 class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-                                title="{% if place in user.favorite_places.all %}{% translate 'Remove from favorites' %}{% else %}{% translate 'Add to favorites' %}{% endif %}">
-                            <i class="fas fa-heart text-xl {% if place in user.favorite_places.all %}text-red-600{% else %}text-gray-400 dark:text-gray-600{% endif %}"></i>
+                                title="{% if is_favorited %}{% translate 'Remove from favorites' %}{% else %}{% translate 'Add to favorites' %}{% endif %}">
+                            <i class="fas fa-heart text-xl {% if is_favorited %}text-red-600{% else %}text-gray-400 dark:text-gray-600{% endif %}"></i>
                         </button>
                         {% endif %}
                         <!-- Share button -->
@@ -383,7 +383,7 @@
                 {% endif %}
 
                 <!-- Rating and Reviews (only show if reviews exist) -->
-                {% if place.reviews.count > 0 %}
+                {% if place.reviews_count > 0 %}
                 <div class="mt-4">
                     <div class="flex items-center">
                         <div class="flex items-center">
@@ -395,7 +395,7 @@
                             {% endfor %}
                         </div>
                         <span class="ml-2 text-gray-600 dark:text-gray-400">
-                            {{ place.average_rating|floatformat:1 }} ({{ place.reviews.count }} {% if place.reviews.count == 1 %}{% translate "review" %}{% else %}{% translate "reviews" %}{% endif %})
+                            {{ place.average_rating|floatformat:1 }} ({{ place.reviews_count }} {% if place.reviews_count == 1 %}{% translate "review" %}{% else %}{% translate "reviews" %}{% endif %})
                         </span>
                     </div>
                 </div>
