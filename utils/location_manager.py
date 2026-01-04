@@ -184,6 +184,12 @@ def update_user_location(request, location_data):
         
     if 'country' in location_data:
         location['country'] = location_data['country']
+    elif 'city' in location_data and location_data['city']:
+        # Auto-detect country for Korean cities if country is missing
+        city_name = location_data['city'].lower()
+        if _is_city_in_korea(city_name):
+            logger.debug(f"Auto-detected Korean city: {location_data['city']}, setting country to South Korea")
+            location['country'] = 'South Korea'
     
     request.session['user_location'] = location
     logger.info(f"User location updated successfully: {location.get('city', 'Unknown')}, {location.get('country', 'Unknown')}")

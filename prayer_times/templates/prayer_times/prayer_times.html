@@ -131,7 +131,7 @@
                     <div class="py-1 max-h-60 overflow-y-auto scrollbar-hide">
                         <template x-for="city in cities.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))" :key="city.name">
                             <a href="#" 
-                               @click.prevent="updateLocation(city.name)"
+                               @click.prevent="updateLocation(city.name, city.country); open = false"
                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <i class="fas fa-city mr-2"></i>
                                 <span x-text="city.name"></span>
@@ -359,8 +359,8 @@
             </div>
 
             <!-- Prayer Times Table Skeleton -->
-            <div class="mt-6 glass-card rounded-lg overflow-hidden">
-                <table class="w-full">
+            <div class="max-w-md w-full mx-auto">
+                <table class="w-full mt-6 glass-card rounded-lg overflow-hidden">
                     <thead>
                         <tr class="bg-primary-50 dark:bg-primary-900/30">
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">{% translate "Prayer" %}</th>
@@ -493,6 +493,9 @@
 </div>
 
 <script>
+    // Store countdown interval ID to prevent memory leaks
+    let countdownInterval = null;
+    
     // Method names mapping for Alpine.js
     const methodNames = {
         '0': '{% translate "Jafari / Shia Ithna-Ashari"|escapejs %}',
@@ -526,7 +529,10 @@
         const asrMethod = '{{ prayer_settings.asr_method }}';
         
         if (calculationMethod) {
-            document.getElementById('calculation-method').value = calculationMethod;
+            const calculationMethodElement = document.getElementById('calculation-method');
+            if (calculationMethodElement) {
+                calculationMethodElement.value = calculationMethod;
+            }
             // Update Alpine.js component via custom event
             window.dispatchEvent(new CustomEvent('set-calculation-method', { 
                 detail: { 
@@ -548,43 +554,96 @@
     });
 
     function updateCurrentTime() {
-        const now = new Date();
-        const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-        document.getElementById('current-time').textContent = now.toLocaleTimeString([], options);
+        const currentTimeElement = document.getElementById('current-time');
+        if (currentTimeElement) {
+            const now = new Date();
+            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            currentTimeElement.textContent = now.toLocaleTimeString([], options);
+        }
     }
     setInterval(updateCurrentTime, 1000);
     updateCurrentTime();
 
     function parseTime(timeStr) {
-        const [hours, minutes] = timeStr.split(":").map(Number);
+        if (!timeStr || typeof timeStr !== 'string') {
+            throw new Error('Invalid time string');
+        }
+        const parts = timeStr.split(":");
+        if (parts.length < 2) {
+            throw new Error('Invalid time format');
+        }
+        const hours = parseInt(parts[0], 10);
+        const minutes = parseInt(parts[1], 10);
+        if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+            throw new Error('Invalid time values');
+        }
         const now = new Date();
         return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
     }
     
     function updateCountdown() {
+        // Clear any existing interval to prevent memory leaks
+        if (countdownInterval !== null) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+        
         const now = new Date();
         const prayerTimes = [];
         const prayerNames = [];
         const prayerRows = [];
     
-        document.querySelectorAll("td[data-time]").forEach((td, index) => {
-            const time = parseTime(td.dataset.time);
-            const row = td.closest('tr');
-            prayerTimes.push(time);
-            prayerNames.push(td.previousElementSibling.textContent.trim()); 
-            prayerRows.push(row);
+        const prayerTimeElements = document.querySelectorAll("td[data-time]");
+        
+        // Check if prayer times are loaded
+        if (prayerTimeElements.length === 0) {
+            return;
+        }
+    
+        prayerTimeElements.forEach((td, index) => {
+            try {
+                if (!td.dataset.time) {
+                    console.warn('Missing data-time attribute on prayer time element');
+                    return;
+                }
+                const time = parseTime(td.dataset.time);
+                const row = td.closest('tr');
+                if (!row) {
+                    console.warn('Could not find parent row for prayer time element');
+                    return;
+                }
+                prayerTimes.push(time);
+                const prayerNameElement = td.previousElementSibling;
+                if (prayerNameElement) {
+                    prayerNames.push(prayerNameElement.textContent.trim());
+                } else {
+                    prayerNames.push('Unknown');
+                }
+                prayerRows.push(row);
 
-            // Reset any previous highlighting
-            row.classList.remove('bg-primary-50', 'dark:bg-primary-900/30');
-            td.previousElementSibling.classList.remove('text-primary-600', 'dark:text-primary-400');
-            td.classList.remove('text-primary-600', 'dark:text-primary-400');
+                // Reset any previous highlighting
+                row.classList.remove('bg-primary-50', 'dark:bg-primary-900/30');
+                if (prayerNameElement) {
+                    prayerNameElement.classList.remove('text-primary-600', 'dark:text-primary-400');
+                }
+                td.classList.remove('text-primary-600', 'dark:text-primary-400');
+            } catch (error) {
+                console.error('Error processing prayer time element:', error);
+            }
         });
     
         // Add tomorrow's Fajr to handle day transition
-        const fajrTimeTomorrow = parseTime(document.querySelector('td[data-time]').dataset.time);
-        fajrTimeTomorrow.setDate(fajrTimeTomorrow.getDate() + 1);
-        prayerTimes.push(fajrTimeTomorrow);
-        prayerNames.push("{% translate 'Fajr (Tomorrow)'|escapejs %}");
+        const firstPrayerElement = document.querySelector('td[data-time]');
+        if (firstPrayerElement && firstPrayerElement.dataset.time) {
+            try {
+                const fajrTimeTomorrow = parseTime(firstPrayerElement.dataset.time);
+                fajrTimeTomorrow.setDate(fajrTimeTomorrow.getDate() + 1);
+                prayerTimes.push(fajrTimeTomorrow);
+                prayerNames.push("{% translate 'Fajr (Tomorrow)'|escapejs %}");
+            } catch (error) {
+                console.error('Error calculating tomorrow\'s Fajr:', error);
+            }
+        }
     
         // Find current prayer
         let currentPrayerIndex = -1;
@@ -605,19 +664,36 @@
             });
         }
     
+        // Check if we have any prayer times
+        if (prayerTimes.length === 0) {
+            const countdownDisplay = document.getElementById("countdown-display");
+            if (countdownDisplay) {
+                countdownDisplay.textContent = "{% translate 'No prayer times available.'|escapejs %}";
+            }
+            return;
+        }
+        
         let nextPrayerIndex = prayerTimes.findIndex(time => time > now);
         
+        const countdownDisplay = document.getElementById("countdown-display");
+        const nextPrayerElement = document.getElementById("next-prayer");
+        
         if (nextPrayerIndex === -1) {
-            document.getElementById("countdown-display").textContent = "{% translate 'All prayer times have passed.'|escapejs %}";
+            if (countdownDisplay) {
+                countdownDisplay.textContent = "{% translate 'All prayer times have passed.'|escapejs %}";
+            }
             return;
         }
     
         const nextPrayerTime = prayerTimes[nextPrayerIndex];
-        const nextPrayerName = prayerNames[nextPrayerIndex];
+        const nextPrayerName = prayerNames[nextPrayerIndex] || 'Unknown';
     
-        document.getElementById("next-prayer").textContent = `${nextPrayerName}`;
+        if (nextPrayerElement) {
+            nextPrayerElement.textContent = nextPrayerName;
+        }
     
         function updateTimer() {
+            if (!countdownDisplay) return;
             const timeDiff = nextPrayerTime - new Date();
             if (timeDiff <= 0) return updateCountdown();
     
@@ -625,107 +701,191 @@
             const minutes = String(Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
             const seconds = String(Math.floor((timeDiff % (1000 * 60)) / 1000)).padStart(2, '0');
             
-            document.getElementById("countdown-display").textContent = `${hours}:${minutes}:${seconds}`;
+            countdownDisplay.textContent = `${hours}:${minutes}:${seconds}`;
         }
     
         updateTimer();
-        setInterval(updateTimer, 1000);
+        countdownInterval = setInterval(updateTimer, 1000);
     }
 
+    // Track ongoing requests to prevent race conditions
+    let isLoadingPrayerTimes = false;
+    
     async function loadPrayerTimes() {
+        // Prevent multiple simultaneous requests
+        if (isLoadingPrayerTimes) {
+            console.log('Prayer times request already in progress, skipping...');
+            return;
+        }
+        
+        // Get DOM elements with null checks
+        const loadingState = document.getElementById('loading-state');
+        const errorState = document.getElementById('error-state');
+        const contentContainer = document.getElementById('content-container');
+        const locationButton = document.getElementById('location-button');
+        const locationSkeleton = document.getElementById('location-skeleton');
+        
+        if (!loadingState || !errorState || !contentContainer || !locationButton || !locationSkeleton) {
+            console.error('Required DOM elements not found');
+            return;
+        }
+        
+        isLoadingPrayerTimes = true;
+        
         // Show loading state
-        document.getElementById('loading-state').classList.remove('hidden');
-        document.getElementById('error-state').classList.add('hidden');
-        document.getElementById('content-container').classList.add('hidden');
+        loadingState.classList.remove('hidden');
+        errorState.classList.add('hidden');
+        contentContainer.classList.add('hidden');
         
         // Show location skeleton
-        document.getElementById('location-button').classList.add('hidden');
-        document.getElementById('location-skeleton').classList.remove('hidden');
+        locationButton.classList.add('hidden');
+        locationSkeleton.classList.remove('hidden');
         
         try {
             const response = await fetch('/prayer/get-prayer-times/');
-            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            let data;
+            try {
+                data = await response.json();
+            } catch (jsonError) {
+                throw new Error('Invalid JSON response from server');
+            }
+            
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid response data');
+            }
             
             if (data.success) {
-                // Update location display
-                document.getElementById('location-display').textContent = 
-                    `${data.location.city}, ${data.location.country}`;
+                // Validate and update location display
+                if (data.location && data.location.city && data.location.country) {
+                    const locationDisplay = document.getElementById('location-display');
+                    if (locationDisplay) {
+                        locationDisplay.textContent = `${data.location.city}, ${data.location.country}`;
+                    }
+                }
                 
                 // Hide location skeleton, show button
-                document.getElementById('location-skeleton').classList.add('hidden');
-                document.getElementById('location-button').classList.remove('hidden');
+                locationSkeleton.classList.add('hidden');
+                locationButton.classList.remove('hidden');
                 
-                // Update dates
-                const gregorian = data.data.date.gregorian;
-                document.getElementById('gregorian-date').textContent = 
-                    `${gregorian.month.en} ${gregorian.day}, ${gregorian.year}`;
-                document.getElementById('gregorian-weekday').textContent = 
-                    gregorian.weekday.en;
+                // Validate and update dates
+                if (data.data && data.data.date) {
+                    const gregorian = data.data.date.gregorian;
+                    if (gregorian && gregorian.month && gregorian.month.en && gregorian.day && gregorian.year) {
+                        const gregorianDate = document.getElementById('gregorian-date');
+                        const gregorianWeekday = document.getElementById('gregorian-weekday');
+                        if (gregorianDate) {
+                            gregorianDate.textContent = `${gregorian.month.en} ${gregorian.day}, ${gregorian.year}`;
+                        }
+                        if (gregorianWeekday && gregorian.weekday && gregorian.weekday.en) {
+                            gregorianWeekday.textContent = gregorian.weekday.en;
+                        }
+                    }
+                    
+                    const hijri = data.data.date.hijri;
+                    if (hijri && hijri.month && hijri.month.en && hijri.day && hijri.year) {
+                        const hijriDate = document.getElementById('hijri-date');
+                        const hijriWeekday = document.getElementById('hijri-weekday');
+                        if (hijriDate) {
+                            hijriDate.textContent = `${hijri.day} ${hijri.month.en}, ${hijri.year}`;
+                        }
+                        if (hijriWeekday && hijri.weekday && hijri.weekday.en) {
+                            hijriWeekday.textContent = hijri.weekday.en;
+                        }
+                    }
+                }
                 
-                const hijri = data.data.date.hijri;
-                document.getElementById('hijri-date').textContent = 
-                    `${hijri.day} ${hijri.month.en}, ${hijri.year}`;
-                document.getElementById('hijri-weekday').textContent = 
-                    hijri.weekday.en;
-                
-                // Update prayer times
-                const prayerTimesBody = document.getElementById('prayer-times-body');
-                prayerTimesBody.innerHTML = '';
-                
-                const prayers = [
-                    { name: "{% translate 'Fajr'|escapejs %}", time: data.data.timings.Fajr },
-                    { name: "{% translate 'Sunrise'|escapejs %}", time: data.data.timings.Sunrise },
-                    { name: "{% translate 'Dhuhr'|escapejs %}", time: data.data.timings.Dhuhr },
-                    { name: "{% translate 'Asr'|escapejs %}", time: data.data.timings.Asr },
-                    { name: "{% translate 'Maghrib'|escapejs %}", time: data.data.timings.Maghrib },
-                    { name: "{% translate 'Isha'|escapejs %}", time: data.data.timings.Isha }
-                ];
-                
-                prayers.forEach(prayer => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150';
-                    row.innerHTML = `
-                        <td class="py-3 px-4 text-gray-700 dark:text-gray-300">${prayer.name}</td>
-                        <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="${prayer.time}">${prayer.time}</td>
-                    `;
-                    prayerTimesBody.appendChild(row);
-                });
-                
-                // Show content and start countdown
-                document.getElementById('loading-state').classList.add('hidden');
-                document.getElementById('content-container').classList.remove('hidden');
-                updateCountdown();
+                // Validate and update prayer times
+                if (data.data && data.data.timings) {
+                    const prayerTimesBody = document.getElementById('prayer-times-body');
+                    if (!prayerTimesBody) {
+                        throw new Error('Prayer times body element not found');
+                    }
+                    
+                    prayerTimesBody.innerHTML = '';
+                    
+                    const timings = data.data.timings;
+                    const prayers = [
+                        { name: "{% translate 'Fajr'|escapejs %}", time: timings.Fajr },
+                        { name: "{% translate 'Sunrise'|escapejs %}", time: timings.Sunrise },
+                        { name: "{% translate 'Dhuhr'|escapejs %}", time: timings.Dhuhr },
+                        { name: "{% translate 'Asr'|escapejs %}", time: timings.Asr },
+                        { name: "{% translate 'Maghrib'|escapejs %}", time: timings.Maghrib },
+                        { name: "{% translate 'Isha'|escapejs %}", time: timings.Isha }
+                    ];
+                    
+                    prayers.forEach(prayer => {
+                        if (!prayer.time) {
+                            console.warn(`Missing time for ${prayer.name}`);
+                            return;
+                        }
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150';
+                        // Escape prayer time to prevent XSS
+                        const escapedTime = String(prayer.time).replace(/[<>]/g, '');
+                        row.innerHTML = `
+                            <td class="py-3 px-4 text-gray-700 dark:text-gray-300">${prayer.name}</td>
+                            <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="${escapedTime}">${escapedTime}</td>
+                        `;
+                        prayerTimesBody.appendChild(row);
+                    });
+                    
+                    // Show content and start countdown
+                    loadingState.classList.add('hidden');
+                    contentContainer.classList.remove('hidden');
+                    updateCountdown();
+                } else {
+                    throw new Error('Missing prayer times data');
+                }
             } else {
                 throw new Error(data.error || "{% translate 'Failed to load prayer times'|escapejs %}");
             }
         } catch (error) {
             console.error("{% translate 'Error loading prayer times:'|escapejs %}", error);
-            document.getElementById('loading-state').classList.add('hidden');
-            document.getElementById('error-state').classList.remove('hidden');
+            loadingState.classList.add('hidden');
+            errorState.classList.remove('hidden');
             
             // Hide location skeleton, show button on error
-            document.getElementById('location-skeleton').classList.add('hidden');
-            document.getElementById('location-button').classList.remove('hidden');
+            locationSkeleton.classList.add('hidden');
+            locationButton.classList.remove('hidden');
+        } finally {
+            isLoadingPrayerTimes = false;
         }
     }
     
-    function updateLocation(city) {
+    function updateLocation(city, country) {
+        const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfTokenElement || !csrfTokenElement.value) {
+            console.error("{% translate 'CSRF token not found'|escapejs %}");
+            return;
+        }
+        
         fetch('/prayer/update-location/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                'X-CSRFToken': csrfTokenElement.value
             },
             body: JSON.stringify({
-                city: city
+                city: city,
+                country: country
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            if (data.success) {
+            if (data && data.success) {
                 loadPrayerTimes();
             } else {
-                console.error("{% translate 'Failed to update location:'|escapejs %}", data.error);
+                console.error("{% translate 'Failed to update location:'|escapejs %}", data?.error || 'Unknown error');
             }
         })
         .catch(error => {
@@ -734,23 +894,40 @@
     }
 
     function getCurrentLocation() {
+        const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfTokenElement || !csrfTokenElement.value) {
+            console.error("{% translate 'CSRF token not found'|escapejs %}");
+            alert("{% translate 'Error: CSRF token not found. Please refresh the page.'|escapejs %}");
+            return;
+        }
+        
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function(position) {
+                    if (!position || !position.coords) {
+                        alert("{% translate 'Could not determine location. Please select a city manually.'|escapejs %}");
+                        return;
+                    }
+                    
                     fetch('/prayer/get-location/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            'X-CSRFToken': csrfTokenElement.value
                         },
                         body: JSON.stringify({
                             latitude: position.coords.latitude,
                             longitude: position.coords.longitude
                         })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        if (data.success) {
+                        if (data && data.success) {
                             loadPrayerTimes();
                         } else {
                             alert("{% translate 'Could not determine location. Please select a city manually.'|escapejs %}");
@@ -762,8 +939,8 @@
                     });
                 },
                 function(error) {
-                                      console.error("{% translate 'Error getting location:'|escapejs %}", error);
-                  alert("{% translate 'Error getting your location. Please select a city manually.'|escapejs %}");
+                    console.error("{% translate 'Error getting location:'|escapejs %}", error);
+                    alert("{% translate 'Error getting your location. Please select a city manually.'|escapejs %}");
                 }
             );
         } else {
@@ -772,22 +949,33 @@
     }
 
     function updateCalculationMethod(method) {
+        const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfTokenElement || !csrfTokenElement.value) {
+            console.error("{% translate 'CSRF token not found'|escapejs %}");
+            return;
+        }
+        
         fetch('/prayer/update-settings/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                'X-CSRFToken': csrfTokenElement.value
             },
             body: JSON.stringify({
                 calculation_method: method
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            if (data.success) {
+            if (data && data.success) {
                 loadPrayerTimes();
             } else {
-                console.error("{% translate 'Failed to update settings:'|escapejs %}", data.error);
+                console.error("{% translate 'Failed to update settings:'|escapejs %}", data?.error || 'Unknown error');
             }
         })
         .catch(error => {
@@ -796,22 +984,33 @@
     }
 
     function updateAsrMethod(method) {
+        const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfTokenElement || !csrfTokenElement.value) {
+            console.error("{% translate 'CSRF token not found'|escapejs %}");
+            return;
+        }
+        
         fetch('/prayer/update-settings/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                'X-CSRFToken': csrfTokenElement.value
             },
             body: JSON.stringify({
                 asr_method: method
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            if (data.success) {
+            if (data && data.success) {
                 loadPrayerTimes();
             } else {
-                console.error("{% translate 'Failed to update settings:'|escapejs %}", data.error);
+                console.error("{% translate 'Failed to update settings:'|escapejs %}", data?.error || 'Unknown error');
             }
         })
         .catch(error => {
