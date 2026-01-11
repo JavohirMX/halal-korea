@@ -14,6 +14,8 @@ class TelegramNotifier:
         self.bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
         self.chat_id = getattr(settings, 'TELEGRAM_CHAT_ID', None)
         self.enabled = getattr(settings, 'TELEGRAM_NOTIFICATIONS_ENABLED', False)
+        # Local Telegram Bot API URL (removes 50MB limit for file uploads)
+        self.api_base_url = getattr(settings, 'TELEGRAM_API_BASE_URL', 'http://telegram-bot-api:8081')
         
         if self.enabled and not (self.bot_token and self.chat_id):
             logger.warning("Telegram notifications are enabled but bot token or chat ID is missing")
@@ -38,7 +40,7 @@ class TelegramNotifier:
             logger.error("Telegram bot token or chat ID not configured")
             return False
         
-        url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
+        url = f"{self.api_base_url}/bot{self.bot_token}/sendMessage"
         
         payload = {
             'chat_id': self.chat_id,

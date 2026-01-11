@@ -65,6 +65,10 @@ TELEGRAM_NOTIFICATIONS_ENABLED = config('TELEGRAM_NOTIFICATIONS_ENABLED', defaul
 TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
 TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
 
+# Local Telegram Bot API Server (removes 50MB file size limit)
+# Uses local server by default when running in Docker, falls back to official API
+TELEGRAM_API_BASE_URL = config('TELEGRAM_API_BASE_URL', default='http://telegram-bot-api:8081')
+
 # Site URL for admin links in notifications
 SITE_URL = config('SITE_URL', default='http://localhost:8000')
 
