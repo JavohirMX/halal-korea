@@ -49,9 +49,22 @@ class HalalPlace(models.Model):
     search_vector = SearchVectorField(null=True, blank=True,
                                       help_text="Full-text search vector for efficient searching")
     
+    # Denormalized rating fields for performance (updated via signals on Review changes)
+    cached_average_rating = models.DecimalField(
+        max_digits=3, decimal_places=1, null=True, blank=True, db_index=True,
+        help_text="Cached average rating to avoid recalculating on every request"
+    )
+    cached_reviews_count = models.PositiveIntegerField(
+        default=0, db_index=True,
+        help_text="Cached reviews count to avoid counting on every request"
+    )
+    
     class Meta:
         indexes = [
             GinIndex(fields=['search_vector'], name='places_search_vector_idx'),
+            models.Index(fields=['status', 'created_at'], name='place_status_created_idx'),
+            models.Index(fields=['status', 'category'], name='place_status_category_idx'),
+            models.Index(fields=['category'], name='place_category_idx'),
         ]
 
     def __str__(self):
@@ -79,6 +92,27 @@ class HalalPlace(models.Model):
                 SearchVector('address', weight='C', config='simple')
             )
         )
+    
+    def update_cached_rating(self):
+        """Update cached rating fields from reviews. Called via signal on review changes."""
+        from django.db.models import Avg, Count
+        from decimal import Decimal, ROUND_HALF_UP
+        
+        stats = self.reviews.aggregate(
+            avg=Avg('rating'),
+            count=Count('id')
+        )
+        
+        if stats['avg'] is not None:
+            # Round to 1 decimal place
+            self.cached_average_rating = Decimal(str(stats['avg'])).quantize(
+                Decimal('0.1'), rounding=ROUND_HALF_UP
+            )
+        else:
+            self.cached_average_rating = None
+        
+        self.cached_reviews_count = stats['count'] or 0
+        self.save(update_fields=['cached_average_rating', 'cached_reviews_count'])
 
 
 # Place Edit Suggestion model for field changes

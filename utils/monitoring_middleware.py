@@ -29,6 +29,14 @@ class MonitoringMiddleware:
         if not self.enabled:
             return self.get_response(request)
         
+        # Skip logging for static files and media files (performance optimization)
+        path = request.path
+        if (path.startswith('/static/') or 
+            path.startswith('/media/') or 
+            path.startswith('/favicon.ico') or
+            path.startswith('/robots.txt')):
+            return self.get_response(request)
+        
         # Start timing
         start_time = time.time()
         
@@ -64,13 +72,15 @@ class MonitoringMiddleware:
             
             # Determine if we should log this request
             should_log = self._should_log_request(
+                request,
                 response,
                 response_time_ms,
                 error_type
             )
             
             if should_log:
-                self._log_request(
+                # Use async logging to avoid blocking response
+                self._log_request_async(
                     request,
                     response,
                     response_time_ms,
@@ -81,10 +91,11 @@ class MonitoringMiddleware:
                     error_message
                 )
     
-    def _should_log_request(self, response, response_time_ms, error_type):
+    def _should_log_request(self, request, response, response_time_ms, error_type):
         """
         Determine if request should be logged based on sampling rules.
         Always log errors and slow requests, sample normal requests.
+        Higher sampling for high-traffic endpoints.
         """
         # Always log errors
         if error_type or (response and response.status_code >= 400):
@@ -94,42 +105,60 @@ class MonitoringMiddleware:
         if response_time_ms > self.slow_threshold_ms:
             return True
         
+        # Higher sampling rate for high-traffic API endpoints
+        path = request.path
+        high_traffic_paths = ['/places/', '/api/', '/explore']
+        is_high_traffic = any(path.startswith(prefix) for prefix in high_traffic_paths)
+        
+        # Use higher sample rate for high-traffic endpoints (5% vs 1%)
+        sample_rate = self.sample_rate * 5 if is_high_traffic else self.sample_rate
+        
         # Sample normal requests
-        return random.random() < self.sample_rate
+        return random.random() < sample_rate
     
-    def _log_request(self, request, response, response_time_ms, query_count,
-                     cache_hits, cache_misses, error_type, error_message):
-        """Log request to database asynchronously if possible."""
-        try:
-            # Get user info
-            user = request.user if request.user.is_authenticated else None
-            is_staff = user.is_staff if user else False
-            
-            # Get IP and user agent (hashed for privacy)
-            ip_address = self._get_client_ip(request)
-            ip_hash = hash_ip(ip_address)
-            user_agent = request.META.get('HTTP_USER_AGENT', '')
-            user_agent_hash = hash_user_agent(user_agent)
-            
-            # Create log entry
-            RequestLog.objects.create(
-                path=request.path[:500],  # Truncate long paths
-                method=request.method,
-                status_code=response.status_code if response else 500,
-                response_time_ms=response_time_ms,
-                user=user,
-                is_staff=is_staff,
-                ip_hash=ip_hash,
-                user_agent_hash=user_agent_hash,
-                db_query_count=query_count,
-                cache_hits=cache_hits,
-                cache_misses=cache_misses,
-                error_type=error_type or '',
-                error_message=error_message or ''
-            )
-        except Exception as e:
-            # Don't let monitoring errors break the application
-            logger.error(f"Failed to log request: {e}", exc_info=True)
+    def _log_request_async(self, request, response, response_time_ms, query_count,
+                          cache_hits, cache_misses, error_type, error_message):
+        """
+        Log request to database asynchronously to avoid blocking response.
+        Uses threading to defer database write.
+        """
+        import threading
+        
+        def log_in_background():
+            try:
+                # Get user info
+                user = request.user if request.user.is_authenticated else None
+                is_staff = user.is_staff if user else False
+                
+                # Get IP and user agent (hashed for privacy)
+                ip_address = self._get_client_ip(request)
+                ip_hash = hash_ip(ip_address)
+                user_agent = request.META.get('HTTP_USER_AGENT', '')
+                user_agent_hash = hash_user_agent(user_agent)
+                
+                # Create log entry
+                RequestLog.objects.create(
+                    path=request.path[:500],  # Truncate long paths
+                    method=request.method,
+                    status_code=response.status_code if response else 500,
+                    response_time_ms=response_time_ms,
+                    user=user,
+                    is_staff=is_staff,
+                    ip_hash=ip_hash,
+                    user_agent_hash=user_agent_hash,
+                    db_query_count=query_count,
+                    cache_hits=cache_hits,
+                    cache_misses=cache_misses,
+                    error_type=error_type or '',
+                    error_message=error_message or ''
+                )
+            except Exception as e:
+                # Don't let monitoring errors break the application
+                logger.error(f"Failed to log request: {e}", exc_info=True)
+        
+        # Execute in background thread (daemon so it doesn't block shutdown)
+        thread = threading.Thread(target=log_in_background, daemon=True)
+        thread.start()
     
     def _get_client_ip(self, request):
         """Extract client IP address from request."""

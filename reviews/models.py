@@ -21,6 +21,10 @@ class Review(models.Model):
 
     class Meta:
         unique_together = ['user', 'place']
+        indexes = [
+            models.Index(fields=['place', 'created_at'], name='review_place_created_idx'),
+            models.Index(fields=['user', 'place'], name='review_user_place_idx'),
+        ]
 
     def __str__(self):
         return f'Review by {self.user.username} for {self.place.name}'

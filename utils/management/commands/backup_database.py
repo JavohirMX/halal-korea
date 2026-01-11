@@ -23,6 +23,9 @@ class Command(BaseCommand):
         self.channel_id = config('TELEGRAM_CHANNEL_ID', default=None)
         self.backup_enabled = config('BACKUP_ENABLED', default=True, cast=bool)
         
+        # Local Telegram Bot API URL (removes 50MB limit)
+        self.telegram_api_base_url = getattr(settings, 'TELEGRAM_API_BASE_URL', 'http://telegram-bot-api:8081')
+        
         # Database configuration
         self.db_config = settings.DATABASES['default']
 
@@ -140,8 +143,8 @@ class Command(BaseCommand):
         return size_diff > threshold
 
     def _send_to_telegram(self, backup_path):
-        """Send backup file to Telegram channel"""
-        url = f'https://api.telegram.org/bot{self.bot_token}/sendDocument'
+        """Send backup file to Telegram channel via local Bot API server"""
+        url = f'{self.telegram_api_base_url}/bot{self.bot_token}/sendDocument'
         
         # Prepare file info
         file_size_mb = self._get_file_size_mb(backup_path)
@@ -155,10 +158,7 @@ class Command(BaseCommand):
             f"✅ <b>Status:</b> Success"
         )
 
-        # Check Telegram file size limit (50MB for bots)
-        if file_size_mb > 50:
-            self._send_error_notification(f'Backup file too large for Telegram: {file_size_mb:.2f} MB')
-            return
+        # Note: Using local Telegram Bot API server removes the 50MB limit (supports up to 2GB)
 
         try:
             with open(backup_path, 'rb') as f:
@@ -179,7 +179,7 @@ class Command(BaseCommand):
 
     def _send_error_notification(self, error_message):
         """Send error notification to Telegram"""
-        url = f'https://api.telegram.org/bot{self.bot_token}/sendMessage'
+        url = f'{self.telegram_api_base_url}/bot{self.bot_token}/sendMessage'
         
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         message = (
