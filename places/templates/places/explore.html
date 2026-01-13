@@ -159,7 +159,120 @@
             display: block !important;
         }
     }
-</style>
+
+
+    <!-- Tutorial/Walkthrough Styles -->
+
+        /* Backdrop */
+        #tutorial-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(2px);
+        }
+        #tutorial-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Spotlight (The cutout/highlight effect) */
+        #tutorial-spotlight {
+            position: absolute;
+            z-index: 1001;
+            border-radius: 8px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none; /* Let clicks pass through if needed, but usually we block */
+        }
+        #tutorial-spotlight.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Ring animation for spotlight */
+        #tutorial-spotlight::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            animation: spotlight-pulse 2s infinite;
+        }
+        @keyframes spotlight-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.05); opacity: 0; }
+        }
+
+        /* Popover Card */
+        #tutorial-popover {
+            position: absolute;
+            z-index: 1002;
+            width: 90%;
+            max-width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .dark #tutorial-popover {
+            background: rgba(31, 41, 55, 0.95);
+            border-color: rgba(75, 85, 99, 0.5);
+            color: white;
+        }
+        #tutorial-popover.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        /* Popover Arrow */
+        #tutorial-popover::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: inherit;
+            transform: rotate(45deg);
+            z-index: -1;
+        }
+        #tutorial-popover.arrow-top::before {
+            top: -6px;
+            left: 50%;
+            margin-left: -6px;
+            border-left: 1px solid rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        #tutorial-popover.arrow-bottom::before {
+            bottom: -6px;
+            left: 50%;
+            margin-left: -6px;
+            border-right: 1px solid rgba(255, 255, 255, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .dark #tutorial-popover.arrow-top::before {
+            border-color: rgba(75, 85, 99, 0.5);
+        }
+        .dark #tutorial-popover.arrow-bottom::before {
+            border-color: rgba(75, 85, 99, 0.5);
+        }
+    </style>
 {% endblock %}
 
 {% block title %}Explore Halal Restaurants, Markets & Mosques in Korea - {{ STATIC_INFO.site_name }}{% endblock %}
@@ -418,7 +531,7 @@
             <!-- Category Filter Chips (Compact icon-only on mobile) -->
             <div class="md:col-span-2 flex items-center gap-2 md:hidden">
                 <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">{% translate "Filter:" %}</span>
-                <div class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 gap-0.5" role="group">
+                <div id="mobile-category-filters" class="inline-flex bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 gap-0.5" role="group">
                     <button type="button" 
                             class="category-chip inline-flex items-center justify-center w-8 h-8 rounded-md text-sm transition-all duration-200 {% if not request.GET.category %}bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-sm{% else %}text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400{% endif %}"
                             data-category=""
@@ -1792,4 +1905,277 @@ function updateLocation() {
     }
 }
 </script>
+
+<!-- Tutorial Overlay Elements -->
+<div id="tutorial-backdrop"></div>
+<div id="tutorial-spotlight"></div>
+<div id="tutorial-popover">
+    <div id="tutorial-content" class="mb-4 text-sm text-gray-700 dark:text-gray-200"></div>
+    <div class="flex justify-between items-center">
+        <div class="flex gap-1" id="tutorial-dots">
+            <!-- Dots will be generated here -->
+        </div>
+        <button id="tutorial-next-btn" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors">
+            {% translate "Next" %}
+        </button>
+    </div>
+</div>
+
+<script>
+    /**
+     * Mobile Explore Walkthrough / Tutorial
+     * Handles the step-by-step guide for first-time mobile users.
+     */
+    class ExploreTutorial {
+        constructor() {
+            this.backdrop = document.getElementById('tutorial-backdrop');
+            this.spotlight = document.getElementById('tutorial-spotlight');
+            this.popover = document.getElementById('tutorial-popover');
+            this.content = document.getElementById('tutorial-content');
+            this.nextBtn = document.getElementById('tutorial-next-btn');
+            this.dotsContainer = document.getElementById('tutorial-dots');
+            
+            this.currentStepIndex = 0;
+            this.steps = [
+                {
+                    elementId: 'map-container',
+                    text: "{% translate 'The interactive map is located just below the list. Scroll down to see it!' %}",
+                    position: 'top',
+                    action: 'scroll_to_map'
+                },
+                {
+                    elementId: 'view-list-btn', // Highlighting the view switcher container
+                    targetContainer: true, // Use parent container
+                    text: "{% translate 'Customize your view: List only, Map only, or Split view.' %}",
+                    position: 'bottom',
+                    action: 'scroll_top',
+                    preAction: 'expand_search'
+                },
+                {
+                    elementId: 'search-input',
+                    text: "{% translate 'Search for specific restaurants, mosques, or markets by name.' %}",
+                    position: 'bottom',
+                    preAction: 'expand_search'
+                },
+                {
+                    elementId: 'mobile-category-filters',
+                    text: "{% translate 'Tap these icons to quickly filter by category (All, Restaurant, Market, Mosque).' %}",
+                    position: 'bottom',
+                    preAction: 'expand_search'
+                },
+                {
+                    elementId: 'location-chip-mobile',
+                    text: "{% translate 'Tap here to update your location or switch cities.' %}",
+                    position: 'bottom',
+                    preAction: 'expand_search'
+                }
+            ];
+
+            this.init();
+        }
+
+        init() {
+            // Check if already seen
+            if (localStorage.getItem('explore_tutorial_seen_v1') === 'true') {
+                return;
+            }
+
+            // Check if mobile/tablet (< 1024px)
+            if (window.innerWidth >= 1024) {
+                return;
+            }
+
+            // Bind events
+            this.nextBtn.addEventListener('click', () => this.nextStep());
+            this.backdrop.addEventListener('click', () => this.finish()); // Clicking backdrop skips
+            
+            // Start after a short delay
+            setTimeout(() => {
+                this.start();
+            }, 1000);
+            
+            // Handle resize
+            window.addEventListener('resize', () => {
+                if (this.isActive && window.innerWidth >= 1024) {
+                    this.finish();
+                } else if (this.isActive) {
+                    this.updatePosition();
+                }
+            });
+        }
+
+        start() {
+            this.isActive = true;
+            this.backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            this.showStep(0);
+        }
+
+        async showStep(index) {
+            if (index >= this.steps.length) {
+                this.finish();
+                return;
+            }
+
+            this.currentStepIndex = index;
+            const step = this.steps[index];
+            
+            // Handle Actions (Scrolling)
+            if (step.action === 'scroll_to_map') {
+                const mapContainer = document.getElementById('map-container');
+                if (mapContainer) {
+                    mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    await new Promise(r => setTimeout(r, 600)); // Wait for scroll
+                }
+            } else if (step.action === 'scroll_top') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                await new Promise(r => setTimeout(r, 600)); // Wait for scroll
+            }
+
+            // Handle Pre-actions (e.g., expanding search)
+            if (step.preAction === 'expand_search') {
+                this.ensureSearchExpanded();
+                await new Promise(r => setTimeout(r, 300)); // Wait for expansion animation
+            }
+
+            // Find Target Element
+            let element = document.getElementById(step.elementId);
+            if (!element) {
+                // Skip if element not found
+                this.nextStep();
+                return;
+            }
+
+            // If targetContainer is true, target the parent (e.g. the button group)
+            if (step.targetContainer) {
+                element = element.parentElement;
+            }
+
+            // Update UI content
+            this.content.textContent = step.text;
+            this.updateDots();
+            
+            // Change button text on last step
+            if (index === this.steps.length - 1) {
+                this.nextBtn.textContent = "{% translate 'Got it!' %}";
+            } else {
+                this.nextBtn.textContent = "{% translate 'Next' %}";
+            }
+
+            // Highlight Element
+            this.highlightElement(element, step.position);
+        }
+
+        ensureSearchExpanded() {
+            const searchFilterContent = document.getElementById('search-filter-content');
+            const searchToggleIcon = document.getElementById('search-toggle-icon');
+            
+            if (searchFilterContent && searchFilterContent.classList.contains('hidden')) {
+                // Expand it
+                searchFilterContent.classList.remove('hidden');
+                if (searchToggleIcon) {
+                    searchToggleIcon.classList.remove('fa-chevron-down');
+                    searchToggleIcon.classList.add('fa-chevron-up');
+                }
+                // We don't save to localStorage here to avoid overriding user preference permanently just for tutorial
+            }
+        }
+
+        highlightElement(element, positionStr) {
+            const rect = element.getBoundingClientRect();
+            const padding = 8;
+
+            // Position Spotlight
+            this.spotlight.style.width = `${rect.width + (padding * 2)}px`;
+            this.spotlight.style.height = `${rect.height + (padding * 2)}px`;
+            this.spotlight.style.top = `${rect.top + window.scrollY - padding}px`;
+            this.spotlight.style.left = `${rect.left + window.scrollX - padding}px`;
+            this.spotlight.classList.add('active');
+
+            // Position Popover
+            const popoverRect = this.popover.getBoundingClientRect();
+            let popoverTop, popoverLeft;
+            
+            // Reset classes
+            this.popover.classList.remove('arrow-top', 'arrow-bottom');
+
+            // Check sufficient space below
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+
+            if (positionStr === 'bottom' && spaceBelow > 150) {
+                 // Place below
+                 popoverTop = rect.bottom + 20;
+                 this.popover.classList.add('arrow-top');
+            } else if (positionStr === 'top' && spaceAbove > 150) {
+                // Place above
+                popoverTop = rect.top - popoverRect.height - 20;
+                this.popover.classList.add('arrow-bottom');
+            } else {
+                // Fallback: place where there is more space
+                if (spaceBelow > spaceAbove) {
+                    popoverTop = rect.bottom + 20;
+                    this.popover.classList.add('arrow-top');
+                } else {
+                    popoverTop = rect.top - popoverRect.height - 20;
+                    this.popover.classList.add('arrow-bottom');
+                }
+            }
+
+            // Center horizontally but keep within screen bounds
+            popoverLeft = rect.left + (rect.width / 2) - (popoverRect.width / 2);
+            
+            // Boundary checks
+            const margin = 16;
+            if (popoverLeft < margin) popoverLeft = margin;
+            if (popoverLeft + popoverRect.width > window.innerWidth - margin) {
+                popoverLeft = window.innerWidth - popoverRect.width - margin;
+            }
+
+            this.popover.style.top = `${popoverTop + window.scrollY}px`;
+            this.popover.style.left = `${popoverLeft}px`;
+            this.popover.classList.add('active');
+        }
+
+        updatePosition() {
+            // Re-highlight current step on resize/scroll
+            if (this.currentStepIndex < this.steps.length) {
+                const step = this.steps[this.currentStepIndex];
+                let element = document.getElementById(step.elementId);
+                if (step.targetContainer && element) element = element.parentElement;
+                if (element) this.highlightElement(element, step.position);
+            }
+        }
+
+        updateDots() {
+            this.dotsContainer.innerHTML = '';
+            for (let i = 0; i < this.steps.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = `w-1.5 h-1.5 rounded-full transition-colors ${i === this.currentStepIndex ? 'bg-primary-600 dark:bg-primary-400' : 'bg-gray-300 dark:bg-gray-600'}`;
+                this.dotsContainer.appendChild(dot);
+            }
+        }
+
+        nextStep() {
+            this.showStep(this.currentStepIndex + 1);
+        }
+
+        finish() {
+            this.isActive = false;
+            this.backdrop.classList.remove('active');
+            this.spotlight.classList.remove('active');
+            this.popover.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+            
+            // Save to localStorage
+            localStorage.setItem('explore_tutorial_seen_v1', 'true');
+        }
+    }
+
+    // Initialize Tutorial
+    document.addEventListener('DOMContentLoaded', () => {
+        new ExploreTutorial();
+    });
+</script>
+
 {% endblock %}
