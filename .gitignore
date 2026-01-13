@@ -119,3 +119,5 @@ config/secrets.json
 *-service-account.json
 ga-*.json
 google-*.json
+
+PROJECT_PASSPORT.md
