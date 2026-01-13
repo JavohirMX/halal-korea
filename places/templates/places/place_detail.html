@@ -191,6 +191,85 @@
         width: 24px !important;
         border-radius: 4px !important;
     }
+
+    /* Tutorial Overlay */
+    #tutorial-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        z-index: 9998;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    #tutorial-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    #tutorial-spotlight {
+        position: absolute;
+        border-radius: 8px;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        pointer-events: none;
+        transition: all 0.4s ease-in-out;
+        opacity: 0;
+    }
+    #tutorial-spotlight.active {
+        opacity: 1;
+    }
+    #tutorial-popover {
+        position: absolute;
+        width: 280px;
+        background: white; /* Fallback */
+        z-index: 10000;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease, top 0.4s ease-in-out, left 0.4s ease-in-out;
+        /* Glassmorphism */
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark #tutorial-popover {
+        background: rgba(31, 41, 55, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    #tutorial-popover.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Popover Arrows */
+    #tutorial-popover.arrow-top::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 0 8px 8px 8px;
+        border-color: transparent transparent rgba(255, 255, 255, 0.95) transparent;
+    }
+    .dark #tutorial-popover.arrow-top::before {
+        border-color: transparent transparent rgba(31, 41, 55, 0.95) transparent;
+    }
+    #tutorial-popover.arrow-bottom::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 8px 8px 0 8px;
+        border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
+    }
+    .dark #tutorial-popover.arrow-bottom::after {
+        border-color: rgba(31, 41, 55, 0.95) transparent transparent transparent;
+    }
 </style>
 {% endblock %}
 
@@ -307,7 +386,7 @@
                     </div>
                     
                     <!-- Buttons container -->
-                    <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                    <div id="action-buttons-container" class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         {% if user.is_authenticated %}
                         <!-- Suggest Edit button -->
                         <a href="{% url 'places:suggest_place_edit' place.pk %}" 
@@ -454,7 +533,7 @@
                 </div>
 
                 <!-- Map Links -->
-                <div class="mt-6">
+                <div id="map-links-section" class="mt-6">
                     <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                         <svg class="w-4 h-4 mr-1.5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
@@ -641,7 +720,7 @@
             </div>
 
             <!-- Reviews Section -->
-            <div class="glass-card rounded-lg p-6">
+            <div id="reviews-section" class="glass-card rounded-lg p-6">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">{% translate "Reviews" %}</h3>
                 
                 {% if user.is_authenticated %}
@@ -1243,5 +1322,218 @@
             closeImageModal();
         }
     });
+</script>
+
+<!-- Tutorial Overlay Elements -->
+<div id="tutorial-backdrop"></div>
+<div id="tutorial-spotlight"></div>
+<div id="tutorial-popover">
+    <div id="tutorial-content" class="mb-4 text-sm text-gray-700 dark:text-gray-200"></div>
+    <div class="flex justify-between items-center">
+        <div class="flex gap-1" id="tutorial-dots">
+            <!-- Dots will be generated here -->
+        </div>
+        <button id="tutorial-next-btn" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors">
+            {% translate "Next" %}
+        </button>
+    </div>
+</div>
+
+<script>
+    /**
+     * Mobile Place Detail Walkthrough / Tutorial
+     */
+    class PlaceDetailTutorial {
+        constructor() {
+            this.backdrop = document.getElementById('tutorial-backdrop');
+            this.spotlight = document.getElementById('tutorial-spotlight');
+            this.popover = document.getElementById('tutorial-popover');
+            this.content = document.getElementById('tutorial-content');
+            this.nextBtn = document.getElementById('tutorial-next-btn');
+            this.dotsContainer = document.getElementById('tutorial-dots');
+            
+            this.currentStepIndex = 0;
+            this.steps = [
+                {
+                    elementId: 'map-links-section',
+                    text: "{% translate 'Tap here to open directions in your preferred map app (Google, Naver, Kakao).' %}",
+                    position: 'top',
+                    action: 'scroll_to_element'
+                },
+                {
+                    elementId: 'action-buttons-container',
+                    text: "{% translate 'Bookmark this place, share it with friends, or suggest edits/photos.' %}",
+                    position: 'bottom',
+                    action: 'scroll_to_element'
+                },
+                {
+                    elementId: 'reviews-section',
+                    text: "{% translate 'Read community reviews, check ratings, or share your own experience.' %}",
+                    position: 'top',
+                    action: 'scroll_to_element'
+                }
+            ];
+
+            this.init();
+        }
+
+        init() {
+            // Check if already seen
+            if (localStorage.getItem('place_detail_tutorial_seen_v1') === 'true') {
+                return;
+            }
+
+            // Check if mobile/tablet (< 1024px)
+            if (window.innerWidth >= 1024) {
+                return;
+            }
+
+            // Bind events
+            this.nextBtn.addEventListener('click', () => this.nextStep());
+            this.backdrop.addEventListener('click', () => this.finish());
+            
+            // Start after a short delay
+            setTimeout(() => {
+                this.start();
+            }, 1000);
+            
+            // Handle resize
+            window.addEventListener('resize', () => {
+                if (this.isActive && window.innerWidth >= 1024) {
+                    this.finish();
+                } else if (this.isActive) {
+                    this.updatePosition();
+                }
+            });
+        }
+
+        start() {
+            this.isActive = true;
+            this.backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+            this.showStep(0);
+        }
+
+        async showStep(index) {
+            if (index >= this.steps.length) {
+                this.finish();
+                return;
+            }
+
+            this.currentStepIndex = index;
+            const step = this.steps[index];
+            
+            // Handle Actions (Scrolling)
+            if (step.action === 'scroll_to_element') {
+                const element = document.getElementById(step.elementId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    await new Promise(r => setTimeout(r, 600)); // Wait for scroll
+                }
+            }
+
+            // Find Target Element
+            let element = document.getElementById(step.elementId);
+            if (!element) {
+                this.nextStep();
+                return;
+            }
+
+            // Update UI content
+            this.content.textContent = step.text;
+            this.updateDots();
+            
+            if (index === this.steps.length - 1) {
+                this.nextBtn.textContent = "{% translate 'Got it!' %}";
+            } else {
+                this.nextBtn.textContent = "{% translate 'Next' %}";
+            }
+
+            // Highlight Element
+            this.highlightElement(element, step.position);
+        }
+
+        highlightElement(element, positionStr) {
+            const rect = element.getBoundingClientRect();
+            const padding = 8;
+
+            // Position Spotlight
+            this.spotlight.style.width = `${rect.width + (padding * 2)}px`;
+            this.spotlight.style.height = `${rect.height + (padding * 2)}px`;
+            this.spotlight.style.top = `${rect.top + window.scrollY - padding}px`;
+            this.spotlight.style.left = `${rect.left + window.scrollX - padding}px`;
+            this.spotlight.classList.add('active');
+
+            // Position Popover
+            const popoverRect = this.popover.getBoundingClientRect();
+            let popoverTop, popoverLeft;
+            
+            this.popover.classList.remove('arrow-top', 'arrow-bottom');
+
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+
+            if (positionStr === 'bottom' && spaceBelow > 150) {
+                 popoverTop = rect.bottom + 20;
+                 this.popover.classList.add('arrow-top');
+            } else if (positionStr === 'top' && spaceAbove > 150) {
+                popoverTop = rect.top - popoverRect.height - 20;
+                this.popover.classList.add('arrow-bottom');
+            } else {
+                if (spaceBelow > spaceAbove) {
+                    popoverTop = rect.bottom + 20;
+                    this.popover.classList.add('arrow-top');
+                } else {
+                    popoverTop = rect.top - popoverRect.height - 20;
+                    this.popover.classList.add('arrow-bottom');
+                }
+            }
+
+            popoverLeft = rect.left + (rect.width / 2) - (popoverRect.width / 2);
+            
+            const margin = 16;
+            if (popoverLeft < margin) popoverLeft = margin;
+            if (popoverLeft + popoverRect.width > window.innerWidth - margin) {
+                popoverLeft = window.innerWidth - popoverRect.width - margin;
+            }
+
+            this.popover.style.top = `${popoverTop + window.scrollY}px`;
+            this.popover.style.left = `${popoverLeft}px`;
+            this.popover.classList.add('active');
+        }
+
+        updatePosition() {
+            if (this.currentStepIndex < this.steps.length) {
+                const step = this.steps[this.currentStepIndex];
+                let element = document.getElementById(step.elementId);
+                if (element) this.highlightElement(element, step.position);
+            }
+        }
+
+        updateDots() {
+            this.dotsContainer.innerHTML = '';
+            for (let i = 0; i < this.steps.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = `w-1.5 h-1.5 rounded-full transition-colors ${i === this.currentStepIndex ? 'bg-primary-600 dark:bg-primary-400' : 'bg-gray-300 dark:bg-gray-600'}`;
+                this.dotsContainer.appendChild(dot);
+            }
+        }
+
+        nextStep() {
+            this.showStep(this.currentStepIndex + 1);
+        }
+
+        finish() {
+            this.isActive = false;
+            this.backdrop.classList.remove('active');
+            this.spotlight.classList.remove('active');
+            this.popover.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            localStorage.setItem('place_detail_tutorial_seen_v1', 'true');
+        }
+    }
+    
+    // Initialize
+    new PlaceDetailTutorial();
 </script>
 {% endblock %}
