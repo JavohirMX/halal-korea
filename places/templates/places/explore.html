@@ -368,14 +368,6 @@
                 
                 <!-- Action Buttons -->
                 <div class="flex items-center gap-2 border-l border-gray-200 dark:border-gray-700 pl-3">
-                    {% if not location_context.is_in_korea %}
-                        <button id="set-seoul-btn" type="button" 
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm"
-                            title="{% translate 'Set location to Seoul' %}">
-                            <i class="fas fa-map-pin text-xs"></i>
-                            <span>Seoul</span>
-                        </button>
-                    {% endif %}
                     <button id="update-location-btn-desktop" type="button"
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium shadow-sm"
                         title="{% translate 'Update my location' %}">
@@ -464,17 +456,10 @@
             </div>
             <div class="flex gap-2">
                 <button id="update-location-btn-mobile" type="button"
-                    class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium">
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium w-full">
                     <i class="fas fa-crosshairs"></i>
                     <span>{% translate "Update" %}</span>
                 </button>
-                {% if not location_context.is_in_korea %}
-                    <button id="set-seoul-btn-mobile" type="button" 
-                        class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm">
-                        <i class="fas fa-map-pin"></i>
-                        <span>Seoul</span>
-                    </button>
-                {% endif %}
             </div>
         </div>
 
@@ -589,7 +574,6 @@
                             <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
                         {% else %}
                             <option value="rating" {% if request.GET.sort == 'rating' or not request.GET.sort %}selected{% endif %}>{% translate "Most Popular" %}</option>
-                            <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "By Location" %}</option>
                         {% endif %}
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -600,6 +584,93 @@
         </form>
         </div> <!-- End collapsible content -->
     </div>
+
+    <!-- Tourist Areas Quick Navigation (Global Users Only) -->
+    {% if not location_context.is_in_korea %}
+    <div class="mb-4 rounded-lg p-3 border border-gray-300 dark:border-gray-600">
+        <div class="flex items-center gap-2 mb-2">
+            <i class="fas fa-map-marked-alt text-primary-600 dark:text-primary-400 text-sm"></i>
+            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{% translate "Popular Tourist Areas" %}</span>
+        </div>
+        <!-- Mobile-friendly horizontal scroll container -->
+        <div class="overflow-x-auto pb-1">
+            <div class="flex gap-2 min-w-max sm:min-w-0 sm:flex-wrap">
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Seoul"
+                        data-lat="37.5665"
+                        data-lng="126.9780">
+                    <i class="fas fa-city mr-1 text-xs"></i>
+                    {% translate "Seoul" %}
+                </button>
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Busan"
+                        data-lat="35.1796"
+                        data-lng="129.0756">
+                    <i class="fas fa-umbrella-beach mr-1 text-xs"></i>
+                    {% translate "Busan" %}
+                </button>
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Jeju"
+                        data-lat="33.4996"
+                        data-lng="126.5312">
+                    <i class="fas fa-mountain mr-1 text-xs"></i>
+                    {% translate "Jeju Island" %}
+                </button>
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Incheon"
+                        data-lat="37.4563"
+                        data-lng="126.7052">
+                    <i class="fas fa-plane mr-1 text-xs"></i>
+                    {% translate "Incheon" %}
+                </button>
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Gyeonggi"
+                        data-lat="37.4138"
+                        data-lng="127.5183">
+                    <i class="fas fa-building mr-1 text-xs"></i>
+                    {% translate "Gyeonggi" %}
+                </button>
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Daegu"
+                        data-lat="35.8714"
+                        data-lng="128.6014">
+                    <i class="fas fa-train mr-1 text-xs"></i>
+                    {% translate "Daegu" %}
+                </button>
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Daejeon"
+                        data-lat="36.3504"
+                        data-lng="127.3845">
+                    <i class="fas fa-microchip mr-1 text-xs"></i>
+                    {% translate "Daejeon" %}
+                </button>
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Gwangju"
+                        data-lat="35.1601"
+                        data-lng="126.8515">
+                    <i class="fas fa-palette mr-1 text-xs"></i>
+                    {% translate "Gwangju" %}
+                </button>
+                <button type="button" 
+                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        data-city="Ulsan"
+                        data-lat="35.5395"
+                        data-lng="129.3114">
+                    <i class="fas fa-industry mr-1 text-xs"></i>
+                    {% translate "Ulsan" %}
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Main Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -693,23 +764,43 @@
     
     // Initialize Google Map
     async function initMap() {
+        // Check if there's a city filter and use its coordinates
+        const searchParams = new URLSearchParams(window.location.search);
+        const cityFilter = searchParams.get('city');
+        const touristAreas = {
+            {% for city, coords in TOURIST_AREAS.items %}
+            '{{ city }}': { lat: {{ coords.lat }}, lng: {{ coords.lng }} }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        };
+        
         // Center on Seoul by default
         const seoul = { lat: 37.5665, lng: 126.9780 };
-        // Center on user location if available
-        {% if user_location %}
-        const userLat = {{ user_location.y|unlocalize }};
-        const userLng = {{ user_location.x|unlocalize }};
-        const center = { lat: userLat, lng: userLng };
-        const userLocationTitle = "{% translate 'Your Location' %}";
-        {% else %}
-        const center = seoul;
-        const userLocationTitle = ""; // No user location
-        {% endif %}
+        
+        let center;
+        let userLocationTitle = "";
+        
+        // Priority: 1. City filter, 2. User location (if in Korea), 3. Seoul
+        if (cityFilter && touristAreas[cityFilter]) {
+            // Center on selected tourist area (highest priority)
+            center = touristAreas[cityFilter];
+        } else if ({% if user_location and location_context.is_in_korea %}true{% else %}false{% endif %}) {
+            // Center on user location if available AND user is in Korea
+            const userLat = {{ user_location.y|unlocalize }};
+            const userLng = {{ user_location.x|unlocalize }};
+            center = { lat: userLat, lng: userLng };
+            userLocationTitle = "{% translate 'Your Location' %}";
+        } else {
+            // Always Seoul for global users
+            center = seoul;
+        }
         const { Map } = await google.maps.importLibrary("maps")
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
+        // Set appropriate zoom based on whether we're centering on a city
+        const zoomLevel = (cityFilter && touristAreas[cityFilter]) ? 13 : 12;
+        
         map = new Map(document.getElementById("map"), {
-            zoom: 12,
+            zoom: zoomLevel,
             center: center,
             mapId: '{{ STATIC_INFO.google_maps_id }}',
             colorScheme: safeGetMapColorScheme(),
@@ -722,8 +813,8 @@
             }
         });
 
-        // Add marker for user's current location if available
-        {% if user_location %}
+        // Add marker for user's current location if available AND user is in Korea
+        {% if user_location and location_context.is_in_korea %}
         const userMarker = new AdvancedMarkerElement({
             map,
             position: { lat: userLat, lng: userLng },
@@ -892,7 +983,8 @@
                     ` : ''}
                 </div>
                 
-                <!-- Distance -->
+                <!-- Distance (only for Korea users) -->
+                {% if location_context.is_in_korea %}
                 ${place.distance ? `
                 <div class="flex items-center gap-1 text-xs text-gray-500 mb-2.5">
                     <i class="fas fa-location-arrow text-xs"></i>
@@ -902,6 +994,7 @@
                     }</span>
                 </div>
                 ` : ''}
+                {% endif %}
                 
                 <!-- CTA Button -->
                 <a href="/place/${place.id}/" 
@@ -1801,60 +1894,7 @@
             });
         }
     }
-</script>
-
-<script>
-// Seoul Default Button AJAX (only for international users)
-{% if not location_context.is_in_korea %}
-// Seoul button - check if elements exist before attaching handlers
-const seoulBtn = document.getElementById('set-seoul-btn');
-if (seoulBtn) {
-    seoulBtn.onclick = function() {
-        setSeoulLocation();
-    };
-}
-
-const seoulBtnMobile = document.getElementById('set-seoul-btn-mobile');
-if (seoulBtnMobile) {
-    seoulBtnMobile.onclick = function() {
-        setSeoulLocation();
-    };
-}
-
-// Shared Seoul location function
-function setSeoulLocation() {
-    // Get CSRF token from the hidden form
-    const csrfToken = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
     
-    // Seoul coordinates
-    const seoulLat = 37.5665;
-    const seoulLng = 126.9780;
-    
-    fetch("{% url 'places:set_location' %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify({
-            latitude: seoulLat,
-            longitude: seoulLng,
-            city: 'Seoul',
-            country: 'South Korea'
-        })
-    }).then(res => res.json()).then(data => {
-        if (data.success) {
-            window.location.reload();
-        } else {
-            alert("{% translate 'Failed to set location to Seoul'|escapejs %}");
-        }
-    }).catch(error => {
-        console.error('Error:', error);
-        alert("{% translate 'Error setting location to Seoul'|escapejs %}");
-    });
-}
-{% endif %}
-
 // Update Location Button AJAX (Mobile) - check if element exists
 const mobileLocationBtn = document.getElementById('update-location-btn-mobile');
 if (mobileLocationBtn) {
@@ -1904,6 +1944,57 @@ function updateLocation() {
         alert("{% translate 'Geolocation is not supported by your browser.'|escapejs %}");
     }
 }
+
+// Tourist Areas Navigation (Global Users Only)
+{% if not location_context.is_in_korea %}
+// Tourist area buttons functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const touristAreaBtns = document.querySelectorAll('.tourist-area-btn');
+    
+    touristAreaBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const city = this.dataset.city;
+            const lat = parseFloat(this.dataset.lat);
+            const lng = parseFloat(this.dataset.lng);
+            
+            // Update map center if map is available
+            if (typeof map !== 'undefined') {
+                map.setCenter({ lat: lat, lng: lng });
+                map.setZoom(13);
+            }
+            
+            // Update URL to include city filter and reload page
+            const url = new URL(window.location);
+            url.searchParams.set('city', city);
+            url.searchParams.delete('page'); // Reset to first page
+            url.searchParams.set('sort', 'distance'); // Force distance-based sorting for tourist area
+            
+            // Navigate to new URL to get filtered results
+            window.location.href = url.toString();
+            
+            // Visual feedback
+            touristAreaBtns.forEach(b => {
+                b.classList.remove('bg-primary-100', 'dark:bg-primary-900/30', 'border-primary-500', 'text-primary-700', 'dark:text-primary-300');
+                b.classList.add('bg-white', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-300');
+            });
+            
+            this.classList.remove('bg-white', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-300');
+            this.classList.add('bg-primary-100', 'dark:bg-primary-900/30', 'border-primary-500', 'text-primary-700', 'dark:text-primary-300');
+        });
+    });
+    
+    // Set active state for current city filter
+    const currentCity = new URL(window.location).searchParams.get('city');
+    if (currentCity) {
+        touristAreaBtns.forEach(btn => {
+            if (btn.dataset.city.toLowerCase() === currentCity.toLowerCase()) {
+                btn.classList.remove('bg-white', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-300');
+                btn.classList.add('bg-primary-100', 'dark:bg-primary-900/30', 'border-primary-500', 'text-primary-700', 'dark:text-primary-300');
+            }
+        });
+    }
+});
+{% endif %}
 </script>
 
 <!-- Tutorial Overlay Elements -->
