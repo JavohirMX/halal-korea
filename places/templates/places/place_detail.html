@@ -53,7 +53,15 @@
         "reviewCount": {{ place.reviews_count }},
         "bestRating": 5,
         "worstRating": 1
-    }{% endif %}
+    }{% endif %}{% if opening_hours_schema %},
+    "openingHoursSpecification": [{% for spec in opening_hours_schema %}
+        {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": "{{ spec.day }}",
+            "opens": "{{ spec.opens }}",
+            "closes": "{{ spec.closes }}"
+        }{% if not forloop.last %},{% endif %}{% endfor %}
+    ]{% endif %}
 }
 </script>
 <script type="application/ld+json">
@@ -482,6 +490,93 @@
                         {% translate "Updated" %} {{ place.updated_at|date:"M d, Y" }}
                     </span>
                 </div>
+
+                <!-- Business Hours Section -->
+                {% if weekly_hours or place.temporary_closure_until %}
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                    
+                    <!-- Header with Status Badge -->
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                                <i class="fas fa-clock text-primary-600 dark:text-primary-400"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {% translate "Hours" %}
+                            </h3>
+                        </div>
+                        
+                        <!-- Live Status Badge -->
+                        {% if business_hours_status %}
+                            {% include 'places/partials/hours_status_badge.html' with status=business_hours_status size='md' %}
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Temporary Closure Alert -->
+                    {% if place.temporary_closure_until %}
+                    <div class="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
+                            <div>
+                                <p class="text-sm font-medium text-red-700 dark:text-red-300">
+                                    {% translate "Temporarily Closed" %}
+                                </p>
+                                <p class="text-xs text-red-600 dark:text-red-400">
+                                    {% translate "Until" %} {{ place.temporary_closure_until|date:"M d, Y" }}
+                                    {% if place.temporary_closure_reason %} - {{ place.temporary_closure_reason }}{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Today's Hours (Always Visible) -->
+                    {% if today_hours %}
+                    <div class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">
+                            {% translate "Today" %}
+                        </span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                            {{ today_hours }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Full Week (Collapsible) -->
+                    {% if weekly_hours %}
+                    <details class="group mt-2">
+                        <summary class="flex items-center justify-between py-2 cursor-pointer text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                            <span>{% translate "See all hours" %}</span>
+                            <i class="fas fa-chevron-down text-xs transform group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        
+                        <div class="mt-2 space-y-1">
+                            {% for day in weekly_hours %}
+                            <div class="flex justify-between py-1.5 text-sm {% if day.is_today %}bg-primary-50 dark:bg-primary-900/20 -mx-2 px-2 rounded{% endif %}">
+                                <span class="{% if day.is_today %}font-medium text-gray-900 dark:text-white{% else %}text-gray-600 dark:text-gray-400{% endif %}">
+                                    {{ day.name }}
+                                </span>
+                                <span class="text-gray-700 dark:text-gray-300 {% if day.is_closed %}text-red-600 dark:text-red-400{% endif %}">
+                                    {% if day.is_closed %}
+                                        {% translate "Closed" %}
+                                    {% else %}
+                                        {{ day.hours }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Notes -->
+                        {% if place.business_hours.notes %}
+                        <p class="mt-3 text-xs text-gray-500 dark:text-gray-400 italic">
+                            <i class="fas fa-info-circle mr-1"></i>{{ place.business_hours.notes }}
+                        </p>
+                        {% endif %}
+                    </details>
+                    {% endif %}
+                </div>
+                {% endif %}
 
                 <!-- Map Links Section -->
                 <div id="map-links-section" class="mt-6">

@@ -1,0 +1,49 @@
+{% comment %}
+Business Hours Status Badge Component
+
+Usage: {% include 'places/partials/hours_status_badge.html' with status=place.business_hours_status size='sm'|'md' %}
+
+Status types: 'open', 'closed', 'closes_soon', 'opens_at', 'temp_closed'
+{% endcomment %}
+{% load i18n %}
+
+{% if status %}
+<span class="inline-flex items-center gap-1 rounded-full font-medium
+    {% if size == 'md' %}px-3 py-1 text-sm{% else %}px-2 py-0.5 text-xs{% endif %}
+    {% if status.type == 'open' %}
+        bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300
+    {% elif status.type == 'closes_soon' %}
+        bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300
+    {% elif status.type == 'opens_at' %}
+        bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300
+    {% elif status.type == 'temp_closed' %}
+        bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400
+    {% else %}
+        bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400
+    {% endif %}">
+    
+    {% if status.type == 'open' %}
+        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+        {% translate "Open" %}
+    {% elif status.type == 'closes_soon' %}
+        <i class="fas fa-clock text-[10px]"></i>
+        {% if status.time %}
+            {% blocktranslate with time=status.time %}Closes {{ time }}{% endblocktranslate %}
+        {% else %}
+            {% translate "Closes soon" %}
+        {% endif %}
+    {% elif status.type == 'opens_at' %}
+        <i class="fas fa-clock text-[10px]"></i>
+        {% if status.time %}
+            {% blocktranslate with time=status.time %}Opens {{ time }}{% endblocktranslate %}
+        {% else %}
+            {% translate "Opens soon" %}
+        {% endif %}
+    {% elif status.type == 'temp_closed' %}
+        <i class="fas fa-exclamation-circle text-[10px]"></i>
+        {% translate "Temp. Closed" %}
+    {% else %}
+        {% translate "Closed" %}
+    {% endif %}
+</span>
+{% endif %}

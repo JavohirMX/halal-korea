@@ -42,21 +42,6 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-def _get_city_variations(city):
-    """Get both Korean and English variations for city filtering"""
-    city_variations = {
-        "Seoul": ["서울", "서울특별시", "Seoul"],
-        "Busan": ["부산", "부산광역시", "Busan"],
-        "Jeju": ["제주", "제주특별자치도", "제주도", "Jeju"],
-        "Incheon": ["인천", "인천광역시", "Incheon"],
-        "Gyeonggi": ["경기", "경기도", "Gyeonggi"],
-        "Daegu": ["대구", "대구광역시", "Daegu"],
-        "Daejeon": ["대전", "대전광역시", "Daejeon"],
-        "Gwangju": ["광주", "광주광역시", "Gwangju"],
-        "Ulsan": ["울산", "울산광역시", "Ulsan"],
-    }
-    return city_variations.get(city, [city])
-
 
 @log_execution(level="info", sample=True)  # Apply sampling for high-volume endpoint
 def home(request):
@@ -264,6 +249,14 @@ def explore(request):
         },
     )
 
+    # Location context already fetched for cache key; use existing data
+    location = location_context["location"]
+    is_in_korea = location_context["is_in_korea"]
+    user_location = None
+
+    if "lat" in location and "lng" in location and not location.get("is_fallback"):
+        user_location = Point(location["lng"], location["lat"], srid=4326)
+
     # Parse proximity phrases from search query (e.g., "near Hongdae")
     cleaned_query = search_query
     is_location_only_search = False
@@ -291,9 +284,6 @@ def explore(request):
             places = places.filter(Q(category="mosque") | Q(category="prayer_room"))
         else:
             places = places.filter(category=category)
-
-    # Note: City filter is NOT applied to places list - we show ALL places
-    # City is only used for distance-based sorting from selected location
 
     # Enhanced search with transliteration and synonyms
     # Use slice-based checks instead of .exists() to reduce database queries
@@ -739,7 +729,6 @@ def get_all_places_for_map(request):
     # Get filter parameters
     category = request.GET.get("category")
     search_query = request.GET.get("q", "")
-    city_filter = request.GET.get("city", "")
 
     # Get user location for distance calculation
     location = get_user_location_context(request)["location"]
@@ -810,7 +799,7 @@ def get_all_places_for_map(request):
         "API get_all_places_for_map completed",
         extra={
             "total_places": len(places_data),
-            "filters_applied": bool(category or search_query or city_filter),
+            "filters_applied": bool(category or search_query),
         },
     )
 
@@ -954,6 +943,19 @@ def place_detail(request, pk):
     if request.user.is_authenticated:
         is_favorited = request.user.favorite_places.filter(pk=place.pk).exists()
 
+    # Get business hours data for display
+    from .business_hours import (
+        get_place_status,
+        get_today_hours,
+        get_weekly_hours,
+        get_opening_hours_schema,
+    )
+
+    business_hours_status = get_place_status(place)
+    today_hours = get_today_hours(place)
+    weekly_hours = get_weekly_hours(place)
+    opening_hours_schema = get_opening_hours_schema(place)
+
     return render(
         request,
         "places/place_detail.html",
@@ -964,6 +966,11 @@ def place_detail(request, pk):
             "is_favorited": is_favorited,  # Pass as context variable
             "google_maps_api_key": settings.GOOGLE_MAPS_API_KEY,
             "location_context": location_context,
+            # Business hours context
+            "business_hours_status": business_hours_status,
+            "today_hours": today_hours,
+            "weekly_hours": weekly_hours,
+            "opening_hours_schema": opening_hours_schema,
         },
     )
 
@@ -1271,10 +1278,42 @@ def suggest_place_edit(request, pk):
     else:
         form = PlaceSuggestionForm(place=place)
 
+    # Check if place has business hours
+    has_business_hours = (
+        hasattr(place, "business_hours") and place.business_hours is not None
+    )
+
+    # Prepare business hours data for pre-population
+    existing_hours_data = None
+    if has_business_hours:
+        bh = place.business_hours
+        existing_hours_data = {
+            "is_24_hours": bh.is_24_hours,
+            "notes": bh.notes or "",
+            "slots": {},
+        }
+        for slot in bh.time_slots.all():
+            day_key = str(slot.day_of_week)
+            if day_key not in existing_hours_data["slots"]:
+                existing_hours_data["slots"][day_key] = []
+            existing_hours_data["slots"][day_key].append(
+                {
+                    "is_closed": slot.is_closed,
+                    "open": slot.open_time.strftime("%H:%M") if slot.open_time else "",
+                    "close": slot.close_time.strftime("%H:%M")
+                    if slot.close_time
+                    else "",
+                }
+            )
+
     context = {
         "place": place,
         "form": form,
         "page_title": f"Suggest edits for {place.name}",
+        "has_business_hours": has_business_hours,
+        "existing_hours_data": json.dumps(existing_hours_data)
+        if existing_hours_data
+        else "null",
     }
     return render(request, "places/suggest_edit.html", context)
 
@@ -1316,8 +1355,49 @@ def _process_place_suggestions(request, form, place):
                 )
                 created_image_suggestions.append(image_suggestion)
 
+        # Handle business hours suggestion
+        created_hours_suggestion = None
+        business_hours_json = request.POST.get("business_hours_json", "")
+        suggest_business_hours = request.POST.get("suggest_business_hours") == "true"
+
+        if suggest_business_hours and business_hours_json:
+            try:
+                from .models import BusinessHoursSuggestion
+
+                hours_data = json.loads(business_hours_json)
+
+                created_hours_suggestion = BusinessHoursSuggestion.objects.create(
+                    place=place,
+                    suggested_by=request.user,
+                    suggested_hours=hours_data.get("hours", {}),
+                    is_24_hours=hours_data.get("is_24_hours", False),
+                    suggested_notes=hours_data.get("notes", ""),
+                    reason=form.cleaned_data.get("reason", "Business hours update"),
+                )
+
+                logger.info(
+                    f"Business hours suggestion created for place {place.id} by user {request.user.username}"
+                )
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid business hours JSON: {e}")
+            except Exception as e:
+                logger.error(f"Error creating hours suggestion: {e}", exc_info=True)
+
         # Log successful suggestion submission
-        total_suggestions = len(created_suggestions) + len(created_image_suggestions)
+        total_suggestions = (
+            len(created_suggestions)
+            + len(created_image_suggestions)
+            + (1 if created_hours_suggestion else 0)
+        )
+
+        # Check if at least one suggestion was created
+        if total_suggestions == 0:
+            messages.warning(
+                request,
+                "Please suggest at least one change, upload an image, or update business hours.",
+            )
+            return redirect("places:suggest_place_edit", pk=place.pk)
+
         log_user_action(
             logger,
             "place_edit_suggestion_submitted",
@@ -1328,24 +1408,26 @@ def _process_place_suggestions(request, form, place):
                 "place_name": place.name,
                 "field_suggestions_count": len(created_suggestions),
                 "image_suggestions_count": len(created_image_suggestions),
+                "hours_suggestion": created_hours_suggestion is not None,
                 "total_suggestions": total_suggestions,
             },
         )
 
         # Send notification if any suggestions were created
-        if created_suggestions or created_image_suggestions:
+        if created_suggestions or created_image_suggestions or created_hours_suggestion:
             _send_suggestion_notification(
-                place, request.user, created_suggestions, created_image_suggestions
+                place,
+                request.user,
+                created_suggestions,
+                created_image_suggestions,
+                created_hours_suggestion,
             )
 
         # Success message
-        if total_suggestions > 0:
-            messages.success(
-                request,
-                f"Thank you! Your {total_suggestions} suggestion(s) have been submitted for review.",
-            )
-        else:
-            messages.info(request, "No valid suggestions were submitted.")
+        messages.success(
+            request,
+            f"Thank you! Your {total_suggestions} suggestion(s) have been submitted for review.",
+        )
 
         return redirect("places:place_detail", pk=place.pk)
 
@@ -1389,11 +1471,17 @@ def _is_valid_image(image):
         return False
 
 
-def _send_suggestion_notification(place, user, field_suggestions, image_suggestions):
+def _send_suggestion_notification(
+    place, user, field_suggestions, image_suggestions, hours_suggestion=None
+):
     """Send Telegram notification for new suggestions"""
     try:
         # Prepare notification message
-        total_suggestions = len(field_suggestions) + len(image_suggestions)
+        total_suggestions = (
+            len(field_suggestions)
+            + len(image_suggestions)
+            + (1 if hours_suggestion else 0)
+        )
 
         message = (
             "<b>🔔 New Place Edit Suggestions</b>\n\n"
@@ -1411,6 +1499,9 @@ def _send_suggestion_notification(place, user, field_suggestions, image_suggesti
 
         if image_suggestions:
             message += f"<b>Images:</b> {len(image_suggestions)}\n"
+
+        if hours_suggestion:
+            message += "<b>Business Hours:</b> Updated\n"
 
         message += "\nPlease review in <a href='https://halal-korea.com/admin/places/'>admin panel</a>."
 

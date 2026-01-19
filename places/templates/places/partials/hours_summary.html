@@ -1,0 +1,38 @@
+{% comment %}
+Business Hours Summary Component
+
+Usage: {% include 'places/partials/hours_summary.html' with hours=place.business_hours %}
+
+Displays a compact summary of business hours for current display/comparison.
+{% endcomment %}
+{% load i18n %}
+
+{% if hours %}
+    {% if hours.is_24_hours %}
+        <p class="text-green-600 dark:text-green-400 font-medium">{% translate "Open 24 Hours" %}</p>
+    {% else %}
+        <div class="text-xs space-y-0.5">
+            {% for slot in hours.time_slots.all %}
+                <div class="flex justify-between">
+                    <span class="text-gray-500">{{ slot.get_day_of_week_display }}</span>
+                    <span class="{% if slot.is_closed %}text-red-500{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                        {% if slot.is_closed %}
+                            {% translate "Closed" %}
+                        {% elif slot.open_time and slot.close_time %}
+                            {{ slot.open_time|time:"H:i" }} - {{ slot.close_time|time:"H:i" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </span>
+                </div>
+            {% empty %}
+                <p class="text-gray-400 italic">{% translate "No hours set" %}</p>
+            {% endfor %}
+        </div>
+        {% if hours.notes %}
+            <p class="mt-2 text-xs text-gray-500 italic">{{ hours.notes }}</p>
+        {% endif %}
+    {% endif %}
+{% else %}
+    <p class="text-gray-400 italic text-xs">{% translate "Hours not available" %}</p>
+{% endif %}
