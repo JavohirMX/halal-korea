@@ -46,7 +46,7 @@
                     <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1 text-xs"></i>
                     {% if place.category == 'prayer_room' %}Prayer Space{% else %}{{ place.category|title }}{% endif %}
                 </span>
-                {% if place.distance %}
+                {% if place.distance and location_context.is_in_korea %}
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium border border-gray-200 dark:border-gray-600">
                     <i class="fas fa-location-arrow mr-1 text-xs"></i>
                     {% if place.distance.m > 1000 %}
@@ -123,7 +123,7 @@
         
         <p class="mt-2 text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{{ place.description }}</p>
         
-        {% if place.distance %}
+        {% if place.distance and location_context.is_in_korea %}
         <div class="mt-2 text-xs text-gray-500">
             {% if place.distance.m > 1000 %}
                 {{ place.distance.km|floatformat:1 }} km away

@@ -59,6 +59,16 @@ class HalalPlace(models.Model):
         help_text="Cached reviews count to avoid counting on every request"
     )
     
+    # Temporary closure fields
+    temporary_closure_until = models.DateField(
+        null=True, blank=True,
+        help_text="Place is temporarily closed until this date"
+    )
+    temporary_closure_reason = models.CharField(
+        max_length=255, blank=True,
+        help_text="Reason for temporary closure (e.g., 'Renovation')"
+    )
+    
     class Meta:
         indexes = [
             GinIndex(fields=['search_vector'], name='places_search_vector_idx'),
@@ -353,6 +363,144 @@ class PlaceImageSuggestion(models.Model):
             logger = logging.getLogger(__name__)
             logger.error(f"Error reapplying watermark: {str(e)}", exc_info=True)
             return False
+
+
+# Business Hours model
+class BusinessHours(models.Model):
+    """Business hours for a place with support for multiple time slots per day."""
+    DAY_CHOICES = [
+        (0, 'Monday'),
+        (1, 'Tuesday'),
+        (2, 'Wednesday'),
+        (3, 'Thursday'),
+        (4, 'Friday'),
+        (5, 'Saturday'),
+        (6, 'Sunday'),
+    ]
+    
+    place = models.OneToOneField(
+        HalalPlace,
+        on_delete=models.CASCADE,
+        related_name='business_hours'
+    )
+    is_24_hours = models.BooleanField(
+        default=False,
+        help_text="Open 24 hours, 7 days a week"
+    )
+    notes = models.CharField(
+        max_length=255, blank=True,
+        help_text="Additional notes (e.g., 'Last order 30 min before close')"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Business Hours'
+        verbose_name_plural = 'Business Hours'
+    
+    def __str__(self):
+        if self.is_24_hours:
+            return f"{self.place.name} - Open 24 Hours"
+        return f"{self.place.name} - Business Hours"
+
+
+# Time Slot model for individual day hours
+class TimeSlot(models.Model):
+    """Individual time slot for a specific day (supports multiple per day)."""
+    business_hours = models.ForeignKey(
+        BusinessHours,
+        on_delete=models.CASCADE,
+        related_name='time_slots'
+    )
+    day_of_week = models.IntegerField(
+        choices=BusinessHours.DAY_CHOICES,
+        help_text="Day of the week (0=Monday, 6=Sunday)"
+    )
+    is_closed = models.BooleanField(
+        default=False,
+        help_text="Mark this day as closed (overrides time fields)"
+    )
+    open_time = models.TimeField(
+        null=True, blank=True,
+        help_text="Opening time in 24-hour format"
+    )
+    close_time = models.TimeField(
+        null=True, blank=True,
+        help_text="Closing time in 24-hour format"
+    )
+    
+    class Meta:
+        ordering = ['day_of_week', 'open_time']
+        verbose_name = 'Time Slot'
+        verbose_name_plural = 'Time Slots'
+    
+    def __str__(self):
+        day_name = dict(BusinessHours.DAY_CHOICES).get(self.day_of_week, 'Unknown')
+        if self.is_closed:
+            return f"{day_name}: Closed"
+        if self.open_time and self.close_time:
+            return f"{day_name}: {self.open_time.strftime('%H:%M')} - {self.close_time.strftime('%H:%M')}"
+        return f"{day_name}: Not set"
+
+
+# Business Hours Suggestion model
+class BusinessHoursSuggestion(models.Model):
+    """User suggestion for business hours changes."""
+    SUGGESTION_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    place = models.ForeignKey(
+        HalalPlace,
+        on_delete=models.CASCADE,
+        related_name='hours_suggestions'
+    )
+    suggested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='hours_suggestions'
+    )
+    
+    # Suggested schedule stored as structured JSON
+    # Format: {"0": [{"open": "09:00", "close": "22:00"}], "1": "closed", ...}
+    suggested_hours = models.JSONField(
+        help_text="Full weekly schedule as structured JSON"
+    )
+    is_24_hours = models.BooleanField(
+        default=False,
+        help_text="Suggested as open 24 hours"
+    )
+    suggested_notes = models.CharField(
+        max_length=255, blank=True,
+        help_text="Suggested notes for business hours"
+    )
+    reason = models.TextField(
+        help_text="Why this change is needed"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=SUGGESTION_STATUS_CHOICES,
+        default='pending'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='reviewed_hours_suggestions'
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    admin_notes = models.TextField(blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Business Hours Suggestion'
+        verbose_name_plural = 'Business Hours Suggestions'
+    
+    def __str__(self):
+        return f"Hours suggestion for {self.place.name} by {self.suggested_by.username}"
 
 
 # Search Query Analytics model

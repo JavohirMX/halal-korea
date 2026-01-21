@@ -1,0 +1,111 @@
+{% load i18n %}
+{% if not has_business_hours %}
+<div id="add-hours-cta" class="mb-3">
+    <button type="button"
+            id="add-hours-button"
+            class="w-full px-5 py-3 rounded-lg border border-primary-200 dark:border-primary-700 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors">
+        <i class="fas fa-plus mr-2"></i>{% translate "Add business hours" %}
+    </button>
+</div>
+{% endif %}
+
+<!-- Business Hours Collapsible -->
+<div id="business-hours-editor-container" class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden {% if not has_business_hours %}hidden{% endif %}">
+    <button type="button" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors touch-manipulation"
+            onclick="toggleSection('hours-section')">
+        <div class="flex items-center space-x-4">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                <i class="fas fa-clock text-gray-500 dark:text-gray-400 text-sm"></i>
+            </div>
+            <div>
+                <span class="text-base font-medium text-gray-900 dark:text-white">{% translate "Business Hours" %}</span>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {% translate "Set opening hours" %}
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <i class="fas fa-chevron-down text-gray-400 transform transition-transform duration-200" id="hours-chevron"></i>
+        </div>
+    </button>
+    
+    <div class="hidden border-t border-gray-200 dark:border-gray-700 p-6" id="hours-section">
+        <!-- Hidden field to store serialized hours JSON -->
+        <input type="hidden" name="business_hours_json" id="business_hours_json" value="">
+        <input type="hidden" name="suggest_business_hours" id="suggest_business_hours" value="false">
+        
+        <!-- 24 Hours Toggle -->
+        <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="is_24_hours" name="is_24_hours" 
+                       class="w-5 h-5 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
+                       onchange="toggle24Hours(this.checked)">
+                <div>
+                    <span class="font-medium text-gray-900 dark:text-white">{% translate "Open 24 Hours" %}</span>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{% translate "This place is open around the clock" %}</p>
+                </div>
+            </label>
+        </div>
+        
+        <!-- Current Hours Display (if available) -->
+        {% if show_current_hours and has_business_hours and place %}
+        <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <h4 class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">
+                <i class="fas fa-info-circle mr-1"></i>{% translate "Current Hours" %}
+            </h4>
+            <div class="text-sm text-blue-600 dark:text-blue-400">
+                {% include 'places/partials/hours_summary.html' with hours=place.business_hours %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Day-by-Day Hours Input -->
+        <div id="hours-editor" class="space-y-3">
+            {% for day_name in day_names %}
+            <div class="day-row border border-gray-200 dark:border-gray-700 rounded-lg p-4" data-day="{{ forloop.counter0 }}">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="font-medium text-gray-900 dark:text-white">{{ day_name }}</span>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" class="day-closed-toggle w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500"
+                               onchange="toggleDayClosed({{ forloop.counter0 }}, this.checked)">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">{% translate "Closed" %}</span>
+                    </label>
+                </div>
+                
+                <div class="time-slots-container">
+                    <div class="time-slot flex items-center gap-2 mb-2">
+                        <input type="text" class="open-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
+                               placeholder="09:00" value="09:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
+                               oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
+                        <span class="text-gray-500">—</span>
+                        <input type="text" class="close-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
+                               placeholder="22:00" value="22:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
+                               oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
+                        <button type="button" class="remove-slot hidden p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                onclick="removeTimeSlot(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="button" class="add-break-btn mt-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+                        onclick="addTimeSlot({{ forloop.counter0 }})">
+                    <i class="fas fa-plus mr-1"></i>{% translate "Add time slot" %}
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Notes Field -->
+        <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {% translate "Notes" %} <span class="text-gray-400 font-normal">{% translate "(optional)" %}</span>
+            </label>
+            <input type="text" name="business_hours_notes" id="business_hours_notes"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                   placeholder="{% translate 'e.g., Last order 30 min before close' %}"
+                   maxlength="255"
+                   oninput="markHoursModified()">
+        </div>    
+    </div>
+</div>

@@ -19,26 +19,26 @@ from sentry_sdk.integrations.django import DjangoIntegration
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Create logs directory if it doesn't exist
-LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(exist_ok=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = config("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
+DEBUG = config("DJANGO_DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS").split() # type: ignore
+ALLOWED_HOSTS = config("ALLOWED_HOSTS").split()  # type: ignore
 
 # Sentry Integration for Error Tracking
-if not DEBUG and config('SENTRY_DSN', default=''):
+if not DEBUG and config("SENTRY_DSN", default=""):
     sentry_sdk.init(
-        dsn=config('SENTRY_DSN'),
+        dsn=config("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
-        traces_sample_rate=config('SENTRY_TRACES_SAMPLE_RATE', default=0.1, cast=float),
+        traces_sample_rate=config("SENTRY_TRACES_SAMPLE_RATE", default=0.1, cast=float),
         # Set profile_session_sample_rate to 1.0 to profile 100%
         # of profile sessions.
         profile_session_sample_rate=1.0,
@@ -46,108 +46,108 @@ if not DEBUG and config('SENTRY_DSN', default=''):
         # run the profiler on when there is an active transaction
         profile_lifecycle="trace",
         send_default_pii=False,  # Privacy: don't send personally identifiable information
-        environment=config('SENTRY_ENVIRONMENT', default='production'),
+        environment=config("SENTRY_ENVIRONMENT", default="production"),
         # Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
         # We recommend adjusting this value in production.
         enable_logs=True,
-        
     )
 
 # CSRF Settings for production
 # Add your production domain(s) to CSRF_TRUSTED_ORIGINS environment variable
 # Example: CSRF_TRUSTED_ORIGINS="https://halal-korea.com https://www.halal-korea.com"
-CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split() # type: ignore
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split()  # type: ignore
 
 # Telegram Bot Notifications
 # Set TELEGRAM_NOTIFICATIONS_ENABLED=True in your .env file to enable notifications
 # Get bot token from @BotFather on Telegram and chat ID from your target channel/group
-TELEGRAM_NOTIFICATIONS_ENABLED = config('TELEGRAM_NOTIFICATIONS_ENABLED', default=False, cast=bool)
-TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
-TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
+TELEGRAM_NOTIFICATIONS_ENABLED = config(
+    "TELEGRAM_NOTIFICATIONS_ENABLED", default=False, cast=bool
+)
+TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
+TELEGRAM_CHAT_ID = config("TELEGRAM_CHAT_ID", default="")
 
 # Local Telegram Bot API Server (removes 50MB file size limit)
 # Uses local server by default when running in Docker, falls back to official API
-TELEGRAM_API_BASE_URL = config('TELEGRAM_API_BASE_URL', default='http://telegram-bot-api:8081')
+TELEGRAM_API_BASE_URL = config(
+    "TELEGRAM_API_BASE_URL", default="http://telegram-bot-api:8081"
+)
 
 # Site URL for admin links in notifications
-SITE_URL = config('SITE_URL', default='http://localhost:8000')
+SITE_URL = config("SITE_URL", default="http://localhost:8000")
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',  # Must be before django.contrib.admin
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',  # Required for django-allauth
-    'django.contrib.sitemaps',  # Added for SEO sitemap generation
-    'django.contrib.gis',
-    'tinymce',
-    'rosetta',  # Web-based translation management
-    
+    "jazzmin",  # Must be before django.contrib.admin
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",  # Required for django-allauth
+    "django.contrib.sitemaps",  # Added for SEO sitemap generation
+    "django.contrib.gis",
+    "tinymce",
+    "rosetta",  # Web-based translation management
     # Django AllAuth
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.github',
-    
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.github",
     # Local apps
-    'places',
-    'reviews',
-    'users',
-    'prayer_times',
-    'utils',
-    'blog',
-    'contact',
-    'feedback',
-    
+    "places",
+    "reviews",
+    "users",
+    "prayer_times",
+    "utils",
+    "blog",
+    "contact",
+    "feedback",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'allauth.account.middleware.AccountMiddleware',  # Required for django-allauth
-    'utils.logging_middleware.RequestIDMiddleware',  # Request ID injection (must be early)
-    'users.social_rate_limiting.SocialAuthRateLimitMiddleware',  # Social auth rate limiting
-    'config.language_middleware.SmartLanguageMiddleware',  # Enhanced language detection (replaces LocaleMiddleware)
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'config.middleware.AdminAccessMiddleware',  # Custom admin access control
-    'utils.monitoring_middleware.MonitoringMiddleware',  # Request monitoring
-    'utils.monitoring_middleware.AdminActionMiddleware',  # Admin action tracking
-    'utils.monitoring_middleware.CacheStatsMiddleware',  # Cache statistics
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",  # Required for django-allauth
+    "utils.logging_middleware.RequestIDMiddleware",  # Request ID injection (must be early)
+    "users.social_rate_limiting.SocialAuthRateLimitMiddleware",  # Social auth rate limiting
+    "config.language_middleware.SmartLanguageMiddleware",  # Enhanced language detection (replaces LocaleMiddleware)
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "config.middleware.AdminAccessMiddleware",  # Custom admin access control
+    "utils.monitoring_middleware.MonitoringMiddleware",  # Request monitoring
+    "utils.monitoring_middleware.AdminActionMiddleware",  # Admin action tracking
+    "utils.monitoring_middleware.CacheStatsMiddleware",  # Cache statistics
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'utils.context_processors.user_location',
-                'utils.context_processors.static_info_context',
-                'utils.language_utils.language_context_processor',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "utils.context_processors.user_location",
+                "utils.context_processors.static_info_context",
+                "utils.language_utils.language_context_processor",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database
@@ -160,13 +160,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #     }
 # }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default='5432'),  # default PostgreSQL port
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST"),
+        "PORT": config("DB_PORT", default="5432"),  # default PostgreSQL port
     }
 }
 # DATABASES = {
@@ -176,252 +176,254 @@ DATABASES = {
 # Cache Configuration
 # https://docs.djangoproject.com/en/5.1/topics/cache/
 # Use Redis in production for persistent caching across restarts
-REDIS_URL = config('REDIS_URL', default='')
+REDIS_URL = config("REDIS_URL", default="")
 
 if REDIS_URL and not DEBUG:
     # Production: Use Redis for better performance and persistence
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': REDIS_URL,
-            'TIMEOUT': 3600,  # 1 hour default timeout
-            'KEY_PREFIX': 'halal_korea',
-            'OPTIONS': {
-                'socket_connect_timeout': 5,
-                'socket_timeout': 5,
-                'retry_on_timeout': True,
-            }
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+            "TIMEOUT": 3600,  # 1 hour default timeout
+            "KEY_PREFIX": "halal_korea",
+            "OPTIONS": {
+                "socket_connect_timeout": 5,
+                "socket_timeout": 5,
+                "retry_on_timeout": True,
+            },
         }
     }
 else:
     # Development: Use local memory cache
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
-            'TIMEOUT': 3600,  # 1 hour default timeout
-            'OPTIONS': {
-                'MAX_ENTRIES': 1000,
-                'CULL_FREQUENCY': 3,
-            }
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake",
+            "TIMEOUT": 3600,  # 1 hour default timeout
+            "OPTIONS": {
+                "MAX_ENTRIES": 1000,
+                "CULL_FREQUENCY": 3,
+            },
         }
     }
 
 # Cache timeouts for different types of data
 CACHE_TIMEOUTS = {
-    'explore_page': 300,      # 5 minutes for explore listings
-    'place_detail': 600,      # 10 minutes for individual places
-    'home_featured': 300,     # 5 minutes for home page featured places
-    'search_results': 180,    # 3 minutes for search results
-    'proximity_locations': 3600,  # 1 hour for location data
+    "explore_page": 300,  # 5 minutes for explore listings
+    "place_detail": 600,  # 10 minutes for individual places
+    "home_featured": 300,  # 5 minutes for home page featured places
+    "search_results": 180,  # 3 minutes for search results
+    "proximity_locations": 3600,  # 1 hour for location data
 }
 
 # Rate Limiting Configuration
 # These settings define the rate limits for various actions
 RATE_LIMIT_SETTINGS = {
-    'EMAIL_SEND_PER_IP_LIMIT': 5,          # emails per hour per IP
-    'EMAIL_SEND_PER_IP_WINDOW': 60,        # minutes
-    'EMAIL_SEND_PER_USER_LIMIT': 3,        # emails per 30 min per user
-    'EMAIL_SEND_PER_USER_WINDOW': 30,      # minutes
-    'REGISTRATION_PER_IP_LIMIT': 3,        # registrations per hour per IP
-    'REGISTRATION_PER_IP_WINDOW': 60,      # minutes
-    'LOGIN_ATTEMPTS_PER_IP_LIMIT': 10,     # login attempts per 30 min per IP
-    'LOGIN_ATTEMPTS_PER_IP_WINDOW': 30,    # minutes
-    
+    "EMAIL_SEND_PER_IP_LIMIT": 5,  # emails per hour per IP
+    "EMAIL_SEND_PER_IP_WINDOW": 60,  # minutes
+    "EMAIL_SEND_PER_USER_LIMIT": 3,  # emails per 30 min per user
+    "EMAIL_SEND_PER_USER_WINDOW": 30,  # minutes
+    "REGISTRATION_PER_IP_LIMIT": 3,  # registrations per hour per IP
+    "REGISTRATION_PER_IP_WINDOW": 60,  # minutes
+    "LOGIN_ATTEMPTS_PER_IP_LIMIT": 10,  # login attempts per 30 min per IP
+    "LOGIN_ATTEMPTS_PER_IP_WINDOW": 30,  # minutes
     # Password Reset Rate Limiting (stricter than regular email)
-    'PASSWORD_RESET_PER_IP_LIMIT': 3,      # password reset requests per hour per IP
-    'PASSWORD_RESET_PER_IP_WINDOW': 60,    # minutes
-    'PASSWORD_RESET_PER_EMAIL_LIMIT': 2,   # password reset requests per hour per email
-    'PASSWORD_RESET_PER_EMAIL_WINDOW': 60, # minutes
-    
+    "PASSWORD_RESET_PER_IP_LIMIT": 3,  # password reset requests per hour per IP
+    "PASSWORD_RESET_PER_IP_WINDOW": 60,  # minutes
+    "PASSWORD_RESET_PER_EMAIL_LIMIT": 2,  # password reset requests per hour per email
+    "PASSWORD_RESET_PER_EMAIL_WINDOW": 60,  # minutes
     # Social Authentication Rate Limiting
-    'SOCIAL_AUTH_PER_IP_LIMIT': 20,        # social auth attempts per hour per IP
-    'SOCIAL_AUTH_PER_IP_WINDOW': 60,       # minutes
-    'SOCIAL_AUTH_GOOGLE_PER_IP_LIMIT': 15,
-    'SOCIAL_AUTH_GOOGLE_PER_IP_WINDOW': 60,
-    'SOCIAL_AUTH_GITHUB_PER_IP_LIMIT': 10,
-    'SOCIAL_AUTH_GITHUB_PER_IP_WINDOW': 60,
+    "SOCIAL_AUTH_PER_IP_LIMIT": 20,  # social auth attempts per hour per IP
+    "SOCIAL_AUTH_PER_IP_WINDOW": 60,  # minutes
+    "SOCIAL_AUTH_GOOGLE_PER_IP_LIMIT": 15,
+    "SOCIAL_AUTH_GOOGLE_PER_IP_WINDOW": 60,
+    "SOCIAL_AUTH_GITHUB_PER_IP_LIMIT": 10,
+    "SOCIAL_AUTH_GITHUB_PER_IP_WINDOW": 60,
 }
 
 # Logging Configuration
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
-        'json': {
-            'format': '{"level": "%(levelname)s", "time": "%(asctime)s", "module": "%(module)s", "message": "%(message)s"}',
+        "json": {
+            "format": '{"level": "%(levelname)s", "time": "%(asctime)s", "module": "%(module)s", "message": "%(message)s"}',
         },
-        'structured': {
-            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-            'format': '%(asctime)s %(name)s %(levelname)s %(message)s %(request_id)s %(user_id)s %(username)s %(hostname)s',
-        },
-    },
-    'filters': {
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        'context_enrichment': {
-            '()': 'utils.logging_utils.ContextEnrichmentFilter',
+        "structured": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "format": "%(asctime)s %(name)s %(levelname)s %(message)s %(request_id)s %(user_id)s %(username)s %(hostname)s",
         },
     },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'filters': ['require_debug_true', 'context_enrichment'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
         },
-        'file': {
-            'level': 'INFO',
-            'filters': ['context_enrichment'],
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'django.log',
-            'maxBytes': 1024*1024*10,  # 10 MB
-            'backupCount': 5,
-            'formatter': 'verbose',
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
         },
-        'error_file': {
-            'level': 'ERROR',
-            'filters': ['context_enrichment'],
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'django_errors.log',
-            'maxBytes': 1024*1024*10,  # 10 MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'security_file': {
-            'level': 'INFO',
-            'filters': ['context_enrichment'],
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'security.log',
-            'maxBytes': 1024*1024*5,  # 5 MB
-            'backupCount': 3,
-            'formatter': 'json',
-        },
-        'api_file': {
-            'level': 'INFO',
-            'filters': ['context_enrichment'],
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'api.log',
-            'maxBytes': 1024*1024*5,  # 5 MB
-            'backupCount': 3,
-            'formatter': 'verbose',
-        },
-        'database_file': {
-            'level': 'WARNING',
-            'filters': ['context_enrichment'],
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'database.log',
-            'maxBytes': 1024*1024*5,  # 5 MB
-            'backupCount': 3,
-            'formatter': 'verbose',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler',
-            'formatter': 'verbose',
+        "context_enrichment": {
+            "()": "utils.logging_utils.ContextEnrichmentFilter",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "filters": ["require_debug_true", "context_enrichment"],
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'django.request': {
-            'handlers': ['error_file', 'mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
+        "file": {
+            "level": "INFO",
+            "filters": ["context_enrichment"],
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "django.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "backupCount": 5,
+            "formatter": "verbose",
         },
-        'django.security': {
-            'handlers': ['security_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "error_file": {
+            "level": "ERROR",
+            "filters": ["context_enrichment"],
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "django_errors.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10 MB
+            "backupCount": 5,
+            "formatter": "verbose",
         },
-        'django.db.backends': {
-            'handlers': ['database_file'],
-            'level': 'WARNING',
-            'propagate': False,
+        "security_file": {
+            "level": "INFO",
+            "filters": ["context_enrichment"],
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "security.log",
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 3,
+            "formatter": "json",
         },
-        'places': {
-            'handlers': ['console', 'file', 'error_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "api_file": {
+            "level": "INFO",
+            "filters": ["context_enrichment"],
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "api.log",
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 3,
+            "formatter": "verbose",
         },
-        'reviews': {
-            'handlers': ['console', 'file', 'error_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "database_file": {
+            "level": "WARNING",
+            "filters": ["context_enrichment"],
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "database.log",
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 3,
+            "formatter": "verbose",
         },
-        'users': {
-            'handlers': ['console', 'file', 'error_file', 'security_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'prayer_times': {
-            'handlers': ['console', 'file', 'api_file', 'error_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'utils': {
-            'handlers': ['console', 'file', 'error_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'blog': {
-            'handlers': ['console', 'file', 'error_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'api': {
-            'handlers': ['api_file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'security': {
-            'handlers': ['security_file', 'error_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+            "formatter": "verbose",
         },
     },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["error_file", "mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["security_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["database_file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "places": {
+            "handlers": ["console", "file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "reviews": {
+            "handlers": ["console", "file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "users": {
+            "handlers": ["console", "file", "error_file", "security_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "prayer_times": {
+            "handlers": ["console", "file", "api_file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "utils": {
+            "handlers": ["console", "file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "blog": {
+            "handlers": ["console", "file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "api": {
+            "handlers": ["api_file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "security": {
+            "handlers": ["security_file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
     },
 }
 
 # Enhanced Logging Configuration
-ENVIRONMENT = config('ENVIRONMENT', default='development')  # development, staging, production
+ENVIRONMENT = config(
+    "ENVIRONMENT", default="development"
+)  # development, staging, production
 
 # Log sampling rates per logger (for high-volume endpoints)
 LOG_SAMPLE_RATES = {
-    'places.views': config('LOG_SAMPLE_RATE_PLACES', default=0.1, cast=float),      # 10%
-    'utils.location': config('LOG_SAMPLE_RATE_LOCATION', default=0.01, cast=float), # 1%
-    'prayer_times': config('LOG_SAMPLE_RATE_PRAYER', default=0.1, cast=float),      # 10%
+    "places.views": config("LOG_SAMPLE_RATE_PLACES", default=0.1, cast=float),  # 10%
+    "utils.location": config(
+        "LOG_SAMPLE_RATE_LOCATION", default=0.01, cast=float
+    ),  # 1%
+    "prayer_times": config("LOG_SAMPLE_RATE_PRAYER", default=0.1, cast=float),  # 10%
 }
 
 # Override logging level based on DEBUG setting
 if DEBUG:
-    LOGGING['handlers']['console']['level'] = 'INFO'
-    LOGGING['handlers']['file']['level'] = 'INFO'  # Enable DEBUG logs in files
-    LOGGING['loggers']['django']['level'] = 'INFO'
-    for logger_name in ['places', 'reviews', 'users', 'prayer_times', 'utils', 'blog']:
-        LOGGING['loggers'][logger_name]['level'] = 'INFO'
+    LOGGING["handlers"]["console"]["level"] = "INFO"
+    LOGGING["handlers"]["file"]["level"] = "INFO"  # Enable DEBUG logs in files
+    LOGGING["loggers"]["django"]["level"] = "INFO"
+    for logger_name in ["places", "reviews", "users", "prayer_times", "utils", "blog"]:
+        LOGGING["loggers"][logger_name]["level"] = "INFO"
 else:
     # In production, log WARNING and above to console
-    LOGGING['handlers']['console']['level'] = 'WARNING'
+    LOGGING["handlers"]["console"]["level"] = "WARNING"
 
 
 # Password validation
@@ -429,16 +431,16 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -446,18 +448,18 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en'  # Default/source language
+LANGUAGE_CODE = "en"  # Default/source language
 
 # English is the source language (no .po file needed)
 # Other languages require translation files
 LANGUAGES = [
-    ('en', 'English'),      # Source language (no translation file needed)
-    ('ko', '한국어'),       # Requires translation
-    ('uz', "O'zbek"),       # Requires translation
+    ("en", "English"),  # Source language (no translation file needed)
+    ("ko", "한국어"),  # Requires translation
+    ("uz", "O'zbek"),  # Requires translation
 ]
 
 LOCALE_PATHS = [
-    BASE_DIR / 'locale',
+    BASE_DIR / "locale",
 ]
 
 # Configure English as source language (don't generate .po for English)
@@ -473,21 +475,21 @@ ROSETTA_SHOW_AT_ADMIN_PANEL = True
 ROSETTA_REQUIRES_AUTH = True
 
 # Rosetta Access Control (only superusers by default)
-ROSETTA_ACCESS_CONTROL_FUNCTION = 'config.rosetta_permissions.has_rosetta_access'
+ROSETTA_ACCESS_CONTROL_FUNCTION = "config.rosetta_permissions.has_rosetta_access"
 
 # Rosetta Storage Settings
 ROSETTA_WSGI_AUTO_RELOAD = True
-ROSETTA_EXCLUDED_APPLICATIONS = ['rosetta']
+ROSETTA_EXCLUDED_APPLICATIONS = ["rosetta"]
 
 # Custom Rosetta Configuration for Halal Korea
 ROSETTA_LANGUAGE_GROUPS = {
-    'Main Languages': ['ko', 'uz'],
-    'Source': ['en'],
+    "Main Languages": ["ko", "uz"],
+    "Source": ["en"],
 }
 
 ROSETTA_POFILE_WRAP_WIDTH = 78
 
-TIME_ZONE = 'Asia/Seoul'
+TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
 
@@ -497,7 +499,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static/",
     BASE_DIR / "assets/",
@@ -507,88 +509,98 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media/'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media/"
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = "users.User"
 
 # Django Sites Framework (required for django-allauth)
 SITE_ID = 1
 
 # Authentication Backends
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Default Django auth
-    'allauth.account.auth_backends.AuthenticationBackend',  # AllAuth
+    "django.contrib.auth.backends.ModelBackend",  # Default Django auth
+    "allauth.account.auth_backends.AuthenticationBackend",  # AllAuth
 ]
 
-GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
-GOOGLE_MAPS_ID = config('GOOGLE_MAPS_ID', default='DEMO_MAP_ID')
+GOOGLE_MAPS_API_KEY = config("GOOGLE_MAPS_API_KEY")
+GOOGLE_MAPS_ID = config("GOOGLE_MAPS_ID", default="DEMO_MAP_ID")
 
 # Prayer Times API Configuration
-PRAYER_TIMES_API_BASE_URL = config('PRAYER_TIMES_API_BASE_URL', default='https://api.aladhan.com')
+PRAYER_TIMES_API_BASE_URL = config(
+    "PRAYER_TIMES_API_BASE_URL", default="https://api.aladhan.com"
+)
 
-LOGIN_URL = 'users:login'  # URL where users will be redirected when login is required
-LOGIN_REDIRECT_URL = 'places:home'  # URL where users will be redirected after successful login
-LOGOUT_REDIRECT_URL = 'places:home'  # URL where users will be redirected after logout
+LOGIN_URL = "users:login"  # URL where users will be redirected when login is required
+LOGIN_REDIRECT_URL = (
+    "places:home"  # URL where users will be redirected after successful login
+)
+LOGOUT_REDIRECT_URL = "places:home"  # URL where users will be redirected after logout
 
 # Email Configuration
 if DEBUG:
     # For development, emails will be printed to console
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
     # For production, use these settings with a service like SendGrid, Mailgun, etc.
-    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-    EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-    EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-    EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-    EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+    EMAIL_BACKEND = config(
+        "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
+    )
+    EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+    EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+    EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+    EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+    EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Halal Korea<noreply@halal-korea.com>')
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL", default="Halal Korea<noreply@halal-korea.com>"
+)
 
 # Email verification settings
-EMAIL_VERIFICATION_TIMEOUT = config('EMAIL_VERIFICATION_TIMEOUT', default=86400, cast=int)  # 24 hours in seconds
+EMAIL_VERIFICATION_TIMEOUT = config(
+    "EMAIL_VERIFICATION_TIMEOUT", default=86400, cast=int
+)  # 24 hours in seconds
 
 # TinyMCE Configuration
 TINYMCE_DEFAULT_CONFIG = {
-    'cleanup_on_startup': True,
-    'custom_undo_redo_levels': 20,
-    'selector': 'textarea',
-    'theme': 'silver',
-    'plugins': '''
+    "cleanup_on_startup": True,
+    "custom_undo_redo_levels": 20,
+    "selector": "textarea",
+    "theme": "silver",
+    "plugins": """
             textcolor save link image media preview codesample contextmenu
             table code lists fullscreen  insertdatetime  nonbreaking
             contextmenu directionality searchreplace wordcount visualblocks
             visualchars code fullscreen autolink lists  charmap print  hr
             anchor pagebreak
-            ''',
-    'toolbar1': '''
+            """,
+    "toolbar1": """
             fullscreen preview bold italic underline | fontselect,
             fontsizeselect  | forecolor backcolor | alignleft alignright |
             aligncenter alignjustify | indent outdent | bullist numlist table |
             | link image media | codesample |
-            ''',
-    'toolbar2': '''
+            """,
+    "toolbar2": """
             visualblocks visualchars |
             charmap hr pagebreak nonbreaking anchor |  code |
-            ''',
-    'contextmenu': 'formats | link image',
-    'menubar': True,
-    'statusbar': True,
-    'width': '100%',
-    'height': 400,
-    'content_css': [
-        '/static/admin/css/base.css',
+            """,
+    "contextmenu": "formats | link image",
+    "menubar": True,
+    "statusbar": True,
+    "width": "100%",
+    "height": 400,
+    "content_css": [
+        "/static/admin/css/base.css",
     ],
-    'images_upload_url': '/tinymce/upload/',
-    'images_upload_credentials': True,
-    'file_picker_types': 'image',
-    'relative_urls': False,
-    'remove_script_host': False,
-    'convert_urls': True,
+    "images_upload_url": "/tinymce/upload/",
+    "images_upload_credentials": True,
+    "file_picker_types": "image",
+    "relative_urls": False,
+    "remove_script_host": False,
+    "convert_urls": True,
 }
 
 # ============================================================================
@@ -596,12 +608,12 @@ TINYMCE_DEFAULT_CONFIG = {
 # ============================================================================
 
 # AllAuth Account Configuration
-ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Use email instead of username
+ACCOUNT_AUTHENTICATION_METHOD = "email"  # Use email instead of username
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'optional'  # We handle verification ourselves
+ACCOUNT_EMAIL_VERIFICATION = "optional"  # We handle verification ourselves
 ACCOUNT_USERNAME_REQUIRED = True  # Keep usernames for our existing system
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
-ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
+ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 
 # Social Account Configuration - Skip intermediate pages for better UX
 SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip the "Continue" confirmation page
@@ -609,59 +621,60 @@ SOCIALACCOUNT_QUERY_EMAIL = True  # Always request email from providers
 SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens (privacy)
 
 # Login/Logout URLs (integrate with existing system)
-ACCOUNT_LOGIN_URL = '/users/login/'
-ACCOUNT_LOGOUT_URL = '/users/logout/'
-ACCOUNT_LOGIN_REDIRECT_URL = '/explore/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGIN_URL = "/users/login/"
+ACCOUNT_LOGOUT_URL = "/users/logout/"
+ACCOUNT_LOGIN_REDIRECT_URL = "/explore/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
 # Account Management
-ACCOUNT_SIGNUP_REDIRECT_URL = '/explore/'
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/users/login/'
+ACCOUNT_SIGNUP_REDIRECT_URL = "/explore/"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/"
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/users/login/"
 
 # Social Account Connection URLs
-SOCIALACCOUNT_CONNECTIONS_REDIRECT_URL = '/users/profile/edit/'
+SOCIALACCOUNT_CONNECTIONS_REDIRECT_URL = "/users/profile/edit/"
 
 # Custom Adapters
-ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'
-SOCIALACCOUNT_ADAPTER = 'users.adapters.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = "users.adapters.CustomAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "users.adapters.CustomSocialAccountAdapter"
 
 # Additional Social Account Configuration
 SOCIALACCOUNT_AUTO_SIGNUP = True  # Auto-create accounts for social logins
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Trust social providers for email verification
+SOCIALACCOUNT_EMAIL_VERIFICATION = (
+    "none"  # Trust social providers for email verification
+)
 
 # Provider-specific settings
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
         ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
+        "AUTH_PARAMS": {
+            "access_type": "online",
         },
-        'OAUTH_PKCE_ENABLED': True,
-        'FETCH_USERINFO': True,
+        "OAUTH_PKCE_ENABLED": True,
+        "FETCH_USERINFO": True,
     },
-
-    'github': {
-        'SCOPE': [
-            'user:email',
+    "github": {
+        "SCOPE": [
+            "user:email",
         ],
     },
 }
 
 # OAuth Client Credentials (to be set in environment variables)
 # Google OAuth
-SOCIALACCOUNT_PROVIDERS['google']['APP'] = {
-    'client_id': config('GOOGLE_OAUTH_CLIENT_ID', default=''),
-    'secret': config('GOOGLE_OAUTH_CLIENT_SECRET', default=''),
+SOCIALACCOUNT_PROVIDERS["google"]["APP"] = {
+    "client_id": config("GOOGLE_OAUTH_CLIENT_ID", default=""),
+    "secret": config("GOOGLE_OAUTH_CLIENT_SECRET", default=""),
 }
 
 # GitHub OAuth
-SOCIALACCOUNT_PROVIDERS['github']['APP'] = {
-    'client_id': config('GITHUB_CLIENT_ID', default=''),
-    'secret': config('GITHUB_CLIENT_SECRET', default=''),
+SOCIALACCOUNT_PROVIDERS["github"]["APP"] = {
+    "client_id": config("GITHUB_CLIENT_ID", default=""),
+    "secret": config("GITHUB_CLIENT_SECRET", default=""),
 }
 
 # ============================================================================
@@ -669,17 +682,33 @@ SOCIALACCOUNT_PROVIDERS['github']['APP'] = {
 # ============================================================================
 
 # Monitoring System
-MONITORING_ENABLED = config('MONITORING_ENABLED', default=True, cast=bool)
-MONITORING_SAMPLE_RATE = config('MONITORING_SAMPLE_RATE', default=0.1, cast=float)  # 10% sampling (good for small sites)
-MONITORING_SLOW_THRESHOLD_MS = config('MONITORING_SLOW_THRESHOLD_MS', default=1000, cast=int)  # 1 second
-MONITORING_RETENTION_DAYS = config('MONITORING_RETENTION_DAYS', default=7, cast=int)  # 7 days retention for small site
+MONITORING_ENABLED = config("MONITORING_ENABLED", default=True, cast=bool)
+MONITORING_SAMPLE_RATE = config(
+    "MONITORING_SAMPLE_RATE", default=0.1, cast=float
+)  # 10% sampling (good for small sites)
+MONITORING_SLOW_THRESHOLD_MS = config(
+    "MONITORING_SLOW_THRESHOLD_MS", default=1000, cast=int
+)  # 1 second
+MONITORING_RETENTION_DAYS = config(
+    "MONITORING_RETENTION_DAYS", default=7, cast=int
+)  # 7 days retention for small site
 
 # Health Check Thresholds (can be overridden via AlertRules in database)
-MONITORING_HEALTH_MIN_REQUESTS = config('MONITORING_HEALTH_MIN_REQUESTS', default=10, cast=int)  # Min logs/hour before warning
-MONITORING_HEALTH_ERROR_RATE_WARNING = config('MONITORING_HEALTH_ERROR_RATE_WARNING', default=5.0, cast=float)  # Error rate % warning
-MONITORING_HEALTH_ERROR_RATE_CRITICAL = config('MONITORING_HEALTH_ERROR_RATE_CRITICAL', default=10.0, cast=float)  # Error rate % critical
-MONITORING_HEALTH_RESPONSE_TIME_WARNING = config('MONITORING_HEALTH_RESPONSE_TIME_WARNING', default=2000, cast=int)  # Response time ms warning
-MONITORING_HEALTH_SECURITY_EVENTS_WARNING = config('MONITORING_HEALTH_SECURITY_EVENTS_WARNING', default=5, cast=int)  # Unresolved high-severity events
+MONITORING_HEALTH_MIN_REQUESTS = config(
+    "MONITORING_HEALTH_MIN_REQUESTS", default=10, cast=int
+)  # Min logs/hour before warning
+MONITORING_HEALTH_ERROR_RATE_WARNING = config(
+    "MONITORING_HEALTH_ERROR_RATE_WARNING", default=5.0, cast=float
+)  # Error rate % warning
+MONITORING_HEALTH_ERROR_RATE_CRITICAL = config(
+    "MONITORING_HEALTH_ERROR_RATE_CRITICAL", default=10.0, cast=float
+)  # Error rate % critical
+MONITORING_HEALTH_RESPONSE_TIME_WARNING = config(
+    "MONITORING_HEALTH_RESPONSE_TIME_WARNING", default=2000, cast=int
+)  # Response time ms warning
+MONITORING_HEALTH_SECURITY_EVENTS_WARNING = config(
+    "MONITORING_HEALTH_SECURITY_EVENTS_WARNING", default=5, cast=int
+)  # Unresolved high-severity events
 
 # Google Analytics Configuration (for dashboard metrics - uses GA4 Data API)
 # To enable GA integration:
@@ -688,37 +717,54 @@ MONITORING_HEALTH_SECURITY_EVENTS_WARNING = config('MONITORING_HEALTH_SECURITY_E
 # 3. Add the service account email as a user in GA4 property settings
 # 4. Download the JSON key file and set GA_CREDENTIALS_FILE path
 # 5. Set GA_PROPERTY_ID to your GA4 property ID (numeric, e.g., '123456789')
-GA_PROPERTY_ID = config('GA_PROPERTY_ID', default='')  # GA4 Property ID (numeric, not measurement ID)
-GA_CREDENTIALS_FILE = config('GA_CREDENTIALS_FILE', default='')  # Path to service account JSON key file
+GA_PROPERTY_ID = config(
+    "GA_PROPERTY_ID", default=""
+)  # GA4 Property ID (numeric, not measurement ID)
+GA_CREDENTIALS_FILE = config(
+    "GA_CREDENTIALS_FILE", default=""
+)  # Path to service account JSON key file
 
 
 # Sentry Error Tracking (to be configured in Phase 1.3)
-SENTRY_DSN = config('SENTRY_DSN', default='')
-SENTRY_ENVIRONMENT = config('SENTRY_ENVIRONMENT', default='production')
-SENTRY_TRACES_SAMPLE_RATE = config('SENTRY_TRACES_SAMPLE_RATE', default=0.1, cast=float)
+SENTRY_DSN = config("SENTRY_DSN", default="")
+SENTRY_ENVIRONMENT = config("SENTRY_ENVIRONMENT", default="production")
+SENTRY_TRACES_SAMPLE_RATE = config("SENTRY_TRACES_SAMPLE_RATE", default=0.1, cast=float)
 
 # Alert Configuration
-ALERT_TELEGRAM_ENABLED = config('ALERT_TELEGRAM_ENABLED', default=True, cast=bool)
-ALERT_EMAIL_ENABLED = config('ALERT_EMAIL_ENABLED', default=True, cast=bool)
-ALERT_EMAIL_RECIPIENTS = config('ALERT_EMAIL_RECIPIENTS', default='').split(',') if config('ALERT_EMAIL_RECIPIENTS', default='') else []
+ALERT_TELEGRAM_ENABLED = config("ALERT_TELEGRAM_ENABLED", default=True, cast=bool)
+ALERT_EMAIL_ENABLED = config("ALERT_EMAIL_ENABLED", default=True, cast=bool)
+ALERT_EMAIL_RECIPIENTS = (
+    config("ALERT_EMAIL_RECIPIENTS", default="").split(",")
+    if config("ALERT_EMAIL_RECIPIENTS", default="")
+    else []
+)
 
 # ============================================================================
 # WATERMARK CONFIGURATION
 # ============================================================================
 
 # Enable/disable watermarking feature
-WATERMARK_ENABLED = config('WATERMARK_ENABLED', default=True, cast=bool)
+WATERMARK_ENABLED = config("WATERMARK_ENABLED", default=True, cast=bool)
 
 # Watermark appearance settings
-WATERMARK_OPACITY = config('WATERMARK_OPACITY', default=0.25, cast=float)  # 0.0 to 1.0
-WATERMARK_ANGLE = config('WATERMARK_ANGLE', default=-45, cast=int)  # Rotation angle in degrees
-WATERMARK_SPACING = config('WATERMARK_SPACING', default=50, cast=int)  # Pixels between tiles
-WATERMARK_SIZE = config('WATERMARK_SIZE', default=200, cast=int)  # Width of watermark in pixels (height auto-scales)
+WATERMARK_OPACITY = config("WATERMARK_OPACITY", default=0.25, cast=float)  # 0.0 to 1.0
+WATERMARK_ANGLE = config(
+    "WATERMARK_ANGLE", default=-45, cast=int
+)  # Rotation angle in degrees
+WATERMARK_SPACING = config(
+    "WATERMARK_SPACING", default=50, cast=int
+)  # Pixels between tiles
+WATERMARK_SIZE = config(
+    "WATERMARK_SIZE", default=200, cast=int
+)  # Width of watermark in pixels (height auto-scales)
 
 # Watermark text settings (used only if watermark.png not found)
-WATERMARK_TEXT = config('WATERMARK_TEXT', default='Halal Korea')
-WATERMARK_TEXT_SIZE = config('WATERMARK_TEXT_SIZE', default=32, cast=int)
-WATERMARK_TILE_SIZE = (300, 100)  # Width, height for generated watermark tile (fallback)
+WATERMARK_TEXT = config("WATERMARK_TEXT", default="Halal Korea")
+WATERMARK_TEXT_SIZE = config("WATERMARK_TEXT_SIZE", default=32, cast=int)
+WATERMARK_TILE_SIZE = (
+    300,
+    100,
+)  # Width, height for generated watermark tile (fallback)
 
 # Security Settings for Production (behind reverse proxy)
 # When Django is behind a reverse proxy (nginx, etc.) that terminates SSL,
@@ -726,15 +772,15 @@ WATERMARK_TILE_SIZE = (300, 100)  # Width, height for generated watermark tile (
 if not DEBUG:
     # Trust the X-Forwarded-Proto header from your reverse proxy
     # Format: ('HTTP_HEADER_NAME', 'header_value_to_trust')
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
     # Force HTTPS redirects
     SECURE_SSL_REDIRECT = True
-    
+
     # Other security settings
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    
+
     # Only send cookies over HTTPS
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -747,50 +793,35 @@ if not DEBUG:
 JAZZMIN_SETTINGS = {
     # Title on the login screen
     "site_title": "Halal Korea Admin",
-    
     # Title on the brand (top left)
     "site_header": "Halal Korea",
-    
     # Title in the browser tab
     "site_brand": "Halal Korea",
-    
     # Logo to use for your site
     "site_logo": "images/logo-square.png",
-    
     # Logo to use for login page
     "login_logo": "images/logo-square.png",
-    
     # CSS classes that are applied to the logo
     "site_logo_classes": "img-rounded",
-    
     # Welcome text on the login screen
     "welcome_sign": "Welcome to Halal Korea Admin",
-    
     # Copyright on the footer
     "copyright": "Halal Korea",
-    
     # The model admin to search from the search bar
-    "search_model": ["auth.User", "places.HalalPlace", "blog.BlogPost"],
-    
+    "search_model": ["users.User", "places.HalalPlace", "blog.BlogPost"],
     # Field name on user model that contains avatar
     "user_avatar": None,
-    
     #############
     # Side Menu #
     #############
-    
     # Whether to display the side menu
     "show_sidebar": True,
-    
     # Whether to auto expand the menu
     "navigation_expanded": True,
-    
     # Hide these apps from the sidebar
     "hide_apps": [],
-    
     # Hide these models from the sidebar
     "hide_models": [],
-    
     # Order of apps and models in the sidebar
     "order_with_respect_to": [
         "auth",
@@ -802,11 +833,9 @@ JAZZMIN_SETTINGS = {
         "feedback",
         "prayer_times",
     ],
-    
     # Custom icons for apps/models
     "icons": {
         "auth": "fas fa-users-cog",
-        "auth.User": "fas fa-user",
         "auth.Group": "fas fa-users",
         "places": "fas fa-map-marked-alt",
         "places.HalalPlace": "fas fa-map-marker-alt",
@@ -848,58 +877,55 @@ JAZZMIN_SETTINGS = {
         "account": "fas fa-user-check",
         "account.EmailAddress": "fas fa-at",
     },
-    
     # Default icon for apps/models not listed
     "default_icon_parents": "fas fa-chevron-circle-right",
     "default_icon_children": "fas fa-circle",
-    
     #############
     # UI Tweaks #
     #############
-    
     # Relative paths to custom CSS/JS
     "custom_css": None,
     "custom_js": None,
-    
     # Whether to show the UI customizer on the sidebar
     "show_ui_builder": True,
-    
     ###############
     # Change view #
     ###############
-    
     # Render out the change view as a single form, or in tabs
     "changeform_format": "horizontal_tabs",
-    
     # Override changeform for specific models
     "changeform_format_overrides": {
-        "auth.User": "collapsible",
+        "users.User": "collapsible",
         "auth.Group": "vertical_tabs",
     },
-    
     #################
     # Related Modal #
     #################
-    
     # Use modals for related items
     "related_modal_active": True,
-    
     #############
     # Top Menu  #
     #############
-    
     # Links to put along the top menu
     "topmenu_links": [
         {"name": "View Site", "url": "/", "new_window": False},
         {"name": "Monitoring", "url": "/admin/monitoring/", "new_window": False},
-        {"name": "Analytics", "url": "https://analytics.google.com/", "new_window": True, "icon": "fas fa-chart-bar"},
-        {"name": "Sentry", "url": "https://sentry.io/", "new_window": True, "icon": "fas fa-bug"},
+        {
+            "name": "Analytics",
+            "url": "https://analytics.google.com/",
+            "new_window": True,
+            "icon": "fas fa-chart-bar",
+        },
+        {
+            "name": "Sentry",
+            "url": "https://sentry.io/",
+            "new_window": True,
+            "icon": "fas fa-bug",
+        },
     ],
-    
     #############
     # User Menu #
     #############
-    
     # Additional links to include in the user menu
     "usermenu_links": [
         {"name": "View Site", "url": "/", "new_window": True, "icon": "fas fa-globe"},

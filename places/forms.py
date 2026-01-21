@@ -133,8 +133,13 @@ class PlaceSuggestionForm(forms.Form):
         
         has_images = cleaned_data.get('images')  # Note: Multiple files will be checked in the view
         
+        # Business hours suggestions will be checked separately in the view (from POST data)
+        # since they come from hidden JSON fields, not from form fields
+        
         if not field_suggestions and not has_images:
-            raise forms.ValidationError("Please suggest at least one change or upload an image.")
+            # Allow submission if only business hours are being suggested
+            # The view will validate that at least one suggestion type is present
+            pass  # Don't raise error here - view handles business hours
         
         # Validate that when a field is suggested, its value is provided
         field_mappings = [
