@@ -573,6 +573,9 @@
                             <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
                             <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
                         {% else %}
+                            {% if request.GET.sort == 'distance' %}
+                                <option value="distance" selected>{% translate "Sort by Distance" %}</option>
+                            {% endif %}
                             <option value="rating" {% if request.GET.sort == 'rating' or not request.GET.sort %}selected{% endif %}>{% translate "Most Popular" %}</option>
                         {% endif %}
                     </select>

@@ -3,6 +3,7 @@ from django.utils.html import format_html
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.gis.geos import Point
+from django.db import transaction
 from django.db.models import Count, Q
 from django.urls import path
 from django.http import HttpResponse, JsonResponse
@@ -1703,43 +1704,44 @@ class BusinessHoursSuggestionAdmin(admin.ModelAdmin):
             if isinstance(hours, str):
                 hours = json.loads(hours)
 
-            # Get or create BusinessHours for this place
-            bh, created = BusinessHours.objects.get_or_create(place=place)
-            bh.is_24_hours = suggestion.is_24_hours
-            bh.notes = suggestion.suggested_notes
-            bh.save()
+            with transaction.atomic():
+                # Get or create BusinessHours for this place
+                bh, created = BusinessHours.objects.get_or_create(place=place)
+                bh.is_24_hours = suggestion.is_24_hours
+                bh.notes = suggestion.suggested_notes
+                bh.save()
 
-            if not suggestion.is_24_hours:
-                # Clear existing time slots
+                # Clear existing time slots to avoid stale data
                 bh.time_slots.all().delete()
 
-                # Create new time slots from suggestion
-                for day_str, day_data in hours.items():
-                    day_num = int(day_str)
-                    if day_data == "closed":
-                        TimeSlot.objects.create(
-                            business_hours=bh, day_of_week=day_num, is_closed=True
-                        )
-                    elif isinstance(day_data, list):
-                        for slot in day_data:
-                            from datetime import datetime
-
-                            open_time = (
-                                datetime.strptime(slot["open"], "%H:%M").time()
-                                if slot.get("open")
-                                else None
-                            )
-                            close_time = (
-                                datetime.strptime(slot["close"], "%H:%M").time()
-                                if slot.get("close")
-                                else None
-                            )
+                if not suggestion.is_24_hours:
+                    # Create new time slots from suggestion
+                    for day_str, day_data in hours.items():
+                        day_num = int(day_str)
+                        if day_data == "closed":
                             TimeSlot.objects.create(
-                                business_hours=bh,
-                                day_of_week=day_num,
-                                open_time=open_time,
-                                close_time=close_time,
+                                business_hours=bh, day_of_week=day_num, is_closed=True
                             )
+                        elif isinstance(day_data, list):
+                            for slot in day_data:
+                                from datetime import datetime
+
+                                open_time = (
+                                    datetime.strptime(slot["open"], "%H:%M").time()
+                                    if slot.get("open")
+                                    else None
+                                )
+                                close_time = (
+                                    datetime.strptime(slot["close"], "%H:%M").time()
+                                    if slot.get("close")
+                                    else None
+                                )
+                                TimeSlot.objects.create(
+                                    business_hours=bh,
+                                    day_of_week=day_num,
+                                    open_time=open_time,
+                                    close_time=close_time,
+                                )
 
             logger.info(
                 f"Applied hours suggestion {suggestion.pk} to place {place.name}"
