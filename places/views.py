@@ -13,9 +13,21 @@ from django.db.models import (
 )
 from django.http import Http404
 from django.contrib.auth import get_user_model
-from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
+from .models import (
+    HalalPlace,
+    PlaceEditSuggestion,
+    PlaceImageSuggestion,
+    BusinessHours,
+    TimeSlot,
+)
 from reviews.models import Review
 from .forms import HalalPlaceForm, PlaceSuggestionForm, PlaceImageSuggestionForm  # noqa: F401
+from .business_hours import (
+    parse_business_hours_payload,
+    build_existing_hours_data_from_payload,
+    BusinessHoursParseError,
+    DAY_NAMES,
+)
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import uuid
@@ -28,6 +40,7 @@ from utils.location_manager import get_user_location_context, update_user_locati
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 import json
+from datetime import datetime
 import logging
 import hashlib
 from django.core.cache import cache
@@ -1042,7 +1055,27 @@ def submit_place(request):
             )
 
             form = HalalPlaceForm(request.POST, request.FILES)
-            if form.is_valid():
+            hours_payload = request.POST.get("business_hours_json", "")
+            existing_hours_data = None
+            if hours_payload:
+                try:
+                    raw_hours_data = json.loads(hours_payload)
+                    existing_hours_data = build_existing_hours_data_from_payload(
+                        raw_hours_data
+                    )
+                except json.JSONDecodeError:
+                    existing_hours_data = None
+
+            parsed_hours = None
+            form_is_valid = form.is_valid()
+            if form_is_valid and hours_payload:
+                try:
+                    parsed_hours = parse_business_hours_payload(hours_payload)
+                except BusinessHoursParseError as e:
+                    form.add_error(None, str(e))
+                    form_is_valid = False
+
+            if form_is_valid and not form.errors:
                 place = form.save(commit=False)
                 place.status = "pending"
                 place.submitted_by = request.user
@@ -1076,6 +1109,34 @@ def submit_place(request):
                     place.photo_urls = photo_urls
 
                 place.save()
+
+                if parsed_hours:
+                    business_hours = BusinessHours.objects.create(
+                        place=place,
+                        is_24_hours=parsed_hours["is_24_hours"],
+                        notes=parsed_hours["notes"],
+                    )
+                    if not parsed_hours["is_24_hours"]:
+                        for day_str, day_data in parsed_hours["hours"].items():
+                            day_num = int(day_str)
+                            if day_data == "closed":
+                                TimeSlot.objects.create(
+                                    business_hours=business_hours,
+                                    day_of_week=day_num,
+                                    is_closed=True,
+                                )
+                            else:
+                                for slot in day_data:
+                                    TimeSlot.objects.create(
+                                        business_hours=business_hours,
+                                        day_of_week=day_num,
+                                        open_time=datetime.strptime(
+                                            slot["open"], "%H:%M"
+                                        ).time(),
+                                        close_time=datetime.strptime(
+                                            slot["close"], "%H:%M"
+                                        ).time(),
+                                    )
 
                 log_user_action(
                     logger,
@@ -1139,13 +1200,14 @@ def submit_place(request):
                     request,
                     extra_data={
                         "form_errors": sanitize_sensitive_data(
-                            str(form.errors.as_json())
+                            form.errors.get_json_data()
                         )
                     },
                 )
                 messages.error(request, "Please correct the errors below.")
         else:
             form = HalalPlaceForm()
+            existing_hours_data = None
 
         return render(
             request,
@@ -1153,6 +1215,10 @@ def submit_place(request):
             {
                 "form": form,
                 "google_maps_api_key": settings.GOOGLE_MAPS_API_KEY,
+                "day_names": DAY_NAMES,
+                "existing_hours_data": json.dumps(existing_hours_data)
+                if existing_hours_data
+                else "null",
             },
         )
     except Exception as e:
@@ -1258,6 +1324,7 @@ def set_location(request):
 def suggest_place_edit(request, pk):
     """Display form for suggesting edits to a place"""
     place = get_object_or_404(HalalPlace, pk=pk, status="approved")
+    existing_hours_data = None
 
     if request.method == "POST":
         log_user_action(
@@ -1273,8 +1340,27 @@ def suggest_place_edit(request, pk):
         )
 
         form = PlaceSuggestionForm(place=place, data=request.POST, files=request.FILES)
+        hours_payload = request.POST.get("business_hours_json", "")
+        suggest_hours = request.POST.get("suggest_business_hours") == "true"
+        if hours_payload:
+            try:
+                raw_hours_data = json.loads(hours_payload)
+                existing_hours_data = build_existing_hours_data_from_payload(
+                    raw_hours_data
+                )
+            except json.JSONDecodeError:
+                existing_hours_data = None
+
         if form.is_valid():
-            return _process_place_suggestions(request, form, place)
+            parsed_hours = None
+            if suggest_hours and hours_payload:
+                try:
+                    parsed_hours = parse_business_hours_payload(hours_payload)
+                except BusinessHoursParseError as e:
+                    form.add_error(None, str(e))
+
+            if not form.errors:
+                return _process_place_suggestions(request, form, place, parsed_hours)
     else:
         form = PlaceSuggestionForm(place=place)
 
@@ -1284,8 +1370,7 @@ def suggest_place_edit(request, pk):
     )
 
     # Prepare business hours data for pre-population
-    existing_hours_data = None
-    if has_business_hours:
+    if existing_hours_data is None and has_business_hours:
         bh = place.business_hours
         existing_hours_data = {
             "is_24_hours": bh.is_24_hours,
@@ -1311,6 +1396,7 @@ def suggest_place_edit(request, pk):
         "form": form,
         "page_title": f"Suggest edits for {place.name}",
         "has_business_hours": has_business_hours,
+        "day_names": DAY_NAMES,
         "existing_hours_data": json.dumps(existing_hours_data)
         if existing_hours_data
         else "null",
@@ -1318,7 +1404,7 @@ def suggest_place_edit(request, pk):
     return render(request, "places/suggest_edit.html", context)
 
 
-def _process_place_suggestions(request, form, place):
+def _process_place_suggestions(request, form, place, parsed_hours_data=None):
     """Process the suggestion form and create suggestion objects"""
     try:
         # Get field suggestions
@@ -1357,29 +1443,22 @@ def _process_place_suggestions(request, form, place):
 
         # Handle business hours suggestion
         created_hours_suggestion = None
-        business_hours_json = request.POST.get("business_hours_json", "")
-        suggest_business_hours = request.POST.get("suggest_business_hours") == "true"
-
-        if suggest_business_hours and business_hours_json:
+        if parsed_hours_data:
             try:
                 from .models import BusinessHoursSuggestion
-
-                hours_data = json.loads(business_hours_json)
 
                 created_hours_suggestion = BusinessHoursSuggestion.objects.create(
                     place=place,
                     suggested_by=request.user,
-                    suggested_hours=hours_data.get("hours", {}),
-                    is_24_hours=hours_data.get("is_24_hours", False),
-                    suggested_notes=hours_data.get("notes", ""),
+                    suggested_hours=parsed_hours_data.get("hours", {}),
+                    is_24_hours=parsed_hours_data.get("is_24_hours", False),
+                    suggested_notes=parsed_hours_data.get("notes", ""),
                     reason=form.cleaned_data.get("reason", "Business hours update"),
                 )
 
                 logger.info(
                     f"Business hours suggestion created for place {place.id} by user {request.user.username}"
                 )
-            except json.JSONDecodeError as e:
-                logger.error(f"Invalid business hours JSON: {e}")
             except Exception as e:
                 logger.error(f"Error creating hours suggestion: {e}", exc_info=True)
 

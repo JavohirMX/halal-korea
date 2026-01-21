@@ -8,6 +8,7 @@ formatting hours for display, and determining status badges.
 from datetime import datetime, time, timedelta
 from typing import Optional, Tuple, Dict, List, Any
 import pytz
+import json
 
 # Status thresholds (in minutes)
 CLOSES_SOON_THRESHOLD = 60  # Show "Closes Soon" if closing within 60 min
@@ -16,6 +17,133 @@ OPENS_SOON_THRESHOLD = 120  # Show "Opens at..." if opening within 2 hours
 # Day names for display
 DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 DAY_NAMES_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+
+class BusinessHoursParseError(ValueError):
+    """Raised when business hours payload is invalid."""
+
+
+def parse_business_hours_payload(payload: str) -> Optional[Dict[str, Any]]:
+    """
+    Parse and validate business hours payload JSON from the editor.
+
+    Returns normalized dict: {"is_24_hours": bool, "notes": str, "hours": dict}
+    """
+    if not payload:
+        return None
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError as exc:
+        raise BusinessHoursParseError("Invalid business hours data.") from exc
+
+    if not isinstance(data, dict):
+        raise BusinessHoursParseError("Invalid business hours format.")
+
+    is_24_hours = bool(data.get("is_24_hours", False))
+    notes = data.get("notes") or ""
+    hours_data = data.get("hours") or {}
+
+    if is_24_hours:
+        return {
+            "is_24_hours": True,
+            "notes": notes,
+            "hours": {},
+        }
+
+    if not isinstance(hours_data, dict) or len(hours_data) == 0:
+        raise BusinessHoursParseError("Please provide at least one day of hours.")
+
+    normalized_hours: Dict[str, Any] = {}
+
+    for day_key, day_value in hours_data.items():
+        try:
+            day_num = int(day_key)
+        except (TypeError, ValueError) as exc:
+            raise BusinessHoursParseError("Invalid day value in hours.") from exc
+
+        if day_num < 0 or day_num > 6:
+            raise BusinessHoursParseError("Invalid day value in hours.")
+
+        day_key_str = str(day_num)
+
+        if day_value == "closed":
+            normalized_hours[day_key_str] = "closed"
+            continue
+
+        if not isinstance(day_value, list) or len(day_value) == 0:
+            raise BusinessHoursParseError(
+                "Each open day needs at least one time slot."
+            )
+
+        normalized_slots = []
+        for slot in day_value:
+            if not isinstance(slot, dict):
+                raise BusinessHoursParseError("Invalid time slot format.")
+
+            open_time = slot.get("open")
+            close_time = slot.get("close")
+            if not open_time or not close_time:
+                raise BusinessHoursParseError(
+                    "Each time slot needs both open and close times."
+                )
+            try:
+                datetime.strptime(open_time, "%H:%M")
+                datetime.strptime(close_time, "%H:%M")
+            except ValueError as exc:
+                raise BusinessHoursParseError(
+                    "Invalid time format. Use HH:MM."
+                ) from exc
+
+            normalized_slots.append({"open": open_time, "close": close_time})
+
+        normalized_hours[day_key_str] = normalized_slots
+
+    return {
+        "is_24_hours": False,
+        "notes": notes,
+        "hours": normalized_hours,
+    }
+
+
+def build_existing_hours_data_from_payload(payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Convert editor payload into existing_hours_data format for prefill."""
+    if not isinstance(payload, dict):
+        return None
+
+    existing = {
+        "is_24_hours": bool(payload.get("is_24_hours", False)),
+        "notes": payload.get("notes") or "",
+        "slots": {},
+    }
+
+    hours = payload.get("hours") or {}
+    if not isinstance(hours, dict):
+        return existing
+
+    for day_key, day_value in hours.items():
+        day_key_str = str(day_key)
+        if day_value == "closed":
+            existing["slots"][day_key_str] = [
+                {"is_closed": True, "open": "", "close": ""}
+            ]
+            continue
+
+        if isinstance(day_value, list):
+            slots = []
+            for slot in day_value:
+                if not isinstance(slot, dict):
+                    continue
+                slots.append(
+                    {
+                        "is_closed": False,
+                        "open": slot.get("open") or "",
+                        "close": slot.get("close") or "",
+                    }
+                )
+            if slots:
+                existing["slots"][day_key_str] = slots
+
+    return existing
 
 
 def get_korea_time() -> datetime:

@@ -778,6 +778,8 @@
         
         let center;
         let userLocationTitle = "";
+        let userLat = null;
+        let userLng = null;
         
         // Priority: 1. City filter, 2. User location (if in Korea), 3. Seoul
         if (cityFilter && touristAreas[cityFilter]) {
@@ -785,8 +787,8 @@
             center = touristAreas[cityFilter];
         } else if ({% if user_location and location_context.is_in_korea %}true{% else %}false{% endif %}) {
             // Center on user location if available AND user is in Korea
-            const userLat = {{ user_location.y|unlocalize }};
-            const userLng = {{ user_location.x|unlocalize }};
+            userLat = {{ user_location.y|unlocalize }};
+            userLng = {{ user_location.x|unlocalize }};
             center = { lat: userLat, lng: userLng };
             userLocationTitle = "{% translate 'Your Location' %}";
         } else {
@@ -815,13 +817,15 @@
 
         // Add marker for user's current location if available AND user is in Korea
         {% if user_location and location_context.is_in_korea %}
-        const userMarker = new AdvancedMarkerElement({
-            map,
-            position: { lat: userLat, lng: userLng },
-            title: userLocationTitle,
-            content: document.createElement('div'),
-        });
-        userMarker.content.innerHTML = '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>';
+        if (userLat !== null && userLng !== null) {
+            const userMarker = new AdvancedMarkerElement({
+                map,
+                position: { lat: userLat, lng: userLng },
+                title: userLocationTitle,
+                content: document.createElement('div'),
+            });
+            userMarker.content.innerHTML = '<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>';
+        }
         {% endif %}
 
         // Load initial places on the map

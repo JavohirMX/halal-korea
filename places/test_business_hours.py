@@ -237,6 +237,119 @@ class BusinessHoursUtilitiesTest(TestCase):
         """Test schema when place has no business hours"""
         schema = get_opening_hours_schema(self.place)
         self.assertEqual(schema, [])
+
+
+class SubmitPlaceBusinessHoursTest(TestCase):
+    """Integration tests for submit place business hours."""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username="submituser",
+            email="submit@example.com",
+            password="testpass123",
+        )
+        self.user.email_verified = True
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def _base_payload(self):
+        return {
+            "name": "New Place",
+            "description": "A brand new place with halal options.",
+            "category": "restaurant",
+            "address": "123 Example Street",
+            "latitude": "37.5665",
+            "longitude": "126.9780",
+        }
+
+    def test_submit_place_with_hours_creates_business_hours(self):
+        payload = self._base_payload()
+        payload.update(
+            {
+                "suggest_business_hours": "true",
+                "business_hours_json": json.dumps(
+                    {
+                        "is_24_hours": False,
+                        "notes": "Last order 30 min before close",
+                        "hours": {
+                            "0": [{"open": "09:00", "close": "17:00"}],
+                            "1": "closed",
+                        },
+                    }
+                ),
+            }
+        )
+
+        response = self.client.post(reverse("places:submit_place"), payload)
+        self.assertEqual(response.status_code, 302)
+
+        place = HalalPlace.objects.get(name="New Place")
+        business_hours = BusinessHours.objects.get(place=place)
+        self.assertFalse(business_hours.is_24_hours)
+        self.assertEqual(business_hours.notes, "Last order 30 min before close")
+        self.assertEqual(TimeSlot.objects.filter(business_hours=business_hours).count(), 2)
+
+    def test_submit_place_invalid_hours_shows_error(self):
+        payload = self._base_payload()
+        payload.update(
+            {
+                "suggest_business_hours": "true",
+                "business_hours_json": json.dumps(
+                    {
+                        "is_24_hours": False,
+                        "notes": "",
+                        "hours": {"0": [{"open": "9am", "close": "17:00"}]},
+                    }
+                ),
+            }
+        )
+
+        response = self.client.post(reverse("places:submit_place"), payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Invalid time format")
+        self.assertEqual(BusinessHours.objects.count(), 0)
+
+
+class SuggestEditBusinessHoursValidationTest(TestCase):
+    """Validate business hours payload in suggest edit flow."""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username="suggestuser",
+            email="suggest@example.com",
+            password="testpass123",
+        )
+        self.user.email_verified = True
+        self.user.save()
+        self.client.force_login(self.user)
+        self.place = HalalPlace.objects.create(
+            name="Suggest Place",
+            description="Test place for suggestions",
+            category="restaurant",
+            location=Point(127.0, 37.5),
+            address="Test Address",
+            status="approved",
+            submitted_by=self.user,
+        )
+
+    def test_suggest_edit_rejects_empty_hours_payload(self):
+        payload = {
+            "reason": "Hours missing",
+            "suggest_business_hours": "true",
+            "business_hours_json": json.dumps(
+                {"is_24_hours": False, "notes": "", "hours": {}}
+            ),
+        }
+
+        response = self.client.post(
+            reverse("places:suggest_place_edit", args=[self.place.pk]),
+            payload,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Please provide at least one day of hours.")
+        self.assertEqual(BusinessHoursSuggestion.objects.count(), 0)
     
     def test_get_opening_hours_schema_24_hours(self):
         """Test schema for 24-hour place"""

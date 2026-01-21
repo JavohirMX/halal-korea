@@ -618,122 +618,7 @@
                     </div>
                 </div>
 
-                <!-- Business Hours Collapsible -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-                    <button type="button" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors touch-manipulation"
-                            onclick="toggleSection('hours-section')">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                                <i class="fas fa-clock text-gray-500 dark:text-gray-400 text-sm"></i>
-                            </div>
-                            <div>
-                                <span class="text-base font-medium text-gray-900 dark:text-white">{% translate "Business Hours" %}</span>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    {% if has_business_hours %}
-                                        {% translate "Edit opening hours" %}
-                                    {% else %}
-                                        <span class="text-amber-600 dark:text-amber-400">{% translate "No hours set - Add them!" %}</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            {% if not has_business_hours %}
-                            <span class="px-2 py-0.5 text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full">
-                                {% translate "Missing" %}
-                            </span>
-                            {% endif %}
-                            <i class="fas fa-chevron-down text-gray-400 transform transition-transform duration-200" id="hours-chevron"></i>
-                        </div>
-                    </button>
-                    
-                    <div class="hidden border-t border-gray-200 dark:border-gray-700 p-6" id="hours-section">
-                        <!-- Hidden field to store serialized hours JSON -->
-                        <input type="hidden" name="business_hours_json" id="business_hours_json" value="">
-                        <input type="hidden" name="suggest_business_hours" id="suggest_business_hours" value="false">
-                        
-                        <!-- 24 Hours Toggle -->
-                        <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" id="is_24_hours" name="is_24_hours" 
-                                       class="w-5 h-5 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
-                                       onchange="toggle24Hours(this.checked)">
-                                <div>
-                                    <span class="font-medium text-gray-900 dark:text-white">{% translate "Open 24 Hours" %}</span>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">{% translate "This place is open around the clock" %}</p>
-                                </div>
-                            </label>
-                        </div>
-                        
-                        <!-- Current Hours Display (if available) -->
-                        {% if has_business_hours %}
-                        <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                            <h4 class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">
-                                <i class="fas fa-info-circle mr-1"></i>{% translate "Current Hours" %}
-                            </h4>
-                            <div class="text-sm text-blue-600 dark:text-blue-400">
-                                {% include 'places/partials/hours_summary.html' with hours=place.business_hours %}
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Day-by-Day Hours Input -->
-                        <div id="hours-editor" class="space-y-3">
-                            {% for day_name in "Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday"|split:"," %}
-                            <div class="day-row border border-gray-200 dark:border-gray-700 rounded-lg p-4" data-day="{{ forloop.counter0 }}">
-                                <div class="flex items-center justify-between mb-3">
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ day_name }}</span>
-                                    <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" class="day-closed-toggle w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500"
-                                               onchange="toggleDayClosed({{ forloop.counter0 }}, this.checked)">
-                                        <span class="text-sm text-gray-600 dark:text-gray-400">{% translate "Closed" %}</span>
-                                    </label>
-                                </div>
-                                
-                                <div class="time-slots-container">
-                                    <div class="time-slot flex items-center gap-2 mb-2">
-                                        <input type="text" class="open-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
-                                               placeholder="09:00" value="09:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
-                                               oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
-                                        <span class="text-gray-500">—</span>
-                                        <input type="text" class="close-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
-                                               placeholder="22:00" value="22:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
-                                               oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
-                                        <button type="button" class="remove-slot hidden p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                                onclick="removeTimeSlot(this)">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <button type="button" class="add-break-btn mt-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
-                                        onclick="addTimeSlot({{ forloop.counter0 }})">
-                                    <i class="fas fa-plus mr-1"></i>{% translate "Add break" %}
-                                </button>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <!-- Notes Field -->
-                        <div class="mt-6">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                {% translate "Notes" %} <span class="text-gray-400 font-normal">{% translate "(optional)" %}</span>
-                            </label>
-                            <input type="text" name="business_hours_notes" id="business_hours_notes"
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
-                                   placeholder="{% translate 'e.g., Last order 30 min before close' %}"
-                                   maxlength="255"
-                                   oninput="markHoursModified()">
-                        </div>
-                        
-                        <!-- Update Summary -->
-                        <div class="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 hidden" id="hours-change-summary">
-                            <p class="text-sm text-green-700 dark:text-green-300">
-                                <i class="fas fa-check-circle mr-1"></i>{% translate "Hours will be updated when you submit" %}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                {% include 'places/partials/business_hours_editor.html' with has_business_hours=has_business_hours show_current_hours=True %}
             </div>
         </div>
 
@@ -969,6 +854,7 @@
     </div>
 </div>
 
+{% include 'places/partials/business_hours_editor_script.html' %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // State management
@@ -977,183 +863,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let isDarkMode = document.documentElement.classList.contains('dark');
     
     // Business hours state (declared early so updateSummary can access it)
-    let hoursModified = false;
     const existingHoursData = {{ existing_hours_data|safe }};
+    const isHoursModified = () => (
+        window.isBusinessHoursModified ? window.isBusinessHoursModified() : false
+    );
 
-    // ========================================
-    // Business Hours Editor Functions
-    // ========================================
-    // Toggle day closed
-    window.toggleDayClosed = function(dayIndex, isClosed) {
-        const dayRow = document.querySelector(`.day-row[data-day="${dayIndex}"]`);
-        const slotsContainer = dayRow.querySelector('.time-slots-container');
-        const addBreakBtn = dayRow.querySelector('.add-break-btn');
-        if (isClosed) {
-            slotsContainer.style.opacity = '0.3';
-            slotsContainer.style.pointerEvents = 'none';
-            addBreakBtn.classList.add('hidden');
-        } else {
-            slotsContainer.style.opacity = '1';
-            slotsContainer.style.pointerEvents = 'auto';
-            addBreakBtn.classList.remove('hidden');
-        }
-        markHoursModified();
-    };
-
-    // Add time slot (for breaks)
-    window.addTimeSlot = function(dayIndex) {
-        const dayRow = document.querySelector(`.day-row[data-day="${dayIndex}"]`);
-        const slotsContainer = dayRow.querySelector('.time-slots-container');
-        slotsContainer.querySelectorAll('.remove-slot').forEach(btn => {
-            btn.classList.remove('hidden');
-        });
-        const newSlot = document.createElement('div');
-        newSlot.className = 'time-slot flex items-center gap-2 mb-2';
-        newSlot.innerHTML = `
-            <input type="text" class="open-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
-                   placeholder="14:00" value="14:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
-                   oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
-            <span class="text-gray-500">—</span>
-            <input type="text" class="close-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
-                   placeholder="22:00" value="22:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
-                   oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
-            <button type="button" class="remove-slot p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                    onclick="removeTimeSlot(this)">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
-        slotsContainer.appendChild(newSlot);
-        newSlot.querySelectorAll('input').forEach(input => {
-            input.addEventListener('change', markHoursModified);
-        });
-        markHoursModified();
-    };
-
-    // Remove time slot
-    window.removeTimeSlot = function(button) {
-        const slot = button.closest('.time-slot');
-        const container = slot.parentElement;
-        slot.remove();
-        const remainingSlots = container.querySelectorAll('.time-slot');
-        if (remainingSlots.length === 1) {
-            remainingSlots[0].querySelector('.remove-slot').classList.add('hidden');
-        }
-        markHoursModified();
-    };
-
-    // Mark hours as modified
-    window.markHoursModified = function() {
-        hoursModified = true;
-        document.getElementById('suggest_business_hours').value = 'true';
-        document.getElementById('hours-change-summary').classList.remove('hidden');
-        updateSummary();
-    };
-
-    // Toggle 24-hour mode
-    window.toggle24Hours = function(isChecked) {
-        const editor = document.getElementById('hours-editor');
-        if (isChecked) {
-            editor.style.opacity = '0.5';
-            editor.style.pointerEvents = 'none';
-        } else {
-            editor.style.opacity = '1';
-            editor.style.pointerEvents = 'auto';
-        }
-        markHoursModified();
-    };
-
-    // Format time input as user types (auto-insert colon)
-    window.formatTimeInput = function(input) {
-        let value = input.value.replace(/[^0-9]/g, '');
-        if (value.length >= 2) {
-            value = value.substring(0, 2) + ':' + value.substring(2, 4);
-        }
-        input.value = value;
-        markHoursModified();
-    };
-
-    // Validate time input on blur (ensure valid 24h format)
-    window.validateTimeInput = function(input) {
-        const value = input.value;
-        const timeRegex = /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
-        if (!value) {
-            return;
-        }
-        if (!timeRegex.test(value)) {
-            let fixed = value.replace(/[^0-9:]/g, '');
-            if (/^\d{3,4}$/.test(fixed)) {
-                fixed = fixed.padStart(4, '0');
-                fixed = fixed.substring(0, 2) + ':' + fixed.substring(2, 4);
-            }
-            if (timeRegex.test(fixed)) {
-                input.value = fixed;
-            } else {
-                input.value = input.placeholder || '09:00';
-            }
-        }
-        const parts = input.value.split(':');
-        if (parts.length === 2) {
-            let hours = parseInt(parts[0], 10);
-            let minutes = parseInt(parts[1], 10);
-            if (hours > 23) hours = 23;
-            if (minutes > 59) minutes = 59;
-            input.value = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
-        }
-    };
-
-    // Initialize business hours from existing data
-    function initializeBusinessHours() {
-        if (!existingHoursData) return;
-        if (existingHoursData.is_24_hours) {
-            const checkbox = document.getElementById('is_24_hours');
-            checkbox.checked = true;
-            toggle24Hours(true);
-        }
-        if (existingHoursData.notes) {
-            document.getElementById('business_hours_notes').value = existingHoursData.notes;
-        }
-        if (existingHoursData.slots) {
-            document.querySelectorAll('.day-row').forEach(row => {
-                const dayIndex = row.dataset.day;
-                const daySlots = existingHoursData.slots[dayIndex];
-                if (daySlots && daySlots.length > 0) {
-                    const slotsContainer = row.querySelector('.time-slots-container');
-                    const closedCheckbox = row.querySelector('.day-closed-toggle');
-                    if (daySlots[0].is_closed) {
-                        closedCheckbox.checked = true;
-                        toggleDayClosed(parseInt(dayIndex), true);
-                    } else {
-                        const firstSlot = slotsContainer.querySelector('.time-slot');
-                        if (firstSlot && daySlots[0].open && daySlots[0].close) {
-                            firstSlot.querySelector('.open-time').value = daySlots[0].open;
-                            firstSlot.querySelector('.close-time').value = daySlots[0].close;
-                        }
-                        for (let i = 1; i < daySlots.length; i++) {
-                            if (daySlots[i].open && daySlots[i].close) {
-                                addTimeSlot(parseInt(dayIndex));
-                                const allSlots = slotsContainer.querySelectorAll('.time-slot');
-                                const newSlot = allSlots[allSlots.length - 1];
-                                newSlot.querySelector('.open-time').value = daySlots[i].open;
-                                newSlot.querySelector('.close-time').value = daySlots[i].close;
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        hoursModified = false;
-        document.getElementById('suggest_business_hours').value = 'false';
-        document.getElementById('hours-change-summary').classList.add('hidden');
-        updateSummary();
-    }
-
-    // Add change listeners to initial time inputs
-    document.querySelectorAll('.time-slot input').forEach(input => {
-        input.addEventListener('change', markHoursModified);
+    const hoursEditor = window.initBusinessHoursEditor({
+        existingHoursData: existingHoursData,
+        onChange: updateSummary
     });
-
-    // Initialize business hours from existing data (must be called after all helper functions are defined)
-    initializeBusinessHours();
 
     // Initialize counters
     updateSummary();
@@ -1583,7 +1301,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateSummary() {
         const validChanges = validateFieldChanges();
-        const hoursChanged = hoursModified ? 1 : 0;
+        const hoursChanged = isHoursModified() ? 1 : 0;
         const totalItems = validChanges + selectedImages.length + hoursChanged;
         
         const summaryCount = document.getElementById('summary-count');
@@ -1651,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </li>
                 `);
             }
-            if (hoursModified) {
+            if (isHoursModified()) {
                 summaryItems.push(`
                     <li class="flex items-center gap-2">
                         <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 text-xs font-semibold">1</span>
@@ -1754,48 +1472,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Serialize business hours FIRST (before validation check)
-        if (hoursModified) {
-            const is24Hours = document.getElementById('is_24_hours').checked;
-            const notes = document.getElementById('business_hours_notes').value;
-            
-            const hours = {};
-            
-            if (!is24Hours) {
-                document.querySelectorAll('.day-row').forEach(row => {
-                    const dayIndex = row.dataset.day;
-                    const isClosed = row.querySelector('.day-closed-toggle').checked;
-                    
-                    if (isClosed) {
-                        hours[dayIndex] = 'closed';
-                    } else {
-                        const slots = [];
-                        row.querySelectorAll('.time-slot').forEach(slot => {
-                            const openTime = slot.querySelector('.open-time').value;
-                            const closeTime = slot.querySelector('.close-time').value;
-                            if (openTime && closeTime) {
-                                slots.push({ open: openTime, close: closeTime });
-                            }
-                        });
-                        if (slots.length > 0) {
-                            hours[dayIndex] = slots;
-                        }
-                    }
-                });
-            }
-            
-            const jsonData = JSON.stringify({
-                is_24_hours: is24Hours,
-                hours: hours,
-                notes: notes
-            });
-            
-            document.getElementById('business_hours_json').value = jsonData;
-            document.getElementById('suggest_business_hours').value = 'true';
+        if (
+            window.serializeBusinessHours
+            && (isHoursModified() || (window.isBusinessHoursTouched && window.isBusinessHoursTouched()))
+        ) {
+            window.serializeBusinessHours();
         }
         
         // Validate all fields one more time
         const validChanges = validateFieldChanges();
-        const hoursChanged = hoursModified ? 1 : 0;
+        const hoursChanged = (isHoursModified() || (window.isBusinessHoursTouched && window.isBusinessHoursTouched())) ? 1 : 0;
         const totalItems = validChanges + selectedImages.length + hoursChanged;
         
         if (totalItems === 0) {
@@ -1834,239 +1520,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return true; // Allow form submission
     };
     
-    // ========================================
-    // Business Hours Editor Functions
-    // ========================================
-    // Toggle day closed
-    window.toggleDayClosed = function(dayIndex, isClosed) {
-        const dayRow = document.querySelector(`.day-row[data-day="${dayIndex}"]`);
-        const slotsContainer = dayRow.querySelector('.time-slots-container');
-        const addBreakBtn = dayRow.querySelector('.add-break-btn');
-        
-        if (isClosed) {
-            slotsContainer.style.opacity = '0.3';
-            slotsContainer.style.pointerEvents = 'none';
-            addBreakBtn.classList.add('hidden');
-        } else {
-            slotsContainer.style.opacity = '1';
-            slotsContainer.style.pointerEvents = 'auto';
-            addBreakBtn.classList.remove('hidden');
-        }
-        markHoursModified();
-    };
-    // Note: hoursModified and existingHoursData are declared at the top of this script block
-    
-    // Initialize business hours from existing data
-    function initializeBusinessHours() {
-        if (!existingHoursData) return;
-        
-        // Set 24 hours checkbox
-        if (existingHoursData.is_24_hours) {
-            const checkbox = document.getElementById('is_24_hours');
-            checkbox.checked = true;
-            toggle24Hours(true);
-        }
-        
-        // Set notes
-        if (existingHoursData.notes) {
-            document.getElementById('business_hours_notes').value = existingHoursData.notes;
-        }
-        
-        // Set time slots for each day
-        if (existingHoursData.slots) {
-            document.querySelectorAll('.day-row').forEach(row => {
-                const dayIndex = row.dataset.day;
-                const daySlots = existingHoursData.slots[dayIndex];
-                
-                if (daySlots && daySlots.length > 0) {
-                    const slotsContainer = row.querySelector('.time-slots-container');
-                    const closedCheckbox = row.querySelector('.day-closed-toggle');
-                    
-                    // Check if day is closed
-                    if (daySlots[0].is_closed) {
-                        closedCheckbox.checked = true;
-                        toggleDayClosed(parseInt(dayIndex), true);
-                    } else {
-                        // Set first slot times
-                        const firstSlot = slotsContainer.querySelector('.time-slot');
-                        if (firstSlot && daySlots[0].open && daySlots[0].close) {
-                            firstSlot.querySelector('.open-time').value = daySlots[0].open;
-                            firstSlot.querySelector('.close-time').value = daySlots[0].close;
-                        }
-                        
-                        // Add additional slots if needed
-                        for (let i = 1; i < daySlots.length; i++) {
-                            if (daySlots[i].open && daySlots[i].close) {
-                                addTimeSlot(parseInt(dayIndex));
-                                const allSlots = slotsContainer.querySelectorAll('.time-slot');
-                                const newSlot = allSlots[allSlots.length - 1];
-                                newSlot.querySelector('.open-time').value = daySlots[i].open;
-                                newSlot.querySelector('.close-time').value = daySlots[i].close;
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Reset hoursModified to false after initialization
-        hoursModified = false;
-        document.getElementById('suggest_business_hours').value = 'false';
-        document.getElementById('hours-change-summary').classList.add('hidden');
-        updateSummary();
-    }
-    
-    // Toggle 24-hour mode
-    window.toggle24Hours = function(isChecked) {
-        const editor = document.getElementById('hours-editor');
-        if (isChecked) {
-            editor.style.opacity = '0.5';
-            editor.style.pointerEvents = 'none';
-        } else {
-            editor.style.opacity = '1';
-            editor.style.pointerEvents = 'auto';
-        }
-        markHoursModified();
-    };
-    
-    // Format time input as user types (auto-insert colon)
-    window.formatTimeInput = function(input) {
-        let value = input.value.replace(/[^0-9]/g, ''); // Remove non-digits
-        
-        // Auto-insert colon after 2 digits
-        if (value.length >= 2) {
-            value = value.substring(0, 2) + ':' + value.substring(2, 4);
-        }
-        
-        input.value = value;
-        markHoursModified();
-    };
-    
-    // Validate time input on blur (ensure valid 24h format)
-    window.validateTimeInput = function(input) {
-        const value = input.value;
-        const timeRegex = /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
-        
-        if (!value) {
-            // Empty is allowed, will use placeholder logic
-            return;
-        }
-        
-        if (!timeRegex.test(value)) {
-            // Try to fix common issues
-            let fixed = value.replace(/[^0-9:]/g, '');
-            
-            // If just digits without colon, try to format
-            if (/^\d{3,4}$/.test(fixed)) {
-                fixed = fixed.padStart(4, '0');
-                fixed = fixed.substring(0, 2) + ':' + fixed.substring(2, 4);
-            }
-            
-            // Validate the fixed value
-            if (timeRegex.test(fixed)) {
-                input.value = fixed;
-            } else {
-                // Reset to a default if can't be fixed
-                input.value = input.placeholder || '09:00';
-            }
-        }
-        
-        // Ensure hours don't exceed 23
-        const parts = input.value.split(':');
-        if (parts.length === 2) {
-            let hours = parseInt(parts[0], 10);
-            let minutes = parseInt(parts[1], 10);
-            
-            if (hours > 23) hours = 23;
-            if (minutes > 59) minutes = 59;
-            
-            input.value = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
-        }
-    };
-    
-    // Toggle day closed
-    window.toggleDayClosed = function(dayIndex, isClosed) {
-        const dayRow = document.querySelector(`.day-row[data-day="${dayIndex}"]`);
-        const slotsContainer = dayRow.querySelector('.time-slots-container');
-        const addBreakBtn = dayRow.querySelector('.add-break-btn');
-        
-        if (isClosed) {
-            slotsContainer.style.opacity = '0.3';
-            slotsContainer.style.pointerEvents = 'none';
-            addBreakBtn.classList.add('hidden');
-        } else {
-            slotsContainer.style.opacity = '1';
-            slotsContainer.style.pointerEvents = 'auto';
-            addBreakBtn.classList.remove('hidden');
-        }
-        markHoursModified();
-    };
-    
-    // Add time slot (for breaks)
-    window.addTimeSlot = function(dayIndex) {
-        const dayRow = document.querySelector(`.day-row[data-day="${dayIndex}"]`);
-        const slotsContainer = dayRow.querySelector('.time-slots-container');
-        
-        // Show remove buttons on all slots
-        slotsContainer.querySelectorAll('.remove-slot').forEach(btn => {
-            btn.classList.remove('hidden');
-        });
-        
-        const newSlot = document.createElement('div');
-        newSlot.className = 'time-slot flex items-center gap-2 mb-2';
-        newSlot.innerHTML = `
-            <input type="text" class="open-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
-                   placeholder="14:00" value="14:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
-                   oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
-            <span class="text-gray-500">—</span>
-            <input type="text" class="close-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
-                   placeholder="22:00" value="22:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
-                   oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
-            <button type="button" class="remove-slot p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                    onclick="removeTimeSlot(this)">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
-        slotsContainer.appendChild(newSlot);
-        
-        // Add change listeners to new inputs
-        newSlot.querySelectorAll('input').forEach(input => {
-            input.addEventListener('change', markHoursModified);
-        });
-        
-        markHoursModified();
-    };
-    
-    // Remove time slot
-    window.removeTimeSlot = function(button) {
-        const slot = button.closest('.time-slot');
-        const container = slot.parentElement;
-        slot.remove();
-        
-        // Hide remove buttons if only one slot left
-        const remainingSlots = container.querySelectorAll('.time-slot');
-        if (remainingSlots.length === 1) {
-            remainingSlots[0].querySelector('.remove-slot').classList.add('hidden');
-        }
-        
-        markHoursModified();
-    };
-    
-    // Mark hours as modified
-    window.markHoursModified = function() {
-        hoursModified = true;
-        document.getElementById('suggest_business_hours').value = 'true';
-        document.getElementById('hours-change-summary').classList.remove('hidden');
-        updateSummary();
-    };
-    
-    // Add change listeners to initial time inputs
-    document.querySelectorAll('.time-slot input').forEach(input => {
-        input.addEventListener('change', markHoursModified);
-    });
-    
-    // Initialize business hours from existing data (must be called after all helper functions are defined)
-    initializeBusinessHours();
 });
 </script>
 {% endblock %}

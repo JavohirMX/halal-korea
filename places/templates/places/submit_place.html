@@ -46,6 +46,7 @@
         border-color: #22c55e !important;
     }
 </style>
+{% include 'places/partials/business_hours_editor_script.html' %}
 <script>
     // Helper function to safely get map color scheme
     function safeGetMapColorScheme() {
@@ -78,6 +79,13 @@
         let marker = null;
         const geocoder = new Geocoder();
 
+        function updateGoogleMapLink(lat, lng) {
+            const googleMapInput = document.getElementById('place-google-map');
+            if (googleMapInput) {
+                googleMapInput.value = `https://maps.google.com/?q=${lat},${lng}`;
+            }
+        }
+
         // Function to update address from coordinates
         async function updateAddressFromCoordinates(lat, lng) {
             try {
@@ -91,6 +99,7 @@
             } catch (error) {
                 console.error("{% translate 'Geocoding error:'|escapejs %}", error);
             }
+            updateGoogleMapLink(lat, lng);
         }
 
         // Function to update marker from address
@@ -108,6 +117,7 @@
                     // Update hidden inputs
                     document.getElementById('id_latitude').value = lat;
                     document.getElementById('id_longitude').value = lng;
+                    updateGoogleMapLink(lat, lng);
                     
                     // Update or add marker
                     if (marker) {
@@ -147,6 +157,7 @@
             // Update hidden inputs
             document.getElementById('id_latitude').value = lat;
             document.getElementById('id_longitude').value = lng;
+            updateGoogleMapLink(lat, lng);
             
             // Update address field
             updateAddressFromCoordinates(lat, lng);
@@ -322,6 +333,11 @@
                 </p>
             </div>
 
+            <!-- Business Hours -->
+            <div>
+                {% include 'places/partials/business_hours_editor.html' with has_business_hours=False show_current_hours=False %}
+            </div>
+
             <!-- Location -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -444,6 +460,8 @@
                     {% translate "Korean users often prefer local map services. Adding these links improves accessibility." %}
                 </p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="hidden" id="place-google-map" name="google_map_link">
+
                     <!-- Naver Maps -->
                     <div>
                         <label for="place-naver-map" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -531,6 +549,10 @@
     const dropZone = document.getElementById('drop-zone');
     const preview = document.getElementById('photo-preview');
     let currentFiles = []; // Keep track of current files
+    const existingHoursData = {{ existing_hours_data|default:"null"|safe }};
+    const hoursEditor = window.initBusinessHoursEditor({
+        existingHoursData: existingHoursData
+    });
 
     // Add a help text below category to explain the difference between mosque and prayer room
     const categorySelect = document.getElementById('place-category');
@@ -610,6 +632,17 @@
             }
             
             return false;
+        }
+
+        if (
+            window.serializeBusinessHours &&
+            (
+                (window.isBusinessHoursEnabled && window.isBusinessHoursEnabled())
+                || (window.isBusinessHoursModified && window.isBusinessHoursModified())
+                || (window.isBusinessHoursTouched && window.isBusinessHoursTouched())
+            )
+        ) {
+            window.serializeBusinessHours();
         }
 
         // Show loading state
