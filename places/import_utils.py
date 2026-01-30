@@ -95,7 +95,19 @@ class PlaceImporter:
 
         # Handle both list and dict (GeoJSON FeatureCollection) formats
         if isinstance(data, dict) and data.get("type") == "FeatureCollection":
-            places_data = [f["properties"] for f in data.get("features", [])]
+            places_data = []
+            for feature in data.get("features", []):
+                # Get properties from feature
+                place_data = feature.get("properties", {}).copy()
+                # Extract coordinates from geometry if available
+                geometry = feature.get("geometry")
+                if geometry and geometry.get("type") == "Point":
+                    coordinates = geometry.get("coordinates", [])
+                    if len(coordinates) >= 2:
+                        # GeoJSON uses [longitude, latitude] order
+                        place_data["longitude"] = coordinates[0]
+                        place_data["latitude"] = coordinates[1]
+                places_data.append(place_data)
         elif isinstance(data, list):
             places_data = data
         elif isinstance(data, dict) and "places" in data:
@@ -311,6 +323,11 @@ class PlaceImporter:
                 raise ValueError(
                     f"Invalid coordinates: lat={latitude}, lng={longitude}"
                 )
+
+        # Remove lat/lng from place_data since they're not model fields
+        # (they're converted to location Point above)
+        place_data.pop("latitude", None)
+        place_data.pop("longitude", None)
 
         # Set submitted_by
         if self.user:
