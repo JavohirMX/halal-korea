@@ -1,0 +1,619 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title|default:"Import Data" }}{% endblock %}
+
+{% block extrahead %}
+<style>
+.import-container {
+    max-width: 800px;
+    margin: 20px auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.header-section {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header-section h1 {
+    margin: 0 0 10px 0;
+    font-size: 2rem;
+}
+
+.header-section p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.form-card {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-label .required {
+    color: #ef4444;
+    margin-left: 3px;
+}
+
+.form-help {
+    display: block;
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.file-upload-area {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.file-upload-area:hover {
+    border-color: #10b981;
+    background: #ecfdf5;
+}
+
+.file-upload-area.dragover {
+    border-color: #10b981;
+    background: #d1fae5;
+}
+
+.file-upload-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.file-upload-text {
+    color: #64748b;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.file-upload-hint {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-selected {
+    background: #ecfdf5;
+    border-color: #10b981;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.file-selected-icon {
+    font-size: 1.5rem;
+}
+
+.file-selected-info {
+    flex: 1;
+}
+
+.file-selected-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.file-selected-size {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.file-selected-remove {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.checkbox-option:hover {
+    border-color: #10b981;
+    background: #f8fafc;
+}
+
+.checkbox-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+.checkbox-content {
+    flex: 1;
+}
+
+.checkbox-label {
+    font-weight: 600;
+    color: #2d3748;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.checkbox-description {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.template-section {
+    background: #f0f4ff;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.template-title {
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.template-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: white;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.template-link:hover {
+    background: #2563eb;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.radio-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.radio-option-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.radio-option-inline:hover {
+    border-color: #10b981;
+}
+
+.radio-option-inline input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.btn-lg {
+    padding: 14px 32px;
+    font-size: 16px;
+}
+
+.actions-row {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.info-box {
+    background: #fefce8;
+    border: 1px solid #fde047;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 25px;
+}
+
+.info-box h4 {
+    margin: 0 0 10px 0;
+    color: #854d0e;
+    font-size: 1rem;
+}
+
+.info-box ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #854d0e;
+    font-size: 0.9rem;
+}
+
+.info-box li {
+    margin-bottom: 5px;
+}
+
+.error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #991b1b;
+    margin-bottom: 20px;
+}
+
+.success-message {
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #166534;
+    margin-bottom: 20px;
+}
+
+.required-fields {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+    padding: 16px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 25px;
+}
+
+.required-fields h4 {
+    margin: 0 0 10px 0;
+    color: #991b1b;
+    font-size: 1rem;
+}
+
+.required-fields ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #7f1d1d;
+    font-size: 0.9rem;
+}
+
+.required-fields li {
+    margin-bottom: 3px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileUploadArea = document.getElementById('file-upload-area');
+    const fileInput = document.getElementById('file-input');
+    const fileSelected = document.getElementById('file-selected');
+    const fileName = document.getElementById('file-name');
+    const fileSize = document.getElementById('file-size');
+    const removeFile = document.getElementById('remove-file');
+
+    // Click to upload
+    fileUploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // Drag and drop
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            handleFile(this.files[0]);
+        }
+    });
+
+    // Remove file
+    removeFile.addEventListener('click', function(e) {
+        e.stopPropagation();
+        fileInput.value = '';
+        fileSelected.style.display = 'none';
+        fileUploadArea.style.display = 'block';
+    });
+
+    function handleFile(file) {
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileUploadArea.style.display = 'none';
+        fileSelected.style.display = 'flex';
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="import-container">
+    <div class="header-section">
+        <h1>📥 Import Data</h1>
+        <p>Upload and import HalalPlace data from files</p>
+    </div>
+
+    {% if error %}
+    <div class="error-message">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="success-message">
+        {{ success }}
+    </div>
+    {% endif %}
+
+    <!-- Download Templates -->
+    <div class="template-section">
+        <div class="template-title">📋 Download Templates</div>
+        <p style="color: #1e40af; margin-bottom: 15px; font-size: 0.9rem;">
+            Download sample files to ensure your data is in the correct format
+        </p>
+        <div class="template-grid">
+            <a href="{% url 'admin:places_data_import_template' 'json' %}" class="template-link">
+                <span>📄</span> JSON Template
+            </a>
+            <a href="{% url 'admin:places_data_import_template' 'csv' %}" class="template-link">
+                <span>📊</span> CSV Template
+            </a>
+            <a href="{% url 'admin:places_data_import_template' 'excel' %}" class="template-link">
+                <span>📈</span> Excel Template
+            </a>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'admin:places_data_import' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-card">
+            <!-- File Format -->
+            <div class="form-group">
+                <label class="form-label">
+                    File Format <span class="required">*</span>
+                </label>
+                <div class="radio-group">
+                    <div class="radio-option-inline">
+                        <input type="radio" name="file_format" id="format_json" value="json" checked>
+                        <label for="format_json">JSON</label>
+                    </div>
+                    <div class="radio-option-inline">
+                        <input type="radio" name="file_format" id="format_csv" value="csv">
+                        <label for="format_csv">CSV</label>
+                    </div>
+                </div>
+                <span class="form-help">Select the format of the file you'll be uploading</span>
+            </div>
+
+            <!-- File Upload -->
+            <div class="form-group">
+                <label class="form-label">
+                    Upload File <span class="required">*</span>
+                </label>
+                <div class="file-upload-area" id="file-upload-area">
+                    <span class="file-upload-icon">📁</span>
+                    <div class="file-upload-text">Click or drag and drop your file here</div>
+                    <div class="file-upload-hint">Supports JSON and CSV files up to 50MB</div>
+                </div>
+                <input type="file" name="import_file" id="file-input" class="file-input" accept=".json,.csv,.xlsx">
+                
+                <div class="file-selected" id="file-selected" style="display: none;">
+                    <span class="file-selected-icon">📄</span>
+                    <div class="file-selected-info">
+                        <div class="file-selected-name" id="file-name">filename.json</div>
+                        <div class="file-selected-size" id="file-size">0 KB</div>
+                    </div>
+                    <button type="button" class="file-selected-remove" id="remove-file">✕</button>
+                </div>
+            </div>
+
+            <!-- Required Fields Info -->
+            <div class="required-fields">
+                <h4>⚠️ Required Fields</h4>
+                <ul>
+                    <li><strong>name</strong> - Place name (required)</li>
+                    <li><strong>address</strong> - Full address (required)</li>
+                    <li><strong>description</strong> - Place description (required)</li>
+                    <li><strong>category</strong> - One of: restaurant, market, mosque, prayer_room</li>
+                </ul>
+            </div>
+
+            <!-- Import Options -->
+            <div class="form-group">
+                <label class="form-label">Import Options</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="dry_run" id="dry_run" checked>
+                        <div class="checkbox-content">
+                            <span class="checkbox-label">Dry Run Mode</span>
+                            <span class="checkbox-description">
+                                Preview the import without making any changes to the database. 
+                                You'll see how many places would be created, updated, or skipped.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="update_existing" id="update_existing" checked>
+                        <div class="checkbox-content">
+                            <span class="checkbox-label">Update Existing Places</span>
+                            <span class="checkbox-description">
+                                If a place with the same name and address already exists, update it with new data. 
+                                Uncheck to skip duplicates.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="validate_only" id="validate_only">
+                        <div class="checkbox-content">
+                            <span class="checkbox-label">Validate Only</span>
+                            <span class="checkbox-description">
+                                Only validate the file format and data structure without processing. 
+                                Useful for checking for errors before importing.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <h4>💡 Import Tips</h4>
+                <ul>
+                    <li>Always test with <strong>Dry Run</strong> first to preview changes</li>
+                    <li>Download the templates to see the expected format</li>
+                    <li>Latitude and longitude should be in decimal degrees</li>
+                    <li>Photo URLs should be complete URLs (http:// or https://)</li>
+                    <li>Large imports may take several minutes to process</li>
+                </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-row">
+                <a href="{% url 'admin:places_data_management' %}" class="btn btn-secondary">
+                    ← Back to Dashboard
+                </a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <span>📥</span> Import Data
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
