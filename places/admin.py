@@ -24,6 +24,7 @@ from .models import (
     TimeSlot,
     BusinessHoursSuggestion,
 )
+from .export_utils import PlaceExporter
 
 logger = logging.getLogger(__name__)
 
@@ -243,7 +244,10 @@ class HalalPlaceAdmin(admin.ModelAdmin):
         "bulk_archive",
         "bulk_reject",
         "bulk_set_pending",
-        "export_selected",
+        "export_selected_csv",
+        "export_selected_json",
+        "export_selected_excel",
+        "export_selected_geojson",
         "validate_images",
         "generate_stats",
     ]
@@ -508,57 +512,33 @@ class HalalPlaceAdmin(admin.ModelAdmin):
 
     bulk_set_pending.short_description = "⏳ Set to pending review"
 
-    def export_selected(self, request, queryset):
-        import csv
-        from django.http import HttpResponse
+    def export_selected_json(self, request, queryset):
+        """Export selected places to JSON"""
+        exporter = PlaceExporter(queryset)
+        return exporter.get_http_response("json", "halal_places_export.json")
 
-        response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = (
-            'attachment; filename="halal_places_export.csv"'
-        )
+    export_selected_json.short_description = "📄 Export selected to JSON"
 
-        writer = csv.writer(response)
-        writer.writerow(
-            [
-                "Name",
-                "Category",
-                "Status",
-                "Address",
-                "Phone",
-                "Website",
-                "Latitude",
-                "Longitude",
-                "Image Count",
-                "Created At",
-                "Submitted By",
-            ]
-        )
+    def export_selected_excel(self, request, queryset):
+        """Export selected places to Excel"""
+        exporter = PlaceExporter(queryset)
+        return exporter.get_http_response("excel", "halal_places_export.xlsx")
 
-        for place in queryset:
-            lat, lng = (
-                (place.location.y, place.location.x) if place.location else ("", "")
-            )
-            image_count = len(place.photo_urls) if place.photo_urls else 0
+    export_selected_excel.short_description = "📊 Export selected to Excel"
 
-            writer.writerow(
-                [
-                    place.name,
-                    place.get_category_display(),
-                    place.get_status_display(),
-                    place.address,
-                    place.phone_number or "",
-                    place.website or "",
-                    lat,
-                    lng,
-                    image_count,
-                    place.created_at.strftime("%Y-%m-%d"),
-                    place.submitted_by.username if place.submitted_by else "",
-                ]
-            )
+    def export_selected_geojson(self, request, queryset):
+        """Export selected places to GeoJSON"""
+        exporter = PlaceExporter(queryset)
+        return exporter.get_http_response("geojson", "halal_places_export.geojson")
 
-        return response
+    export_selected_geojson.short_description = "🗺️ Export selected to GeoJSON"
 
-    export_selected.short_description = "📊 Export selected to CSV"
+    def export_selected_csv(self, request, queryset):
+        """Export selected places to CSV (enhanced version)"""
+        exporter = PlaceExporter(queryset)
+        return exporter.get_http_response("csv", "halal_places_export.csv")
+
+    export_selected_csv.short_description = "📋 Export selected to CSV"
 
     def validate_images(self, request, queryset):
         validated_count = 0
