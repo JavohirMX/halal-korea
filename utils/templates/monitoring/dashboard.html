@@ -326,7 +326,7 @@
 <!-- Quick Actions -->
 <div class="mb-8">
     <h2 class="section-heading mb-4">Quick Actions</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <a href="/admin/utils/requestlog/" class="stat-card hover:border-blue-500 dark:hover:border-blue-400 border-2 border-transparent">
             <div class="text-lg font-semibold text-gray-900 dark:text-dark-text">📋 View Request Logs</div>
             <div class="text-sm text-gray-600 dark:text-dark-muted mt-2">Detailed request history and analysis</div>
@@ -338,6 +338,10 @@
         <a href="/admin/utils/adminaction/" class="stat-card hover:border-blue-500 dark:hover:border-blue-400 border-2 border-transparent">
             <div class="text-lg font-semibold text-gray-900 dark:text-dark-text">📝 Admin Actions</div>
             <div class="text-sm text-gray-600 dark:text-dark-muted mt-2">Audit trail of admin operations</div>
+        </a>
+        <a href="{{ data_management_url }}" class="stat-card hover:border-blue-500 dark:hover:border-blue-400 border-2 border-transparent">
+            <div class="text-lg font-semibold text-gray-900 dark:text-dark-text">📊 Data Management</div>
+            <div class="text-sm text-gray-600 dark:text-dark-muted mt-2">Import and export place data</div>
         </a>
     </div>
 </div>

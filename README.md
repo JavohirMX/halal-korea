@@ -109,6 +109,11 @@ Halal Korea is a location-based web application designed to help Muslims and hal
   - Security dashboard (failed logins, suspicious activity)
   - Content operations (pending submissions, moderation queue)
   - Analytics dashboard (user engagement, popular content)
+- **Data Import/Export**: Multi-format data management system
+  - Export: JSON, CSV, Excel, GeoJSON formats
+  - Import: JSON and CSV with validation and duplicate detection
+  - Bulk operations from admin list view
+  - Dry-run validation before importing
 - **Suggestion Management**: Review and approve community edits and images
 - **Blog Management**: Full CMS with TinyMCE rich text editor
 - **Translation Management**: Rosetta web interface for i18n strings

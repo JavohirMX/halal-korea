@@ -911,6 +911,12 @@ JAZZMIN_SETTINGS = {
         {"name": "View Site", "url": "/", "new_window": False},
         {"name": "Monitoring", "url": "/admin/monitoring/", "new_window": False},
         {
+            "name": "Data Management",
+            "url": "/admin/places/data-management/",
+            "new_window": False,
+            "icon": "fas fa-database",
+        },
+        {
             "name": "Analytics",
             "url": "https://analytics.google.com/",
             "new_window": True,
