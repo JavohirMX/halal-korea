@@ -1,0 +1,487 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title|default:"Import Results" }}{% endblock %}
+
+{% block extrahead %}
+<style>
+.import-results-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #e0e0e0;
+}
+
+.header-section {
+    background: #2d2d2d;
+    color: #f5f5f5;
+    padding: 24px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-section h1 {
+    margin: 0 0 8px 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.header-section p {
+    margin: 0;
+    color: #a0a0a0;
+    font-size: 0.95rem;
+}
+
+.summary-card {
+    background: #2d2d2d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.summary-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #f5f5f5;
+    margin: 0 0 16px 0;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.summary-item {
+    text-align: center;
+    padding: 16px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.summary-count {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.summary-count.total {
+    color: #e0e0e0;
+}
+
+.summary-count.created {
+    color: #10b981;
+}
+
+.summary-count.updated {
+    color: #6366f1;
+}
+
+.summary-count.skipped {
+    color: #94a3b8;
+}
+
+.summary-count.errors {
+    color: #ef4444;
+}
+
+.summary-label {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.details-card {
+    background: #2d2d2d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.details-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #f5f5f5;
+    margin: 0 0 16px 0;
+}
+
+.details-table-wrapper {
+    overflow-x: auto;
+}
+
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.details-table th {
+    background: #1a1a1a;
+    color: #a0a0a0;
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.details-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #e0e0e0;
+}
+
+.details-table tbody tr:hover {
+    background: rgba(255,255,255,0.02);
+}
+
+.row-number {
+    color: #666;
+    font-family: monospace;
+}
+
+.name-cell {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-create {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.badge-update {
+    background: rgba(99, 102, 241, 0.15);
+    color: #6366f1;
+}
+
+.badge-skip {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+}
+
+.badge-error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.status-badge-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.status-badge-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.status-badge-error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.status-badge-info {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.btn-toggle {
+    background: #3d3d3d;
+    color: #e0e0e0;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-toggle:hover {
+    background: #4d4d4d;
+}
+
+.changes-row {
+    background: #1a1a1a;
+}
+
+.changes-content {
+    padding: 16px;
+}
+
+.changes-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #a0a0a0;
+    margin: 0 0 12px 0;
+}
+
+.change-item {
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background: #252525;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.change-field {
+    color: #6366f1;
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.change-arrow {
+    color: #666;
+    margin: 0 8px;
+}
+
+.old-value {
+    color: #ef4444;
+    text-decoration: line-through;
+}
+
+.new-value {
+    color: #10b981;
+}
+
+.actions-card {
+    background: #2d2d2d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.actions-row {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-success {
+    background: #10b981;
+    color: #1a1a1a;
+}
+
+.btn-secondary {
+    background: #3d3d3d;
+    color: #e0e0e0;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-lg {
+    padding: 12px 28px;
+    font-size: 15px;
+}
+
+.show-more-note {
+    text-align: center;
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 16px;
+    padding: 12px;
+    background: #1a1a1a;
+    border-radius: 4px;
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 6px;
+    padding: 12px 16px;
+    color: #ef4444;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.btn-toggle');
+    
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetRow = document.getElementById(targetId);
+            
+            if (targetRow) {
+                const isHidden = targetRow.style.display === 'none' || targetRow.style.display === '';
+                targetRow.style.display = isHidden ? 'table-row' : 'none';
+                this.textContent = isHidden ? 'Hide Changes' : 'Show Changes';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="import-results-container">
+    <div class="header-section">
+        <h1>Import Dry Run Results</h1>
+        <p>Review the changes before confirming the import</p>
+    </div>
+
+    {% if error %}
+    <div class="error-message">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <div class="summary-card">
+        <h2 class="summary-title">Summary</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-count total">{{ import_result.total|default:"0" }}</div>
+                <div class="summary-label">Total Rows</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-count created">{{ import_result.created|default:"0" }}</div>
+                <div class="summary-label">Created</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-count updated">{{ import_result.updated|default:"0" }}</div>
+                <div class="summary-label">Updated</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-count skipped">{{ import_result.skipped|default:"0" }}</div>
+                <div class="summary-label">Skipped</div>
+            </div>
+            {% if import_result.errors > 0 %}
+            <div class="summary-item">
+                <div class="summary-count errors">{{ import_result.errors }}</div>
+                <div class="summary-label">Errors</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="details-card">
+        <h2 class="details-title">Row Details</h2>
+        <div class="details-table-wrapper">
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>Row #</th>
+                        <th>Name</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in row_details %}
+                    <tr>
+                        <td><span class="row-number">{{ row.row_number }}</span></td>
+                        <td class="name-cell" title="{{ row.name }}">{{ row.name }}</td>
+                        <td>
+                            {% if row.action == 'create' %}
+                                <span class="badge badge-create">Create</span>
+                            {% elif row.action == 'update' %}
+                                <span class="badge badge-update">Update</span>
+                            {% elif row.action == 'skip' %}
+                                <span class="badge badge-skip">Skip</span>
+                            {% elif row.action == 'error' %}
+                                <span class="badge badge-error">Error</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.status == 'success' %}
+                                <span class="badge status-badge-success">Success</span>
+                            {% elif row.status == 'warning' %}
+                                <span class="badge status-badge-warning">Warning</span>
+                            {% elif row.status == 'error' %}
+                                <span class="badge status-badge-error">Error</span>
+                            {% elif row.status == 'info' %}
+                                <span class="badge status-badge-info">Info</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.changes %}
+                                <button class="btn-toggle" data-target="changes-{{ row.row_number }}">Show Changes</button>
+                            {% elif row.message %}
+                                {{ row.message }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if row.changes %}
+                    <tr id="changes-{{ row.row_number }}" class="changes-row" style="display: none;">
+                        <td colspan="5">
+                            <div class="changes-content">
+                                <h4 class="changes-title">Field Changes</h4>
+                                {% for change in row.changes %}
+                                <div class="change-item">
+                                    <span class="change-field">{{ change.field }}:</span>
+                                    <span class="old-value">{{ change.old_value|default:"(empty)" }}</span>
+                                    <span class="change-arrow">-</span>
+                                    <span class="new-value">{{ change.new_value|default:"(empty)" }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if import_result.total > 20 %}
+        <div class="show-more-note">
+            Showing first 20 of {{ import_result.total }} rows
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="actions-card">
+        <form method="post" action="{% url 'places_data_management:import_places' %}">
+            {% csrf_token %}
+            <input type="hidden" name="confirm_import" value="true">
+            <input type="hidden" name="dry_run" value="false">
+            
+            <div class="actions-row">
+                <a href="{% url 'places_data_management:import_places' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-success btn-lg">
+                    Confirm Import ({{ import_result.created|default:"0"|add:import_result.updated|default:"0" }} changes)
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
