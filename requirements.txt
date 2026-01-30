@@ -26,3 +26,7 @@ Pillow==11.3.0
 sentry-sdk==2.46.0
 python-json-logger==2.0.7
 google-analytics-data
+
+# Data export/import dependencies
+openpyxl>=3.1.2  # Excel support
+pandas>=2.1.0    # Optional: for advanced data manipulation
