@@ -640,6 +640,63 @@ Valid CSV,Test,restaurant,123 Test St"""
 
         self.assertEqual(existing.id, self.existing_place.id)
 
+    def test_import_skips_identical_places(self):
+        """Test that importing identical place data skips the update."""
+        # Create existing place
+        existing = HalalPlace.objects.create(
+            name="Existing Place",
+            description="Same description",
+            category="restaurant",
+            location=Point(126.9780, 37.5665, srid=4326),
+            address="100 Same Street",
+            status="approved",
+        )
+
+        # Import identical data
+        json_data = json.dumps(
+            [
+                {
+                    "name": "Existing Place",
+                    "description": "Same description",
+                    "category": "restaurant",
+                    "address": "100 Same Street",
+                    "latitude": 37.5665,
+                    "longitude": 126.9780,
+                    "status": "approved",
+                }
+            ]
+        )
+
+        importer = PlaceImporter(user=self.user, update_existing=True)
+        result = importer.import_json(json_data)
+
+        # Should skip, not update
+        self.assertEqual(result.skipped_count, 1)
+        self.assertEqual(result.updated_count, 0)
+
+        # Check row detail
+        self.assertEqual(len(result.row_details), 1)
+        self.assertEqual(result.row_details[0]["action"], "skip")
+        self.assertEqual(result.row_details[0]["status"], "no-op")
+
+    def test_import_tracks_row_details(self):
+        """Test that import tracks detailed row information."""
+        json_data = json.dumps(
+            [
+                {"name": "Place 1", "address": "Address 1", "description": "Desc 1"},
+                {"name": "Place 2", "address": "Address 2", "description": "Desc 2"},
+            ]
+        )
+
+        importer = PlaceImporter(user=self.user, dry_run=True)
+        result = importer.import_json(json_data)
+
+        # Should have 2 row details
+        self.assertEqual(len(result.row_details), 2)
+        self.assertEqual(result.row_details[0]["row"], 1)
+        self.assertEqual(result.row_details[0]["name"], "Place 1")
+        self.assertEqual(result.row_details[0]["action"], "create")
+
 
 class DataManagementViewsTests(TestCase):
     """Test all data management views with proper permissions."""
@@ -670,33 +727,43 @@ class DataManagementViewsTests(TestCase):
     def test_dashboard_requires_staff(self):
         """Test that dashboard requires staff access."""
         # Anonymous user
-        response = self.client.get(reverse("places:data_management_dashboard"))
-        self.assertEqual(response.status_code, 302)  # Redirect to login
+        response = self.client.get(
+            reverse("places_data_management:data_management_dashboard")
+        )
+        self.assertEqual(
+            response.status_code, 404
+        )  # Not found (intentional for security)
 
         # Regular user
         self.client.login(username="regularuser", password="regularpass123")
-        response = self.client.get(reverse("places:data_management_dashboard"))
-        self.assertEqual(response.status_code, 302)  # Redirect
+        response = self.client.get(
+            reverse("places_data_management:data_management_dashboard")
+        )
+        self.assertEqual(response.status_code, 404)  # Not found
 
         # Staff user
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.get(reverse("places:data_management_dashboard"))
+        response = self.client.get(
+            reverse("places_data_management:data_management_dashboard")
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_dashboard_shows_statistics(self):
         """Test dashboard shows place statistics."""
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.get(reverse("places:data_management_dashboard"))
+        response = self.client.get(
+            reverse("places_data_management:data_management_dashboard")
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test Place")
-        # Should show counts
-        self.assertContains(response, "total_places")
+        # Dashboard shows counts and labels
+        self.assertContains(response, "Total Places")
+        self.assertContains(response, "Approved")
 
     def test_export_view_get(self):
         """Test export view GET request."""
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.get(reverse("places:export_places"))
+        response = self.client.get(reverse("places_data_management:export_places"))
 
         self.assertEqual(response.status_code, 200)
         # Should contain format choices
@@ -709,7 +776,7 @@ class DataManagementViewsTests(TestCase):
         """Test export view POST with JSON format."""
         self.client.login(username="staffuser", password="staffpass123")
         response = self.client.post(
-            reverse("places:export_places"),
+            reverse("places_data_management:export_places"),
             {"format": "json", "status": "all", "include_business_hours": "on"},
         )
 
@@ -721,7 +788,7 @@ class DataManagementViewsTests(TestCase):
         """Test export view POST with CSV format."""
         self.client.login(username="staffuser", password="staffpass123")
         response = self.client.post(
-            reverse("places:export_places"),
+            reverse("places_data_management:export_places"),
             {"format": "csv", "status": "all"},
         )
 
@@ -732,7 +799,7 @@ class DataManagementViewsTests(TestCase):
         """Test export view POST with Excel format."""
         self.client.login(username="staffuser", password="staffpass123")
         response = self.client.post(
-            reverse("places:export_places"),
+            reverse("places_data_management:export_places"),
             {"format": "excel", "status": "all"},
         )
 
@@ -746,7 +813,7 @@ class DataManagementViewsTests(TestCase):
         """Test export view POST with GeoJSON format."""
         self.client.login(username="staffuser", password="staffpass123")
         response = self.client.post(
-            reverse("places:export_places"),
+            reverse("places_data_management:export_places"),
             {"format": "geojson", "status": "all"},
         )
 
@@ -757,7 +824,7 @@ class DataManagementViewsTests(TestCase):
         """Test export view with invalid format shows error."""
         self.client.login(username="staffuser", password="staffpass123")
         response = self.client.post(
-            reverse("places:export_places"),
+            reverse("places_data_management:export_places"),
             {"format": "invalid", "status": "all"},
         )
 
@@ -767,7 +834,7 @@ class DataManagementViewsTests(TestCase):
     def test_import_view_get(self):
         """Test import view GET request."""
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.get(reverse("places:import_places"))
+        response = self.client.get(reverse("places_data_management:import_places"))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Import")
@@ -795,7 +862,7 @@ class DataManagementViewsTests(TestCase):
         )
 
         response = self.client.post(
-            reverse("places:import_places"),
+            reverse("places_data_management:import_places"),
             {
                 "import_file": uploaded_file,
                 "format": "json",
@@ -823,7 +890,7 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
         )
 
         response = self.client.post(
-            reverse("places:import_places"),
+            reverse("places_data_management:import_places"),
             {
                 "import_file": uploaded_file,
                 "format": "csv",
@@ -841,7 +908,7 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
     def test_import_view_no_file(self):
         """Test import view with no file shows error."""
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.post(reverse("places:import_places"), {})
+        response = self.client.post(reverse("places_data_management:import_places"), {})
 
         # Should redirect with error
         self.assertEqual(response.status_code, 302)
@@ -869,7 +936,7 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
         )
 
         response = self.client.post(
-            reverse("places:import_places"),
+            reverse("places_data_management:import_places"),
             {
                 "import_file": uploaded_file,
                 "format": "json",
@@ -902,7 +969,7 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
         )
 
         response = self.client.post(
-            reverse("places:validate_import_file"),
+            reverse("places_data_management:validate_import_file"),
             {"file": uploaded_file, "format": "json"},
         )
 
@@ -920,7 +987,7 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
         )
 
         response = self.client.post(
-            reverse("places:validate_import_file"),
+            reverse("places_data_management:validate_import_file"),
             {"file": uploaded_file, "format": "json"},
         )
 
@@ -932,7 +999,9 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
     def test_validate_ajax_no_file(self):
         """Test AJAX validation endpoint with no file."""
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.post(reverse("places:validate_import_file"), {})
+        response = self.client.post(
+            reverse("places_data_management:validate_import_file"), {}
+        )
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -941,7 +1010,9 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
     def test_import_template_download_csv(self):
         """Test CSV template download."""
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.get(reverse("places:import_template", args=["csv"]))
+        response = self.client.get(
+            reverse("places_data_management:import_template", args=["csv"])
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/csv")
@@ -957,7 +1028,9 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
     def test_import_template_download_json(self):
         """Test JSON template download."""
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.get(reverse("places:import_template", args=["json"]))
+        response = self.client.get(
+            reverse("places_data_management:import_template", args=["json"])
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/json")
@@ -971,7 +1044,9 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
     def test_import_template_invalid_format(self):
         """Test template download with invalid format."""
         self.client.login(username="staffuser", password="staffpass123")
-        response = self.client.get(reverse("places:import_template", args=["invalid"]))
+        response = self.client.get(
+            reverse("places_data_management:import_template", args=["invalid"])
+        )
 
         # Should redirect with error
         self.assertEqual(response.status_code, 302)
@@ -979,14 +1054,14 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
     def test_non_staff_cannot_access_export(self):
         """Test that non-staff users cannot access export view."""
         self.client.login(username="regularuser", password="regularpass123")
-        response = self.client.get(reverse("places:export_places"))
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get(reverse("places_data_management:export_places"))
+        self.assertEqual(response.status_code, 404)  # Not found for security
 
     def test_non_staff_cannot_access_import(self):
         """Test that non-staff users cannot access import view."""
         self.client.login(username="regularuser", password="regularpass123")
-        response = self.client.get(reverse("places:import_places"))
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get(reverse("places_data_management:import_places"))
+        self.assertEqual(response.status_code, 404)  # Not found for security
 
 
 class GeoJSONImportTests(TestCase):
