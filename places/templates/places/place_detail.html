@@ -40,8 +40,8 @@
     },
     "geo": {
         "@type": "GeoCoordinates",
-        "latitude": {{ place.location.y|unlocalize }},
-        "longitude": {{ place.location.x|unlocalize }}
+        "latitude": {{ place.location.y|unlocalize|default:"null" }},
+        "longitude": {{ place.location.x|unlocalize|default:"null" }}
     },
     "isAccessibleForFree": true{% if place.category == 'restaurant' %},
     "servesCuisine": ["Halal", "Halal Food"]{% endif %}{% if place.phone_number %},
@@ -1007,7 +1007,7 @@
     }
 
     async function initMaps() {
-        const location = { lat: {{ place.location.y|unlocalize }}, lng: {{ place.location.x|unlocalize }} };
+        const location = { lat: {{ place.location.y|unlocalize|default:"null" }}, lng: {{ place.location.x|unlocalize|default:"null" }} };
         
         // Load Google Maps libraries once
         if (!mapsLibraryLoaded) {

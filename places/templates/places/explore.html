@@ -788,10 +788,10 @@
         if (cityFilter && touristAreas[cityFilter]) {
             // Center on selected tourist area (highest priority)
             center = touristAreas[cityFilter];
-        } else if ({% if user_location and location_context.is_in_korea %}true{% else %}false{% endif %}) {
+        } else if ({% if user_location and location_context.is_in_korea and user_location.y and user_location.x %}true{% else %}false{% endif %}) {
             // Center on user location if available AND user is in Korea
-            userLat = {{ user_location.y|unlocalize }};
-            userLng = {{ user_location.x|unlocalize }};
+            userLat = {{ user_location.y|unlocalize|default:"null" }};
+            userLng = {{ user_location.x|unlocalize|default:"null" }};
             center = { lat: userLat, lng: userLng };
             userLocationTitle = "{% translate 'Your Location' %}";
         } else {

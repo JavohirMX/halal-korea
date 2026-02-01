@@ -3,13 +3,46 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from django.core.cache import cache
 import logging
+import ipaddress
 
 logger = logging.getLogger(__name__)
 
 # Constants for IP geolocation
 IP_LOCATION_CACHE_TIMEOUT = 3600  # 1 hour for successful lookups
-IP_LOCATION_FAILURE_CACHE_TIMEOUT = 300  # 5 minutes for failed lookups (prevents hammering)
+IP_LOCATION_FAILURE_CACHE_TIMEOUT = (
+    300  # 5 minutes for failed lookups (prevents hammering)
+)
 IP_API_TIMEOUT = 5  # Reduced timeout for faster failover
+
+
+def _is_private_or_internal_ip(ip):
+    """
+    Check if an IP address is private, internal, or localhost.
+    This includes Docker networks, private LANs, and localhost.
+    Returns True for IPs that should not be used for geolocation.
+    """
+    if not ip or ip in ["127.0.0.1", "localhost", "::1", "UNKNOWN"]:
+        return True
+
+    try:
+        ip_obj = ipaddress.ip_address(ip)
+        # Check for:
+        # - 127.0.0.0/8 (localhost)
+        # - 10.0.0.0/8 (private)
+        # - 172.16.0.0/12 (private - Docker default)
+        # - 192.168.0.0/16 (private)
+        # - 169.254.0.0/16 (link-local)
+        # - fc00::/7 (unique local addresses - IPv6)
+        return (
+            ip_obj.is_loopback
+            or ip_obj.is_private
+            or ip_obj.is_link_local
+            or ip_obj.is_multicast
+            or ip_obj.is_reserved
+        )
+    except ValueError:
+        # Not a valid IP address
+        return True
 
 
 def _create_session_with_retries(retries=2, backoff_factor=0.3):
@@ -30,24 +63,28 @@ def _create_session_with_retries(retries=2, backoff_factor=0.3):
 def get_client_ip(request):
     """Extracts the client's IP address from the request."""
     logger.debug("Extracting client IP address from request")
-    
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
         # Take the first IP if there are multiple (proxy chain)
-        ip = x_forwarded_for.split(',')[0].strip()
+        ip = x_forwarded_for.split(",")[0].strip()
         logger.debug(f"Client IP extracted from X-Forwarded-For header: {ip}")
     else:
-        ip = request.META.get('REMOTE_ADDR')
+        ip = request.META.get("REMOTE_ADDR")
         logger.debug(f"Client IP extracted from REMOTE_ADDR: {ip}")
 
-    # If running locally, get public IP for testing
-    if ip in ["127.0.0.1", "localhost", None]:
-        logger.debug("Local or null IP detected, attempting to fetch public IP for development")
+    # If running locally, in Docker, or behind private network, get public IP for geolocation
+    if _is_private_or_internal_ip(ip):
+        logger.debug(
+            f"Private/internal IP detected ({ip}), fetching public IP for geolocation"
+        )
         try:
             response = requests.get("https://api64.ipify.org?format=json", timeout=5)
             public_ip = response.json().get("ip")
             if public_ip:
-                logger.info(f"Public IP fetched for development: {public_ip} (original: {ip})")
+                logger.info(
+                    f"Public IP fetched for geolocation: {public_ip} (original: {ip})"
+                )
                 ip = public_ip
             else:
                 logger.warning("Failed to get public IP from ipify service")
@@ -62,10 +99,11 @@ def get_client_ip(request):
     logger.debug(f"Final client IP determined: {ip}")
     return ip
 
+
 def get_ip_location(ip):
     """
     Fetches location details for the given IP address using external APIs, with caching.
-    
+
     Features:
     - Caches successful lookups for 1 hour
     - Caches failures for 5 minutes to prevent hammering failing services
@@ -73,37 +111,45 @@ def get_ip_location(ip):
     - Falls back to alternative API if primary fails
     - Returns graceful default on complete failure
     """
-    
+
     # Check if IP location is already cached (success or failure)
-    cache_key = f'ip_location_{ip}'
+    cache_key = f"ip_location_{ip}"
     cached_location = cache.get(cache_key)
     if cached_location is not None:
-        if cached_location.get('_cached_failure'):
+        if cached_location.get("_cached_failure"):
             logger.debug(f"IP location failure cache hit for IP: {ip}, skipping lookup")
             return _get_default_location(ip)
-        logger.debug(f"IP location cache hit for IP: {ip} -> {cached_location.get('city', 'Unknown')}, {cached_location.get('country', 'Unknown')}")
+        logger.debug(
+            f"IP location cache hit for IP: {ip} -> {cached_location.get('city', 'Unknown')}, {cached_location.get('country', 'Unknown')}"
+        )
         return cached_location
-    
+
     logger.info(f"Fetching location for IP: {ip} (cache miss)")
-    
+
     # Try primary API (ip-api.com)
     location_data = _fetch_from_ip_api(ip)
-    
+
     # If primary fails, try fallback API (ipwho.is - free, HTTPS, no rate limit issues)
     if location_data is None:
         logger.info(f"Primary API failed for IP {ip}, trying fallback API")
         location_data = _fetch_from_ipwhois(ip)
-    
+
     # If all APIs fail, cache the failure and return default
     if location_data is None:
         logger.warning(f"All geolocation APIs failed for IP: {ip}, caching failure")
-        cache.set(cache_key, {'_cached_failure': True}, timeout=IP_LOCATION_FAILURE_CACHE_TIMEOUT)
+        cache.set(
+            cache_key,
+            {"_cached_failure": True},
+            timeout=IP_LOCATION_FAILURE_CACHE_TIMEOUT,
+        )
         return _get_default_location(ip)
-    
+
     # Cache successful result
     cache.set(cache_key, location_data, timeout=IP_LOCATION_CACHE_TIMEOUT)
-    logger.info(f"Location data fetched successfully for IP {ip}: {location_data.get('city', 'Unknown')}, {location_data.get('country', 'Unknown')}")
-    
+    logger.info(
+        f"Location data fetched successfully for IP {ip}: {location_data.get('city', 'Unknown')}, {location_data.get('country', 'Unknown')}"
+    )
+
     return location_data
 
 
@@ -112,11 +158,11 @@ def _fetch_from_ip_api(ip):
     try:
         session = _create_session_with_retries(retries=1, backoff_factor=0.2)
         logger.debug(f"Making API call to ip-api.com for IP: {ip}")
-        response = session.get(f'http://ip-api.com/json/{ip}', timeout=IP_API_TIMEOUT)
+        response = session.get(f"http://ip-api.com/json/{ip}", timeout=IP_API_TIMEOUT)
         data = response.json()
-        
+
         logger.debug(f"IP API response status: {data.get('status')} for IP: {ip}")
-        
+
         if data.get("status") == "success":
             return {
                 "ip": ip,
@@ -129,7 +175,7 @@ def _fetch_from_ip_api(ip):
                 "isp": data.get("isp"),
             }
         else:
-            error_msg = data.get('message', 'Unknown error')
+            error_msg = data.get("message", "Unknown error")
             logger.warning(f"ip-api.com returned error for IP {ip}: {error_msg}")
             return None
     except requests.RequestException as e:
@@ -145,9 +191,9 @@ def _fetch_from_ipwhois(ip):
     try:
         session = _create_session_with_retries(retries=1, backoff_factor=0.2)
         logger.debug(f"Making API call to ipwho.is for IP: {ip}")
-        response = session.get(f'https://ipwho.is/{ip}', timeout=IP_API_TIMEOUT)
+        response = session.get(f"https://ipwho.is/{ip}", timeout=IP_API_TIMEOUT)
         data = response.json()
-        
+
         if data.get("success", False):
             return {
                 "ip": ip,
@@ -160,7 +206,7 @@ def _fetch_from_ipwhois(ip):
                 "isp": data.get("connection", {}).get("isp"),
             }
         else:
-            error_msg = data.get('message', 'Unknown error')
+            error_msg = data.get("message", "Unknown error")
             logger.warning(f"ipwho.is returned error for IP {ip}: {error_msg}")
             return None
     except requests.RequestException as e:
@@ -186,8 +232,8 @@ def _get_default_location(ip):
     }
 
 
-if __name__ == '__main__':
-    ip = '175.114.21.96'
+if __name__ == "__main__":
+    ip = "175.114.21.96"
     location = get_ip_location(ip)
-    
+
     print(location)
