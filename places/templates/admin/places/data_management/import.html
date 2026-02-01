@@ -562,6 +562,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
+    {% if not show_results %}
     <form method="post" action="{% url 'places_data_management:import_places' %}" enctype="multipart/form-data">
         {% csrf_token %}
         
@@ -677,5 +678,11 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </form>
+    {% endif %}
+
+    <!-- Import Results (shown after dry run) -->
+    {% if show_results %}
+        {% include "admin/places/data_management/import_results.html" %}
+    {% endif %}
 </div>
 {% endblock %}

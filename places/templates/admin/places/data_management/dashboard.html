@@ -1,0 +1,351 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title|default:"Data Management" }}{% endblock %}
+
+{% block extrahead %}
+<style>
+.data-management-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.header-section {
+    background: #1a1a1a;
+    color: white;
+    padding: 24px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-section h1 {
+    margin: 0 0 8px 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.header-section p {
+    margin: 0;
+    color: rgba(255,255,255,0.6);
+    font-size: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: #2d2d2d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.stat-card:hover {
+    background: #3d3d3d;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #6366f1;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.875rem;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.action-card {
+    background: #2d2d2d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 20px;
+    transition: background-color 0.2s ease;
+}
+
+.action-card:hover {
+    background: #3d3d3d;
+}
+
+.action-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.action-description {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-primary {
+    background: #6366f1;
+    color: white;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-info {
+    background: #6366f1;
+    color: white;
+}
+
+.recent-activity {
+    background: #2d2d2d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.activity-header {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    color: #6366f1;
+    font-size: 1rem;
+}
+
+.activity-text {
+    flex: 1;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+}
+
+.activity-time {
+    color: rgba(255,255,255,0.4);
+    font-size: 0.8rem;
+}
+
+.empty-activity {
+    text-align: center;
+    padding: 32px;
+    color: rgba(255,255,255,0.4);
+}
+
+.format-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.format-badge {
+    background: #3d3d3d;
+    color: rgba(255,255,255,0.6);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.info-section {
+    background: #2d2d2d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.info-section h4 {
+    margin: 0 0 12px 0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.info-section ul {
+    margin: 0;
+    padding-left: 20px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+}
+
+.info-section li {
+    margin-bottom: 6px;
+}
+
+.info-section strong {
+    color: #fff;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="data-management-container">
+    <div class="header-section">
+        <h1>Data Management Dashboard</h1>
+        <p>Import, export, and manage your HalalPlace data</p>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_places|default:"0" }}</div>
+            <div class="stat-label">Total Places</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ approved_places|default:"0" }}</div>
+            <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ pending_places|default:"0" }}</div>
+            <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_reviews|default:"0" }}</div>
+            <div class="stat-label">Total Reviews</div>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+        <h4>Quick Tips</h4>
+        <ul>
+            <li><strong>Export:</strong> Download your data in JSON, CSV, Excel, or GeoJSON formats</li>
+            <li><strong>Import:</strong> Bulk add or update places from JSON or CSV files</li>
+            <li><strong>Dry Run:</strong> Test imports without making changes to your database</li>
+            <li><strong>Templates:</strong> Download sample files to ensure correct format</li>
+        </ul>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="action-grid">
+        <!-- Export Card -->
+        <div class="action-card">
+            <h3 class="action-title">Export Data</h3>
+            <p class="action-description">
+                Export your HalalPlace data in multiple formats. Filter by status, category, or date range before exporting.
+            </p>
+            <div class="format-badges">
+                <span class="format-badge">JSON</span>
+                <span class="format-badge">CSV</span>
+                <span class="format-badge">Excel</span>
+                <span class="format-badge">GeoJSON</span>
+            </div>
+            <div style="margin-top: 16px;">
+                <a href="{% url 'places_data_management:export_places' %}" class="btn btn-primary">
+                    Export Data
+                </a>
+            </div>
+        </div>
+
+        <!-- Import Card -->
+        <div class="action-card">
+            <h3 class="action-title">Import Data</h3>
+            <p class="action-description">
+                Bulk import places from JSON or CSV files. Use dry-run mode to preview changes before committing.
+            </p>
+            <div class="format-badges">
+                <span class="format-badge">JSON</span>
+                <span class="format-badge">CSV</span>
+                <span class="format-badge">Validation</span>
+                <span class="format-badge">Dry Run</span>
+            </div>
+            <div style="margin-top: 16px;">
+                <a href="{% url 'places_data_management:import_places' %}" class="btn btn-success">
+                    Import Data
+                </a>
+            </div>
+        </div>
+
+        <!-- Back to Admin Card -->
+        <div class="action-card">
+            <h3 class="action-title">Manage Places</h3>
+            <p class="action-description">
+                Return to the main admin interface to view, edit, or delete individual places.
+            </p>
+            <div style="margin-top: 16px;">
+                <a href="{% url 'admin:places_halalplace_changelist' %}" class="btn btn-info">
+                    View All Places
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity">
+        <h3 class="activity-header">Recent Activity</h3>
+        {% if recent_activity %}
+            <ul class="activity-list">
+                {% for activity in recent_activity %}
+                <li class="activity-item">
+                    <span class="activity-icon">&rsaquo;</span>
+                    <span class="activity-text">{{ activity.description }}</span>
+                    <span class="activity-time">{{ activity.timestamp|timesince }} ago</span>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-activity">
+                <p>No recent import or export activity</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

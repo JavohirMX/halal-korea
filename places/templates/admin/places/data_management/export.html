@@ -1,0 +1,450 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title|default:"Export Data" }}{% endblock %}
+
+{% block extrahead %}
+<style>
+.export-container {
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.header-section {
+    background: #1a1a1a;
+    color: white;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-section h1 {
+    margin: 0 0 8px 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.header-section p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.form-card {
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.form-label .required {
+    color: #ef4444;
+    margin-left: 3px;
+}
+
+.form-help {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #3d3d3d;
+    background: #2d2d2d;
+    color: #e2e8f0;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid #3d3d3d;
+    background: #2d2d2d;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.radio-option:hover {
+    border-color: #6366f1;
+}
+
+.radio-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #6366f1;
+}
+
+.radio-option.selected {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.radio-label {
+    font-weight: 500;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.radio-description {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    cursor: pointer;
+    color: #e2e8f0;
+}
+
+.checkbox-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #6366f1;
+}
+
+.filter-section {
+    background: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.filter-title {
+    font-weight: 500;
+    color: #e2e8f0;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #6366f1;
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid #3d3d3d;
+}
+
+.btn-secondary:hover {
+    background: #2d2d2d;
+}
+
+.btn-lg {
+    padding: 12px 24px;
+}
+
+.actions-row {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #3d3d3d;
+}
+
+.format-info {
+    border: 1px solid #3d3d3d;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.format-info h4 {
+    margin: 0 0 8px 0;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.format-info ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.format-info li {
+    margin-bottom: 4px;
+}
+
+.preview-section {
+    background: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    padding: 16px;
+    margin-top: 20px;
+}
+
+.preview-title {
+    font-weight: 500;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.preview-count {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #6366f1;
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 12px 16px;
+    color: #ef4444;
+    margin-bottom: 20px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Radio button selection styling
+    const radioOptions = document.querySelectorAll('.radio-option');
+    radioOptions.forEach(option => {
+        const radio = option.querySelector('input[type="radio"]');
+        if (radio.checked) {
+            option.classList.add('selected');
+        }
+        
+        option.addEventListener('click', function() {
+            radioOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            radio.checked = true;
+        });
+        
+        radio.addEventListener('change', function() {
+            radioOptions.forEach(opt => opt.classList.remove('selected'));
+            if (this.checked) {
+                option.classList.add('selected');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="export-container">
+    <div class="header-section">
+        <h1>Export Data</h1>
+        <p>Configure and download your HalalPlace data</p>
+    </div>
+
+    {% if error %}
+    <div class="error-message">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'places_data_management:export_places' %}">
+        {% csrf_token %}
+        
+        <div class="form-card">
+            <!-- Export Format -->
+            <div class="form-group">
+                <label class="form-label">
+                    Export Format <span class="required">*</span>
+                </label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="format" id="format_json" value="json" checked>
+                        <div>
+                            <div class="radio-label">JSON (Recommended)</div>
+                            <div class="radio-description">Complete data with all fields and nested structures</div>
+                        </div>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="format" id="format_csv" value="csv">
+                        <div>
+                            <div class="radio-label">CSV</div>
+                            <div class="radio-description">Spreadsheet format, good for Excel or Google Sheets</div>
+                        </div>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="format" id="format_excel" value="excel">
+                        <div>
+                            <div class="radio-label">Excel (.xlsx)</div>
+                            <div class="radio-description">Microsoft Excel format with formatted columns</div>
+                        </div>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="format" id="format_geojson" value="geojson">
+                        <div>
+                            <div class="radio-label">GeoJSON</div>
+                            <div class="radio-description">Geographic format for mapping applications</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Format Info -->
+            <div class="format-info">
+                <h4>Export Includes:</h4>
+                <ul>
+                    <li>Place details (name, description, category, address)</li>
+                    <li>Contact information (phone, website, map links)</li>
+                    <li>Location data (latitude, longitude)</li>
+                    <li>Photos and ratings</li>
+                    <li>Business hours (JSON and Excel only)</li>
+                    <li>Status and metadata</li>
+                </ul>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-section">
+                <div class="filter-title">Filters (Optional)</div>
+                <div class="filter-grid">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="status">Status</label>
+                        <select name="status" id="status" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="approved">Approved</option>
+                            <option value="pending">Pending</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="category">Category</label>
+                        <select name="category" id="category" class="form-control">
+                            <option value="">All Categories</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="market">Market</option>
+                            <option value="mosque">Mosque</option>
+                            <option value="prayer_room">Prayer Room</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-grid" style="margin-top: 12px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="date_from">Date From</label>
+                        <input type="date" name="date_from" id="date_from" class="form-control">
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="date_to">Date To</label>
+                        <input type="date" name="date_to" id="date_to" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Include Options -->
+            <div class="form-group">
+                <label class="form-label">Include Options</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="include_business_hours" id="include_business_hours" checked>
+                        <label for="include_business_hours">Include business hours data</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="include_photos" id="include_photos" checked>
+                        <label for="include_photos">Include photo URLs</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="include_reviews" id="include_reviews">
+                        <label for="include_reviews">Include review data (separate file)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Preview -->
+            {% if preview_count %}
+            <div class="preview-section">
+                <div class="preview-title">Export Preview</div>
+                <div class="preview-count">{{ preview_count }} places</div>
+                <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 0.85rem;">
+                    Places matching your filter criteria
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="actions-row">
+                <a href="{% url 'places_data_management:data_management_dashboard' %}" class="btn btn-secondary">
+                    Back to Dashboard
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Export Data
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

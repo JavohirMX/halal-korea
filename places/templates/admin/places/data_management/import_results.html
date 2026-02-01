@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <h2 class="summary-title">Summary</h2>
         <div class="summary-grid">
             <div class="summary-item">
-                <div class="summary-count total">{{ import_result.total|default:"0" }}</div>
+                <div class="summary-count total">{{ import_result.total_rows|default:"0" }}</div>
                 <div class="summary-label">Total Rows</div>
             </div>
             <div class="summary-item">
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <tbody>
                     {% for row in row_details %}
                     <tr>
-                        <td><span class="row-number">{{ row.row_number }}</span></td>
+                        <td><span class="row-number">{{ row.row }}</span></td>
                         <td class="name-cell" title="{{ row.name }}">{{ row.name }}</td>
                         <td>
                             {% if row.action == 'create' %}
@@ -460,9 +460,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </table>
         </div>
         
-        {% if import_result.total > 20 %}
+        {% if import_result.total_rows > 20 %}
         <div class="show-more-note">
-            Showing first 20 of {{ import_result.total }} rows
+            Showing first 20 of {{ import_result.total_rows }} rows
         </div>
         {% endif %}
     </div>
