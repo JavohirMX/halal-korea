@@ -44,8 +44,8 @@ def data_management_dashboard(request):
 
     context = {
         "total_places": total_places,
-        "approved_count": approved_count,
-        "pending_count": pending_count,
+        "approved_places": approved_count,
+        "pending_places": pending_count,
         "rejected_count": rejected_count,
         "archived_count": archived_count,
         "recent_places": recent_places,
@@ -89,7 +89,7 @@ def export_places_view(request):
             return response
         except ValueError as e:
             messages.error(request, f"Export error: {str(e)}")
-            return redirect("places:data_management_dashboard")
+            return redirect("places_data_management:data_management_dashboard")
 
     # GET request - show export form
     context = {
@@ -113,10 +113,74 @@ def import_places_view(request):
     Supports JSON and CSV formats with preview and validation.
     """
     if request.method == "POST":
+        # Check if this is a confirm import from preview
+        if request.POST.get("confirm_import") == "true":
+            # Get stored file content from session
+            content = request.session.get("import_preview_content")
+            file_format = request.session.get("import_preview_format")
+            update_existing = request.session.get(
+                "import_preview_update_existing", True
+            )
+
+            if not content:
+                messages.error(
+                    request, "Preview data expired. Please upload file again."
+                )
+                return redirect("places_data_management:import_places")
+
+            # Perform actual import (dry_run=False)
+            importer = PlaceImporter(
+                user=request.user, dry_run=False, update_existing=update_existing
+            )
+
+            try:
+                if file_format == "json":
+                    result = importer.import_json(content)
+                elif file_format == "csv":
+                    result = importer.import_csv(content)
+                else:
+                    messages.error(request, f"Unsupported format: {file_format}")
+                    return redirect("places_data_management:import_places")
+
+                # Build success message
+                message_parts = []
+                if result.created_count > 0:
+                    message_parts.append(f"{result.created_count} created")
+                if result.updated_count > 0:
+                    message_parts.append(f"{result.updated_count} updated")
+
+                if message_parts:
+                    messages.success(
+                        request, f"Import complete: {', '.join(message_parts)}."
+                    )
+
+                # Clear session
+                for key in [
+                    "import_preview_content",
+                    "import_preview_format",
+                    "import_preview_filename",
+                    "import_preview_update_existing",
+                ]:
+                    request.session.pop(key, None)
+
+                return redirect("places_data_management:data_management_dashboard")
+
+            except Exception as e:
+                # Clear session on error
+                for key in [
+                    "import_preview_content",
+                    "import_preview_format",
+                    "import_preview_filename",
+                    "import_preview_update_existing",
+                ]:
+                    request.session.pop(key, None)
+                messages.error(request, f"Import failed: {str(e)}")
+                return redirect("places_data_management:import_places")
+
         # Check if file was uploaded
         if "import_file" not in request.FILES:
             messages.error(request, "Please select a file to import.")
-            return redirect("places:import_places")
+            return redirect("places_data_management:import_places")
 
         uploaded_file = request.FILES["import_file"]
         file_format = request.POST.get("format", "auto")
@@ -135,17 +199,26 @@ def import_places_view(request):
                     request,
                     "Could not determine file format. Please specify the format.",
                 )
-                return redirect("places:import_places")
+                return redirect("places_data_management:import_places")
 
         # Read file content
         try:
             content = uploaded_file.read().decode("utf-8")
         except UnicodeDecodeError:
             messages.error(request, "File must be UTF-8 encoded.")
-            return redirect("places:import_places")
+            return redirect("places_data_management:import_places")
         except Exception as e:
             messages.error(request, f"Error reading file: {str(e)}")
-            return redirect("places:import_places")
+            return redirect("places_data_management:import_places")
+
+        # Validate file size (10MB limit)
+        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+        if len(content) > MAX_FILE_SIZE:
+            messages.error(
+                request,
+                f"File too large. Maximum size is {MAX_FILE_SIZE // (1024 * 1024)}MB.",
+            )
+            return redirect("places_data_management:import_places")
 
         # Create importer
         importer = PlaceImporter(
@@ -160,7 +233,7 @@ def import_places_view(request):
                 result = importer.import_csv(content)
             else:
                 messages.error(request, f"Unsupported format: {file_format}")
-                return redirect("places:import_places")
+                return redirect("places_data_management:import_places")
 
             # Build success message
             if dry_run:
@@ -178,6 +251,31 @@ def import_places_view(request):
             if result.error_count > 0:
                 message_parts.append(f"{result.error_count} errors")
 
+            if dry_run:
+                # Show detailed preview on same page
+                context = {
+                    "format_choices": [
+                        ("auto", "Auto-detect"),
+                        ("json", "JSON / GeoJSON"),
+                        ("csv", "CSV"),
+                    ],
+                    "title": "Import Places - Preview",
+                    "import_result": result.get_summary(),
+                    "row_details": result.row_details[:20],  # First 20 rows only
+                    "file_format": file_format,
+                    "update_existing": "on" if update_existing else "off",
+                    "show_results": True,
+                }
+                # Store content in session for confirm
+                request.session["import_preview_content"] = content
+                request.session["import_preview_format"] = file_format
+                request.session["import_preview_update_existing"] = update_existing
+
+                return render(
+                    request, "admin/places/data_management/import.html", context
+                )
+
+            # Build success message for actual import
             if message_parts:
                 status_msg = f"Import complete: {', '.join(message_parts)}."
                 if result.error_count > 0:
@@ -188,11 +286,11 @@ def import_places_view(request):
             # Store import result in session for detailed view
             request.session["last_import_result"] = result.to_dict()
 
-            return redirect("places:data_management_dashboard")
+            return redirect("places_data_management:data_management_dashboard")
 
         except Exception as e:
             messages.error(request, f"Import failed: {str(e)}")
-            return redirect("places:import_places")
+            return redirect("places_data_management:import_places")
 
     # GET request - show import form
     context = {
@@ -372,6 +470,6 @@ def import_template_download(request, format_type):
 
     else:
         messages.error(request, f"Unknown template format: {format_type}")
-        return redirect("places:import_places")
+        return redirect("places_data_management:import_places")
 
     return response

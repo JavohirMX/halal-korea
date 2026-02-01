@@ -35,30 +35,4 @@ urlpatterns = [
         name="suggest_place_edit",
     ),
     path("my-contributions/", views.my_contributions, name="my_contributions"),
-    # Data management URLs (admin import/export)
-    path(
-        "admin/data-management/",
-        data_management_views.data_management_dashboard,
-        name="data_management_dashboard",
-    ),
-    path(
-        "admin/data-management/export/",
-        data_management_views.export_places_view,
-        name="export_places",
-    ),
-    path(
-        "admin/data-management/import/",
-        data_management_views.import_places_view,
-        name="import_places",
-    ),
-    path(
-        "admin/data-management/import/validate/",
-        data_management_views.validate_import_file_ajax,
-        name="validate_import_file",
-    ),
-    path(
-        "admin/data-management/template/<str:format_type>/",
-        data_management_views.import_template_download,
-        name="import_template",
-    ),
 ]

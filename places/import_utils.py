@@ -24,6 +24,8 @@ class ImportResult:
         self.error_count = 0
         self.errors: List[Dict[str, Any]] = []
         self.warnings: List[str] = []
+        self.row_details: List[Dict[str, Any]] = []
+        self.total_rows = 0
 
     def add_error(self, row_num: int, field: str, message: str, data: Dict = None):
         self.errors.append(
@@ -33,6 +35,37 @@ class ImportResult:
 
     def add_warning(self, message: str):
         self.warnings.append(message)
+
+    def get_summary(self) -> Dict[str, Any]:
+        """Get summary statistics for display."""
+        return {
+            "total": self.total_rows,
+            "created": self.created_count,
+            "updated": self.updated_count,
+            "skipped": self.skipped_count,
+            "errors": self.error_count,
+        }
+
+    def add_row_detail(
+        self,
+        row_num: int,
+        name: str,
+        action: str,
+        status: str,
+        details: str = "",
+        changes: Dict = None,
+    ):
+        self.row_details.append(
+            {
+                "row": row_num,
+                "name": name,
+                "action": action,
+                "status": status,
+                "details": details,
+                "changes": changes or {},
+            }
+        )
+        self.total_rows += 1
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -204,13 +237,21 @@ class PlaceImporter:
 
     def _import_single_place(self, data: Dict[str, Any], row_num: int):
         """Import or update a single place."""
+        name = data.get("name", "")
+
         # Validate required fields
         if not data.get("name"):
             self.result.add_error(row_num, "name", "Name is required", data)
+            self.result.add_row_detail(
+                row_num, name, "validate", "error", "Name is required"
+            )
             return
 
         if not data.get("address"):
             self.result.add_error(row_num, "address", "Address is required", data)
+            self.result.add_row_detail(
+                row_num, name, "validate", "error", "Address is required"
+            )
             return
 
         # Validate category
@@ -221,6 +262,9 @@ class PlaceImporter:
                 "category",
                 f"Invalid category: {category}. Valid options: {', '.join(self.VALID_CATEGORIES)}",
                 data,
+            )
+            self.result.add_row_detail(
+                row_num, name, "validate", "error", f"Invalid category: {category}"
             )
             return
 
@@ -233,41 +277,177 @@ class PlaceImporter:
                 f"Invalid status: {status}. Valid options: {', '.join(self.VALID_STATUSES)}",
                 data,
             )
+            self.result.add_row_detail(
+                row_num, name, "validate", "error", f"Invalid status: {status}"
+            )
             return
 
         # Check for existing place
         existing = self._find_existing_place(data)
 
-        if existing and not self.update_existing:
-            self.result.skipped_count += 1
-            return
+        if existing:
+            # Check for changes
+            changes = self._get_place_changes(existing, data)
 
-        # Prepare place data
-        place_fields = self._prepare_place_data(data)
+            if not changes:
+                # No-op: no changes detected
+                self.result.skipped_count += 1
+                self.result.add_row_detail(
+                    row_num, name, "skip", "no-op", "No changes detected"
+                )
+                return
 
-        if self.dry_run:
-            # In dry run mode, just validate
-            if existing:
+            if not self.update_existing:
+                self.result.skipped_count += 1
+                self.result.add_row_detail(
+                    row_num,
+                    name,
+                    "skip",
+                    "skipped",
+                    "Update existing disabled",
+                    changes,
+                )
+                return
+
+            # Prepare place data for update
+            place_fields = self._prepare_place_data(data)
+
+            if self.dry_run:
                 self.result.updated_count += 1
-            else:
-                self.result.created_count += 1
-            return
+                self.result.add_row_detail(
+                    row_num, name, "update", "dry-run", "Would update", changes
+                )
+                return
 
-        # Save to database
-        try:
-            with transaction.atomic():
-                if existing:
-                    # Update existing
+            # Save to database
+            try:
+                with transaction.atomic():
                     for field, value in place_fields.items():
                         setattr(existing, field, value)
                     existing.save()
                     self.result.updated_count += 1
-                else:
-                    # Create new
+                    self.result.add_row_detail(
+                        row_num,
+                        name,
+                        "update",
+                        "success",
+                        "Updated successfully",
+                        changes,
+                    )
+            except Exception as e:
+                self.result.add_error(row_num, "database", str(e), data)
+                self.result.add_row_detail(row_num, name, "update", "error", str(e))
+
+        else:
+            # Create new place
+            place_fields = self._prepare_place_data(data)
+
+            if self.dry_run:
+                self.result.created_count += 1
+                self.result.add_row_detail(
+                    row_num, name, "create", "dry-run", "Would create"
+                )
+                return
+
+            # Save to database
+            try:
+                with transaction.atomic():
                     place = HalalPlace.objects.create(**place_fields)
                     self.result.created_count += 1
-        except Exception as e:
-            self.result.add_error(row_num, "database", str(e), data)
+                    self.result.add_row_detail(
+                        row_num, name, "create", "success", "Created successfully"
+                    )
+            except Exception as e:
+                self.result.add_error(row_num, "database", str(e), data)
+                self.result.add_row_detail(row_num, name, "create", "error", str(e))
+
+    def _get_place_changes(
+        self, existing: HalalPlace, data: Dict[str, Any]
+    ) -> Dict[str, Dict[str, Any]]:
+        """
+        Compare existing place with new data and return dict of changes.
+        Returns: {field: {'old': val, 'new': val}}
+        """
+        changes = {}
+        place_fields = self._prepare_place_data(data)
+
+        # Fields to compare
+        comparable_fields = [
+            "name",
+            "description",
+            "category",
+            "address",
+            "phone_number",
+            "website",
+            "google_map_link",
+            "kakao_map_link",
+            "naver_map_link",
+            "status",
+            "temporary_closure_until",
+            "temporary_closure_reason",
+        ]
+
+        for field in comparable_fields:
+            old_val = getattr(existing, field, None)
+            new_val = place_fields.get(field)
+
+            # Normalize None vs empty strings
+            old_val = old_val if old_val else None
+            new_val = new_val if new_val else None
+
+            # Handle date comparison
+            if field == "temporary_closure_until":
+                if isinstance(old_val, datetime):
+                    old_val = old_val.date()
+                if isinstance(new_val, str):
+                    try:
+                        new_val = datetime.strptime(new_val, "%Y-%m-%d").date()
+                    except ValueError:
+                        pass
+
+            if old_val != new_val:
+                changes[field] = {"old": old_val, "new": new_val}
+
+        # Compare coordinates (rounded to 6 decimal places)
+        if existing.location and "location" in place_fields:
+            old_lat = round(existing.location.y, 6)
+            old_lng = round(existing.location.x, 6)
+            new_lat = round(place_fields["location"].y, 6)
+            new_lng = round(place_fields["location"].x, 6)
+
+            if old_lat != new_lat or old_lng != new_lng:
+                changes["coordinates"] = {
+                    "old": {"lat": old_lat, "lng": old_lng},
+                    "new": {"lat": new_lat, "lng": new_lng},
+                }
+        elif (not existing.location) != (
+            "location" not in place_fields or not place_fields["location"]
+        ):
+            changes["coordinates"] = {
+                "old": {
+                    "lat": round(existing.location.y, 6),
+                    "lng": round(existing.location.x, 6),
+                }
+                if existing.location
+                else None,
+                "new": {
+                    "lat": round(place_fields["location"].y, 6),
+                    "lng": round(place_fields["location"].x, 6),
+                }
+                if place_fields.get("location")
+                else None,
+            }
+
+        # Compare photo_urls as sets
+        old_photos = set(existing.photo_urls or [])
+        new_photos = set(place_fields.get("photo_urls") or [])
+        if old_photos != new_photos:
+            changes["photo_urls"] = {
+                "old": sorted(old_photos) if old_photos else None,
+                "new": sorted(new_photos) if new_photos else None,
+            }
+
+        return changes
 
     def _find_existing_place(self, data: Dict[str, Any]) -> Optional[HalalPlace]:
         """Find existing place by ID or name+address combination."""
