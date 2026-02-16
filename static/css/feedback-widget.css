@@ -1,6 +1,6 @@
 /**
  * Feedback Widget Styles
- * Floating feedback button and form with glassmorphism effect
+ * Clean, minimal floating feedback button and form
  */
 
 /* Container */
@@ -12,7 +12,7 @@
     font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     transition: opacity 0.3s ease, transform 0.3s ease;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
 }
 
 .feedback-widget-container.hidden {
@@ -26,85 +26,46 @@
 
 /* Floating Button */
 .feedback-button {
-    background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+    width: 48px;
+    height: 48px;
+    background: #22c55e;
     color: white;
-    border-radius: 50px;
-    padding: 14px 20px;
+    border: none;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 15px;
-}
-
-.feedback-button:hover {
-    transform: scale(1.05) translateY(-2px);
-    box-shadow: 0 6px 30px rgba(34, 197, 94, 0.6);
-}
-
-.feedback-button i {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s, transform 0.2s;
     font-size: 18px;
 }
 
-.feedback-button.pulse {
-    animation: pulse 1s ease-in-out;
+.feedback-button:hover {
+    background: #16a34a;
+    transform: scale(1.05);
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.08);
-    }
-}
-
-/* Mobile adjustments for button */
-@media (max-width: 640px) {
-    .feedback-widget-container {
-        bottom: 16px;
-        right: 16px;
-    }
-    
-    .feedback-button {
-        padding: 12px 16px;
-        font-size: 14px;
-    }
-    
-    .feedback-button-text {
-        display: none;
-    }
-    
-    .feedback-button {
-        width: 56px;
-        height: 56px;
-        padding: 0;
-        justify-content: center;
-        border-radius: 50%;
-    }
+.dark .feedback-button {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Expanded Form */
 .feedback-form {
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(12px);
-    border-radius: 16px;
-    padding: 0;
-    width: 380px;
+    background: #ffffff;
+    border-radius: 12px;
+    width: 340px;
     max-width: calc(100vw - 40px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e5e7eb;
     overflow: hidden;
-    animation: slideUp 0.3s ease-out;
+    animation: feedbackSlideUp 0.2s ease-out;
 }
 
-@keyframes slideUp {
+@keyframes feedbackSlideUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(6px);
     }
     to {
         opacity: 1;
@@ -112,10 +73,10 @@
     }
 }
 
-/* Dark mode support */
 .dark .feedback-form {
-    background: rgba(17, 24, 39, 0.98);
-    border-color: rgba(34, 197, 94, 0.3);
+    background: #1f2937;
+    border-color: #374151;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
 /* Form Header */
@@ -123,72 +84,90 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
-    color: white;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.dark .feedback-form-header {
+    border-bottom-color: #374151;
 }
 
 .feedback-form-title {
     margin: 0;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
+    color: #111827;
+}
+
+.dark .feedback-form-title {
+    color: #f9fafb;
 }
 
 .feedback-close-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: none;
     border: none;
-    color: white;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    color: #9ca3af;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: color 0.15s, background-color 0.15s;
+    font-size: 14px;
 }
 
 .feedback-close-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+.dark .feedback-close-btn:hover {
+    color: #d1d5db;
+    background: #374151;
 }
 
 /* Form Body */
 .feedback-form-body {
-    padding: 24px;
+    padding: 20px;
 }
 
 /* Star Rating */
 .feedback-rating {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .star-rating {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 6px;
+    margin-bottom: 6px;
 }
 
 .star {
-    font-size: 32px;
+    font-size: 28px;
     color: #d1d5db;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: color 0.15s;
 }
 
 .star:hover,
 .star.fas {
     color: #fbbf24;
-    transform: scale(1.15);
+}
+
+.dark .star {
+    color: #4b5563;
 }
 
 .rating-label {
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
     color: #6b7280;
     font-weight: 500;
+    min-height: 20px;
 }
 
 .dark .rating-label {
@@ -197,13 +176,13 @@
 
 /* Comment Section */
 .feedback-comment {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .feedback-label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
+    margin-bottom: 6px;
+    font-size: 13px;
     font-weight: 500;
     color: #374151;
 }
@@ -214,71 +193,63 @@
 
 .feedback-textarea {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e5e7eb;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 14px;
     font-family: inherit;
     resize: vertical;
-    transition: border-color 0.2s;
-    background: white;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    background: #ffffff;
     color: #1f2937;
+    box-sizing: border-box;
 }
 
 .feedback-textarea:focus {
     outline: none;
     border-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.15);
 }
 
 .dark .feedback-textarea {
-    background: #1f2937;
+    background: #111827;
     border-color: #374151;
     color: #f3f4f6;
 }
 
 .dark .feedback-textarea:focus {
     border-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
 }
 
 .char-count {
     display: block;
     text-align: right;
-    font-size: 12px;
+    font-size: 11px;
     color: #9ca3af;
     margin-top: 4px;
 }
 
-/* Actions */
-.feedback-actions {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.feedback-submit-btn,
-.feedback-later-btn {
-    flex: 1;
-    padding: 12px 20px;
+/* Submit Button */
+.feedback-submit-btn {
+    width: 100%;
+    padding: 10px 16px;
     border: none;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-}
-
-.feedback-submit-btn {
-    background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+    background: #22c55e;
     color: white;
 }
 
 .feedback-submit-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    background: #16a34a;
 }
 
 .feedback-submit-btn:disabled {
@@ -286,120 +257,142 @@
     cursor: not-allowed;
 }
 
-.feedback-later-btn {
-    background: transparent;
-    color: #6b7280;
-    border: 2px solid #e5e7eb;
-}
-
-.feedback-later-btn:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-}
-
-.dark .feedback-later-btn {
-    color: #9ca3af;
-    border-color: #374151;
-}
-
-.dark .feedback-later-btn:hover {
-    background: #1f2937;
-    border-color: #4b5563;
-}
-
-/* Disable Link */
-.feedback-disable-link {
-    width: 100%;
-    background: none;
-    border: none;
-    color: #9ca3af;
-    font-size: 12px;
-    cursor: pointer;
-    padding: 8px;
-    text-decoration: underline;
-    transition: color 0.2s;
-}
-
-.feedback-disable-link:hover {
-    color: #6b7280;
-}
-
-/* Loading State */
-.feedback-loading {
-    padding: 40px;
-    text-align: center;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto 16px;
-    border: 4px solid #e5e7eb;
-    border-top-color: #22c55e;
+.feedback-submit-btn .btn-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: feedbackSpin 0.6s linear infinite;
 }
 
-@keyframes spin {
+@keyframes feedbackSpin {
     to {
         transform: rotate(360deg);
     }
 }
 
-.feedback-loading p {
-    margin: 0;
-    color: #6b7280;
-    font-size: 14px;
+/* Secondary Actions */
+.feedback-secondary-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 12px;
 }
 
-.dark .feedback-loading p {
+.feedback-text-link {
+    background: none;
+    border: none;
     color: #9ca3af;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: color 0.15s;
+}
+
+.feedback-text-link:hover {
+    color: #6b7280;
+}
+
+.dark .feedback-text-link:hover {
+    color: #d1d5db;
+}
+
+/* Inline Confirm */
+.feedback-confirm-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.dark .feedback-confirm-inline {
+    color: #9ca3af;
+}
+
+.feedback-confirm-inline button {
+    background: none;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.feedback-confirm-yes {
+    color: #ef4444;
+}
+
+.feedback-confirm-yes:hover {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.dark .feedback-confirm-yes:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.feedback-confirm-no {
+    color: #6b7280;
+}
+
+.feedback-confirm-no:hover {
+    background: #f3f4f6;
+}
+
+.dark .feedback-confirm-no:hover {
+    background: #374151;
+    color: #d1d5db;
+}
+
+/* Error Message */
+.feedback-error {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.dark .feedback-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.2);
 }
 
 /* Success State */
 .feedback-success {
-    padding: 40px;
+    padding: 32px 20px;
     text-align: center;
 }
 
-.success-icon {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 16px;
-    background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    font-weight: bold;
-    animation: scaleIn 0.4s ease-out;
-}
-
-@keyframes scaleIn {
-    from {
-        transform: scale(0);
-    }
-    to {
-        transform: scale(1);
-    }
+.feedback-success .success-icon {
+    color: #22c55e;
+    font-size: 36px;
+    margin-bottom: 12px;
 }
 
 .feedback-success h3 {
-    margin: 0 0 8px;
-    font-size: 20px;
-    color: #1f2937;
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
 }
 
 .feedback-success p {
     margin: 0;
     color: #6b7280;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .dark .feedback-success h3 {
-    color: #f3f4f6;
+    color: #f9fafb;
 }
 
 .dark .feedback-success p {
@@ -408,33 +401,26 @@
 
 /* Mobile Responsive */
 @media (max-width: 640px) {
-    .feedback-form {
-        width: calc(100vw - 32px);
-        border-radius: 12px;
+    .feedback-widget-container {
+        bottom: 16px;
+        right: 16px;
     }
-    
-    .feedback-form-header {
-        padding: 16px;
-    }
-    
-    .feedback-form-title {
+
+    .feedback-button {
+        width: 44px;
+        height: 44px;
         font-size: 16px;
     }
-    
+
+    .feedback-form {
+        width: calc(100vw - 32px);
+    }
+
     .feedback-form-body {
-        padding: 20px;
+        padding: 16px;
     }
-    
+
     .star {
-        font-size: 28px;
-    }
-    
-    .feedback-actions {
-        flex-direction: column;
-    }
-    
-    .feedback-submit-btn,
-    .feedback-later-btn {
-        width: 100%;
+        font-size: 24px;
     }
 }
