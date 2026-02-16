@@ -49,8 +49,8 @@
     "sameAs": "{{ place.website }}"{% endif %}{% if place.reviews_count > 0 %},
     "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": {{ place.average_rating }},
-        "reviewCount": {{ place.reviews_count }},
+        "ratingValue": {{ place.average_rating|unlocalize }},
+        "reviewCount": {{ place.reviews_count|unlocalize }},
         "bestRating": 5,
         "worstRating": 1
     }{% endif %}{% if opening_hours_schema %},
@@ -1018,8 +1018,8 @@
 
         const infoWindowContent = `
             <div style="padding: 12px; margin: -12px 0 0 -12px;">
-                <p style="font-size:18px; font-weight:700; color:#111;" class="font-bold">{{ place.name }}</p>
-                <p style="font-size:14px; color:#4B5563;" class="text-sm">{{ place.address }}</p>
+                <p style="font-size:18px; font-weight:700; color:#111;" class="font-bold">{{ place.name|escapejs }}</p>
+                <p style="font-size:14px; color:#4B5563;" class="text-sm">{{ place.address|escapejs }}</p>
             </div>
         `;
 
@@ -1039,7 +1039,7 @@
                 const sidebarMarker = new GoogleMarker({
                     map: sidebarMapInstance,
                     position: location,
-                    title: '{{ place.name }}'
+                    title: '{{ place.name|escapejs }}'
                 });
 
                 const sidebarInfowindow = new google.maps.InfoWindow({
@@ -1067,7 +1067,7 @@
                 const inlineMarker = new GoogleMarker({
                     map: inlineMapInstance,
                     position: location,
-                    title: '{{ place.name }}'
+                    title: '{{ place.name|escapejs }}'
                 });
 
                 const inlineInfowindow = new google.maps.InfoWindow({
@@ -1216,13 +1216,14 @@
     });
 
     // Share button functionality
+    {% blocktranslate with place_name=place.name site_name=STATIC_INFO.site_name asvar share_text %}Check out {{ place_name }} on {{ site_name }}!{% endblocktranslate %}
     const shareButtons = document.querySelectorAll('#share-button, #mobile-share-button');
     
     shareButtons.forEach(button => {
         button.addEventListener('click', async function() {
             const shareData = {
-                title: '{{ place.name }}',
-                text: "{% blocktranslate with place_name=place.name site_name=STATIC_INFO.site_name %}Check out {{ place_name }} on {{ site_name }}!{% endblocktranslate %}",
+                title: '{{ place.name|escapejs }}',
+                text: "{{ share_text|escapejs }}",
                 url: window.location.href
             };
 

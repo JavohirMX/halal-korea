@@ -738,6 +738,7 @@
 <!-- Marker Clusterer Library -->
 <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
 
+{% localize off %}
 <script>
     // Global variables
     let map;
@@ -793,7 +794,7 @@
             userLat = {{ user_location.y|unlocalize|default:"null" }};
             userLng = {{ user_location.x|unlocalize|default:"null" }};
             center = { lat: userLat, lng: userLng };
-            userLocationTitle = "{% translate 'Your Location' %}";
+            userLocationTitle = "{% translate 'Your Location'|escapejs %}";
         } else {
             // Always Seoul for global users
             center = seoul;
@@ -1006,7 +1007,7 @@
                 <!-- CTA Button -->
                 <a href="/place/${place.id}/" 
                    class="inline-flex items-center justify-center w-full px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors duration-200">
-                    {% translate "View Details" %}
+                    {% translate "View Details"|escapejs %}
                     <i class="fas fa-chevron-right ml-1 text-xs"></i>
                 </a>
             </div>
@@ -1105,7 +1106,7 @@
                <div class="flex justify-center items-center">
                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                </div>
-               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% translate "Loading more places..." %}</p>
+               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% translate "Loading more places..."|escapejs %}</p>
             `;
             placesContainer.appendChild(newSpinner);
             
@@ -1231,7 +1232,7 @@
                <div class="flex justify-center items-center">
                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                </div>
-               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% translate "Loading more places..." %}</p>
+               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{% translate "Loading more places..."|escapejs %}</p>
             `;
             placesContainer.appendChild(loadingSpinner);
             
@@ -1348,11 +1349,11 @@
                 
                 // Update text and icon based on pull progress
                 if (pullDistance > maxPull) {
-                    refreshText.textContent = "{% translate 'Release to refresh' %}";
+                    refreshText.textContent = "{% translate 'Release to refresh'|escapejs %}";
                     refreshIcon.classList.remove('fa-arrow-down');
                     refreshIcon.classList.add('fa-arrow-up');
                 } else {
-                    refreshText.textContent = "{% translate 'Pull to refresh' %}";
+                    refreshText.textContent = "{% translate 'Pull to refresh'|escapejs %}";
                     refreshIcon.classList.remove('fa-arrow-up');
                     refreshIcon.classList.add('fa-arrow-down');
                 }
@@ -1370,7 +1371,7 @@
                 isRefreshing = true;
                 
                 // Show spinning animation
-                refreshText.textContent = "{% translate 'Refreshing...' %}";
+                refreshText.textContent = "{% translate 'Refreshing...'|escapejs %}";
                 refreshIcon.classList.remove('fa-arrow-down', 'fa-arrow-up');
                 refreshIcon.classList.add('fa-spinner', 'fa-spin');
                 indicator.style.opacity = '1';
@@ -1442,7 +1443,7 @@
                 indicator.style.transform = 'translateY(-3rem)';
                 refreshIcon.classList.remove('fa-spinner', 'fa-spin');
                 refreshIcon.classList.add('fa-arrow-down');
-                refreshText.textContent = "{% translate 'Pull to refresh' %}";
+                refreshText.textContent = "{% translate 'Pull to refresh'|escapejs %}";
                 
                 // Reset state
                 const placesContainer = document.getElementById('places-container');
@@ -2003,6 +2004,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 {% endif %}
 </script>
+{% endlocalize %}
 
 <!-- Tutorial Overlay Elements -->
 <div id="tutorial-backdrop"></div>
@@ -2019,6 +2021,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
+{% localize off %}
 <script>
     /**
      * Mobile Explore Walkthrough / Tutorial
@@ -2037,33 +2040,33 @@ document.addEventListener('DOMContentLoaded', function() {
             this.steps = [
                 {
                     elementId: 'map-container',
-                    text: "{% translate 'The interactive map is located just below the list. Scroll down to see it!' %}",
+                    text: "{% translate 'The interactive map is located just below the list. Scroll down to see it!'|escapejs %}",
                     position: 'top',
                     action: 'scroll_to_map'
                 },
                 {
                     elementId: 'view-list-btn', // Highlighting the view switcher container
                     targetContainer: true, // Use parent container
-                    text: "{% translate 'Customize your view: List only, Map only, or Split view.' %}",
+                    text: "{% translate 'Customize your view: List only, Map only, or Split view.'|escapejs %}",
                     position: 'bottom',
                     action: 'scroll_top',
                     preAction: 'expand_search'
                 },
                 {
                     elementId: 'search-input',
-                    text: "{% translate 'Search for specific restaurants, mosques, or markets by name.' %}",
+                    text: "{% translate 'Search for specific restaurants, mosques, or markets by name.'|escapejs %}",
                     position: 'bottom',
                     preAction: 'expand_search'
                 },
                 {
                     elementId: 'mobile-category-filters',
-                    text: "{% translate 'Tap these icons to quickly filter by category (All, Restaurant, Market, Mosque).' %}",
+                    text: "{% translate 'Tap these icons to quickly filter by category (All, Restaurant, Market, Mosque).'|escapejs %}",
                     position: 'bottom',
                     preAction: 'expand_search'
                 },
                 {
                     elementId: 'location-chip-mobile',
-                    text: "{% translate 'Tap here to update your location or switch cities.' %}",
+                    text: "{% translate 'Tap here to update your location or switch cities.'|escapejs %}",
                     position: 'bottom',
                     preAction: 'expand_search'
                 }
@@ -2155,9 +2158,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Change button text on last step
             if (index === this.steps.length - 1) {
-                this.nextBtn.textContent = "{% translate 'Got it!' %}";
+                this.nextBtn.textContent = "{% translate 'Got it!'|escapejs %}";
             } else {
-                this.nextBtn.textContent = "{% translate 'Next' %}";
+                this.nextBtn.textContent = "{% translate 'Next'|escapejs %}";
             }
 
             // Highlight Element
@@ -2275,5 +2278,6 @@ document.addEventListener('DOMContentLoaded', function() {
         new ExploreTutorial();
     });
 </script>
+{% endlocalize %}
 
 {% endblock %}

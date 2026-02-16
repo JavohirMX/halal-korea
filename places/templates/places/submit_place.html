@@ -849,14 +849,14 @@
             div.innerHTML = `
                 <div class="relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
                     <img src="${e.target.result}" 
-                         alt="{% translate 'Preview' %}" 
+                         alt="{% translate 'Preview'|escapejs %}" 
                          class="w-full h-full object-cover">
                     <!-- Larger, more touch-friendly delete button -->
                     <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center">
                         <button type="button" 
                                 class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-red-500 hover:bg-red-600 text-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shadow-lg transform hover:scale-110 active:scale-95 transition-transform"
                                 onclick="removePhoto(this)"
-                                aria-label="{% translate 'Remove photo' %}">
+                                aria-label="{% translate 'Remove photo'|escapejs %}">
                             <i class="fas fa-trash text-base sm:text-lg"></i>
                         </button>
                     </div>
@@ -864,7 +864,7 @@
                     <button type="button" 
                             class="sm:hidden absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg active:scale-95 transition-transform z-10"
                             onclick="removePhoto(this)"
-                            aria-label="{% translate 'Remove photo' %}">
+                            aria-label="{% translate 'Remove photo'|escapejs %}">
                         <i class="fas fa-times text-sm"></i>
                     </button>
                     <!-- File name tooltip on hover -->

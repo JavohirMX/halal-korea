@@ -1318,13 +1318,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const infoContent = `
                 <div class="flex items-center">
                     <i class="fas fa-info-circle mr-2 text-primary-500"></i>
-                    {% translate "Select fields to edit or upload images to create suggestions." %}
+                    {% translate "Select fields to edit or upload images to create suggestions."|escapejs %}
                 </div>
             `;
             const mobileInfoContent = `
                 <div class="flex items-center">
                     <i class="fas fa-info-circle mr-1 text-primary-500"></i>
-                    {% translate "Select fields to edit or upload images to create suggestions." %}
+                    {% translate "Select fields to edit or upload images to create suggestions."|escapejs %}
                 </div>
             `;
             
@@ -1335,10 +1335,10 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.classList.add('opacity-50', 'cursor-not-allowed');
         } else {
             const summaryItems = [];
-            const fieldEditSingular = "{% translate 'Field edit' %}";
-            const fieldEditPlural = "{% translate 'Field edits' %}";
-            const photoUploadSingular = "{% translate 'Photo upload' %}";
-            const photoUploadPlural = "{% translate 'Photo uploads' %}";
+            const fieldEditSingular = "{% translate 'Field edit'|escapejs %}";
+            const fieldEditPlural = "{% translate 'Field edits'|escapejs %}";
+            const photoUploadSingular = "{% translate 'Photo upload'|escapejs %}";
+            const photoUploadPlural = "{% translate 'Photo uploads'|escapejs %}";
             
             if (validChanges > 0) {
                 const fieldEditLabel = validChanges === 1 ? fieldEditSingular : fieldEditPlural;
@@ -1355,7 +1355,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     summaryItems.push(`
                         <li class="flex items-center gap-2">
                             <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 text-xs font-semibold">${emptyFields}</span>
-                            <span class="text-red-600 dark:text-red-400">{% translate "Empty fields" %}</span>
+                            <span class="text-red-600 dark:text-red-400">{% translate "Empty fields"|escapejs %}</span>
                         </li>
                     `);
                 }
@@ -1373,7 +1373,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 summaryItems.push(`
                     <li class="flex items-center gap-2">
                         <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 text-xs font-semibold">1</span>
-                        <span>{% translate "Business hours update" %}</span>
+                        <span>{% translate "Business hours update"|escapejs %}</span>
                     </li>
                 `);
             }
@@ -1382,7 +1382,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="space-y-3">
                     <div class="flex items-center font-medium text-primary-600 dark:text-primary-400">
                         <i class="fas fa-check-circle mr-2 text-primary-500"></i>
-                        {% translate "Ready to submit" %}
+                        {% translate "Ready to submit"|escapejs %}
                     </div>
                     <ul class="space-y-2 text-gray-700 dark:text-gray-300">
                         ${summaryItems.join('')}
@@ -1393,7 +1393,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="space-y-2">
                     <div class="flex items-center font-medium text-primary-600 dark:text-primary-400">
                         <i class="fas fa-check-circle mr-1 text-primary-500"></i>
-                        {% translate "Ready" %}
+                        {% translate "Ready"|escapejs %}
                     </div>
                     <ul class="space-y-1 text-gray-700 dark:text-gray-300">
                         ${summaryItems.join('')}
@@ -1486,7 +1486,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (totalItems === 0) {
             e.preventDefault();
-            alert('{% translate "Please make at least one change, upload an image, or update business hours before submitting." %}');
+            alert('{% translate "Please make at least one change, upload an image, or update business hours before submitting."|escapejs %}');
             return false;
         }
         
@@ -1494,8 +1494,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activeEdits.size > validChanges) {
             const emptyCount = activeEdits.size - validChanges;
             const message = emptyCount === 1 ? 
-                '{% translate "You have 1 empty field. Continue anyway?" %}' : 
-                `{% translate "You have" %} ${emptyCount} {% translate "empty fields. Continue anyway?" %}`;
+                '{% translate "You have 1 empty field. Continue anyway?"|escapejs %}' : 
+                `{% translate "You have"|escapejs %} ${emptyCount} {% translate "empty fields. Continue anyway?"|escapejs %}`;
             
             if (!confirm(message)) {
                 e.preventDefault();
@@ -1511,7 +1511,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.style.transform = 'scale(1)';
         }, 100);
         
-        submitText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>{% translate "Submitting..." %}';
+        submitText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>{% translate "Submitting..."|escapejs %}';
         
         // Add loading state to the page
         document.body.style.pointerEvents = 'none';
