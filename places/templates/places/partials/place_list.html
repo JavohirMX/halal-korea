@@ -44,7 +44,7 @@
             <div class="flex items-center gap-2 text-xs mb-1.5">
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium border border-primary-200 dark:border-primary-800">
                     <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1 text-xs"></i>
-                    {% if place.category == 'prayer_room' %}Prayer Space{% else %}{{ place.category|title }}{% endif %}
+                    {{ place.get_category_display }}
                 </span>
                 {% if place.distance and location_context.is_in_korea %}
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium border border-gray-200 dark:border-gray-600">
@@ -106,7 +106,7 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ place.name }}</h3>
                 <p class="text-sm text-primary-600 dark:text-primary-400">
                     <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1"></i>
-                    {% if place.category == 'prayer_room' %}Prayer Space{% else %}{{ place.category|title }}{% endif %}
+                    {{ place.get_category_display }}
                 </p>
             </div>
             {% if place.reviews_count > 0 %}
@@ -126,9 +126,9 @@
         {% if place.distance and location_context.is_in_korea %}
         <div class="mt-2 text-xs text-gray-500">
             {% if place.distance.m > 1000 %}
-                {{ place.distance.km|floatformat:1 }} km away
+                {% blocktranslate with km=place.distance.km|floatformat:1 %}{{ km }} km away{% endblocktranslate %}
             {% else %}
-                {{ place.distance.m|floatformat:0 }} meters away
+                {% blocktranslate with m=place.distance.m|floatformat:0 %}{{ m }} meters away{% endblocktranslate %}
             {% endif %}
         </div>
         {% endif %}

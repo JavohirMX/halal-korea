@@ -3,15 +3,16 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 
 # Halal Place model
 class HalalPlace(models.Model):
     CATEGORY_CHOICES = [
-        ('restaurant', 'Restaurant'),
-        ('market', 'Market'),
-        ('mosque', 'Mosque'),
-        ('prayer_room', 'Prayer Room'),
+        ('restaurant', _('Restaurant')),
+        ('market', _('Market')),
+        ('mosque', _('Mosque')),
+        ('prayer_room', _('Prayer Space')),
     ]
     STATUS_CHOICES = [
         ('pending', 'Pending'),

@@ -17,8 +17,8 @@
 {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Prayer Times in Korea",
-    "description": "Accurate prayer times for Muslims in South Korea.",
+    "name": "{% translate 'Prayer Times in Korea'|escapejs %}",
+    "description": "{% translate 'Accurate prayer times for Muslims in South Korea.'|escapejs %}",
     "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'prayer_times:prayer_times' %}",
     "breadcrumb": {
         "@type": "BreadcrumbList",
@@ -26,13 +26,13 @@
             {
                 "@type": "ListItem",
                 "position": 1,
-                "name": "Home",
+                "name": "{% translate 'Home'|escapejs %}",
                 "item": "{{ request.scheme }}://{{ request.get_host }}"
             },
             {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "Prayer Times",
+                "name": "{% translate 'Prayer Times'|escapejs %}",
                 "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'prayer_times:prayer_times' %}"
             }
         ]
@@ -68,16 +68,16 @@
         <div class="mt-4 max-w-md w-full mx-auto flex items-center space-x-2">
             <!-- Location Selector -->
             <div class="relative flex-grow" x-data="{ open: false, search: '', cities: [
-                { name: 'Seoul', country: 'South Korea' },
-                { name: 'Busan', country: 'South Korea' },
-                { name: 'Incheon', country: 'South Korea' },
-                { name: 'Daegu', country: 'South Korea' },
-                { name: 'Daejeon', country: 'South Korea' },
-                { name: 'Gwangju', country: 'South Korea' },
-                { name: 'Ulsan', country: 'South Korea' },
-                { name: 'Suwon', country: 'South Korea' },
-                { name: 'Sejong', country: 'South Korea' },
-                { name: 'Jeju', country: 'South Korea' }
+                { name: 'Seoul', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Busan', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Incheon', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Daegu', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Daejeon', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Gwangju', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Ulsan', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Suwon', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Sejong', country: '{% translate "South Korea"|escapejs %}' },
+                { name: 'Jeju', country: '{% translate "South Korea"|escapejs %}' }
             ] }">
                 <button @click="open = !open" 
                         id="location-button"

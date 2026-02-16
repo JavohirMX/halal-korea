@@ -6,18 +6,18 @@
 
 {% block title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
 
-{% block meta_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_category_display|lower }} in {{ place.address }}, South Korea.{% endif %}{% endblock %}
+{% block meta_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{% blocktranslate with name=place.name category=place.get_category_display|lower address=place.address %}{{ name }} - Find halal {{ category }} in {{ address }}, South Korea.{% endblocktranslate %}{% endif %}{% endblock %}
 {% block meta_keywords %}{{ place.name }}, halal {{ place.get_category_display|lower }}, {{ place.address }}, South Korea, {{ STATIC_INFO.meta_keywords }}{% endblock %}
 
 {% block og_title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
-{% block og_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_category_display|lower }} in {{ place.address }}, South Korea.{% endif %}{% endblock %}
+{% block og_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{% blocktranslate with name=place.name category=place.get_category_display|lower address=place.address %}{{ name }} - Find halal {{ category }} in {{ address }}, South Korea.{% endblocktranslate %}{% endif %}{% endblock %}
 {% block og_type %}place{% endblock %}
 {% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}{% endblock %}
 {% block og_image %}{% if place.photo_urls.0 %}{{ request.scheme }}://{{ request.get_host }}{{ place.photo_urls.0 }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
 {% block og_image_alt %}{% if place.photo_urls.0 %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
 {% block twitter_title %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% endblock %}
-{% block twitter_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{{ place.name }} - Find halal {{ place.get_category_display|lower }} in {{ place.address }}, South Korea.{% endif %}{% endblock %}
+{% block twitter_description %}{% if place.description %}{{ place.description|truncatewords:25 }}{% else %}{% blocktranslate with name=place.name category=place.get_category_display|lower address=place.address %}{{ name }} - Find halal {{ category }} in {{ address }}, South Korea.{% endblocktranslate %}{% endif %}{% endblock %}
 {% block twitter_image %}{% if place.photo_urls.0 %}{{ request.scheme }}://{{ request.get_host }}{{ place.photo_urls.0 }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}{% endif %}{% endblock %}
 {% block twitter_image_alt %}{% if place.photo_urls.0 %}{{ place.name }} - {{ STATIC_INFO.site_name }}{% else %}{{ STATIC_INFO.default_og_image_alt }}{% endif %}{% endblock %}
 
@@ -30,7 +30,7 @@
     "@type": "{% if place.category == 'restaurant' %}Restaurant{% elif place.category == 'market' %}GroceryStore{% elif place.category == 'mosque' %}Mosque{% elif place.category == 'prayer_room' %}PlaceOfWorship{% else %}LocalBusiness{% endif %}",
     "@id": "{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}#place",
     "name": "{{ place.name|escapejs }}",
-    "description": "{% if place.description %}{{ place.description|escapejs }}{% else %}{{ place.name|escapejs }} - Halal {{ place.get_category_display|lower }} in {{ place.address|escapejs }}, South Korea.{% endif %}",
+    "description": "{% if place.description %}{{ place.description|escapejs }}{% else %}{% blocktranslate with name=place.name|escapejs category=place.get_category_display|lower address=place.address|escapejs %}{{ name }} - Halal {{ category }} in {{ address }}, South Korea.{% endblocktranslate %}{% endif %}",
     "url": "{{ request.scheme }}://{{ request.get_host }}{{ place.get_absolute_url }}",
     "image": {% if place.photo_urls.0 %}"{{ request.scheme }}://{{ request.get_host }}{{ place.photo_urls.0 }}"{% else %}"{{ request.scheme }}://{{ request.get_host }}{% static STATIC_INFO.default_og_image %}"{% endif %},
     "address": {
@@ -72,13 +72,13 @@
         {
             "@type": "ListItem",
             "position": 1,
-            "name": "Home",
+            "name": "{% translate 'Home'|escapejs %}",
             "item": "{{ request.scheme }}://{{ request.get_host }}"
         },
         {
             "@type": "ListItem",
             "position": 2,
-            "name": "Explore",
+            "name": "{% translate 'Explore'|escapejs %}",
             "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:explore' %}"
         },
         {
@@ -311,8 +311,8 @@
                     <div class="flex-shrink-0">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
                             <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1"></i>
-                            <span class="hidden xs:inline">{{ place.category|title }}</span>
-                            <span class="xs:hidden">{{ place.category|title }}</span>
+                            <span class="hidden xs:inline">{{ place.get_category_display }}</span>
+                            <span class="xs:hidden">{{ place.get_category_display }}</span>
                         </span>
                     </div>
                     

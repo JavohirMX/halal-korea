@@ -18,15 +18,15 @@
 {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": "About Halal Korea",
-    "description": "Learn about Halal Korea - your trusted platform for finding halal restaurants, markets, and prayer spaces in South Korea.",
+    "name": "{% translate 'About Halal Korea'|escapejs %}",
+    "description": "{% translate 'Learn about Halal Korea - your trusted platform for finding halal restaurants, markets, and prayer spaces in South Korea.'|escapejs %}",
     "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:about' %}",
     "mainEntity": {
         "@type": "Organization",
         "name": "{{ STATIC_INFO.site_name }}",
         "url": "{{ request.scheme }}://{{ request.get_host }}",
         "email": "{{ STATIC_INFO.email }}",
-        "description": "Halal Korea aims to make life easier for Muslims living in and visiting South Korea by providing a comprehensive platform to find halal food, markets, and prayer spaces."
+        "description": "{% translate 'Halal Korea aims to make life easier for Muslims living in and visiting South Korea by providing a comprehensive platform to find halal food, markets, and prayer spaces.'|escapejs %}"
     },
     "breadcrumb": {
         "@type": "BreadcrumbList",
@@ -34,13 +34,13 @@
             {
                 "@type": "ListItem",
                 "position": 1,
-                "name": "Home",
+                "name": "{% translate 'Home'|escapejs %}",
                 "item": "{{ request.scheme }}://{{ request.get_host }}"
             },
             {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "About",
+                "name": "{% translate 'About'|escapejs %}",
                 "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'places:about' %}"
             }
         ]

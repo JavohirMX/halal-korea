@@ -4,16 +4,16 @@
 {% block title %}{{ page_title }} - {{ STATIC_INFO.site_name }}{% endblock %}
 
 {% block meta_description %}
-{{ meta_description|default:"Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea. Latest articles about halal food, places, and cultural insights." }}
+{% if meta_description %}{{ meta_description }}{% else %}{% translate "Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea. Latest articles about halal food, places, and cultural insights." %}{% endif %}
 {% endblock %}
 
 {% block meta_keywords %}halal blog Korea, Muslim lifestyle Korea, halal food tips, Korea travel guide Muslim, halal Korea articles{% endblock %}
 
 {% block og_title %}{{ page_title }} - {{ STATIC_INFO.site_name }}{% endblock %}
-{% block og_description %}{{ meta_description|default:"Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea." }}{% endblock %}
+{% block og_description %}{% if meta_description %}{{ meta_description }}{% else %}{% translate "Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea." %}{% endif %}{% endblock %}
 
 {% block twitter_title %}{{ page_title }} - {{ STATIC_INFO.site_name }}{% endblock %}
-{% block twitter_description %}{{ meta_description|default:"Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea." }}{% endblock %}
+{% block twitter_description %}{% if meta_description %}{{ meta_description }}{% else %}{% translate "Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea." %}{% endif %}{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -21,7 +21,7 @@
     "@context": "https://schema.org",
     "@type": "Blog",
     "name": "{{ page_title|escapejs }}",
-    "description": "{{ meta_description|default:'Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea.'|escapejs }}",
+    "description": "{% if meta_description %}{{ meta_description|escapejs }}{% else %}{% translate 'Discover halal lifestyle tips, travel guides, and community updates for Muslims in Korea.'|escapejs %}{% endif %}",
     "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'blog:home' %}",
     "publisher": {
         "@type": "Organization",

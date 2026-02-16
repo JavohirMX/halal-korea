@@ -89,7 +89,7 @@
             "name": "{{ STATIC_INFO.site_name }}",
             "alternateName": "Halal Korea",
             "url": "{{ request.scheme }}://{{ request.get_host }}",
-            "description": "Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.",
+            "description": "{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.'|escapejs %}",
             "potentialAction": {
                 "@type": "SearchAction",
                 "target": {

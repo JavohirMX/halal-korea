@@ -658,7 +658,7 @@
                         <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center">
                             <div class="text-center text-gray-500 dark:text-gray-400">
                                 <i class="fas fa-ellipsis-h text-xl mb-1"></i>
-                                <div class="text-xs">+{{ place.photo_urls|length|add:"-8" }} more</div>
+                                <div class="text-xs">{% blocktranslate with count=place.photo_urls|length|add:"-8" %}+{{ count }} more{% endblocktranslate %}</div>
                             </div>
                         </div>
                         {% endif %}
@@ -685,9 +685,9 @@
                         <input type="file" id="images" name="images" multiple accept="image/*" 
                                class="hidden" onchange="handleFileSelect(event)">
                         <div class="flex justify-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
-                            <span><i class="fas fa-check mr-1"></i>JPG, PNG, GIF, WebP</span>
-                            <span><i class="fas fa-weight mr-1"></i>Max 5MB each</span>
-                            <span><i class="fas fa-layer-group mr-1"></i>Multiple files</span>
+                            <span><i class="fas fa-check mr-1"></i>{% translate "JPG, PNG, GIF, WebP" %}</span>
+                            <span><i class="fas fa-weight mr-1"></i>{% translate "Max 5MB each" %}</span>
+                            <span><i class="fas fa-layer-group mr-1"></i>{% translate "Multiple files" %}</span>
                         </div>
                     </div>
                 </div>
@@ -1175,13 +1175,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const validFiles = files.filter(file => {
             // Validate file size (5MB max)
             if (file.size > 5 * 1024 * 1024) {
-                alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
+                alert("{% translate 'File is too large. Maximum size is 5MB.'|escapejs %}");
                 return false;
             }
             
             // Validate file type
             if (!file.type.startsWith('image/')) {
-                alert(`File "${file.name}" is not a valid image.`);
+                alert("{% translate 'File is not a valid image.'|escapejs %}");
                 return false;
             }
             
@@ -1219,7 +1219,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const div = document.createElement('div');
                 div.className = 'relative group aspect-square';
                 div.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview" 
+                    <img src="${e.target.result}" alt="{% translate 'Preview'|escapejs %}" 
                          class="w-full h-full object-cover rounded-lg border border-gray-200 dark:border-gray-700">
                     <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                         <button type="button" onclick="removeImage(${index})" 

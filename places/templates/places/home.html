@@ -2,16 +2,16 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Halal Korea - Find Halal Restaurants, Markets & Mosques in South Korea{% endblock %}
+{% block title %}{% translate "Halal Korea - Find Halal Restaurants, Markets & Mosques in South Korea" %}{% endblock %}
 
-{% block meta_description %}Discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Your trusted guide to halal dining and Islamic facilities in Korea for Muslims living in or visiting Korea.{% endblock %}
+{% block meta_description %}{% translate "Discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Your trusted guide to halal dining and Islamic facilities in Korea for Muslims living in or visiting Korea." %}{% endblock %}
 {% block meta_keywords %}halal Korea, halal food Korea, halal restaurants Seoul, Muslim travel Korea, halal places, Islamic facilities Korea, prayer times Seoul, halal certification Korea, Muslim friendly Korea, halal Busan, halal Incheon{% endblock %}
 
-{% block og_title %}Halal Korea - Find Halal Restaurants, Markets & Mosques in South Korea{% endblock %}
-{% block og_description %}Discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Your trusted guide for Muslims living in or visiting Korea.{% endblock %}
+{% block og_title %}{% translate "Halal Korea - Find Halal Restaurants, Markets & Mosques in South Korea" %}{% endblock %}
+{% block og_description %}{% translate "Discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Your trusted guide for Muslims living in or visiting Korea." %}{% endblock %}
 
-{% block twitter_title %}Halal Korea - Find Halal Restaurants, Markets & Mosques in South Korea{% endblock %}
-{% block twitter_description %}Discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Your trusted guide for Muslims living in or visiting Korea.{% endblock %}
+{% block twitter_title %}{% translate "Halal Korea - Find Halal Restaurants, Markets & Mosques in South Korea" %}{% endblock %}
+{% block twitter_description %}{% translate "Discover halal restaurants, markets, mosques, and prayer spaces across South Korea. Your trusted guide for Muslims living in or visiting Korea." %}{% endblock %}
 
 {% block structured_data %}
 {{ block.super }}
@@ -19,13 +19,13 @@
 {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Halal Korea - Find Halal Restaurants, Markets & Mosques",
-    "description": "Discover halal restaurants, markets, mosques, and prayer spaces across South Korea.",
+    "name": "{% translate 'Halal Korea - Find Halal Restaurants, Markets & Mosques'|escapejs %}",
+    "description": "{% translate 'Discover halal restaurants, markets, mosques, and prayer spaces across South Korea.'|escapejs %}",
     "url": "{{ request.scheme }}://{{ request.get_host }}",
     "mainEntity": {
         "@type": "ItemList",
-        "name": "Halal Places in Korea",
-        "description": "Directory of halal restaurants, markets, mosques, and prayer rooms in South Korea",
+        "name": "{% translate 'Halal Places in Korea'|escapejs %}",
+        "description": "{% translate 'Directory of halal restaurants, markets, mosques, and prayer rooms in South Korea'|escapejs %}",
         "numberOfItems": "{{ featured_places.count }}",
         "itemListElement": [
             {% for place in featured_places %}
@@ -54,26 +54,26 @@
     "mainEntity": [
         {
             "@type": "Question",
-            "name": "Where can I find halal food in Korea?",
+            "name": "{% translate 'Where can I find halal food in Korea?'|escapejs %}",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "You can find halal food in major Korean cities like Seoul, Busan, and Incheon. Popular areas include Itaewon in Seoul which has many halal restaurants. Use Halal Korea to discover verified halal restaurants near you."
+                "text": "{% translate 'You can find halal food in major Korean cities like Seoul, Busan, and Incheon. Popular areas include Itaewon in Seoul which has many halal restaurants. Use Halal Korea to discover verified halal restaurants near you.'|escapejs %}"
             }
         },
         {
             "@type": "Question",
-            "name": "Are there mosques in South Korea?",
+            "name": "{% translate 'Are there mosques in South Korea?'|escapejs %}",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, there are several mosques in South Korea. The Seoul Central Mosque in Itaewon is the largest. Other mosques are located in Busan, Gwangju, Jeonju, and other cities. Halal Korea provides a complete directory of mosques and prayer spaces."
+                "text": "{% translate 'Yes, there are several mosques in South Korea. The Seoul Central Mosque in Itaewon is the largest. Other mosques are located in Busan, Gwangju, Jeonju, and other cities. Halal Korea provides a complete directory of mosques and prayer spaces.'|escapejs %}"
             }
         },
         {
             "@type": "Question",
-            "name": "Is Korea Muslim-friendly for tourists?",
+            "name": "{% translate 'Is Korea Muslim-friendly for tourists?'|escapejs %}",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, Korea is becoming increasingly Muslim-friendly. Many restaurants now offer halal options, and prayer facilities are available in major tourist areas and airports. The Korea Tourism Organization actively promotes Muslim-friendly tourism."
+                "text": "{% translate 'Yes, Korea is becoming increasingly Muslim-friendly. Many restaurants now offer halal options, and prayer facilities are available in major tourist areas and airports. The Korea Tourism Organization actively promotes Muslim-friendly tourism.'|escapejs %}"
             }
         }
     ]
@@ -243,7 +243,7 @@
                         </h3>
                         <p class="text-sm text-primary-600 dark:text-primary-400">
                             <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque {% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1"></i>
-                            {% if place.category == 'prayer_room' %}Prayer Space{% else %}{{ place.category|title }}{% endif %}
+                            {{ place.get_category_display }}
                         </p>
                         {% if place.reviews_count > 0 %}
                         <div class="mt-2 flex items-center">
