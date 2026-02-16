@@ -234,7 +234,24 @@ class TranslationGuidelines:
         # Check halal terminology
         halal_terms = cls.HALAL_TERMINOLOGY.get(language_code, {})
         for en_term, local_term in halal_terms.items():
-            if language_code != 'en' and en_term.lower() in text.lower():
+            if language_code == 'en':
+                continue
+
+            # Match whole terms only to avoid false positives such as "gu" in "guide".
+            term_pattern = re.escape(en_term.replace('_', ' '))
+            term_regex = re.compile(rf'\b{term_pattern}\b', re.IGNORECASE)
+            matches = list(term_regex.finditer(text))
+            if not matches:
+                continue
+
+            # Allow project brand name "Halal Korea" without forcing term replacement.
+            if en_term in {'halal', 'korea'}:
+                brand_regex = re.compile(r'\bHalal Korea\b', re.IGNORECASE)
+                brand_count = len(list(brand_regex.finditer(text)))
+                if brand_count >= len(matches):
+                    continue
+
+            if language_code != 'en' and matches:
                 issues.append(TranslationIssue(
                     severity=TranslationSeverity.WARNING,
                     message=f"English term '{en_term}' found in {language_code} text",
@@ -511,18 +528,22 @@ class TranslationMetrics:
         try:
             with open(po_file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
-            # Count msgid entries (excluding plurals)
-            msgids = re.findall(r'^msgid\s+"([^"]*)"', content, re.MULTILINE)
-            # Exclude empty msgids
-            msgids = [m for m in msgids if m.strip()]
-            
-            # Count translated entries (non-empty msgstr)
-            msgstrs = re.findall(r'^msgstr\s+"([^"]*)"', content, re.MULTILINE)
-            translated = [m for m in msgstrs if m.strip()]
-            
-            total = len(msgids)
-            completed = len(translated)
+
+            entries = TranslationMetrics._parse_po_entries(content)
+            total = 0
+            completed = 0
+            for entry in entries:
+                msgid = entry['msgid']
+                if not msgid.strip():
+                    continue
+                total += 1
+
+                if entry['is_plural']:
+                    plural_values = [v.strip() for v in entry['msgstr_plural'].values()]
+                    if plural_values and all(plural_values):
+                        completed += 1
+                elif entry['msgstr'].strip():
+                    completed += 1
             
             return {
                 'total': total,
@@ -539,20 +560,98 @@ class TranslationMetrics:
         try:
             with open(po_file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
-            # Find msgid-msgstr pairs
-            pattern = r'msgid\s+"([^"]*)"\s*msgstr\s+"([^"]*)"'
-            matches = re.findall(pattern, content, re.MULTILINE | re.DOTALL)
-            
+
+            entries = TranslationMetrics._parse_po_entries(content)
             missing = []
-            for msgid, msgstr in matches:
-                if msgid.strip() and not msgstr.strip():
+            for entry in entries:
+                msgid = entry['msgid']
+                if not msgid.strip():
+                    continue
+
+                if entry['is_plural']:
+                    plural_values = [v.strip() for v in entry['msgstr_plural'].values()]
+                    if not plural_values or any(not v for v in plural_values):
+                        missing.append(msgid)
+                elif not entry['msgstr'].strip():
                     missing.append(msgid)
             
             return missing
         except Exception as e:
             logger.error(f"Error identifying missing translations: {e}")
             return []
+
+    @staticmethod
+    def _parse_po_entries(content: str) -> List[Dict[str, object]]:
+        """Parse PO content into structured singular/plural entries."""
+        entries: List[Dict[str, object]] = []
+        blocks = re.split(r'\n\s*\n', content)
+
+        for block in blocks:
+            stripped = block.strip()
+            if not stripped:
+                continue
+
+            lines = stripped.split('\n')
+            if any(line.strip().startswith('#~') for line in lines):
+                continue
+
+            msgid = ""
+            msgstr = ""
+            msgstr_plural: Dict[int, str] = {}
+            in_msgid = False
+            in_msgstr = False
+            current_plural_index: Optional[int] = None
+            is_plural = False
+
+            for raw_line in lines:
+                line = raw_line.strip()
+
+                if line.startswith('msgid_plural '):
+                    is_plural = True
+                    in_msgid = False
+                    in_msgstr = False
+                    current_plural_index = None
+                elif line.startswith('msgid '):
+                    match = re.match(r'msgid\s+"(.*)"', line)
+                    msgid = match.group(1) if match else ""
+                    in_msgid = True
+                    in_msgstr = False
+                    current_plural_index = None
+                elif line.startswith('msgstr['):
+                    match = re.match(r'msgstr\[(\d+)\]\s+"(.*)"', line)
+                    if match:
+                        is_plural = True
+                        current_plural_index = int(match.group(1))
+                        msgstr_plural[current_plural_index] = match.group(2)
+                        in_msgid = False
+                        in_msgstr = False
+                elif line.startswith('msgstr '):
+                    match = re.match(r'msgstr\s+"(.*)"', line)
+                    msgstr = match.group(1) if match else ""
+                    in_msgid = False
+                    in_msgstr = True
+                    current_plural_index = None
+                elif line.startswith('"'):
+                    additional = re.match(r'"(.*)"', line)
+                    if not additional:
+                        continue
+                    text = additional.group(1)
+                    if in_msgid:
+                        msgid += text
+                    elif current_plural_index is not None:
+                        msgstr_plural[current_plural_index] = msgstr_plural.get(current_plural_index, "") + text
+                    elif in_msgstr:
+                        msgstr += text
+
+            if msgid.strip():
+                entries.append({
+                    'msgid': msgid,
+                    'msgstr': msgstr,
+                    'is_plural': is_plural,
+                    'msgstr_plural': msgstr_plural,
+                })
+
+        return entries
 
 
 # Export main classes

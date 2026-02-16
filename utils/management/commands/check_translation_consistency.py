@@ -113,9 +113,19 @@ class Command(BaseCommand):
                 
                 # Check if English msgid contains terminology
                 for en_term, expected_translation in lang_terms.items():
-                    if en_term.lower() in msgid.lower():
+                    # Use whole-term matching to avoid false positives
+                    # (e.g., "gu" matching inside "guide").
+                    source_term = en_term.replace('_', ' ')
+                    source_regex = re.compile(rf'\b{re.escape(source_term)}\b', re.IGNORECASE)
+                    msgid_matches = list(source_regex.finditer(msgid))
+
+                    if msgid_matches:
                         # Check if translation uses expected term
-                        if expected_translation.lower() not in msgstr.lower():
+                        accepted_terms = self.get_accepted_terms(language_code, en_term, expected_translation)
+                        if not any(term.lower() in msgstr.lower() for term in accepted_terms):
+                            # Preserve project brand name without forcing localized terms.
+                            if en_term in {'halal', 'korea'} and re.search(r'\bHalal Korea\b', msgstr, re.IGNORECASE):
+                                continue
                             inconsistencies.append({
                                 'line': line_num,
                                 'english_term': en_term,
@@ -126,7 +136,9 @@ class Command(BaseCommand):
                             })
                     
                     # Check if translation incorrectly uses English term
-                    elif en_term.lower() in msgstr.lower() and language_code != 'en':
+                    elif language_code != 'en' and re.search(rf'\b{re.escape(source_term)}\b', msgstr, re.IGNORECASE):
+                        if en_term in {'halal', 'korea'} and re.search(r'\bHalal Korea\b', msgstr, re.IGNORECASE):
+                            continue
                         inconsistencies.append({
                             'line': line_num,
                             'english_term': en_term,
@@ -142,6 +154,29 @@ class Command(BaseCommand):
             )
         
         return inconsistencies
+
+    def get_accepted_terms(self, language_code: str, en_term: str, expected_translation: str) -> list:
+        """Return acceptable localized variants for a terminology term."""
+        aliases = {
+            'ko': {
+                'korea': ['한국', '대한민국', '코리아'],
+                'south_korea': ['대한민국', '한국', '남한'],
+                'korean': ['한국어', '한국의', '한국'],
+                'mosque': ['모스크', '사원'],
+            },
+            'uz': {
+                'korea': ['Koreya', 'Janubiy Koreya'],
+                'south_korea': ['Janubiy Koreya', 'Koreya'],
+                'korean': ['koreys', 'koreyscha'],
+                'busan': ['Pusan', 'Busan'],
+                'daegu': ['Tegu', 'Daegu'],
+                'halal': ['halol', 'Halal'],
+            },
+        }
+        language_aliases = aliases.get(language_code, {})
+        terms = [expected_translation]
+        terms.extend(language_aliases.get(en_term, []))
+        return list(dict.fromkeys(terms))
     
     def check_translation_patterns(self) -> dict:
         """Check for consistent translation patterns."""
@@ -222,7 +257,8 @@ class Command(BaseCommand):
             
             # Check if multiple different endings are used
             unique_endings = set(endings)
-            if len(unique_endings) > 2:  # Allow some variation
+            # Korean questions naturally vary by context; only flag extreme variation.
+            if len(unique_endings) > 5:
                 issues.append({
                     'type': 'inconsistent_question_endings',
                     'pattern': pattern_name,
