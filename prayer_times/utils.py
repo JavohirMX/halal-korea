@@ -1,8 +1,9 @@
 import requests
-from datetime import datetime
+from datetime import datetime, date
 from django.core.cache import cache
 from django.conf import settings
 from .models import PrayerTimeCache
+from .ramadan_utils import strip_timezone_suffix
 import logging
 
 logger = logging.getLogger(__name__)
@@ -297,7 +298,92 @@ def get_prayer_times_ll(latitude, longitude, date=None, method=None, school=1):
   }
 }
 """
- 
+
+
+def get_monthly_prayer_times(city, country, year, month, method=None, school=1):
+    """
+    Fetches a full month of prayer times using the AlAdhan calendar endpoint.
+    Returns a dict keyed by 'DD-MM-YYYY' date string for O(1) lookup.
+    """
+    cache_key = f"monthly_prayer_{city}_{country}_{year}_{month}_{method}_{school}".replace(' ', '_')
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return cached_data
+
+    api_base_url = getattr(settings, 'PRAYER_TIMES_API_BASE_URL', 'https://api.aladhan.com')
+    url = f'{api_base_url}/v1/calendarByCity/{year}/{month}'
+    params = {
+        'city': city,
+        'country': country,
+        'method': method,
+        'school': school,
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get('code') == 200 and data.get('data'):
+            result = {}
+            for day_data in data['data']:
+                greg = day_data.get('date', {}).get('gregorian', {})
+                date_key = greg.get('date')  # 'DD-MM-YYYY'
+                if date_key:
+                    result[date_key] = day_data
+            cache.set(cache_key, result, 86400)  # 24h cache
+            return result
+        return {}
+    except (requests.Timeout, requests.RequestException) as e:
+        logger.error(f"Error fetching monthly prayer times for {city}, {country} ({year}/{month}): {str(e)}")
+        return {}
+
+
+def get_ramadan_prayer_times(city, country, date_range, method=None, school=1):
+    """
+    Fetches prayer times for the full Ramadan date range.
+    Handles the fact that Ramadan may span two Gregorian months.
+    Returns a list of dicts, one per day, in order.
+    """
+    months_needed = set()
+    for d in date_range:
+        months_needed.add((d.year, d.month))
+
+    all_monthly_data = {}
+    for year, month in months_needed:
+        monthly = get_monthly_prayer_times(city, country, year, month, method, school)
+        all_monthly_data.update(monthly)
+
+    result = []
+    for i, d in enumerate(date_range, start=1):
+        date_key = d.strftime('%d-%m-%Y')
+        day_data = all_monthly_data.get(date_key)
+
+        if day_data:
+            timings = day_data.get('timings', {})
+            cleaned_timings = {k: strip_timezone_suffix(v) for k, v in timings.items()}
+
+            result.append({
+                'day_number': i,
+                'date': d,
+                'date_str': d.strftime('%d %b'),
+                'weekday': d.strftime('%a'),
+                'timings': cleaned_timings,
+                'gregorian': day_data.get('date', {}).get('gregorian', {}),
+                'hijri': day_data.get('date', {}).get('hijri', {}),
+            })
+        else:
+            result.append({
+                'day_number': i,
+                'date': d,
+                'date_str': d.strftime('%d %b'),
+                'weekday': d.strftime('%a'),
+                'timings': None,
+                'error': True,
+            })
+
+    return result
+
 
 if __name__ == '__main__':
     city = 'Seoul'

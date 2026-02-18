@@ -10,4 +10,8 @@ urlpatterns = [
     path('update-settings/', views.update_prayer_settings, name='update_settings'),
     path('update-location/', views.update_location, name='update_location'),
     path('clear-location/', views.clear_location, name='clear_location'),
+    # Ramadan
+    path('ramadan/', views.ramadan_timetable, name='ramadan_timetable'),
+    path('ramadan/calendar-data/', views.get_ramadan_calendar_data, name='ramadan_calendar_data'),
+    path('ramadan/download/', views.download_ramadan_image, name='ramadan_download_image'),
 ]
