@@ -1,8 +1,48 @@
 from django.db import models
 from django.utils import timezone
-from datetime import datetime
+from django.core.exceptions import ValidationError
+from datetime import datetime, date
 
-# Create your models here.
+
+class RamadanConfig(models.Model):
+    year = models.IntegerField(unique=True, help_text="Gregorian year (e.g. 2026)")
+    hijri_year = models.IntegerField(help_text="Hijri year (e.g. 1447)")
+    start_date = models.DateField(help_text="First day of fasting per local authority (e.g. KMF)")
+    end_date = models.DateField(help_text="Last day of fasting")
+    is_active = models.BooleanField(default=True)
+    notes = models.TextField(blank=True, help_text="e.g. 'Per KMF announcement on Feb 17'")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Ramadan Configuration"
+        verbose_name_plural = "Ramadan Configurations"
+        ordering = ['-year']
+
+    def __str__(self):
+        return f"Ramadan {self.hijri_year} ({self.year})"
+
+    def clean(self):
+        if self.start_date and self.end_date and self.start_date >= self.end_date:
+            raise ValidationError("End date must be after start date.")
+
+    @property
+    def total_days(self):
+        return (self.end_date - self.start_date).days + 1
+
+    @classmethod
+    def get_active_config(cls):
+        today = date.today()
+        try:
+            return cls.objects.get(
+                is_active=True,
+                year=today.year
+            )
+        except cls.DoesNotExist:
+            return None
+        except cls.MultipleObjectsReturned:
+            return cls.objects.filter(is_active=True, year=today.year).first()
+
 
 class PrayerTimeCache(models.Model):
     city = models.CharField(max_length=100)

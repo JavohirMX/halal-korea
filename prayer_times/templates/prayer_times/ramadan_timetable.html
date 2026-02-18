@@ -1,0 +1,623 @@
+{% extends 'places/base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Ramadan Timetable" %} - {{ STATIC_INFO.site_name }}{% endblock %}
+
+{% block meta_description %}{% translate "Full Ramadan fasting timetable for Korea with daily Suhoor and Iftar times, Laylatul Qadr nights, and fasting durations." %}{% endblock %}
+{% block meta_keywords %}Ramadan timetable Korea, fasting times Seoul, Suhoor Iftar Korea, Ramadan 2026 Korea, Islamic fasting schedule{% endblock %}
+
+{% block og_title %}{% translate "Ramadan Timetable" %} - {{ STATIC_INFO.site_name }}{% endblock %}
+{% block og_description %}{% translate "Full Ramadan fasting timetable for Korea with daily Suhoor and Iftar times." %}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[70vh] py-8" x-data="ramadanTimetable()">
+    <div class="w-full max-w-5xl px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+
+        <!-- Header -->
+        <div class="text-center">
+            <div class="hidden md:inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 mb-2">
+                <i class="fas fa-moon text-2xl"></i>
+            </div>
+            {% if ramadan_config %}
+                <h1 class="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                    <i class="fas fa-moon text-sm md:hidden text-primary-600 dark:text-primary-400 mr-1"></i>
+                    {% translate "Ramadan" %} {{ ramadan_config.hijri_year }} {% translate "Timetable" %}
+                </h1>
+                <p class="text-xs md:text-base mt-0.5 md:mt-1 text-gray-600 dark:text-gray-400">
+                    {{ ramadan_config.start_date|date:"M d" }} – {{ ramadan_config.end_date|date:"M d, Y" }}
+                </p>
+            {% else %}
+                <h1 class="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">{% translate "Ramadan Timetable" %}</h1>
+                <p class="mt-1 md:mt-2 text-amber-600 dark:text-amber-400 text-sm">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    {% translate "Ramadan dates have not been configured yet. Please check back later." %}
+                </p>
+            {% endif %}
+        </div>
+
+        {% if ramadan_config %}
+
+        <!-- Ramadan Status Banner -->
+        {% if ramadan_status.status == "before" %}
+        <div class="mt-4 w-full max-w-lg glass-card p-4 rounded-lg border-l-4 border-primary-500 text-center">
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+                <i class="fas fa-hourglass-start mr-1 text-primary-600 dark:text-primary-400"></i>
+                {% translate "Ramadan starts in" %}
+                <span class="font-bold text-primary-600 dark:text-primary-400">{{ ramadan_status.days_until }}</span>
+                {% translate "days" %}
+            </p>
+        </div>
+        {% elif ramadan_status.status == "after" %}
+        <div class="mt-4 w-full max-w-lg glass-card p-4 rounded-lg border-l-4 border-amber-500 text-center">
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+                <i class="fas fa-check-circle mr-1 text-amber-600 dark:text-amber-400"></i>
+                {% translate "Ramadan has ended. May Allah accept your fasting and good deeds." %}
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- City Selector + Download -->
+        <div class="mt-4 w-full max-w-lg flex items-center gap-2">
+            <div class="relative flex-grow" x-data="{ open: false, search: '' }">
+                <button @click="open = !open"
+                        class="w-full flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 glass-card">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
+                        <span x-text="selectedCity + ', {% translate "South Korea"|escapejs %}'"></span>
+                    </div>
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </button>
+
+                <div x-show="open" x-cloak @click.away="open = false"
+                     class="absolute z-10 mt-2 w-full rounded-md shadow-lg glass-card ring-1 ring-black ring-opacity-5"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95">
+
+                    <div class="p-2 border-b border-gray-200 dark:border-gray-700">
+                        <div class="relative">
+                            <input type="text"
+                                   x-model="search"
+                                   placeholder="{% translate 'Search city...'|escapejs %}"
+                                   class="w-full pl-8 pr-4 py-2 text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+
+                    <button @click="detectLocation(); open = false"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center border-b border-gray-200 dark:border-gray-700">
+                        <i class="fas fa-crosshairs mr-2 text-primary-600 dark:text-primary-400"></i>
+                        {% translate "Use Current Location" %}
+                    </button>
+
+                    <div class="py-1 max-h-60 overflow-y-auto scrollbar-hide">
+                        {% for city in korea_cities %}
+                        <a href="#"
+                           x-show="'{{ city.name }}'.toLowerCase().includes(search.toLowerCase())"
+                           @click.prevent="changeCity('{{ city.name }}', '{{ city.country }}'); open = false; search = ''"
+                           class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-city mr-2"></i>{{ city.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <a :href="downloadBaseUrl + '?city=' + encodeURIComponent(selectedCity)"
+               data-download-url="{% url 'prayer_times:ramadan_download_image' %}"
+               class="h-[38px] px-4 rounded-md text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 flex items-center gap-2 whitespace-nowrap transition-colors">
+                <i class="fas fa-download"></i>
+                <span class="hidden sm:inline">{% translate "Download" %}</span>
+            </a>
+        </div>
+
+        <!-- Today's Fasting Card with Duas -->
+        <template x-if="todayEntry">
+            <div class="mt-5 w-full max-w-5xl">
+                <div class="glass-card rounded-xl p-5 border border-primary-200 dark:border-primary-700/50 bg-gradient-to-r from-primary-50 to-emerald-50 dark:from-primary-900/20 dark:to-emerald-900/20">
+                    <!-- Day header + times + countdown -->
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-sm font-semibold text-primary-700 dark:text-primary-400 uppercase tracking-wide">
+                            <i class="fas fa-moon mr-1"></i>
+                            {% translate "Day" %} <span x-text="todayEntry.day_number"></span> / <span x-text="totalDays"></span>
+                        </h2>
+                        <span class="text-xs text-gray-500 dark:text-gray-400" x-text="todayEntry.date_str + ' (' + todayEntry.weekday + ')'"></span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 text-center mb-3">
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{% translate "Suhoor ends" %}</p>
+                            <p class="text-xl font-bold text-gray-900 dark:text-white" x-text="todayEntry.timings?.Imsak || '--'"></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{% translate "Iftar" %}</p>
+                            <p class="text-xl font-bold text-primary-600 dark:text-primary-400" x-text="todayEntry.timings?.Maghrib || '--'"></p>
+                        </div>
+                    </div>
+
+                    <div x-show="countdownLabel" class="pb-3 border-b border-primary-200 dark:border-primary-700/50 text-center">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            <span x-text="countdownLabel"></span>
+                            <span x-show="countdownTimer" class="font-mono font-bold text-primary-600 dark:text-primary-400" x-text="countdownTimer"></span>
+                        </p>
+                    </div>
+
+                    <!-- Duas: side-by-side on desktop, accordion on mobile -->
+                    <!-- Desktop: side by side (always visible) -->
+                    <div class="mt-3 hidden md:grid grid-cols-2 gap-4">
+                        <div class="bg-white/60 dark:bg-gray-800/40 rounded-lg p-3">
+                            <h3 class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide mb-2">
+                                <i class="fas fa-utensils mr-1"></i>
+                                {% translate "Dua for Suhoor (Fasting Intention)" %}
+                            </h3>
+                            <p class="text-sm text-right font-arabic leading-relaxed text-gray-900 dark:text-white mb-1.5" dir="rtl">نَوَيْتُ أَنْ أَصُومَ صَوْمَ شَهْرَ رَمَضَانَ مِنَ الْفَجْرِ إِلَى الْمَغْرِبِ، خَالِصًا لِلهِ تَعَالَى أَللهُ أَكْبَرُ</p>
+                            <p class="text-[11px] italic text-gray-600 dark:text-gray-400 leading-relaxed mb-1">Navaytu an asuvma sovma shahro Ramazona minal fajri ilal mag'ribi, xolisan lillahi ta'ala, Allohu akbar.</p>
+                            <p class="text-[10px] text-gray-500 dark:text-gray-500 leading-relaxed">{% translate "I intend to fast the month of Ramadan from dawn to sunset, sincerely for Allah the Exalted. Allah is the Greatest." %}</p>
+                        </div>
+                        <div class="bg-white/60 dark:bg-gray-800/40 rounded-lg p-3">
+                            <h3 class="text-[11px] font-semibold text-primary-700 dark:text-primary-400 uppercase tracking-wide mb-2">
+                                <i class="fas fa-glass-water mr-1"></i>
+                                {% translate "Dua for Breaking Fast (Iftar)" %}
+                            </h3>
+                            <p class="text-sm text-right font-arabic leading-relaxed text-gray-900 dark:text-white mb-1.5" dir="rtl">اَللّٰهُمَّ لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَيْكَ تَوَكَّلْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ فَاغْفِرْلِي يَا غَفَّارُ مَا قَدَّمْتُ وَمَا أَخَّرْتُ</p>
+                            <p class="text-[11px] italic text-gray-600 dark:text-gray-400 leading-relaxed mb-1">Allohumma laka sumtu va bika amantu va a'alayka tavakkaltu va 'ala rizqika aftartu, fag'firli, ya G'offaru ma qoddamtu va ma axxortu.</p>
+                            <p class="text-[10px] text-gray-500 dark:text-gray-500 leading-relaxed">{% translate "O Allah, I fasted for You, believed in You, put my trust in You, and broke my fast with Your sustenance. O Forgiver, forgive my past and future sins." %}</p>
+                        </div>
+                    </div>
+
+                    <!-- Mobile: accordion (relevant dua open, other collapsed) -->
+                    <div class="mt-3 md:hidden space-y-2" x-data="{ activeDua: relevantDua }">
+                        <!-- Suhoor dua -->
+                        <div class="bg-white/60 dark:bg-gray-800/40 rounded-lg overflow-hidden">
+                            <button @click="activeDua = activeDua === 'suhoor' ? null : 'suhoor'"
+                                    class="w-full flex items-center justify-between px-3 py-2.5 text-left">
+                                <h3 class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
+                                    <i class="fas fa-utensils mr-1"></i>
+                                    {% translate "Dua for Suhoor (Fasting Intention)" %}
+                                </h3>
+                                <i class="fas text-[10px] text-gray-400 transition-transform"
+                                   :class="activeDua === 'suhoor' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                            </button>
+                            <div x-show="activeDua === 'suhoor'" x-cloak
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 max-h-0"
+                                 x-transition:enter-end="opacity-100 max-h-96"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100"
+                                 x-transition:leave-end="opacity-0">
+                                <div class="px-3 pb-3">
+                                    <p class="text-sm text-right font-arabic leading-relaxed text-gray-900 dark:text-white mb-1.5" dir="rtl">نَوَيْتُ أَنْ أَصُومَ صَوْمَ شَهْرَ رَمَضَانَ مِنَ الْفَجْرِ إِلَى الْمَغْرِبِ، خَالِصًا لِلهِ تَعَالَى أَللهُ أَكْبَرُ</p>
+                                    <p class="text-[11px] italic text-gray-600 dark:text-gray-400 leading-relaxed mb-1">Navaytu an asuvma sovma shahro Ramazona minal fajri ilal mag'ribi, xolisan lillahi ta'ala, Allohu akbar.</p>
+                                    <p class="text-[10px] text-gray-500 leading-relaxed">{% translate "I intend to fast the month of Ramadan from dawn to sunset, sincerely for Allah the Exalted. Allah is the Greatest." %}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Iftar dua -->
+                        <div class="bg-white/60 dark:bg-gray-800/40 rounded-lg overflow-hidden">
+                            <button @click="activeDua = activeDua === 'iftar' ? null : 'iftar'"
+                                    class="w-full flex items-center justify-between px-3 py-2.5 text-left">
+                                <h3 class="text-[11px] font-semibold text-primary-700 dark:text-primary-400 uppercase tracking-wide">
+                                    <i class="fas fa-glass-water mr-1"></i>
+                                    {% translate "Dua for Breaking Fast (Iftar)" %}
+                                </h3>
+                                <i class="fas text-[10px] text-gray-400 transition-transform"
+                                   :class="activeDua === 'iftar' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                            </button>
+                            <div x-show="activeDua === 'iftar'" x-cloak
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 max-h-0"
+                                 x-transition:enter-end="opacity-100 max-h-96"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100"
+                                 x-transition:leave-end="opacity-0">
+                                <div class="px-3 pb-3">
+                                    <p class="text-sm text-right font-arabic leading-relaxed text-gray-900 dark:text-white mb-1.5" dir="rtl">اَللّٰهُمَّ لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَيْكَ تَوَكَّلْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ فَاغْفِرْلِي يَا غَفَّارُ مَا قَدَّمْتُ وَمَا أَخَّرْتُ</p>
+                                    <p class="text-[11px] italic text-gray-600 dark:text-gray-400 leading-relaxed mb-1">Allohumma laka sumtu va bika amantu va a'alayka tavakkaltu va 'ala rizqika aftartu, fag'firli, ya G'offaru ma qoddamtu va ma axxortu.</p>
+                                    <p class="text-[10px] text-gray-500 leading-relaxed">{% translate "O Allah, I fasted for You, believed in You, put my trust in You, and broke my fast with Your sustenance. O Forgiver, forgive my past and future sins." %}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Fasting Duas (shown when no todayEntry, i.e. before/after Ramadan) -->
+        <template x-if="!todayEntry">
+            <div class="mt-5 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 border border-emerald-200 dark:border-emerald-700/50">
+                    <h3 class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide mb-2">
+                        <i class="fas fa-utensils mr-1"></i>
+                        {% translate "Dua for Suhoor (Fasting Intention)" %}
+                    </h3>
+                    <p class="text-base text-right font-arabic leading-relaxed text-gray-900 dark:text-white mb-2" dir="rtl">نَوَيْتُ أَنْ أَصُومَ صَوْمَ شَهْرَ رَمَضَانَ مِنَ الْفَجْرِ إِلَى الْمَغْرِبِ، خَالِصًا لِلهِ تَعَالَى أَللهُ أَكْبَرُ</p>
+                    <p class="text-[11px] italic text-gray-600 dark:text-gray-400 leading-relaxed mb-1">Navaytu an asuvma sovma shahri Ramazona minal fajri ilal mag'ribi, xolisan lillahi ta'ala, Allohu akbar.</p>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-500 leading-relaxed">{% translate "I intend to fast the month of Ramadan from dawn to sunset, sincerely for Allah the Exalted. Allah is the Greatest." %}</p>
+                </div>
+
+                <div class="glass-card rounded-xl p-4 border border-primary-200 dark:border-primary-700/50">
+                    <h3 class="text-xs font-semibold text-primary-700 dark:text-primary-400 uppercase tracking-wide mb-2">
+                        <i class="fas fa-glass-water mr-1"></i>
+                        {% translate "Dua for Breaking Fast (Iftar)" %}
+                    </h3>
+                    <p class="text-base text-right font-arabic leading-relaxed text-gray-900 dark:text-white mb-2" dir="rtl">اَللّٰهُمَّ لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَيْكَ تَوَكَّلْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ فَاغْفِرْلِي يَا غَفَّارُ مَا قَدَّمْتُ وَمَا أَخَّرْتُ</p>
+                    <p class="text-[11px] italic text-gray-600 dark:text-gray-400 leading-relaxed mb-1">Allohumma laka sumtu va bika amantu va a'alayka tavakkaltu va 'ala rizqika aftartu, fag'firli, ya G'offaru ma qoddamtu va ma axxortu.</p>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-500 leading-relaxed">{% translate "O Allah, I fasted for You, believed in You, put my trust in You, and broke my fast with Your sustenance. O Forgiver, forgive my past and future sins." %}</p>
+                </div>
+            </div>
+        </template>
+
+        <!-- Loading State -->
+        <div x-show="loading" class="mt-6 text-center">
+            <span class="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <svg class="animate-spin h-4 w-4 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {% translate "Loading Ramadan timetable..." %}
+            </span>
+        </div>
+
+        <!-- Error State -->
+        <div x-show="error" x-cloak class="mt-6 text-center text-red-600 dark:text-red-400">
+            <i class="fas fa-exclamation-circle text-2xl"></i>
+            <p class="mt-2" x-text="error"></p>
+            <button @click="fetchCalendar()" class="mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline">{% translate "Try Again" %}</button>
+        </div>
+
+        <!-- Timetable (Desktop: table, Mobile: cards) -->
+        <div x-show="!loading && !error && days.length > 0" x-cloak class="mt-6 w-full">
+
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full glass-card rounded-lg overflow-hidden text-sm">
+                    <thead>
+                        <tr class="bg-primary-50 dark:bg-primary-900/30">
+                            <th class="py-2 px-2 text-center font-semibold text-gray-700 dark:text-gray-300">#</th>
+                            <th class="py-2 px-2 text-left font-semibold text-gray-700 dark:text-gray-300">{% translate "Date" %}</th>
+                            <th class="py-2 px-2 text-center font-semibold text-primary-700 dark:text-primary-400">{% translate "Imsak" %}</th>
+                            <th class="py-2 px-2 text-center font-semibold text-gray-700 dark:text-gray-300">{% translate "Fajr" %}</th>
+                            <th class="py-2 px-2 text-center font-semibold text-gray-700 dark:text-gray-300">{% translate "Dhuhr" %}</th>
+                            <th class="py-2 px-2 text-center font-semibold text-gray-700 dark:text-gray-300">{% translate "Asr" %}</th>
+                            <th class="py-2 px-2 text-center font-semibold text-primary-700 dark:text-primary-400">{% translate "Maghrib" %}</th>
+                            <th class="py-2 px-2 text-center font-semibold text-gray-700 dark:text-gray-300">{% translate "Isha" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <template x-for="day in days" :key="day.day_number">
+                            <tr :id="'day-' + day.day_number"
+                                :class="{
+                                    'bg-primary-50/70 dark:bg-primary-900/20 font-medium': day.date === todayStr,
+                                    'bg-amber-50/50 dark:bg-amber-900/10': day.is_lailatul_qadr && day.date !== todayStr,
+                                    'bg-gradient-to-r from-amber-50/50 via-yellow-50/30 to-transparent dark:from-amber-900/15 dark:via-yellow-900/10 dark:to-transparent': day.weekday === 'Fri' && day.date !== todayStr && !day.is_lailatul_qadr,
+                                    'opacity-50': day.date < todayStr,
+                                }"
+                                class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                <td class="py-2 px-2 text-center text-gray-600 dark:text-gray-400">
+                                    <span x-text="day.day_number"></span>
+                                    <template x-if="day.is_lailatul_qadr">
+                                        <i class="fas fa-star-and-crescent text-amber-500 ml-0.5 text-xs" title="Laylatul Qadr"></i>
+                                    </template>
+                                </td>
+                                <td class="py-2 px-2 text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                    <span x-text="day.date_str"></span>
+                                    <span class="text-xs ml-1" :class="day.weekday === 'Fri' ? 'text-amber-600 dark:text-amber-400 font-medium' : 'text-gray-400'" x-text="day.weekday"></span>
+                                    
+                                </td>
+                                <td class="py-2 px-2 text-center font-semibold text-primary-700 dark:text-primary-400" x-text="day.timings?.Imsak || '--'"></td>
+                                <td class="py-2 px-2 text-center text-gray-700 dark:text-gray-300" x-text="day.timings?.Fajr || '--'"></td>
+                                <td class="py-2 px-2 text-center text-gray-700 dark:text-gray-300" x-text="day.timings?.Dhuhr || '--'"></td>
+                                <td class="py-2 px-2 text-center text-gray-700 dark:text-gray-300" x-text="day.timings?.Asr || '--'"></td>
+                                <td class="py-2 px-2 text-center font-semibold text-primary-700 dark:text-primary-400" x-text="day.timings?.Maghrib || '--'"></td>
+                                <td class="py-2 px-2 text-center text-gray-700 dark:text-gray-300" x-text="day.timings?.Isha || '--'"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="md:hidden space-y-2" id="mobile-days">
+                <template x-for="day in days" :key="day.day_number">
+                    <div class="glass-card rounded-lg transition-colors"
+                         :id="'day-' + day.day_number"
+                         :class="{
+                            'border-l-4 border-primary-500 bg-primary-50/70 dark:bg-primary-900/20 ring-1 ring-primary-300 dark:ring-primary-700': day.date === todayStr,
+                            'border-l-4 border-amber-400 bg-amber-50/50 dark:bg-amber-900/10': day.is_lailatul_qadr && day.date !== todayStr,
+                            '': day.weekday === 'Fri' && day.date !== todayStr && !day.is_lailatul_qadr,
+                            'opacity-40': day.date < todayStr,
+                         }">
+                        <!-- Header row -->
+                        <div class="flex items-center justify-between px-3 pt-3 pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-white bg-primary-600 dark:bg-primary-500 rounded-full w-7 h-7 flex items-center justify-center" x-text="day.day_number"></span>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white" x-text="day.date_str"></span>
+                                    <span class="text-xs ml-1" :class="day.weekday === 'Fri' ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-gray-400'" x-text="day.weekday"></span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <template x-if="day.is_lailatul_qadr">
+                                    <span class="text-[10px] bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded">{% translate "Laylatul Qadr" %}</span>
+                                </template>
+                                <template x-if="day.date === todayStr">
+                                    <span class="text-[10px] bg-primary-600 text-white px-1.5 py-0.5 rounded">{% translate "Today" %}</span>
+                                </template>
+                            </div>
+                        </div>
+                        <!-- Suhoor / Iftar (prominent) -->
+                        <div class="grid grid-cols-2 gap-0 text-center border-t border-gray-100 dark:border-gray-700/50">
+                            <div class="py-2 border-r border-gray-100 dark:border-gray-700/50">
+                                <p class="text-[10px] text-gray-400 uppercase tracking-wider">{% translate "Suhoor ends" %}</p>
+                                <p class="text-base font-bold text-emerald-700 dark:text-emerald-400" x-text="day.timings?.Imsak || '--'"></p>
+                            </div>
+                            <div class="py-2">
+                                <p class="text-[10px] text-gray-400 uppercase tracking-wider">{% translate "Iftar" %}</p>
+                                <p class="text-base font-bold text-primary-700 dark:text-primary-400" x-text="day.timings?.Maghrib || '--'"></p>
+                            </div>
+                        </div>
+                        <!-- Other prayers (compact) -->
+                        <div class="grid grid-cols-4 gap-0 text-center border-t border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/30 rounded-b-lg">
+                            <div class="py-1.5">
+                                <p class="text-[9px] text-gray-400">{% translate "Fajr" %}</p>
+                                <p class="text-[11px] font-medium text-gray-600 dark:text-gray-300" x-text="day.timings?.Fajr || '--'"></p>
+                            </div>
+                            <div class="py-1.5">
+                                <p class="text-[9px] text-gray-400">{% translate "Dhuhr" %}</p>
+                                <p class="text-[11px] font-medium text-gray-600 dark:text-gray-300" x-text="day.timings?.Dhuhr || '--'"></p>
+                            </div>
+                            <div class="py-1.5">
+                                <p class="text-[9px] text-gray-400">{% translate "Asr" %}</p>
+                                <p class="text-[11px] font-medium text-gray-600 dark:text-gray-300" x-text="day.timings?.Asr || '--'"></p>
+                            </div>
+                            <div class="py-1.5">
+                                <p class="text-[9px] text-gray-400">{% translate "Isha" %}</p>
+                                <p class="text-[11px] font-medium text-gray-600 dark:text-gray-300" x-text="day.timings?.Isha || '--'"></p>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Daily Dua & Tip -->
+        {% if today_dua %}
+        <div class="mt-8 w-full max-w-lg">
+            <div class="glass-card rounded-xl p-5">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
+                    <i class="fas fa-hands-praying mr-1 text-primary-600 dark:text-primary-400"></i>
+                    {% translate "Today's Dua" %}
+                </h3>
+                <p class="text-xl text-right font-arabic leading-loose text-gray-900 dark:text-white mb-2" dir="rtl">{{ today_dua.arabic }}</p>
+                <p class="text-sm italic text-gray-600 dark:text-gray-400 mb-1">{{ today_dua.transliteration }}</p>
+                <p class="text-sm text-gray-700 dark:text-gray-300">{{ today_dua.translation }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if today_tip %}
+        <div class="mt-4 w-full max-w-lg">
+            <div class="glass-card rounded-xl p-4">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">
+                    <i class="fas fa-lightbulb mr-1 text-amber-500"></i>
+                    {% translate "Tip of the Day" %}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ today_tip }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Disclaimer -->
+        <div class="mt-8 max-w-lg w-full text-xs text-gray-500 dark:text-gray-400 text-center space-y-1">
+            <p>{% translate "Ramadan dates follow the Korean Muslim Federation (KMF) announcement." %}</p>
+            <p>{% blocktranslate %}Prayer times provided by <a href="https://aladhan.com/" target="_blank" rel="noopener" class="underline hover:text-primary-600 dark:hover:text-primary-400">aladhan.com</a>{% endblocktranslate %}</p>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function ramadanTimetable() {
+    const koreaCities = [
+        {% for city in korea_cities %}'{{ city.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}
+    ];
+
+    return {
+        days: [],
+        loading: true,
+        error: null,
+        selectedCity: '{{ detected_city|default:"Seoul" }}',
+        selectedCountry: 'South Korea',
+        locating: false,
+        todayStr: new Date().toLocaleDateString('sv'),  // 'sv' locale gives YYYY-MM-DD in local timezone
+        totalDays: {{ ramadan_config.total_days|default:"30" }},
+        countdownLabel: '',
+        countdownTimer: '--:--:--',
+        _interval: null,
+        downloadBaseUrl: document.querySelector('[data-download-url]')?.dataset.downloadUrl || '/prayer/ramadan/download/',
+
+        get todayEntry() {
+            return this.days.find(d => d.date === this.todayStr) || null;
+        },
+
+        get relevantDua() {
+            const entry = this.todayEntry;
+            if (entry && entry.timings && entry.timings.Fajr) {
+                const [h, m] = entry.timings.Fajr.split(':').map(Number);
+                const now = new Date();
+                if (now.getHours() < h || (now.getHours() === h && now.getMinutes() < m)) {
+                    return 'suhoor';
+                }
+            }
+            return 'iftar';
+        },
+
+        init() {
+            this.fetchCalendar();
+            this._startCountdown();
+        },
+
+        async changeCity(city, country) {
+            this.selectedCity = city;
+            this.selectedCountry = country || 'South Korea';
+            await this.fetchCalendar();
+        },
+
+        detectLocation() {
+            if (!navigator.geolocation) {
+                alert("{% translate 'Geolocation is not supported by your browser. Please select a city manually.'|escapejs %}");
+                return;
+            }
+            this.locating = true;
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    try {
+                        const csrfEl = document.querySelector('[name=csrfmiddlewaretoken]');
+                        const res = await fetch('/prayer/get-location/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfEl ? csrfEl.value : ''
+                            },
+                            body: JSON.stringify({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude
+                            })
+                        });
+                        const data = await res.json();
+                        if (data && data.success) {
+                            const city = data.city || '';
+                            if (koreaCities.includes(city)) {
+                                this.selectedCity = city;
+                            } else {
+                                const nearest = this._findNearestCity(position.coords.latitude, position.coords.longitude);
+                                this.selectedCity = nearest;
+                            }
+                            await this.fetchCalendar();
+                        } else {
+                            alert("{% translate 'Could not determine location. Please select a city manually.'|escapejs %}");
+                        }
+                    } catch (e) {
+                        alert("{% translate 'Error getting your location. Please select a city manually.'|escapejs %}");
+                    } finally {
+                        this.locating = false;
+                    }
+                },
+                () => {
+                    this.locating = false;
+                    alert("{% translate 'Error getting your location. Please select a city manually.'|escapejs %}");
+                }
+            );
+        },
+
+        _findNearestCity(lat, lng) {
+            const cityCoords = {
+                'Seoul': [37.5665, 126.9780],
+                'Busan': [35.1796, 129.0756],
+                'Incheon': [37.4563, 126.7052],
+                'Daegu': [35.8714, 128.6014],
+                'Daejeon': [36.3504, 127.3845],
+                'Gwangju': [35.1595, 126.8526],
+                'Ulsan': [35.5384, 129.3114],
+                'Suwon': [37.2636, 127.0286],
+                'Sejong': [36.4800, 127.2890],
+                'Jeju': [33.4996, 126.5312],
+            };
+            let nearest = 'Seoul';
+            let minDist = Infinity;
+            for (const [city, [clat, clng]] of Object.entries(cityCoords)) {
+                const d = Math.pow(lat - clat, 2) + Math.pow(lng - clng, 2);
+                if (d < minDist) { minDist = d; nearest = city; }
+            }
+            return nearest;
+        },
+
+        async fetchCalendar() {
+            this.loading = true;
+            this.error = null;
+            try {
+                const url = `/prayer/ramadan/calendar-data/?city=${encodeURIComponent(this.selectedCity)}&country=${encodeURIComponent(this.selectedCountry)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Failed to load');
+                this.days = data.days;
+                this.totalDays = data.config.total_days;
+                if (data.today) this.todayStr = data.today;  // use server's authoritative date
+                this.$nextTick(() => {
+                    setTimeout(() => this._scrollToToday(), 2500);
+                });
+            } catch (e) {
+                this.error = e.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        _scrollToToday() {
+            const todayEntry = this.days.find(d => d.date === this.todayStr);
+            if (!todayEntry) return;
+            const el = document.getElementById('day-' + todayEntry.day_number);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        },
+
+        _startCountdown() {
+            const tick = () => {
+                const entry = this.todayEntry;
+                if (!entry || !entry.timings) {
+                    this.countdownLabel = "{% translate 'Next prayer'|escapejs %}";
+                    this.countdownTimer = '--:--:--';
+                    return;
+                }
+                const now = new Date();
+                const today = now.toDateString();
+                const imsak = this._parseTime(entry.timings.Imsak, today);
+                const fajr = this._parseTime(entry.timings.Fajr, today);
+                const maghrib = this._parseTime(entry.timings.Maghrib, today);
+
+                let target, label;
+                if (now < imsak) {
+                    target = imsak;
+                    label = "{% translate 'Suhoor ends in'|escapejs %}";
+                } else if (now < maghrib) {
+                    target = maghrib;
+                    label = "{% translate 'Iftar in'|escapejs %}";
+                } else {
+                    this.countdownLabel = '';
+                    this.countdownTimer = '';
+                    return;
+                }
+
+                const diff = target - now;
+                if (diff <= 0) {
+                    this.countdownTimer = '00:00:00';
+                } else {
+                    const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+                    const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+                    const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+                    this.countdownTimer = `${h}:${m}:${s}`;
+                }
+                this.countdownLabel = label;
+            };
+            tick();
+            this._interval = setInterval(tick, 1000);
+        },
+
+        _parseTime(str, todayStr) {
+            if (!str) return new Date(0);
+            const [h, m] = str.split(':').map(Number);
+            const d = new Date(todayStr);
+            d.setHours(h, m, 0, 0);
+            return d;
+        },
+
+        destroy() {
+            if (this._interval) clearInterval(this._interval);
+        }
+    };
+}
+</script>
+{% endblock %}

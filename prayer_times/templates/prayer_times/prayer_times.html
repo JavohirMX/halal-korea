@@ -63,6 +63,49 @@
                 </div>
             </div>
         {% endif %}
+
+        <!-- Ramadan Approaching Banner -->
+        {% if ramadan.is_approaching %}
+        <div class="mt-4 max-w-md w-full mx-auto">
+            <div class="bg-gradient-to-r from-amber-50 to-primary-50 dark:from-amber-900/20 dark:to-primary-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg p-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-moon text-amber-600 dark:text-amber-400"></i>
+                        <span class="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                            {% translate "Ramadan starts in" %} {{ ramadan.days_until }} {% translate "days" %}
+                        </span>
+                    </div>
+                    <a href="{% url 'prayer_times:ramadan_timetable' %}" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                        {% translate "View timetable" %} <i class="fas fa-arrow-right ml-0.5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Ramadan Banner -->
+        {% if ramadan.is_ramadan %}
+        <div class="mt-4 max-w-md w-full mx-auto">
+            <div class="bg-gradient-to-r from-primary-50 to-emerald-50 dark:from-primary-900/20 dark:to-emerald-900/20 border border-primary-200 dark:border-primary-700/50 rounded-lg p-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-moon text-primary-600 dark:text-primary-400"></i>
+                        <span class="text-sm font-semibold text-primary-700 dark:text-primary-400">
+                            {% translate "Ramadan Day" %} {{ ramadan.day_number }} / {{ ramadan.total_days }}
+                        </span>
+                        {% if ramadan.is_lailatul_qadr %}
+                        <span class="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded">
+                            {% translate "Laylatul Qadr" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'prayer_times:ramadan_timetable' %}" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                        {% translate "Full timetable" %} <i class="fas fa-arrow-right ml-0.5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         
         <!-- Location and Settings Container -->
         <div class="mt-4 max-w-md w-full mx-auto flex items-center space-x-2">
@@ -485,6 +528,28 @@
             </div>
         </div>
 
+        <!-- Ramadan fasting info + dua (shown during Ramadan) -->
+        {% if ramadan.is_ramadan %}
+        <div id="ramadan-fasting-info" class="hidden max-w-md w-full mx-auto mt-4">
+            <div class="glass-card rounded-lg p-3 text-center">
+                <span class="text-sm text-gray-600 dark:text-gray-400">{% translate "Today's fast" %}:</span>
+                <span class="text-sm font-bold text-primary-600 dark:text-primary-400" id="ramadan-fasting-duration"></span>
+            </div>
+        </div>
+
+        <div class="max-w-md w-full mx-auto mt-4">
+            <div class="glass-card rounded-lg p-4">
+                <h3 class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">
+                    <i class="fas fa-hands-praying mr-1 text-primary-600 dark:text-primary-400"></i>
+                    {% translate "Today's Dua" %}
+                </h3>
+                <p class="text-lg text-right font-arabic leading-loose text-gray-900 dark:text-white mb-1" dir="rtl">{{ ramadan.dua.arabic }}</p>
+                <p class="text-xs italic text-gray-600 dark:text-gray-400 mb-1">{{ ramadan.dua.transliteration }}</p>
+                <p class="text-xs text-gray-700 dark:text-gray-300">{{ ramadan.dua.translation }}</p>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Info about source -->
         <div class="max-w-md w-full mx-auto mt-8 text-xs text-gray-500 dark:text-gray-400 text-center">
             {% blocktranslate %}Prayer times are provided by <a href="https://aladhan.com/" target="_blank" rel="noopener" class="underline hover:text-primary-600 dark:hover:text-primary-400">aladhan.com</a>{% endblocktranslate %}
@@ -809,14 +874,20 @@
                     prayerTimesBody.innerHTML = '';
                     
                     const timings = data.data.timings;
-                    const prayers = [
+                    const ri = data.ramadan_info;
+                    const prayers = [];
+
+                    if (ri && ri.is_ramadan && ri.imsak) {
+                        prayers.push({ name: "{% translate 'Suhoor ends'|escapejs %}", time: ri.imsak, highlight: true });
+                    }
+                    prayers.push(
                         { name: "{% translate 'Fajr'|escapejs %}", time: timings.Fajr },
                         { name: "{% translate 'Sunrise'|escapejs %}", time: timings.Sunrise },
                         { name: "{% translate 'Dhuhr'|escapejs %}", time: timings.Dhuhr },
                         { name: "{% translate 'Asr'|escapejs %}", time: timings.Asr },
-                        { name: "{% translate 'Maghrib'|escapejs %}", time: timings.Maghrib },
+                        { name: ri && ri.is_ramadan ? "{% translate 'Iftar (Maghrib)'|escapejs %}" : "{% translate 'Maghrib'|escapejs %}", time: timings.Maghrib, highlight: !!(ri && ri.is_ramadan) },
                         { name: "{% translate 'Isha'|escapejs %}", time: timings.Isha }
-                    ];
+                    );
                     
                     prayers.forEach(prayer => {
                         if (!prayer.time) {
@@ -824,16 +895,24 @@
                             return;
                         }
                         const row = document.createElement('tr');
+                        const hlClass = prayer.highlight ? ' font-semibold text-primary-700 dark:text-primary-400' : ' text-gray-700 dark:text-gray-300';
                         row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150';
-                        // Escape prayer time to prevent XSS
                         const escapedTime = String(prayer.time).replace(/[<>]/g, '');
                         row.innerHTML = `
-                            <td class="py-3 px-4 text-gray-700 dark:text-gray-300">${prayer.name}</td>
-                            <td class="py-3 px-4 text-right text-gray-700 dark:text-gray-300" data-time="${escapedTime}">${escapedTime}</td>
+                            <td class="py-3 px-4${hlClass}">${prayer.name}</td>
+                            <td class="py-3 px-4 text-right${hlClass}" data-time="${escapedTime}">${escapedTime}</td>
                         `;
                         prayerTimesBody.appendChild(row);
                     });
                     
+                    // Show Ramadan fasting duration if available
+                    if (ri && ri.fasting_duration) {
+                        const fastingEl = document.getElementById('ramadan-fasting-duration');
+                        const fastingContainer = document.getElementById('ramadan-fasting-info');
+                        if (fastingEl) fastingEl.textContent = ri.fasting_duration;
+                        if (fastingContainer) fastingContainer.classList.remove('hidden');
+                    }
+
                     // Show content and start countdown
                     loadingState.classList.add('hidden');
                     contentContainer.classList.remove('hidden');
