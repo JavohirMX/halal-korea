@@ -28,6 +28,8 @@ class RamadanConfig(models.Model):
 
     @property
     def total_days(self):
+        if not self.start_date or not self.end_date:
+            return None
         return (self.end_date - self.start_date).days + 1
 
     @classmethod
