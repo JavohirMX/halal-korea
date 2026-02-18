@@ -2772,239 +2772,239 @@ msgstr "ta bo'sh maydon bor. Baribir davom etasizmi?"
 
 #: prayer_times/ramadan_content.py:12
 msgid "O Allah, bless us in Ramadan."
-msgstr ""
+msgstr "Ey Alloh, bizni Ramazonda barakali qil."
 
 #: prayer_times/ramadan_content.py:17
 msgid "O Allah, I ask You for Paradise and seek refuge from the Fire."
-msgstr ""
+msgstr "Ey Alloh, Men Sendan jannatni so'rayman va do'zaxdan panoh tilayman."
 
 #: prayer_times/ramadan_content.py:22 prayer_times/ramadan_content.py:142
 msgid "O Allah, You are the Pardoner and You love to pardon, so pardon me."
-msgstr ""
+msgstr "Ey Alloh, Sen kechiruvchisan va kechirishni sevasan, shunday ekan meni kechir."
 
 #: prayer_times/ramadan_content.py:27
 msgid "Our Lord, give us good in this world and good in the Hereafter, and save us from the Fire."
-msgstr ""
+msgstr "Rabbimiz, bizga bu dunyoda ham, oxiratda ham yaxshilik ber va bizni do'zaxdan saqlа."
 
 #: prayer_times/ramadan_content.py:32
 msgid "O Allah, forgive all my sins, small and great, first and last."
-msgstr ""
+msgstr "Ey Alloh, barcha gunohlarimni kechir — kichik va kattasini, birinchi va oxirgisini."
 
 #: prayer_times/ramadan_content.py:37
 msgid "O Allah, I seek refuge in You from worry and grief."
-msgstr ""
+msgstr "Ey Alloh, g'am va qayg'udan Sening panohing'a tilayman."
 
 #: prayer_times/ramadan_content.py:42
 msgid "My Lord, expand my chest and ease my affair."
-msgstr ""
+msgstr "Rabbim, ko'kragimni keng qil va ishimni osonlashtir."
 
 #: prayer_times/ramadan_content.py:47
 msgid "O Allah, help me to remember You, thank You, and worship You well."
-msgstr ""
+msgstr "Ey Alloh, Seni eslab, Senga shukr qilib va yaxshi ibodat qila olishimga yordam ber."
 
 #: prayer_times/ramadan_content.py:52
 msgid "O Allah, accept from us our fasting and our prayers."
-msgstr ""
+msgstr "Ey Alloh, bizning ro'za va namozlarimizni qabul qil."
 
 #: prayer_times/ramadan_content.py:57
 msgid "O Allah, grant me Your love and the love of those who love You."
-msgstr ""
+msgstr "Ey Alloh, menga Sening sevgingni va Seni sevuvchilarning sevgisini ber."
 
 #: prayer_times/ramadan_content.py:62
 msgid "Our Lord, do not let our hearts deviate after You have guided us."
-msgstr ""
+msgstr "Rabbimiz, bizni hidoyat qilganingdan so'ng qalblarimizni yo'ldan ozdirma."
 
 #: prayer_times/ramadan_content.py:67
 msgid "O Allah, make me among those who repent and those who purify themselves."
-msgstr ""
+msgstr "Ey Alloh, meni tavba qiluvchilar va o'zini tozalovchilar jumlasiga qo'sh."
 
 #: prayer_times/ramadan_content.py:72
 msgid "O Allah, let us reach the Night of Decree."
-msgstr ""
+msgstr "Ey Alloh, bizni Qadr kechasiga yetkazgin."
 
 #: prayer_times/ramadan_content.py:77
 msgid "O Allah, guide me and keep me on the right path."
-msgstr ""
+msgstr "Ey Alloh, meni to'g'ri yo'lga boshlа va shu yo'lda saqlа."
 
 #: prayer_times/ramadan_content.py:82
 msgid "My Lord, inspire me to be grateful for Your favors which You have bestowed upon me."
-msgstr ""
+msgstr "Rabbim, menga bergan ne'matlaringga shukr qilishga ilhom ber."
 
 #: prayer_times/ramadan_content.py:87
 msgid "O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds."
-msgstr ""
+msgstr "Ey Alloh, foydali ilm, halol rizq va qabul bo'ladigan amallarni so'rayman."
 
 #: prayer_times/ramadan_content.py:92
 msgid "O Allah, set right my religion which is the safeguard of my affairs."
-msgstr ""
+msgstr "Ey Alloh, ishlarimning poydevori bo'lgan dinim to'g'irla."
 
 #: prayer_times/ramadan_content.py:97
 msgid "Our Lord, grant us from our spouses and offspring comfort to our eyes."
-msgstr ""
+msgstr "Rabbimiz, bizga juftlarimiz va farzandlarimizdan ko'z quvonchi ato et."
 
 #: prayer_times/ramadan_content.py:102
 msgid "O Allah, make the Quran the spring of my heart."
-msgstr ""
+msgstr "Ey Alloh, Qur'onni qalbimning bahori qilgin."
 
 #: prayer_times/ramadan_content.py:107
 msgid "O Allah, free our necks from the Fire."
-msgstr ""
+msgstr "Ey Alloh, bizni do'zaxdan ozod qilgin."
 
 #: prayer_times/ramadan_content.py:112
 msgid "O Allah, You are the Generous Pardoner who loves to pardon, so pardon me."
-msgstr ""
+msgstr "Ey Alloh, Sen kechirishni sevuvchi saxiy Kechiruvchisan, shunday ekan meni kechir."
 
 #: prayer_times/ramadan_content.py:117
 msgid "O Allah, keep me steadfast upon Your religion."
-msgstr ""
+msgstr "Ey Alloh, meni Sening diningda mustahkam saqlа."
 
 #: prayer_times/ramadan_content.py:122
 msgid "O Allah, make the best of my life its end, and the best of my deeds the final ones."
-msgstr ""
+msgstr "Ey Alloh, hayotimning eng yaxshisini uning oxiri qilgin, va amallarimning eng yaxshisini oxirgisi qilgin."
 
 #: prayer_times/ramadan_content.py:127
 msgid "O Allah, have mercy on me by keeping me away from sins for as long as You let me live."
-msgstr ""
+msgstr "Ey Alloh, umr berib turgan ekansan, gunohlardan uzoq tutib menga rahm qilgin."
 
 #: prayer_times/ramadan_content.py:132
 msgid "O Allah, make me among those who stand in prayer on the Night of Decree with faith and hope of reward."
-msgstr ""
+msgstr "Ey Alloh, meni Qadr kechasida imon va savob umidi bilan namoz o'qib turadigan bandalar jumlasiga qo'sh."
 
 #: prayer_times/ramadan_content.py:137
 msgid "O Allah, I ask You for steadfastness in all affairs."
-msgstr ""
+msgstr "Ey Alloh, barcha ishlarda sobitqadamlikni so'rayman."
 
 #: prayer_times/ramadan_content.py:147
 msgid "O Allah, accept from us; indeed You are the All-Hearing, All-Knowing."
-msgstr ""
+msgstr "Ey Alloh, bizdan qabul qilgin; albatta Sen Eshituvchi va Biluvchisan."
 
 #: prayer_times/ramadan_content.py:152
 msgid "O Allah, make us among those You have freed from the Fire."
-msgstr ""
+msgstr "Ey Alloh, bizni do'zaxdan ozod qilganlar jumlasiga qo'sh."
 
 #: prayer_times/ramadan_content.py:157
 msgid "O Allah, accept our Ramadan and return it to us for many years to come."
-msgstr ""
+msgstr "Ey Alloh, Ramazonimizni qabul qil va uni yana ko'p yillar bizga qaytarib ber."
 
 #: prayer_times/ramadan_content.py:163
 msgid "Begin Ramadan with a sincere intention (niyyah) for fasting. The intention should be made in the heart before Fajr."
-msgstr ""
+msgstr "Ramazonga ro'za uchun samimiy niyat bilan boshlang. Niyat Bomdoddan oldin yurakda qilinishi kerak."
 
 #: prayer_times/ramadan_content.py:164
 msgid "Have a nutritious suhoor -- include complex carbohydrates, protein, and plenty of water to stay energized."
-msgstr ""
+msgstr "Foydali saharlik qiling -- faol bo'lib turish uchun murakkab uglevodlar, oqsil va ko'p suv iste'mol qiling."
 
 #: prayer_times/ramadan_content.py:165
 msgid "Break your fast with dates and water, following the Sunnah of the Prophet (peace be upon him)."
-msgstr ""
+msgstr "Payg'ambar (u zotga salotu salom bo'lsin) Sunnatiga amal qilib, xurmo va suv bilan iftorini oching."
 
 #: prayer_times/ramadan_content.py:166
 msgid "Increase your Quran recitation. Many Muslims aim to complete the entire Quran during Ramadan."
-msgstr ""
+msgstr "Qur'on tilоvatingizni oshiring. Ko'plab musulmonlar Ramazon davomida butun Qur'onni xatm qilishni maqsad qiladi."
 
 #: prayer_times/ramadan_content.py:167
 msgid "Avoid overeating at iftar. Eat moderately and give your body time to adjust."
-msgstr ""
+msgstr "Iftorda ko'p yeyishdan saqlaning. Mo''tadil yeng va tanangizga moslashish uchun vaqt bering."
 
 #: prayer_times/ramadan_content.py:168
 msgid "Give charity regularly during Ramadan. Even a small amount each day carries great reward."
-msgstr ""
+msgstr "Ramazon davomida muntazam sadaqa bering. Har kuni oz miqdor ham katta savobga ega."
 
 #: prayer_times/ramadan_content.py:169
 msgid "Perform Tarawih prayers at the mosque to strengthen your community bonds."
-msgstr ""
+msgstr "Jamoa rishtalарini mustahkamlash uchun masjidda Tarovih namozini o'qing."
 
 #: prayer_times/ramadan_content.py:170
 msgid "Guard your tongue from backbiting, gossip, and harsh words -- fasting includes the tongue."
-msgstr ""
+msgstr "Tilingizni g'iybat, behuda gap va qo'pol so'zlardan saqlang -- ro'za tilni ham qamrab oladi."
 
 #: prayer_times/ramadan_content.py:171
 msgid "Make a Ramadan schedule: set specific times for Quran, dhikr, dua, and rest."
-msgstr ""
+msgstr "Ramazon jadvali tuzing: Qur'on, zikr, du'o va dam olish uchun aniq vaqtlar belgilang."
 
 #: prayer_times/ramadan_content.py:172
 msgid "Stay hydrated between iftar and suhoor. Drink water regularly, not all at once."
-msgstr ""
+msgstr "Iftor va saharlik o'rtasida suv muvozanatini saqlang. Suvni bir yo'la emas, muntazam iching."
 
 #: prayer_times/ramadan_content.py:173
 msgid "Use the time before iftar for dua -- it is one of the times when supplications are accepted."
-msgstr ""
+msgstr "Iftordan oldingi vaqtni du'oga sarflang -- bu du'olar ijobat bo'ladigan vaqtlardan biridir."
 
 #: prayer_times/ramadan_content.py:174
 msgid "Take a short nap after Dhuhr if possible to help manage energy during fasting."
-msgstr ""
+msgstr "Iloji bo'lsa, ro'za paytida energiyani boshqarishga yordam berish uchun peshin namozidan keyin qisqa uxlang."
 
 #: prayer_times/ramadan_content.py:175
 msgid "Feed others who are fasting. The reward for feeding a fasting person is equal to their fast."
-msgstr ""
+msgstr "Ro'za tutayotgan boshqalarga taom bering. Ro'zadar odam ko'nglini qondirgan kimsaning savоbi uning ro'zasiga tengdir."
 
 #: prayer_times/ramadan_content.py:176
 msgid "Reduce screen time and social media to focus more on worship and reflection."
-msgstr ""
+msgstr "Ibodat va fikr-mulohazaga ko'proq e'tibor qaratish uchun ekran vaqti va ijtimoiy tarmoqlarni kamaytiring."
 
 #: prayer_times/ramadan_content.py:177
 msgid "Reflect on the halfway point of Ramadan. Renew your intentions and increase your efforts."
-msgstr ""
+msgstr "Ramazonning o'rta nuqtasini o'ylab ko'ring. Niyatingizni yangilang va harakatlarингизни oshiring."
 
 #: prayer_times/ramadan_content.py:178
 msgid "Practice patience (sabr). Fasting trains us to be patient in all aspects of life."
-msgstr ""
+msgstr "Sabr mashq qiling. Ro'za bizni hayotning barcha jabhalarida sabr qilishga o'rgatadi."
 
 #: prayer_times/ramadan_content.py:179
 msgid "Attend Islamic study circles or lectures to deepen your understanding during Ramadan."
-msgstr ""
+msgstr "Ramazon davomida tushunchangizni chuqurlashtirish uchun islomiy dars doiralari yoki ma'ruzalarga qatnashing."
 
 #: prayer_times/ramadan_content.py:180
 msgid "Remember those less fortunate. Calculate and pay your Zakat during this blessed month."
-msgstr ""
+msgstr "Kam ta'minlanganlarni yodda tuting. Shu muborak oyda Zakotingizni hisoblang va to'lang."
 
 #: prayer_times/ramadan_content.py:181
 msgid "As you approach the last ten nights, plan to increase your worship significantly."
-msgstr ""
+msgstr "Oxirgi o'n kechaga yaqinlashganda, ibodatingizni sezilarli darajada oshirish rejasini tuzing."
 
 #: prayer_times/ramadan_content.py:182
 msgid "Begin preparing for the last ten nights. Some people perform i'tikaf (spiritual retreat) at the mosque."
-msgstr ""
+msgstr "Oxirgi o'n kechaga tayyorlanishni boshlang. Ba'zilar masjidda e'tikof (ma'naviy xilvat) o'tiradilar."
 
 #: prayer_times/ramadan_content.py:183
 msgid "The last ten nights have begun. Seek Laylatul Qadr (the Night of Decree) in the odd nights."
-msgstr ""
+msgstr "Oxirgi o'n kecha boshlandi. Toq kechalarda Laylatul Qadrni (Qadr kechasini) izlang."
 
 #: prayer_times/ramadan_content.py:184
 msgid "Make a special dua list for the last ten nights and ask Allah sincerely."
-msgstr ""
+msgstr "Oxirgi o'n kecha uchun maxsus du'olar ro'yxati tuzing va Allohga samimiy iltijо qiling."
 
 #: prayer_times/ramadan_content.py:185
 msgid "This could be Laylatul Qadr. Worship as if this is the night -- pray, make dua, and recite Quran."
-msgstr ""
+msgstr "Bu Laylatul Qadr bo'lishi mumkin. Go'yo bu shu kecha ekanday ibodat qiling -- namoz o'qing, du'o qiling va Qur'on tilovat qiling."
 
 #: prayer_times/ramadan_content.py:186
 msgid "Continue your extra worship. Keep up the momentum through each remaining night."
-msgstr ""
+msgstr "Qo'shimcha ibodatingizni davom ettiring. Qolgan har bir kechada shu yoʼnalishni saqlang."
 
 #: prayer_times/ramadan_content.py:187
 msgid "One of the most likely nights for Laylatul Qadr. Increase your prayers and supplications."
-msgstr ""
+msgstr "Laylatul Qadrga eng ko'p to'g'ri keladigan kechalardan biri. Namoz va du'olaringizni oshiring."
 
 #: prayer_times/ramadan_content.py:188
 msgid "Prepare your Zakat al-Fitr before Eid. It must be given before the Eid prayer."
-msgstr ""
+msgstr "Hayitdan oldin Fitr zakotingizni tayyorlang. U Hayit namozidan oldin berilishi shart."
 
 #: prayer_times/ramadan_content.py:189
 msgid "Traditionally considered the most likely Laylatul Qadr. Dedicate this night to worship."
-msgstr ""
+msgstr "An'anaviy ravishda Laylatul Qadrga eng ko'p mos kelishi ehtimoli yuqori kecha deb hisoblanadi. Bu kechani ibodatga bag'ishlang."
 
 #: prayer_times/ramadan_content.py:190
 msgid "Begin planning for Eid. Prepare your clothes and arrange Eid greetings for loved ones."
-msgstr ""
+msgstr "Hayit uchun rejalashtira boshlang. Kiyimlaringizni tayyorlang va yaqinlaringizga Hayit tabriklarini tartibga soling."
 
 #: prayer_times/ramadan_content.py:191
 msgid "As Ramadan nears its end, ask Allah to accept your fasting and good deeds."
-msgstr ""
+msgstr "Ramazon oxiriga yaqinlashganda, Allohdan ro'za va yaxshi amallarini qabul qilishini so'rang."
 
 #: prayer_times/ramadan_content.py:192
 msgid "On the last day, recite the Eid takbeer and prepare for tomorrow's celebration. Eid Mubarak!"
-msgstr ""
+msgstr "Oxirgi kuni Hayit takbirini aytib, ertangi bayramga tayyorlaning. Hayit muborak!"
 
 #: prayer_times/ramadan_image.py:279
 #, python-format

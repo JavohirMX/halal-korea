@@ -2771,239 +2771,239 @@ msgstr "개 있습니다. 계속하시겠습니까?"
 
 #: prayer_times/ramadan_content.py:12
 msgid "O Allah, bless us in Ramadan."
-msgstr ""
+msgstr "오 알라여, 라마단에 우리를 축복해 주소서."
 
 #: prayer_times/ramadan_content.py:17
 msgid "O Allah, I ask You for Paradise and seek refuge from the Fire."
-msgstr ""
+msgstr "오 알라여, 저는 당신께 천국을 구하며 지옥불로부터 피난처를 청합니다."
 
 #: prayer_times/ramadan_content.py:22 prayer_times/ramadan_content.py:142
 msgid "O Allah, You are the Pardoner and You love to pardon, so pardon me."
-msgstr ""
+msgstr "오 알라여, 당신은 용서하시는 분이며 용서를 사랑하시니, 저를 용서해 주소서."
 
 #: prayer_times/ramadan_content.py:27
 msgid "Our Lord, give us good in this world and good in the Hereafter, and save us from the Fire."
-msgstr ""
+msgstr "우리 주님, 이 세상에서도 내세에서도 좋은 것을 주시고, 지옥불로부터 우리를 구해 주소서."
 
 #: prayer_times/ramadan_content.py:32
 msgid "O Allah, forgive all my sins, small and great, first and last."
-msgstr ""
+msgstr "오 알라여, 저의 모든 죄를 용서해 주소서 — 작은 것과 큰 것, 처음과 마지막을."
 
 #: prayer_times/ramadan_content.py:37
 msgid "O Allah, I seek refuge in You from worry and grief."
-msgstr ""
+msgstr "오 알라여, 저는 당신께 걱정과 슬픔으로부터의 피난처를 구합니다."
 
 #: prayer_times/ramadan_content.py:42
 msgid "My Lord, expand my chest and ease my affair."
-msgstr ""
+msgstr "저의 주님, 제 가슴을 넓혀 주시고 제 일을 쉽게 해주소서."
 
 #: prayer_times/ramadan_content.py:47
 msgid "O Allah, help me to remember You, thank You, and worship You well."
-msgstr ""
+msgstr "오 알라여, 당신을 기억하고, 감사하고, 잘 예배드릴 수 있도록 도와주소서."
 
 #: prayer_times/ramadan_content.py:52
 msgid "O Allah, accept from us our fasting and our prayers."
-msgstr ""
+msgstr "오 알라여, 저희의 금식과 기도를 받아 주소서."
 
 #: prayer_times/ramadan_content.py:57
 msgid "O Allah, grant me Your love and the love of those who love You."
-msgstr ""
+msgstr "오 알라여, 당신의 사랑과 당신을 사랑하는 이들의 사랑을 제게 허락해 주소서."
 
 #: prayer_times/ramadan_content.py:62
 msgid "Our Lord, do not let our hearts deviate after You have guided us."
-msgstr ""
+msgstr "우리 주님, 당신이 저희를 인도하신 후에 저희 마음이 빗나가지 않게 해주소서."
 
 #: prayer_times/ramadan_content.py:67
 msgid "O Allah, make me among those who repent and those who purify themselves."
-msgstr ""
+msgstr "오 알라여, 저를 회개하는 자들과 자신을 정화하는 자들 중에 속하게 해주소서."
 
 #: prayer_times/ramadan_content.py:72
 msgid "O Allah, let us reach the Night of Decree."
-msgstr ""
+msgstr "오 알라여, 저희가 권능의 밤(라일라툴 까드르)에 이를 수 있게 해주소서."
 
 #: prayer_times/ramadan_content.py:77
 msgid "O Allah, guide me and keep me on the right path."
-msgstr ""
+msgstr "오 알라여, 저를 인도하시고 올바른 길 위에 머물게 해주소서."
 
 #: prayer_times/ramadan_content.py:82
 msgid "My Lord, inspire me to be grateful for Your favors which You have bestowed upon me."
-msgstr ""
+msgstr "저의 주님, 당신이 제게 베풀어 주신 은혜에 감사할 수 있도록 영감을 주소서."
 
 #: prayer_times/ramadan_content.py:87
 msgid "O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds."
-msgstr ""
+msgstr "오 알라여, 유익한 지식과 좋은 양식, 그리고 받아들여지는 행위를 구합니다."
 
 #: prayer_times/ramadan_content.py:92
 msgid "O Allah, set right my religion which is the safeguard of my affairs."
-msgstr ""
+msgstr "오 알라여, 제 일들의 보호막인 저의 종교를 바로잡아 주소서."
 
 #: prayer_times/ramadan_content.py:97
 msgid "Our Lord, grant us from our spouses and offspring comfort to our eyes."
-msgstr ""
+msgstr "우리 주님, 저희 배우자와 자녀들로부터 눈의 위안을 허락해 주소서."
 
 #: prayer_times/ramadan_content.py:102
 msgid "O Allah, make the Quran the spring of my heart."
-msgstr ""
+msgstr "오 알라여, 꾸란을 제 마음의 샘이 되게 해주소서."
 
 #: prayer_times/ramadan_content.py:107
 msgid "O Allah, free our necks from the Fire."
-msgstr ""
+msgstr "오 알라여, 저희를 지옥불로부터 해방시켜 주소서."
 
 #: prayer_times/ramadan_content.py:112
 msgid "O Allah, You are the Generous Pardoner who loves to pardon, so pardon me."
-msgstr ""
+msgstr "오 알라여, 당신은 용서를 사랑하시는 관대한 용서자이시니, 저를 용서해 주소서."
 
 #: prayer_times/ramadan_content.py:117
 msgid "O Allah, keep me steadfast upon Your religion."
-msgstr ""
+msgstr "오 알라여, 저를 당신의 종교 위에 굳건히 머물게 해주소서."
 
 #: prayer_times/ramadan_content.py:122
 msgid "O Allah, make the best of my life its end, and the best of my deeds the final ones."
-msgstr ""
+msgstr "오 알라여, 제 삶에서 가장 좋은 것을 마지막이 되게 하시고, 제 행위 중 가장 좋은 것을 마지막 것이 되게 해주소서."
 
 #: prayer_times/ramadan_content.py:127
 msgid "O Allah, have mercy on me by keeping me away from sins for as long as You let me live."
-msgstr ""
+msgstr "오 알라여, 제가 사는 동안 죄로부터 멀리하게 해주시는 자비를 베풀어 주소서."
 
 #: prayer_times/ramadan_content.py:132
 msgid "O Allah, make me among those who stand in prayer on the Night of Decree with faith and hope of reward."
-msgstr ""
+msgstr "오 알라여, 저를 믿음과 보상의 희망으로 권능의 밤에 기도로 서는 자들 중에 속하게 해주소서."
 
 #: prayer_times/ramadan_content.py:137
 msgid "O Allah, I ask You for steadfastness in all affairs."
-msgstr ""
+msgstr "오 알라여, 모든 일에 있어 굳건함을 청합니다."
 
 #: prayer_times/ramadan_content.py:147
 msgid "O Allah, accept from us; indeed You are the All-Hearing, All-Knowing."
-msgstr ""
+msgstr "오 알라여, 저희로부터 받아 주소서; 진실로 당신은 모든 것을 들으시고 아시는 분이십니다."
 
 #: prayer_times/ramadan_content.py:152
 msgid "O Allah, make us among those You have freed from the Fire."
-msgstr ""
+msgstr "오 알라여, 저희를 지옥불로부터 해방시키신 자들 중에 속하게 해주소서."
 
 #: prayer_times/ramadan_content.py:157
 msgid "O Allah, accept our Ramadan and return it to us for many years to come."
-msgstr ""
+msgstr "오 알라여, 저희의 라마단을 받아 주시고 앞으로도 수년간 저희에게 돌아오게 해주소서."
 
 #: prayer_times/ramadan_content.py:163
 msgid "Begin Ramadan with a sincere intention (niyyah) for fasting. The intention should be made in the heart before Fajr."
-msgstr ""
+msgstr "진심 어린 금식 의도(니야)로 라마단을 시작하세요. 의도는 파즈르 전에 마음속으로 해야 합니다."
 
 #: prayer_times/ramadan_content.py:164
 msgid "Have a nutritious suhoor -- include complex carbohydrates, protein, and plenty of water to stay energized."
-msgstr ""
+msgstr "영양가 있는 수후르를 드세요 -- 활력을 유지하기 위해 복합 탄수화물, 단백질, 충분한 물을 포함하세요."
 
 #: prayer_times/ramadan_content.py:165
 msgid "Break your fast with dates and water, following the Sunnah of the Prophet (peace be upon him)."
-msgstr ""
+msgstr "예언자(평화가 그에게 깃들기를)의 순나를 따라 대추야자와 물로 금식을 여세요."
 
 #: prayer_times/ramadan_content.py:166
 msgid "Increase your Quran recitation. Many Muslims aim to complete the entire Quran during Ramadan."
-msgstr ""
+msgstr "꾸란 낭송을 늘리세요. 많은 무슬림들이 라마단 동안 꾸란 전체를 완독하는 것을 목표로 합니다."
 
 #: prayer_times/ramadan_content.py:167
 msgid "Avoid overeating at iftar. Eat moderately and give your body time to adjust."
-msgstr ""
+msgstr "이프타르에서 과식을 피하세요. 적당히 먹고 몸이 적응할 시간을 주세요."
 
 #: prayer_times/ramadan_content.py:168
 msgid "Give charity regularly during Ramadan. Even a small amount each day carries great reward."
-msgstr ""
+msgstr "라마단 동안 정기적으로 자선을 베푸세요. 매일 작은 금액이라도 큰 보상을 가져옵니다."
 
 #: prayer_times/ramadan_content.py:169
 msgid "Perform Tarawih prayers at the mosque to strengthen your community bonds."
-msgstr ""
+msgstr "공동체 유대를 강화하기 위해 모스크에서 타라위흐 예배를 드리세요."
 
 #: prayer_times/ramadan_content.py:170
 msgid "Guard your tongue from backbiting, gossip, and harsh words -- fasting includes the tongue."
-msgstr ""
+msgstr "험담, 가십, 거친 말로부터 혀를 지키세요 -- 금식에는 혀도 포함됩니다."
 
 #: prayer_times/ramadan_content.py:171
 msgid "Make a Ramadan schedule: set specific times for Quran, dhikr, dua, and rest."
-msgstr ""
+msgstr "라마단 일정을 만드세요: 꾸란, 지크르, 두아, 휴식을 위한 구체적인 시간을 정하세요."
 
 #: prayer_times/ramadan_content.py:172
 msgid "Stay hydrated between iftar and suhoor. Drink water regularly, not all at once."
-msgstr ""
+msgstr "이프타르와 수후르 사이에 수분을 유지하세요. 한꺼번에 마시지 말고 규칙적으로 물을 드세요."
 
 #: prayer_times/ramadan_content.py:173
 msgid "Use the time before iftar for dua -- it is one of the times when supplications are accepted."
-msgstr ""
+msgstr "이프타르 전 시간을 두아에 활용하세요 -- 그것은 기도가 받아들여지는 시간 중 하나입니다."
 
 #: prayer_times/ramadan_content.py:174
 msgid "Take a short nap after Dhuhr if possible to help manage energy during fasting."
-msgstr ""
+msgstr "가능하다면 주흐르 후 짧은 낮잠을 자세요 — 금식 중 에너지 관리에 도움이 됩니다."
 
 #: prayer_times/ramadan_content.py:175
 msgid "Feed others who are fasting. The reward for feeding a fasting person is equal to their fast."
-msgstr ""
+msgstr "금식 중인 다른 사람들에게 음식을 나누어 주세요. 금식자에게 음식을 먹이는 보상은 그들의 금식과 동일합니다."
 
 #: prayer_times/ramadan_content.py:176
 msgid "Reduce screen time and social media to focus more on worship and reflection."
-msgstr ""
+msgstr "예배와 성찰에 더 집중하기 위해 스크린 시간과 소셜 미디어를 줄이세요."
 
 #: prayer_times/ramadan_content.py:177
 msgid "Reflect on the halfway point of Ramadan. Renew your intentions and increase your efforts."
-msgstr ""
+msgstr "라마단 중간 지점을 돌아보세요. 의도를 새롭게 하고 노력을 더하세요."
 
 #: prayer_times/ramadan_content.py:178
 msgid "Practice patience (sabr). Fasting trains us to be patient in all aspects of life."
-msgstr ""
+msgstr "인내(사브르)를 실천하세요. 금식은 삶의 모든 면에서 인내하도록 우리를 훈련시킵니다."
 
 #: prayer_times/ramadan_content.py:179
 msgid "Attend Islamic study circles or lectures to deepen your understanding during Ramadan."
-msgstr ""
+msgstr "라마단 동안 이해를 깊이하기 위해 이슬람 학습 모임이나 강연에 참석하세요."
 
 #: prayer_times/ramadan_content.py:180
 msgid "Remember those less fortunate. Calculate and pay your Zakat during this blessed month."
-msgstr ""
+msgstr "불우한 이웃을 기억하세요. 이 축복받은 달에 자카트를 계산하고 납부하세요."
 
 #: prayer_times/ramadan_content.py:181
 msgid "As you approach the last ten nights, plan to increase your worship significantly."
-msgstr ""
+msgstr "마지막 열흘 밤이 다가올수록 예배를 크게 늘릴 계획을 세우세요."
 
 #: prayer_times/ramadan_content.py:182
 msgid "Begin preparing for the last ten nights. Some people perform i'tikaf (spiritual retreat) at the mosque."
-msgstr ""
+msgstr "마지막 열흘 밤을 위해 준비를 시작하세요. 일부 사람들은 모스크에서 이으티카프(영적 수련)를 행합니다."
 
 #: prayer_times/ramadan_content.py:183
 msgid "The last ten nights have begun. Seek Laylatul Qadr (the Night of Decree) in the odd nights."
-msgstr ""
+msgstr "마지막 열흘 밤이 시작되었습니다. 홀수 밤에 라일라툴 까드르(권능의 밤)를 찾으세요."
 
 #: prayer_times/ramadan_content.py:184
 msgid "Make a special dua list for the last ten nights and ask Allah sincerely."
-msgstr ""
+msgstr "마지막 열흘 밤을 위한 특별한 두아 목록을 만들고 알라께 진심으로 간구하세요."
 
 #: prayer_times/ramadan_content.py:185
 msgid "This could be Laylatul Qadr. Worship as if this is the night -- pray, make dua, and recite Quran."
-msgstr ""
+msgstr "이 밤이 라일라툴 까드르일 수 있습니다. 마치 이 밤인 것처럼 예배하세요 -- 기도하고, 두아를 드리고, 꾸란을 낭송하세요."
 
 #: prayer_times/ramadan_content.py:186
 msgid "Continue your extra worship. Keep up the momentum through each remaining night."
-msgstr ""
+msgstr "추가 예배를 계속하세요. 남은 각 밤마다 그 기세를 유지하세요."
 
 #: prayer_times/ramadan_content.py:187
 msgid "One of the most likely nights for Laylatul Qadr. Increase your prayers and supplications."
-msgstr ""
+msgstr "라일라툴 까드르가 될 가능성이 가장 높은 밤 중 하나입니다. 기도와 간구를 늘리세요."
 
 #: prayer_times/ramadan_content.py:188
 msgid "Prepare your Zakat al-Fitr before Eid. It must be given before the Eid prayer."
-msgstr ""
+msgstr "이드 전에 피트라 자카트를 준비하세요. 이드 예배 전에 지급해야 합니다."
 
 #: prayer_times/ramadan_content.py:189
 msgid "Traditionally considered the most likely Laylatul Qadr. Dedicate this night to worship."
-msgstr ""
+msgstr "전통적으로 라일라툴 까드르의 가능성이 가장 높다고 여겨지는 밤입니다. 이 밤을 예배에 헌신하세요."
 
 #: prayer_times/ramadan_content.py:190
 msgid "Begin planning for Eid. Prepare your clothes and arrange Eid greetings for loved ones."
-msgstr ""
+msgstr "이드를 위한 계획을 시작하세요. 옷을 준비하고 사랑하는 이들을 위한 이드 인사를 준비하세요."
 
 #: prayer_times/ramadan_content.py:191
 msgid "As Ramadan nears its end, ask Allah to accept your fasting and good deeds."
-msgstr ""
+msgstr "라마단이 끝에 가까워질수록 알라께 금식과 선행을 받아달라고 간구하세요."
 
 #: prayer_times/ramadan_content.py:192
 msgid "On the last day, recite the Eid takbeer and prepare for tomorrow's celebration. Eid Mubarak!"
-msgstr ""
+msgstr "마지막 날, 이드 딱비르를 외치고 내일의 축제를 준비하세요. 이드 무바라크!"
 
 #: prayer_times/ramadan_image.py:279
 #, python-format
