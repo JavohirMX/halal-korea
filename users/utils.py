@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -9,11 +10,34 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+_email_executor = ThreadPoolExecutor(max_workers=4)
+
+
+def _deliver_email(subject, plain_message, html_message, recipient, success_log, error_log):
+    try:
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        logger.info(success_log)
+    except Exception:
+        logger.exception(error_log)
+
+
 def send_activation_email(user, request):
     """
-    Send activation email to the user.
+    Queue activation email for delivery without blocking the request thread.
+    Returns True when the email was submitted for sending, False on validation failure.
     """
     try:
+        if not user.email:
+            logger.error("Cannot send activation email: user has no email address")
+            return False
+
         # Generate activation token
         token = email_verification_token.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -28,33 +52,36 @@ def send_activation_email(user, request):
             'activation_link': activation_link,
         }
         
-        # Render email templates
+        # Render email templates synchronously before handing off to the worker thread
         html_message = render_to_string('users/email/activation_email.html', context)
         plain_message = render_to_string('users/email/activation_email.txt', context)
-        
-        # Send email
-        send_mail(
+
+        _email_executor.submit(
+            _deliver_email,
             subject='Activate Your Halal Korea Account',
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
+            plain_message=plain_message,
             html_message=html_message,
-            fail_silently=False,
+            recipient=user.email,
+            success_log=f"Activation email sent to {user.email} for user {user.username}",
+            error_log=f"Failed to send activation email to {user.email}",
         )
-        
-        logger.info(f"Activation email sent to {user.email} for user {user.username}")
         return True
         
     except Exception as e:
-        logger.error(f"Failed to send activation email to {user.email}: {str(e)}")
+        logger.error(f"Failed to queue activation email to {user.email}: {str(e)}")
         return False
 
 
 def send_password_reset_email(user, request):
     """
-    Send password reset email to the user.
+    Queue password reset email for delivery without blocking the request thread.
+    Returns True when the email was submitted for sending, False on validation failure.
     """
     try:
+        if not user.email:
+            logger.error("Cannot send password reset email: user has no email address")
+            return False
+
         # Generate password reset token
         token = password_reset_token.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -76,23 +103,21 @@ def send_password_reset_email(user, request):
             'site_name': getattr(settings, 'SITE_NAME', 'Halal Korea'),
         }
         
-        # Render email templates
+        # Render email templates synchronously before handing off to the worker thread
         html_message = render_to_string('users/email/password_reset_email.html', context)
         plain_message = render_to_string('users/email/password_reset_email.txt', context)
-        
-        # Send email
-        send_mail(
+
+        _email_executor.submit(
+            _deliver_email,
             subject='Reset Your Halal Korea Password',
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
+            plain_message=plain_message,
             html_message=html_message,
-            fail_silently=False,
+            recipient=user.email,
+            success_log=f"Password reset email sent to {user.email} for user {user.username} from IP {user_ip}",
+            error_log=f"Failed to send password reset email to {user.email}",
         )
-        
-        logger.info(f"Password reset email sent to {user.email} for user {user.username} from IP {user_ip}")
         return True
         
     except Exception as e:
-        logger.error(f"Failed to send password reset email to {user.email}: {str(e)}")
+        logger.error(f"Failed to queue password reset email to {user.email}: {str(e)}")
         return False

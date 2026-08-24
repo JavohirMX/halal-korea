@@ -334,7 +334,7 @@ def activate_account(request, uidb64, token):
                 'error_message': error_message
             })
             
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+    except (TypeError, ValueError, OverflowError, UnicodeDecodeError, User.DoesNotExist) as e:
         logger.error(f"Error during account activation: {str(e)}")
         error_message = 'Invalid activation link. Please request a new activation email.'
         return render(request, 'users/activation_result.html', {
@@ -502,7 +502,7 @@ def password_reset_confirm(request, uidb64, token):
                 'error_message': error_message
             })
             
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
+    except (TypeError, ValueError, OverflowError, UnicodeDecodeError, User.DoesNotExist) as e:
         logger.error(f"Error during password reset confirmation: {str(e)}")
         error_message = 'Invalid password reset link. Please request a new password reset.'
         return render(request, 'users/password_reset_invalid.html', {
