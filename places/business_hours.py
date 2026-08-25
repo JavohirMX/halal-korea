@@ -194,7 +194,7 @@ def get_place_status(place) -> Dict[str, Any]:
     current_time = now.time()
     
     # Get today's time slots
-    today_slots = list(business_hours.time_slots.filter(day_of_week=current_day))
+    today_slots = [slot for slot in business_hours.time_slots.all() if slot.day_of_week == current_day]
     
     # Check if day is explicitly closed
     if any(slot.is_closed for slot in today_slots):
@@ -290,12 +290,13 @@ def get_place_status(place) -> Dict[str, Any]:
 
 def _get_next_opening(business_hours, current_day: int, current_time: time) -> Optional[Dict]:
     """Find the next opening time within the next 7 days."""
+    all_slots = list(business_hours.time_slots.all())
     for day_offset in range(7):
         check_day = (current_day + day_offset) % 7
-        slots = business_hours.time_slots.filter(
-            day_of_week=check_day,
-            is_closed=False
-        ).order_by('open_time')
+        slots = [
+            slot for slot in all_slots
+            if slot.day_of_week == check_day and not slot.is_closed
+        ]
         
         for slot in slots:
             if slot.open_time:
@@ -345,8 +346,8 @@ def get_today_hours(place) -> str:
     now = get_korea_time()
     current_day = now.weekday()
     
-    slots = list(business_hours.time_slots.filter(day_of_week=current_day))
-    
+    slots = [slot for slot in business_hours.time_slots.all() if slot.day_of_week == current_day]
+
     if not slots:
         return "Hours not set"
     
@@ -389,7 +390,8 @@ def get_weekly_hours(place) -> List[Dict[str, Any]]:
     current_day = now.weekday()
     
     weekly = []
-    
+    all_slots = list(business_hours.time_slots.all())
+
     for day_num in range(7):
         day_data = {
             'day_num': day_num,
@@ -399,11 +401,11 @@ def get_weekly_hours(place) -> List[Dict[str, Any]]:
             'is_closed': False,
             'hours': ''
         }
-        
+
         if business_hours.is_24_hours:
             day_data['hours'] = '24 Hours'
         else:
-            slots = list(business_hours.time_slots.filter(day_of_week=day_num))
+            slots = [slot for slot in all_slots if slot.day_of_week == day_num]
             
             if not slots:
                 day_data['hours'] = 'Not set'

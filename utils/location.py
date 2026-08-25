@@ -1,3 +1,6 @@
+import threading
+import time
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -13,6 +16,35 @@ IP_LOCATION_FAILURE_CACHE_TIMEOUT = (
     300  # 5 minutes for failed lookups (prevents hammering)
 )
 IP_API_TIMEOUT = 5  # Reduced timeout for faster failover
+
+# Process-level cache for the server's own public IP (behind proxy/private networks)
+PUBLIC_IP_CACHE_TIMEOUT = 21600  # 6 hours for successful lookups
+PUBLIC_IP_FAILURE_CACHE_TIMEOUT = 600  # 10 minutes for failed lookups
+_public_ip_cache = {"ip": None, "fetched_at": 0.0}
+_public_ip_lock = threading.Lock()
+
+# Non-page paths/extensions and User-Agent tokens that must never trigger
+# external geolocation lookups
+NON_PAGE_PATHS = ("/robots.txt", "/sitemap.xml", "/favicon.ico")
+NON_PAGE_PATH_SUFFIXES = (
+    ".php",
+    ".env",
+    ".git",
+    ".yaml",
+    ".yml",
+    ".json",
+)
+BOT_USER_AGENT_TOKENS = (
+    "bot",
+    "crawl",
+    "spider",
+    "slurp",
+    "curl",
+    "wget",
+    "python-requests",
+    "jscrawler",
+    "headless",
+)
 
 
 def _is_private_or_internal_ip(ip):
@@ -60,6 +92,63 @@ def _create_session_with_retries(retries=2, backoff_factor=0.3):
     return session
 
 
+def is_bot_or_non_page_request(request):
+    """
+    Check if a request comes from a bot/crawler or targets a non-page path
+    (robots.txt, sitemaps, favicons, scanner probes). Such requests should
+    skip IP geolocation entirely to avoid blocking external HTTP calls.
+    """
+    path = request.path.lower()
+
+    if path in NON_PAGE_PATHS or path.startswith("/.well-known"):
+        return True
+
+    if path.endswith(NON_PAGE_PATH_SUFFIXES):
+        return True
+
+    user_agent = (request.META.get("HTTP_USER_AGENT") or "").lower()
+    return any(token in user_agent for token in BOT_USER_AGENT_TOKENS)
+
+
+def _get_public_ip():
+    """
+    Fetch the server's public IP from ipify with process-level caching.
+    Successful lookups are cached for 6 hours and failures for 10 minutes,
+    so the external service is contacted at most once per TTL per process.
+    """
+    now = time.time()
+    with _public_ip_lock:
+        cached_ip = _public_ip_cache["ip"]
+        if cached_ip:
+            ttl = (
+                PUBLIC_IP_FAILURE_CACHE_TIMEOUT
+                if cached_ip == "UNKNOWN"
+                else PUBLIC_IP_CACHE_TIMEOUT
+            )
+            if now - _public_ip_cache["fetched_at"] < ttl:
+                logger.debug(f"Using cached public IP: {cached_ip}")
+                return cached_ip
+
+        try:
+            response = requests.get("https://api64.ipify.org?format=json", timeout=5)
+            public_ip = response.json().get("ip")
+            if public_ip:
+                logger.info(f"Public IP fetched for geolocation: {public_ip}")
+            else:
+                logger.warning("Failed to get public IP from ipify service")
+                public_ip = "UNKNOWN"
+        except requests.RequestException as e:
+            logger.error(f"Failed to fetch public IP: {str(e)}")
+            public_ip = "UNKNOWN"
+        except Exception as e:
+            logger.error(f"Unexpected error fetching public IP: {str(e)}")
+            public_ip = "UNKNOWN"
+
+        _public_ip_cache["ip"] = public_ip
+        _public_ip_cache["fetched_at"] = now
+        return public_ip
+
+
 def get_client_ip(request):
     """Extracts the client's IP address from the request."""
     logger.debug("Extracting client IP address from request")
@@ -78,23 +167,7 @@ def get_client_ip(request):
         logger.debug(
             f"Private/internal IP detected ({ip}), fetching public IP for geolocation"
         )
-        try:
-            response = requests.get("https://api64.ipify.org?format=json", timeout=5)
-            public_ip = response.json().get("ip")
-            if public_ip:
-                logger.info(
-                    f"Public IP fetched for geolocation: {public_ip} (original: {ip})"
-                )
-                ip = public_ip
-            else:
-                logger.warning("Failed to get public IP from ipify service")
-                ip = "UNKNOWN"
-        except requests.RequestException as e:
-            logger.error(f"Failed to fetch public IP: {str(e)}")
-            ip = "UNKNOWN"
-        except Exception as e:
-            logger.error(f"Unexpected error fetching public IP: {str(e)}")
-            ip = "UNKNOWN"
+        ip = _get_public_ip()
 
     logger.debug(f"Final client IP determined: {ip}")
     return ip

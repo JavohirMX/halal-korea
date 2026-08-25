@@ -123,10 +123,12 @@ def home(request):
                 extra={"sort_method": "rating", "user_type": "international"},
             )
 
+        featured_places = list(featured_places)
+
         logger.info(
             "Home page rendered successfully",
             extra={
-                "featured_places_count": featured_places.count(),
+                "featured_places_count": len(featured_places),
                 "is_in_korea": is_in_korea,
             },
         )
@@ -915,7 +917,8 @@ def place_detail(request, pk):
             Prefetch(
                 "reviews",
                 queryset=Review.objects.select_related("user").order_by("-created_at"),
-            )
+            ),
+            "business_hours__time_slots",
         )
         .first()
     )

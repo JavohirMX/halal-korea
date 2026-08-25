@@ -1,4 +1,8 @@
-from utils.location import get_client_ip, get_ip_location
+from utils.location import (
+    get_client_ip,
+    get_ip_location,
+    is_bot_or_non_page_request,
+)
 import time
 import logging
 
@@ -94,6 +98,11 @@ def get_user_location(request):
     Returns a dictionary with location information.
     Enhanced to better handle international users.
     """
+    # Skip external lookups entirely for bots and non-page requests
+    if is_bot_or_non_page_request(request):
+        logger.debug("Bot or non-page request detected, using fallback location")
+        return {"city": "Unknown", "country": "Unknown", "is_fallback": True}
+
     # Development override for testing international users
     if request.GET.get("force_international"):
         return {
@@ -186,6 +195,11 @@ def update_user_location(request, location_data):
     Enhanced to fill in missing country information for coordinates.
     location_data should be a dictionary containing at least 'city' or both 'lat' and 'lng'.
     """
+    # Skip reverse geocoding and session writes for bots and non-page requests
+    if is_bot_or_non_page_request(request):
+        logger.debug("Bot or non-page request detected, skipping location update")
+        return {"is_fallback": True}
+
     logger.info(f"Updating user location with data: {location_data}")
 
     location = {"timestamp": time.time()}

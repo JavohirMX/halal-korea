@@ -12,6 +12,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+NON_PAGE_PATH_SUFFIXES = ('.php', '.env', '.git', '.yaml', '.yml', '.asp', '.aspx', '.jsp', '.cgi')
+BOT_PROBE_PATHS = ('/robots.txt', '/sitemap.xml', '/favicon.ico', '/.well-known/traffic-advice')
+
 
 class MonitoringMiddleware:
     """
@@ -35,6 +38,10 @@ class MonitoringMiddleware:
             path.startswith('/media/') or 
             path.startswith('/favicon.ico') or
             path.startswith('/robots.txt')):
+            return self.get_response(request)
+        
+        # Skip monitoring for obvious bot/scanner probes
+        if path.endswith(NON_PAGE_PATH_SUFFIXES) or path in BOT_PROBE_PATHS:
             return self.get_response(request)
         
         # Start timing
@@ -139,7 +146,7 @@ class MonitoringMiddleware:
                 # Create log entry
                 RequestLog.objects.create(
                     path=request.path[:500],  # Truncate long paths
-                    method=request.method,
+                    method=request.method[:10],
                     status_code=response.status_code if response else 500,
                     response_time_ms=response_time_ms,
                     user=user,
@@ -149,7 +156,7 @@ class MonitoringMiddleware:
                     db_query_count=query_count,
                     cache_hits=cache_hits,
                     cache_misses=cache_misses,
-                    error_type=error_type or '',
+                    error_type=(error_type or '')[:100],
                     error_message=error_message or ''
                 )
             except Exception as e:
