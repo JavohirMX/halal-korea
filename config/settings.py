@@ -840,6 +840,17 @@ JAZZMIN_SETTINGS = {
         "feedback",
         "prayer_times",
     ],
+    # Custom sidebar links (Email hub under Users)
+    "custom_links": {
+        "users": [
+            {
+                "name": "Email",
+                "url": "/admin/email/",
+                "icon": "fas fa-envelope",
+                "permissions": ["users.change_user"],
+            }
+        ]
+    },
     # Custom icons for apps/models
     "icons": {
         "auth": "fas fa-users-cog",
@@ -891,7 +902,7 @@ JAZZMIN_SETTINGS = {
     # UI Tweaks #
     #############
     # Relative paths to custom CSS/JS
-    "custom_css": None,
+    "custom_css": "admin/css/compose_email.css",
     "custom_js": None,
     # Whether to show the UI customizer on the sidebar
     "show_ui_builder": True,
@@ -917,6 +928,12 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
         {"name": "View Site", "url": "/", "new_window": False},
         {"name": "Monitoring", "url": "/admin/monitoring/", "new_window": False},
+        {
+            "name": "Email",
+            "url": "/admin/email/",
+            "new_window": False,
+            "icon": "fas fa-envelope",
+        },
         {
             "name": "Data Management",
             "url": "/admin/places/data-management/",

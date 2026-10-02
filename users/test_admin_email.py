@@ -293,3 +293,127 @@ class AdminComposeEmailViewTests(TestCase):
         action = AdminAction.objects.filter(action_type='email_users').latest('timestamp')
         self.assertEqual(action.changes['sent'], 1)
         self.assertGreaterEqual(action.changes['skipped'], 1)
+
+    def test_compose_uses_theme_token_css(self):
+        self._login_admin()
+        response = self.client.get(self.compose_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'admin/css/compose_email.css')
+        self.assertNotContains(response, '#f0fdf4')
+        self.assertNotContains(response, '#64748b')
+
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class AdminEmailHubTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin = User.objects.create_superuser(
+            username='admin',
+            email='admin@example.com',
+            password='adminpass123',
+        )
+        self.staff_no_perm = User.objects.create_user(
+            username='staffer',
+            email='staffer@example.com',
+            password='staffpass123',
+            is_staff=True,
+        )
+        self.u1 = User.objects.create_user(
+            username='u1',
+            email='u1@example.com',
+            password='pass12345',
+            email_verified=True,
+            preferred_language='en',
+            is_active=True,
+        )
+        self.hub_url = reverse('admin_email:hub')
+        self.compose_hub_url = reverse('admin_email:compose')
+
+    def _login_admin(self):
+        self.client.login(username='admin', password='adminpass123')
+
+    def test_hub_requires_login(self):
+        response = self.client.get(self.hub_url)
+        # staff_member_required redirects to login; some setups surface 404
+        self.assertIn(response.status_code, [302, 404])
+        self.assertNotEqual(response.status_code, 200)
+
+    def test_hub_permission_denied_without_change_user(self):
+        self.client.login(username='staffer', password='staffpass123')
+        response = self.client.get(self.hub_url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_hub_ok_with_change_user(self):
+        perm = Permission.objects.get(codename='change_user', content_type__app_label='users')
+        self.staff_no_perm.user_permissions.add(perm)
+        self.client.login(username='staffer', password='staffpass123')
+        response = self.client.get(self.hub_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Compose')
+        self.assertContains(response, 'Recent sends')
+        self.assertContains(response, 'admin/css/compose_email.css')
+
+    def test_hub_compose_tab_renders_form(self):
+        self._login_admin()
+        response = self.client.get(f'{self.hub_url}?tab=compose')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Send email')
+        self.assertContains(response, 'name="subject"')
+
+    def test_hub_recent_tab_shows_email_actions(self):
+        self._login_admin()
+        AdminAction.objects.create(
+            admin_user=self.admin,
+            action_type='email_users',
+            object_repr='Email users (broadcast): Hello',
+            changes={
+                'subject': 'Hello hub',
+                'mode': 'broadcast',
+                'recipient_count': 3,
+                'sent': 3,
+                'skipped': 0,
+                'failed': 0,
+            },
+            ip_hash='abcd1234',
+        )
+        response = self.client.get(f'{self.hub_url}?tab=recent')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Hello hub')
+        self.assertContains(response, 'admin')
+        self.assertContains(response, '3')
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_hub_compose_sends_and_redirects_to_recent(self, _mock_submit):
+        self._login_admin()
+        response = self.client.post(
+            f'{self.hub_url}?tab=compose&user_id={self.u1.pk}',
+            {
+                'user_id': str(self.u1.pk),
+                'subject': 'Hub subject',
+                'message': 'Hello from hub',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/admin/email/', response.url)
+        self.assertIn('tab=recent', response.url)
+        self.assertEqual(len(mail.outbox), 1)
+        action = AdminAction.objects.filter(action_type='email_users').latest('timestamp')
+        self.assertEqual(action.changes['subject'], 'Hub subject')
+
+    def test_compose_path_redirects_to_hub_preserving_params(self):
+        self._login_admin()
+        response = self.client.get(f'{self.compose_hub_url}?user_id={self.u1.pk}')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/admin/email/', response.url)
+        self.assertIn('tab=compose', response.url)
+        self.assertIn(f'user_id={self.u1.pk}', response.url)
+
+    def test_users_shortcuts_still_present(self):
+        self._login_admin()
+        changelist = self.client.get(reverse('admin:users_user_changelist'))
+        self.assertEqual(changelist.status_code, 200)
+        self.assertContains(changelist, 'Compose email')
+        change = self.client.get(reverse('admin:users_user_change', args=[self.u1.pk]))
+        self.assertEqual(change.status_code, 200)
+        self.assertContains(change, 'Send email')
+        self.assertContains(change, f'user_id={self.u1.pk}')

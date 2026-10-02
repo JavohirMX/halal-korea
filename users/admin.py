@@ -59,7 +59,7 @@ class UserAdmin(admin.ModelAdmin):
 
     email_selected_users.short_description = 'Email selected users'
 
-    def compose_email_view(self, request):
+    def compose_email_view(self, request, hub_mode=False, recent_sends=None):
         if not request.user.has_perm('users.change_user'):
             raise PermissionDenied
 
@@ -127,6 +127,8 @@ class UserAdmin(admin.ModelAdmin):
                         f"Skipped {result['skipped']}, failed {result['failed']}."
                     ),
                 )
+                if hub_mode:
+                    return HttpResponseRedirect(f"{reverse('admin_email:hub')}?tab=recent")
                 return HttpResponseRedirect(reverse('admin:users_user_changelist'))
 
         # Preview for GET and re-rendered POST forms
@@ -148,7 +150,7 @@ class UserAdmin(admin.ModelAdmin):
 
         context = {
             **self.admin_site.each_context(request),
-            'title': 'Compose email',
+            'title': 'Email' if hub_mode else 'Compose email',
             'opts': self.model._meta,
             'form': form,
             'mode': mode,
@@ -162,8 +164,12 @@ class UserAdmin(admin.ModelAdmin):
             'large_send_threshold': LARGE_SEND_THRESHOLD,
             'has_view_permission': self.has_view_permission(request),
             'has_change_permission': self.has_change_permission(request),
+            'from_hub': hub_mode,
+            'tab': 'compose',
+            'recent_sends': recent_sends or [],
         }
-        return render(request, 'admin/users/compose_email.html', context)
+        template = 'admin/email/hub.html' if hub_mode else 'admin/users/compose_email.html'
+        return render(request, template, context)
 
     def _resolve_mode(self, user_id, ids_param):
         if user_id:

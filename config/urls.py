@@ -32,6 +32,8 @@ from config.sitemaps import sitemaps
 urlpatterns = [
     # --- Monitoring Dashboard URLs (MUST come before admin URLs) ---
     path("admin/monitoring/", include("utils.monitoring_urls", namespace="monitoring")),
+    # --- Admin Email Hub (MUST come before admin URLs) ---
+    path("admin/email/", include("users.email_urls", namespace="admin_email")),
     # --- Data Management URLs (MUST come before admin URLs to avoid catch_all) ---
     path(
         "admin/places/data-management/",

@@ -1,0 +1,172 @@
+/* Admin compose email + Email hub — theme-token styles (Jazzmin light/dark) */
+
+.compose-email,
+.email-hub {
+    max-width: 900px;
+    margin: 20px auto;
+    color: var(--body-fg, inherit);
+}
+
+.email-hub {
+    max-width: 960px;
+}
+
+.compose-email .card,
+.email-hub .card {
+    background: var(--body-bg, transparent);
+    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    color: var(--body-fg, inherit);
+}
+
+.compose-email h1,
+.email-hub h1 {
+    margin-top: 0;
+    color: var(--body-fg, inherit);
+}
+
+.compose-email .form-row,
+.email-hub .form-row {
+    margin-bottom: 18px;
+}
+
+.compose-email label,
+.email-hub label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--body-fg, inherit);
+}
+
+.compose-email .help,
+.email-hub .help {
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.compose-email .form-control,
+.compose-email input[type="text"],
+.compose-email textarea,
+.compose-email select,
+.email-hub .form-control,
+.email-hub input[type="text"],
+.email-hub textarea,
+.email-hub select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.compose-email .filters-grid,
+.email-hub .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.compose-email .summary,
+.email-hub .summary {
+    background: rgba(40, 167, 69, 0.12);
+    border: 1px solid rgba(40, 167, 69, 0.35);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    color: var(--body-fg, inherit);
+}
+
+.compose-email .summary strong,
+.email-hub .summary strong {
+    color: var(--body-fg, inherit);
+}
+
+.compose-email .summary .warning-text,
+.email-hub .summary .warning-text {
+    color: var(--warning, #ffc107);
+}
+
+.compose-email .errorlist,
+.email-hub .errorlist {
+    color: var(--danger, #dc3545);
+    margin: 4px 0 8px;
+    padding-left: 18px;
+}
+
+.compose-email .actions,
+.email-hub .actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.compose-email .preview-list,
+.email-hub .preview-list {
+    font-size: 0.9rem;
+    color: var(--body-fg, inherit);
+    max-height: 160px;
+    overflow: auto;
+}
+
+/* Hub tabs */
+.email-hub-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    padding-bottom: 0;
+}
+
+.email-hub-tabs a {
+    display: inline-block;
+    padding: 10px 16px;
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.email-hub-tabs a:hover {
+    color: var(--body-fg, inherit);
+}
+
+.email-hub-tabs a.active {
+    color: var(--body-fg, inherit);
+    border-bottom-color: var(--primary, #007bff);
+    font-weight: 600;
+}
+
+/* Recent sends table */
+.email-hub .recent-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--body-fg, inherit);
+}
+
+.email-hub .recent-table th,
+.email-hub .recent-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    vertical-align: top;
+}
+
+.email-hub .recent-table th {
+    font-weight: 600;
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.email-hub .recent-table .muted {
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    font-size: 0.85rem;
+}
+
+.email-hub .empty-state {
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    padding: 24px 0;
+}

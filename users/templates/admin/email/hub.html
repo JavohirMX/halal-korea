@@ -1,0 +1,79 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/compose_email.css' %}">
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin_email:hub' %}">{% trans 'Email' %}</a>
+    {% if tab == 'compose' %}
+        &rsaquo; {% trans 'Compose' %}
+    {% else %}
+        &rsaquo; {% trans 'Recent sends' %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="email-hub">
+    <h1>{% trans "Email" %}</h1>
+
+    <nav class="email-hub-tabs" aria-label="{% trans 'Email sections' %}">
+        <a href="{% url 'admin_email:hub' %}?tab=compose{% if user_id %}&amp;user_id={{ user_id }}{% endif %}{% if ids %}&amp;ids={{ ids }}{% endif %}"
+           class="{% if tab == 'compose' %}active{% endif %}">
+            {% trans "Compose" %}
+        </a>
+        <a href="{% url 'admin_email:hub' %}?tab=recent"
+           class="{% if tab == 'recent' %}active{% endif %}">
+            {% trans "Recent sends" %}
+        </a>
+    </nav>
+
+    {% if tab == 'compose' %}
+        {% include "admin/users/_compose_email_form.html" %}
+    {% else %}
+        <div class="card">
+            <h2 style="margin-top:0;">{% trans "Recent sends" %}</h2>
+            {% if recent_sends %}
+                <table class="recent-table">
+                    <thead>
+                        <tr>
+                            <th>{% trans "When" %}</th>
+                            <th>{% trans "Subject" %}</th>
+                            <th>{% trans "Recipients" %}</th>
+                            <th>{% trans "Admin" %}</th>
+                            <th>{% trans "Result" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for action in recent_sends %}
+                        <tr>
+                            <td>
+                                {{ action.timestamp|date:"Y-m-d H:i" }}
+                                <div class="muted">{{ action.changes.mode|default:"" }}</div>
+                            </td>
+                            <td>{{ action.changes.subject|default:action.object_repr }}</td>
+                            <td>{{ action.changes.recipient_count|default:"—" }}</td>
+                            <td>{{ action.admin_user.username }}</td>
+                            <td>
+                                <span class="muted">
+                                    {% blocktrans with sent=action.changes.sent|default:0 skipped=action.changes.skipped|default:0 failed=action.changes.failed|default:0 %}sent {{ sent }}, skipped {{ skipped }}, failed {{ failed }}{% endblocktrans %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="empty-state">{% trans "No emails have been sent yet." %}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
