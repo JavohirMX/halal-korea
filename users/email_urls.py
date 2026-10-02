@@ -12,4 +12,6 @@ app_name = 'admin_email'
 urlpatterns = [
     path('', admin_email_views.email_hub, name='hub'),
     path('compose/', admin_email_views.email_compose, name='compose'),
+    path('api/preview/', admin_email_views.email_preview, name='preview'),
+    path('api/users/', admin_email_views.email_user_search, name='user_search'),
 ]

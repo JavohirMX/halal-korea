@@ -25,7 +25,7 @@
     <h1>{% trans "Email" %}</h1>
 
     <nav class="email-hub-tabs" aria-label="{% trans 'Email sections' %}">
-        <a href="{% url 'admin_email:hub' %}?tab=compose{% if user_id %}&amp;user_id={{ user_id }}{% endif %}{% if ids %}&amp;ids={{ ids }}{% endif %}"
+        <a href="{% url 'admin_email:hub' %}?tab=compose"
            class="{% if tab == 'compose' %}active{% endif %}">
             {% trans "Compose" %}
         </a>
@@ -38,6 +38,11 @@
     {% if tab == 'compose' %}
         {% include "admin/users/_compose_email_form.html" %}
     {% else %}
+        <div class="email-compose-actions">
+            <a href="{% url 'admin_email:hub' %}?tab=compose" class="btn btn-info">
+                <i class="fa fa-envelope"></i> &nbsp; {% trans "Compose" %}
+            </a>
+        </div>
         <div class="card">
             <h2 style="margin-top:0;">{% trans "Recent sends" %}</h2>
             {% if recent_sends %}
@@ -56,7 +61,7 @@
                         <tr>
                             <td>
                                 {{ action.timestamp|date:"Y-m-d H:i" }}
-                                <div class="muted">{{ action.changes.mode|default:"" }}</div>
+                                <div class="muted">{{ action.changes.audience_label|default:action.changes.mode|default:"" }}</div>
                             </td>
                             <td>{{ action.changes.subject|default:action.object_repr }}</td>
                             <td>{{ action.changes.recipient_count|default:"—" }}</td>

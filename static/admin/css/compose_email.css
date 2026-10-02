@@ -1,7 +1,8 @@
 /* Admin compose email + Email hub — theme-token styles (Jazzmin light/dark) */
 
 .compose-email,
-.email-hub {
+.email-hub,
+.email-compose {
     max-width: 900px;
     margin: 20px auto;
     color: var(--body-fg, inherit);
@@ -12,7 +13,8 @@
 }
 
 .compose-email .card,
-.email-hub .card {
+.email-hub .card,
+.email-compose .card {
     background: var(--body-bg, transparent);
     border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
     border-radius: 8px;
@@ -169,4 +171,287 @@
 .email-hub .empty-state {
     color: var(--secondary, var(--body-quiet-color, #6c757d));
     padding: 24px 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Audience picker                                                     */
+/* ------------------------------------------------------------------ */
+
+.email-compose .card-title {
+    margin: 0 0 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.email-compose .panel-title {
+    margin: 20px 0 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--body-fg, inherit);
+}
+
+.email-compose .audience-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.email-compose .audience-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0;
+    padding: 12px 14px;
+    font-weight: 400;
+    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.email-compose .audience-option:hover {
+    border-color: var(--primary, #007bff);
+}
+
+/* Keyboard focus should land on the whole row, not just the radio glyph. */
+.email-compose .audience-option:has(input:focus-visible) {
+    outline: 2px solid var(--primary, #007bff);
+    outline-offset: 2px;
+}
+
+.email-compose .audience-option:has(input:checked) {
+    border-color: var(--primary, #007bff);
+    background: var(--selected-bg, rgba(0, 123, 255, 0.08));
+}
+
+.email-compose .audience-option input[type="radio"] {
+    margin: 3px 0 0;
+    flex: 0 0 auto;
+}
+
+.email-compose .audience-option-text {
+    line-height: 1.4;
+}
+
+.email-compose .audience-panel {
+    margin-top: 20px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
+}
+
+.email-compose .audience-panel[hidden] {
+    display: none;
+}
+
+.email-compose .addresses-row {
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+.email-compose .addresses-row.is-required label::after {
+    content: " *";
+    color: var(--danger, #dc3545);
+}
+
+/* ------------------------------------------------------------------ */
+/* User chips + typeahead                                              */
+/* ------------------------------------------------------------------ */
+
+.email-compose .user-picker {
+    position: relative;
+}
+
+.email-compose .typeahead-results {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    right: 0;
+    margin: 4px 0 0;
+    padding: 4px 0;
+    list-style: none;
+    max-height: 280px;
+    overflow-y: auto;
+    background: var(--body-bg, #fff);
+    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.email-compose .typeahead-results[hidden] {
+    display: none;
+}
+
+.email-compose .typeahead-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color, rgba(128, 128, 128, 0.15));
+}
+
+.email-compose .typeahead-item:last-child {
+    border-bottom: none;
+}
+
+.email-compose .typeahead-item:hover {
+    background: var(--selected-bg, rgba(0, 123, 255, 0.08));
+}
+
+.email-compose .typeahead-name {
+    font-weight: 600;
+    color: var(--body-fg, inherit);
+}
+
+.email-compose .typeahead-email,
+.email-compose .typeahead-warn,
+.email-compose .typeahead-empty {
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    font-size: 0.85rem;
+}
+
+.email-compose .typeahead-warn {
+    margin-left: auto;
+    color: var(--warning, #ffc107);
+}
+
+.email-compose .typeahead-empty {
+    padding: 8px 14px;
+}
+
+.email-compose .chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.email-compose .chip-list:empty {
+    display: none;
+}
+
+.email-compose .chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 8px 6px 12px;
+    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    border-radius: 999px;
+    background: var(--body-bg, transparent);
+    font-size: 0.88rem;
+}
+
+.email-compose .chip[data-has-email="0"],
+.email-compose .chip-warning {
+    border-color: var(--warning, #ffc107);
+}
+
+/* Single-user panel chips are informational — nothing to remove. */
+.email-compose .audience-panel[data-audience-panel="single"] .chip {
+    background: var(--body-bg, transparent);
+}
+
+.email-compose .chip-label {
+    font-weight: 600;
+    color: var(--body-fg, inherit);
+}
+
+.email-compose .chip-email {
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+}
+
+.email-compose .chip-remove {
+    border: none;
+    background: transparent;
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0 4px;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.email-compose .chip-remove:hover {
+    color: var(--danger, #dc3545);
+}
+
+/* ------------------------------------------------------------------ */
+/* Live summary + typed confirmation                                    */
+/* ------------------------------------------------------------------ */
+
+.email-compose .summary .summary-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.email-compose .summary .summary-label {
+    font-weight: 600;
+}
+
+.email-compose .summary .summary-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary, #007bff);
+    line-height: 1.2;
+}
+
+.email-compose .summary .summary-loading {
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    font-size: 0.85rem;
+}
+
+.email-compose .summary .summary-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 0;
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    font-size: 0.9rem;
+}
+
+.email-compose .summary .summary-chip {
+    padding: 2px 10px;
+    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
+.email-compose .summary .preview-list {
+    margin: 12px 0 0;
+    padding-left: 20px;
+}
+
+.email-compose .summary .preview-list:empty {
+    display: none;
+}
+
+.email-compose .summary .preview-more {
+    margin: 8px 0 0;
+}
+
+.email-compose .confirm-card[hidden] {
+    display: none;
+}
+
+.email-compose .confirm-card {
+    border-color: var(--warning, #ffc107);
+}
+
+.email-compose .confirm-card .warning-text {
+    margin: 0 0 14px;
+    color: var(--warning, #ffc107);
+    font-weight: 600;
+}
+
+.email-compose .confirm-card input {
+    max-width: 240px;
+}
+
+.email-compose .actions .discard-draft {
+    margin-left: auto;
+    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    font-size: 0.9rem;
 }

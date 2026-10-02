@@ -11,7 +11,7 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-    &rsaquo; <a href="{% url 'admin:users_user_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; <a href="{% url 'admin_email:hub' %}">{% trans 'Email' %}</a>
     &rsaquo; {% trans 'Compose email' %}
 </div>
 {% endblock %}

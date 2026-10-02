@@ -1,121 +1,212 @@
-{% load i18n %}
-{# Shared compose form body — used by Users compose page and Email hub #}
+{% load i18n static %}
+{# Shared compose form body — used by the Email hub compose tab and the Users compose page #}
 
-<div class="summary">
-    <p>
-        <strong>{% trans "Mode" %}:</strong>
-        {% if mode == 'single' %}{% trans "Single user" %}
-        {% elif mode == 'selected' %}{% trans "Selected users" %}
-        {% else %}{% trans "Broadcast / filtered" %}{% endif %}
-    </p>
-    <p>
-        <strong>{% trans "Estimated recipients" %}:</strong> {{ recipient_count }}
-        {% if skipped_count %}
-            &middot; <span>{% blocktrans count counter=skipped_count %}{{ counter }} user skipped (no email){% plural %}{{ counter }} users skipped (no email){% endblocktrans %}</span>
-        {% endif %}
-        {% if ad_hoc_count %}
-            &middot; {% blocktrans count counter=ad_hoc_count %}{{ counter }} additional address{% plural %}{{ counter }} additional addresses{% endblocktrans %}
-        {% endif %}
-    </p>
-    {% if recipient_count > large_send_threshold %}
-        <p class="warning-text">{% blocktrans with n=large_send_threshold %}More than {{ n }} recipients — confirmation required.{% endblocktrans %}</p>
-    {% endif %}
-    {% if preview_recipients %}
-        <div class="preview-list">
-            <strong>{% trans "Preview" %}:</strong>
-            <ul>
-                {% for r in preview_recipients %}
-                    <li>{{ r.email }}{% if r.name %} ({{ r.name }}){% endif %}</li>
-                {% endfor %}
-                {% if recipient_count > preview_recipients|length %}
-                    <li>… {% blocktrans with n=recipient_count %}and more ({{ n }} total){% endblocktrans %}</li>
-                {% endif %}
-            </ul>
-        </div>
-    {% endif %}
-</div>
+<div class="email-compose">
 
-<form method="post" novalidate>
-    {% csrf_token %}
-    {% if user_id %}<input type="hidden" name="user_id" value="{{ user_id }}">{% endif %}
-    {% if ids %}<input type="hidden" name="ids" value="{{ ids }}">{% endif %}
+    <form method="post" novalidate id="email-compose-form">
+        {% csrf_token %}
+        {{ form.user_id }}
+        {{ form.selected_user_ids }}
 
-    <div class="card">
         {% if form.non_field_errors %}
             <ul class="errorlist">{{ form.non_field_errors }}</ul>
         {% endif %}
 
-        <div class="form-row">
-            <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
-            {{ form.subject.errors }}
-            {{ form.subject }}
-        </div>
+        {# ---------- Audience ---------- #}
+        <div class="card">
+            <h2 class="card-title">{% trans "Recipients" %}</h2>
 
-        <div class="form-row">
-            <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
-            {{ form.message.errors }}
-            {{ form.message }}
-        </div>
-
-        <div class="form-row">
-            <label>
-                {{ form.send_as_html }} {{ form.send_as_html.label }}
-            </label>
-            {% if form.send_as_html.help_text %}<p class="help">{{ form.send_as_html.help_text }}</p>{% endif %}
-        </div>
-
-        <div class="form-row">
-            <label for="{{ form.additional_emails.id_for_label }}">{{ form.additional_emails.label }}</label>
-            {{ form.additional_emails.errors }}
-            {{ form.additional_emails }}
-            {% if form.additional_emails.help_text %}<p class="help">{{ form.additional_emails.help_text }}</p>{% endif %}
-        </div>
-    </div>
-
-    {% if mode == 'broadcast' %}
-    <div class="card">
-        <h2 style="margin-top:0;">{% trans "Recipient filters" %}</h2>
-        <div class="filters-grid">
-            <div class="form-row">
-                <label for="{{ form.filter_is_active.id_for_label }}">{{ form.filter_is_active.label }}</label>
-                {{ form.filter_is_active }}
+            {{ form.audience_mode.errors }}
+            <div class="audience-picker" role="radiogroup" aria-label="{{ form.audience_mode.label }}">
+                {% for radio in form.audience_mode %}
+                    <label class="audience-option" for="{{ radio.id }}">
+                        {{ radio.tag }}
+                        <span class="audience-option-text">{{ radio.choice_label }}</span>
+                    </label>
+                {% endfor %}
             </div>
-            <div class="form-row">
-                <label for="{{ form.filter_email_verified.id_for_label }}">{{ form.filter_email_verified.label }}</label>
-                {{ form.filter_email_verified }}
+            {% if form.audience_mode.help_text %}
+                <p class="help">{{ form.audience_mode.help_text }}</p>
+            {% endif %}
+
+            <p class="help warning-text" id="all-mode-note" {% if audience_mode != 'all' %}hidden{% endif %}>
+                {% trans "Every user with an email address will be included. The filters below are ignored." %}
+            </p>
+
+            {# Segment filters — only meaningful for the segment mode #}
+            <div class="audience-panel" data-audience-panel="segment" {% if audience_mode != 'segment' %}hidden{% endif %}>
+                <h3 class="panel-title">{% trans "Filters" %}</h3>
+                <div class="filters-grid">
+                    <div class="form-row">
+                        <label for="{{ form.filter_is_active.id_for_label }}">{{ form.filter_is_active.label }}</label>
+                        {{ form.filter_is_active }}
+                    </div>
+                    <div class="form-row">
+                        <label for="{{ form.filter_email_verified.id_for_label }}">{{ form.filter_email_verified.label }}</label>
+                        {{ form.filter_email_verified }}
+                    </div>
+                    <div class="form-row">
+                        <label for="{{ form.filter_preferred_language.id_for_label }}">{{ form.filter_preferred_language.label }}</label>
+                        {{ form.filter_preferred_language }}
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            {{ form.include_staff }} {{ form.include_staff.label }}
+                        </label>
+                        {% if form.include_staff.help_text %}<p class="help">{{ form.include_staff.help_text }}</p>{% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="form-row">
-                <label for="{{ form.filter_preferred_language.id_for_label }}">{{ form.filter_preferred_language.label }}</label>
-                {{ form.filter_preferred_language }}
+
+            {# Specific users — search-as-you-type chips #}
+            <div class="audience-panel" data-audience-panel="users" {% if audience_mode != 'users' %}hidden{% endif %}>
+                <h3 class="panel-title">{% trans "Pick users" %}</h3>
+                <div class="user-picker">
+                    <input type="text"
+                           class="form-control"
+                           id="user-search-input"
+                           placeholder="{% trans 'Search by name, username or email…' %}"
+                           autocomplete="off"
+                           role="combobox"
+                           aria-expanded="false"
+                           aria-controls="user-search-results">
+                    <ul class="typeahead-results" id="user-search-results" role="listbox" hidden></ul>
+                </div>
+                <ul class="chip-list" id="user-chips">
+                    {% for row in selected_users %}
+                        <li class="chip" data-user-id="{{ row.id }}"{% if not row.has_email %} data-has-email="0"{% endif %}>
+                            <span class="chip-label">{{ row.name }}</span>
+                            <span class="chip-email">{{ row.email|default:_("no email — will be skipped") }}</span>
+                            <button type="button" class="chip-remove" aria-label="{% trans 'Remove' %}">&times;</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% if form.selected_user_ids.errors %}
+                    <ul class="errorlist">{{ form.selected_user_ids.errors }}</ul>
+                {% endif %}
+                <p class="help">{% trans "Users without an email address are counted as skipped." %}</p>
             </div>
+
+            {# Single user — arrives via ?user_id= from the change form #}
+            <div class="audience-panel" data-audience-panel="single" {% if audience_mode != 'single' %}hidden{% endif %}>
+                <h3 class="panel-title">{% trans "Single user" %}</h3>
+                <ul class="chip-list">
+                    {% for row in selected_users %}
+                        <li class="chip" data-user-id="{{ row.id }}"{% if not row.has_email %} data-has-email="0"{% endif %}>
+                            <span class="chip-label">{{ row.name }}</span>
+                            <span class="chip-email">{{ row.email|default:_("no email — will be skipped") }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="chip chip-warning" data-has-email="0">
+                            <span class="chip-label">{% trans "No user selected" %}</span>
+                            <span class="chip-email">{% trans "open this page from a user's change form" %}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {{ form.user_id.errors }}
+            </div>
+
+            {# Manual addresses — explained here, edited in the addresses card below #}
+            <div class="audience-panel" data-audience-panel="manual" {% if audience_mode != 'manual' %}hidden{% endif %}>
+                <h3 class="panel-title">{% trans "Manual addresses" %}</h3>
+                <p class="help">{% trans "Use the Addresses field below — it becomes required and is your only recipient source in this mode." %}</p>
+            </div>
+
+            {# Addresses — additive in every mode except manual, where it is the sole source #}
+            <div class="form-row addresses-row{% if audience_mode == 'manual' %} is-required{% endif %}" id="addresses-row">
+                <label for="{{ form.additional_emails.id_for_label }}">{% trans "Addresses" %}</label>
+                {{ form.additional_emails.errors }}
+                {{ form.additional_emails }}
+                <p class="help" id="addresses-help">
+                    {% if audience_mode == 'manual' %}
+                        {% trans "Required in this mode. Comma- or newline-separated; they do not need to be registered users." %}
+                    {% else %}
+                        {% trans "Optional. Comma- or newline-separated; they do not need to be registered users." %}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        {# ---------- Message ---------- #}
+        <div class="card">
+            <h2 class="card-title">{% trans "Message" %}</h2>
+
+            <div class="form-row">
+                <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+                {{ form.subject.errors }}
+                {{ form.subject }}
+            </div>
+
+            <div class="form-row">
+                <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+                {{ form.message.errors }}
+                {{ form.message }}
+            </div>
+
             <div class="form-row">
                 <label>
-                    {{ form.include_staff }} {{ form.include_staff.label }}
+                    {{ form.send_as_html }} {{ form.send_as_html.label }}
                 </label>
-                {% if form.include_staff.help_text %}<p class="help">{{ form.include_staff.help_text }}</p>{% endif %}
+                {% if form.send_as_html.help_text %}<p class="help">{{ form.send_as_html.help_text }}</p>{% endif %}
             </div>
         </div>
-        <p class="help">{% trans "Change filters and refresh the page (GET) to update the preview count, or submit to send." %}</p>
-    </div>
-    {% endif %}
 
-    {% if recipient_count > large_send_threshold or form.confirm_large_send.errors %}
-    <div class="card">
-        <div class="form-row">
-            <label>
-                {{ form.confirm_large_send }} {{ form.confirm_large_send.label }}
-            </label>
-            {{ form.confirm_large_send.errors }}
+        {# ---------- Live audience summary ---------- #}
+        <div class="card summary" id="compose-summary">
+            <div class="summary-head">
+                <span class="summary-label">{% trans "Recipients" %}</span>
+                <span class="summary-count" id="recipient-count">{{ recipient_count }}</span>
+                <span class="summary-loading" id="preview-loading" hidden aria-live="polite">{% trans "updating…" %}</span>
+            </div>
+
+            <p class="summary-meta" id="recipient-meta">
+                <span class="summary-mode" id="recipient-mode">{{ audience_mode_label }}</span>
+                {% if skipped_count %}
+                    <span class="summary-chip" id="meta-skipped">
+                        {% blocktrans count counter=skipped_count %}{{ counter }} user skipped (no email){% plural %}{{ counter }} users skipped (no email){% endblocktrans %}
+                    </span>
+                {% endif %}
+                {% if ad_hoc_count %}
+                    <span class="summary-chip" id="meta-adhoc">
+                        {% blocktrans count counter=ad_hoc_count %}{{ counter }} additional address{% plural %}{{ counter }} additional addresses{% endblocktrans %}
+                    </span>
+                {% endif %}
+            </p>
+
+            <ul class="preview-list" id="preview-recipients">
+                {% for r in preview_recipients %}
+                    <li>{{ r.email }}{% if r.name %} ({{ r.name }}){% endif %}</li>
+                {% endfor %}
+            </ul>
+            <p class="help preview-more" id="preview-more"
+               {% if recipient_count <= preview_sample_size %}hidden{% endif %}>
+                {% blocktrans with n=recipient_count %}and more ({{ n }} total){% endblocktrans %}
+            </p>
         </div>
-    </div>
-    {% endif %}
 
-    <div class="actions">
-        <input type="submit" class="default" value="{% trans 'Send email' %}">
-        {% if from_hub %}
+        {# ---------- Typed confirmation ---------- #}
+        <div class="card confirm-card" id="confirm-card"
+             {% if not needs_confirmation and not form.confirm_send_count.errors %}hidden{% endif %}>
+            <p class="warning-text" id="confirm-warning">
+                {% blocktrans with n=recipient_count %}This reaches {{ n }} recipients. Type the number below to confirm.{% endblocktrans %}
+            </p>
+            <div class="form-row">
+                <label for="{{ form.confirm_send_count.id_for_label }}">{{ form.confirm_send_count.label }}</label>
+                {{ form.confirm_send_count.errors }}
+                {{ form.confirm_send_count }}
+                {% if form.confirm_send_count.help_text %}
+                    <p class="help">{{ form.confirm_send_count.help_text }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="actions">
+            <input type="submit" class="default" value="{% trans 'Send email' %}">
             <a href="{% url 'admin_email:hub' %}?tab=recent">{% trans 'Cancel' %}</a>
-        {% else %}
-            <a href="{% url 'admin:users_user_changelist' %}">{% trans 'Cancel' %}</a>
-        {% endif %}
-    </div>
-</form>
+            <a href="{% url 'admin_email:hub' %}?tab=compose&amp;discard=1" class="discard-draft" id="discard-draft">{% trans 'Discard draft' %}</a>
+        </div>
+    </form>
+
+    {{ compose_js_config|json_script:"email-compose-config" }}
+    <script src="{% static 'admin/js/email_compose.js' %}" defer></script>
+</div>
