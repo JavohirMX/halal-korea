@@ -1,0 +1,203 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:users_user_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; {% trans 'Compose email' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+.compose-email {
+    max-width: 820px;
+    margin: 20px auto;
+}
+.compose-email .card {
+    background: var(--body-bg, #fff);
+    border: 1px solid var(--border-color, #e1e5e9);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+.compose-email h1 {
+    margin-top: 0;
+}
+.compose-email .form-row {
+    margin-bottom: 18px;
+}
+.compose-email label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.compose-email .help {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+.compose-email .form-control,
+.compose-email input[type="text"],
+.compose-email textarea,
+.compose-email select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.compose-email .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+.compose-email .summary {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+.compose-email .summary strong {
+    color: #166534;
+}
+.compose-email .errorlist {
+    color: #b91c1c;
+    margin: 4px 0 8px;
+    padding-left: 18px;
+}
+.compose-email .actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 24px;
+}
+.compose-email .preview-list {
+    font-size: 0.9rem;
+    color: #374151;
+    max-height: 160px;
+    overflow: auto;
+}
+</style>
+
+<div class="compose-email">
+    <h1>{% trans "Compose email" %}</h1>
+
+    <div class="summary">
+        <p>
+            <strong>{% trans "Mode" %}:</strong>
+            {% if mode == 'single' %}{% trans "Single user" %}
+            {% elif mode == 'selected' %}{% trans "Selected users" %}
+            {% else %}{% trans "Broadcast / filtered" %}{% endif %}
+        </p>
+        <p>
+            <strong>{% trans "Estimated recipients" %}:</strong> {{ recipient_count }}
+            {% if skipped_count %}
+                &middot; <span>{% blocktrans count counter=skipped_count %}{{ counter }} user skipped (no email){% plural %}{{ counter }} users skipped (no email){% endblocktrans %}</span>
+            {% endif %}
+            {% if ad_hoc_count %}
+                &middot; {% blocktrans count counter=ad_hoc_count %}{{ counter }} additional address{% plural %}{{ counter }} additional addresses{% endblocktrans %}
+            {% endif %}
+        </p>
+        {% if recipient_count > large_send_threshold %}
+            <p style="color:#92400e;">{% blocktrans with n=large_send_threshold %}More than {{ n }} recipients — confirmation required.{% endblocktrans %}</p>
+        {% endif %}
+        {% if preview_recipients %}
+            <div class="preview-list">
+                <strong>{% trans "Preview" %}:</strong>
+                <ul>
+                    {% for r in preview_recipients %}
+                        <li>{{ r.email }}{% if r.name %} ({{ r.name }}){% endif %}</li>
+                    {% endfor %}
+                    {% if recipient_count > preview_recipients|length %}
+                        <li>… {% blocktrans with n=recipient_count %}and more ({{ n }} total){% endblocktrans %}</li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% if user_id %}<input type="hidden" name="user_id" value="{{ user_id }}">{% endif %}
+        {% if ids %}<input type="hidden" name="ids" value="{{ ids }}">{% endif %}
+
+        <div class="card">
+            {% if form.non_field_errors %}
+                <ul class="errorlist">{{ form.non_field_errors }}</ul>
+            {% endif %}
+
+            <div class="form-row">
+                <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+                {{ form.subject.errors }}
+                {{ form.subject }}
+            </div>
+
+            <div class="form-row">
+                <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+                {{ form.message.errors }}
+                {{ form.message }}
+            </div>
+
+            <div class="form-row">
+                <label>
+                    {{ form.send_as_html }} {{ form.send_as_html.label }}
+                </label>
+                {% if form.send_as_html.help_text %}<p class="help">{{ form.send_as_html.help_text }}</p>{% endif %}
+            </div>
+
+            <div class="form-row">
+                <label for="{{ form.additional_emails.id_for_label }}">{{ form.additional_emails.label }}</label>
+                {{ form.additional_emails.errors }}
+                {{ form.additional_emails }}
+                {% if form.additional_emails.help_text %}<p class="help">{{ form.additional_emails.help_text }}</p>{% endif %}
+            </div>
+        </div>
+
+        {% if mode == 'broadcast' %}
+        <div class="card">
+            <h2 style="margin-top:0;">{% trans "Recipient filters" %}</h2>
+            <div class="filters-grid">
+                <div class="form-row">
+                    <label for="{{ form.filter_is_active.id_for_label }}">{{ form.filter_is_active.label }}</label>
+                    {{ form.filter_is_active }}
+                </div>
+                <div class="form-row">
+                    <label for="{{ form.filter_email_verified.id_for_label }}">{{ form.filter_email_verified.label }}</label>
+                    {{ form.filter_email_verified }}
+                </div>
+                <div class="form-row">
+                    <label for="{{ form.filter_preferred_language.id_for_label }}">{{ form.filter_preferred_language.label }}</label>
+                    {{ form.filter_preferred_language }}
+                </div>
+                <div class="form-row">
+                    <label>
+                        {{ form.include_staff }} {{ form.include_staff.label }}
+                    </label>
+                    {% if form.include_staff.help_text %}<p class="help">{{ form.include_staff.help_text }}</p>{% endif %}
+                </div>
+            </div>
+            <p class="help">{% trans "Change filters and refresh the page (GET) to update the preview count, or submit to send." %}</p>
+        </div>
+        {% endif %}
+
+        {% if recipient_count > large_send_threshold or form.confirm_large_send.errors %}
+        <div class="card">
+            <div class="form-row">
+                <label>
+                    {{ form.confirm_large_send }} {{ form.confirm_large_send.label }}
+                </label>
+                {{ form.confirm_large_send.errors }}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="actions">
+            <input type="submit" class="default" value="{% trans 'Send email' %}">
+            <a href="{% url 'admin:users_user_changelist' %}">{% trans 'Cancel' %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

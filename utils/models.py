@@ -125,6 +125,7 @@ class AdminAction(models.Model):
         ('reject', 'Reject'),
         ('archive', 'Archive'),
         ('bulk_action', 'Bulk Action'),
+        ('email_users', 'Email Users'),
     ]
     
     timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
