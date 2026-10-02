@@ -274,9 +274,9 @@ class AlertManagerTests(TestCase):
         self.assertEqual(notification.severity, 'critical')
     
     @override_settings(ALERT_TELEGRAM_ENABLED=True, TELEGRAM_BOT_TOKEN='test', TELEGRAM_CHAT_ID='123')
-    @patch('utils.telegram_notifications.send_telegram_notification')
+    @patch('utils.telegram_notifications.send_telegram_message')
     def test_send_telegram_alert_calls_telegram(self, mock_send):
-        """Test that Telegram alert sends message."""
+        """Test that Telegram alert sends via real send helper with HTML formatter."""
         rule = AlertRule.objects.create(
             name='Test Alert',
             condition='error_rate_above',
@@ -284,11 +284,17 @@ class AlertManagerTests(TestCase):
             enabled=True
         )
         
-        context = {'error_rate': '10%', 'severity': 'high'}
-        self.manager._send_telegram_alert(rule, 'Test message', context)
+        context = {'error_rate': '10%', 'severity': 'critical', 'link': '/admin/monitoring/'}
+        self.manager._send_telegram_alert(rule, 'unused plain message', context)
         
-        # Should have attempted to send
-        self.assertTrue(mock_send.called or True)  # Always pass for now
+        self.assertTrue(mock_send.called)
+        sent = mock_send.call_args[0][0]
+        self.assertIn('Test Alert', sent)
+        self.assertIn('#halalkorea', sent)
+        self.assertIn('#monitoring', sent)
+        self.assertIn('#critical', sent)
+        self.assertIn('<code>CRITICAL</code>', sent)
+        self.assertIn('error_rate: 10%', sent)
     
     @override_settings(ALERT_EMAIL_ENABLED=True, ALERT_EMAIL_RECIPIENTS=['admin@test.com'])
     @patch('django.core.mail.send_mail')
@@ -327,6 +333,8 @@ class AlertManagerTests(TestCase):
         self.assertIn('Test Alert', message)
         self.assertIn('error_rate', message)
         self.assertIn('10%', message)
+        # Plain text for email/in-app — no Markdown bold markers
+        self.assertNotIn('**', message)
 
 
 class CheckAlertsHelperTests(TestCase):

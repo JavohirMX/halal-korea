@@ -144,18 +144,22 @@ class Command(BaseCommand):
 
     def _send_to_telegram(self, backup_path):
         """Send backup file to Telegram channel via local Bot API server"""
+        from utils.telegram_notifications import format_telegram_message
+
         url = f'{self.telegram_api_base_url}/bot{self.bot_token}/sendDocument'
         
         # Prepare file info
         file_size_mb = self._get_file_size_mb(backup_path)
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        
-        caption = (
-            f"🗄️ <b>Halal Korea Database Backup</b>\n"
-            f"📅 <b>Date:</b> {timestamp}\n"
-            f"📊 <b>Size:</b> {file_size_mb:.2f} MB\n"
-            f"🏷️ <b>Database:</b> {self.db_config['NAME']}\n"
-            f"✅ <b>Status:</b> Success"
+
+        caption = format_telegram_message(
+            'Halal Korea Database Backup',
+            [
+                f"📊 Size: {file_size_mb:.2f} MB",
+                f"🏷️ Database: {self.db_config['NAME']}",
+                '✅ Status: Success',
+            ],
+            severity='info',
+            category='backup',
         )
 
         # Note: Using local Telegram Bot API server removes the 50MB limit (supports up to 2GB)
@@ -179,14 +183,18 @@ class Command(BaseCommand):
 
     def _send_error_notification(self, error_message):
         """Send error notification to Telegram"""
+        from utils.telegram_notifications import format_telegram_message
+
         url = f'{self.telegram_api_base_url}/bot{self.bot_token}/sendMessage'
-        
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        message = (
-            f"🚨 <b>Halal Korea Backup Error</b>\n"
-            f"📅 <b>Time:</b> {timestamp}\n"
-            f"❌ <b>Error:</b> {error_message}\n"
-            f"🏷️ <b>Database:</b> {self.db_config['NAME']}"
+
+        message = format_telegram_message(
+            'Halal Korea Backup Error',
+            [
+                f"❌ Error: {error_message}",
+                f"🏷️ Database: {self.db_config['NAME']}",
+            ],
+            severity='critical',
+            category='backup',
         )
 
         try:

@@ -36,6 +36,7 @@ class SystemMetric(models.Model):
         ('active_users', 'Active Users'),
         ('api_call_count', 'External API Call Count'),
         ('api_latency', 'External API Latency'),
+        ('aggregation_heartbeat', 'Aggregation Heartbeat'),
     ]
     
     timestamp = models.DateTimeField(db_index=True)

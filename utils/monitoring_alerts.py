@@ -102,36 +102,55 @@ class AlertManager:
                 logger.error(f"Failed to send alert via {channel}: {e}", exc_info=True)
     
     def _format_alert_message(self, rule, context):
-        """Format alert message with context data."""
-        message = f"**{rule.name}**\n\n"
+        """Format plain-text alert message with context data (email / in-app)."""
+        message = f"{rule.name}\n\n"
         message += f"Condition: {rule.get_condition_display()}\n"
         message += f"Threshold: {rule.threshold}\n\n"
         
         if context:
             message += "Details:\n"
             for key, value in context.items():
+                if key in ('severity', 'link'):
+                    continue
                 message += f"• {key}: {value}\n"
         
         return message
+
+    def _format_telegram_alert_body(self, rule, context):
+        """Build body lines for the shared Telegram HTML formatter."""
+        lines = [
+            f"Condition: {rule.get_condition_display()}",
+            f"Threshold: {rule.threshold}",
+        ]
+        if context:
+            for key, value in context.items():
+                if key in ('severity', 'link'):
+                    continue
+                lines.append(f"{key}: {value}")
+        return lines
     
     def _send_telegram_alert(self, rule, message, context):
-        """Send alert via Telegram."""
+        """Send alert via Telegram (HTML + hashtags)."""
         if not getattr(settings, 'ALERT_TELEGRAM_ENABLED', False):
             return
         
         try:
-            from utils.telegram_notifications import send_telegram_message
-            
-            # Add severity emoji
-            severity_emoji = {
-                'low': 'ℹ️',
-                'medium': '⚠️',
-                'high': '🔴',
-                'critical': '🚨'
-            }
-            emoji = severity_emoji.get(context.get('severity', 'medium'), '⚠️')
-            
-            telegram_message = f"{emoji} *ALERT*\n\n{message}"
+            from utils.telegram_notifications import (
+                format_telegram_message,
+                send_telegram_message,
+            )
+
+            severity = context.get('severity', 'medium') if context else 'medium'
+            link = context.get('link') if context else None
+
+            telegram_message = format_telegram_message(
+                rule.name,
+                self._format_telegram_alert_body(rule, context),
+                severity=severity,
+                category='monitoring',
+                link=link or '/admin/monitoring/',
+                link_text='Open dashboard',
+            )
             send_telegram_message(telegram_message)
             logger.info(f"Telegram alert sent for rule: {rule.name}")
         except Exception as e:

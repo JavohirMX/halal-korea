@@ -1,13 +1,16 @@
 """
 Management command to check monitoring system health.
 """
+import hashlib
+from datetime import timedelta
+
+from django.core.cache import cache
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.conf import settings
-from datetime import timedelta
 from utils.models import RequestLog, SecurityEvent, SystemMetric, AlertRule
 from utils.monitoring_emails import send_critical_alert
-from utils.telegram_notifications import send_telegram_notification
+from utils.telegram_notifications import format_telegram_message, send_telegram_notification
 
 
 # Default thresholds from settings (can be overridden via AlertRules)
@@ -198,31 +201,73 @@ class Command(BaseCommand):
             }
     
     def _check_metrics_freshness(self, hours):
-        """Check if metrics are being aggregated regularly."""
+        """
+        Check if metrics are being aggregated regularly.
+
+        Only warn when request logs exist but metrics are stale. An idle site
+        (no request logs) is healthy even without recent metrics — though
+        aggregate_metrics now always writes a heartbeat when cron runs.
+        """
         cutoff = timezone.now() - timedelta(hours=hours * 2)  # Check last 2x hours
         recent_metrics = SystemMetric.objects.filter(timestamp__gte=cutoff).count()
-        
-        if recent_metrics == 0:
+        recent_logs = RequestLog.objects.filter(timestamp__gte=cutoff).count()
+
+        if recent_metrics == 0 and recent_logs > 0:
             return {
                 'status': 'warning',
                 'message': 'No recent system metrics - Run aggregate_metrics command'
+            }
+        elif recent_metrics == 0:
+            return {
+                'status': 'ok',
+                'message': 'No recent metrics (site idle — no request logs)'
             }
         else:
             return {
                 'status': 'ok',
                 'message': f'System metrics up to date ({recent_metrics} recent metrics)'
             }
+
+    def _alert_cooldown_seconds(self, severity):
+        """Return cooldown window in seconds for the given severity."""
+        if severity == 'critical':
+            hours = getattr(settings, 'MONITORING_HEALTH_ALERT_COOLDOWN_CRITICAL_HOURS', 1)
+        else:
+            hours = getattr(settings, 'MONITORING_HEALTH_ALERT_COOLDOWN_WARNING_HOURS', 6)
+        return max(int(hours), 0) * 3600
+
+    def _alert_cache_key(self, severity, messages):
+        """Cache key keyed by severity + content hash so new issue sets still alert."""
+        content = '|'.join(sorted(messages))
+        digest = hashlib.sha256(content.encode('utf-8')).hexdigest()[:16]
+        return f'monitoring_health_alert:{severity}:{digest}'
     
     def _send_health_alert(self, severity, messages):
-        """Send health alert via configured channels."""
+        """Send health alert via configured channels, with cache-based cooldown."""
+        cache_key = self._alert_cache_key(severity, messages)
+        cooldown = self._alert_cooldown_seconds(severity)
+
+        if cooldown > 0 and cache.get(cache_key):
+            self.stdout.write(
+                self.style.WARNING(
+                    f'  → Alert suppressed (cooldown active for this {severity} issue set)'
+                )
+            )
+            return
+
         if severity == 'critical':
             title = 'Monitoring System Health: CRITICAL ISSUES'
-            emoji = '🚨'
         else:
             title = 'Monitoring System Health: Warnings'
-            emoji = '⚠️'
-        
-        message_text = f"{emoji} {title}\n\n" + "\n".join(f"• {msg}" for msg in messages)
+
+        telegram_text = format_telegram_message(
+            title,
+            messages,
+            severity=severity,
+            category='monitoring',
+            link='/admin/monitoring/',
+            link_text='Open dashboard',
+        )
         
         # Send email if enabled
         if getattr(settings, 'ALERT_EMAIL_ENABLED', False):
@@ -239,7 +284,10 @@ class Command(BaseCommand):
         # Send Telegram if enabled
         if getattr(settings, 'ALERT_TELEGRAM_ENABLED', False):
             try:
-                send_telegram_notification(message_text)
+                send_telegram_notification(telegram_text)
                 self.stdout.write('  → Alert sent to Telegram')
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'  → Failed to send Telegram: {e}'))
+
+        if cooldown > 0:
+            cache.set(cache_key, True, timeout=cooldown)

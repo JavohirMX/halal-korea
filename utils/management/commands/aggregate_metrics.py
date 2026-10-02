@@ -46,9 +46,16 @@ class Command(BaseCommand):
         
         total_logs = logs.count()
         self.stdout.write(f'Found {total_logs} request logs to aggregate')
-        
+
+        # Always write a heartbeat so health checks know aggregation ran,
+        # even when the site was idle (0 request logs).
+        self._write_aggregation_heartbeat(start_time, total_logs)
+
         if total_logs == 0:
-            self.stdout.write(self.style.WARNING('No logs to aggregate'))
+            self.stdout.write(self.style.WARNING('No logs to aggregate (heartbeat written)'))
+            if cleanup:
+                self._cleanup_old_logs()
+            self.stdout.write(self.style.SUCCESS('Metric aggregation completed successfully'))
             return
         
         # Aggregate metrics
@@ -62,6 +69,17 @@ class Command(BaseCommand):
             self._cleanup_old_logs()
         
         self.stdout.write(self.style.SUCCESS('Metric aggregation completed successfully'))
+    
+    def _write_aggregation_heartbeat(self, timestamp, log_count):
+        """Record that aggregation ran, even with zero request logs."""
+        SystemMetric.objects.create(
+            timestamp=timestamp,
+            metric_type='aggregation_heartbeat',
+            metric_name='aggregate_metrics',
+            value=float(log_count),
+            metadata={'aggregation': 'hourly', 'log_count': log_count}
+        )
+        self.stdout.write(f'  ✓ Aggregation heartbeat written (logs={log_count})')
     
     def _aggregate_request_metrics(self, logs, timestamp):
         """Aggregate total request counts."""

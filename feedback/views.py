@@ -83,19 +83,29 @@ def submit_feedback(request):
         # Send Telegram notification for low ratings (1-2 stars)
         if rating <= 2:
             try:
+                from utils.telegram_notifications import format_telegram_message
+
                 user_str = feedback.user.username if feedback.user else f"Anonymous-{feedback.session_id[:8]}"
-                message = (
-                    f"⚠️ <b>Low Feedback Rating Alert</b>\n\n"
-                    f"<b>Rating:</b> {'⭐' * rating} ({rating}/5)\n"
-                    f"<b>User:</b> {user_str}\n"
-                    f"<b>Page:</b> {feedback.page_type}\n"
-                    f"<b>URL:</b> {feedback.page_url}\n"
-                )
+                body_lines = [
+                    f"Rating: {'⭐' * rating} ({rating}/5)",
+                    f"User: {user_str}",
+                    f"Page: {feedback.page_type}",
+                    f"URL: {feedback.page_url}",
+                ]
                 if feedback.comment:
-                    message += f"\n<b>Comment:</b>\n{feedback.comment}\n"
-                
-                message += f"\n<b>Language:</b> {feedback.language} | <b>Device:</b> {feedback.device_type}"
-                
+                    body_lines.append('')
+                    body_lines.append(f"Comment: {feedback.comment}")
+                body_lines.append('')
+                body_lines.append(
+                    f"Language: {feedback.language} | Device: {feedback.device_type}"
+                )
+
+                message = format_telegram_message(
+                    'Low Feedback Rating Alert',
+                    body_lines,
+                    severity='warning',
+                    category='feedback',
+                )
                 send_telegram_notification(message)
             except Exception as e:
                 logger.warning(f"Failed to send Telegram notification for feedback: {e}")

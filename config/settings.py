@@ -710,6 +710,12 @@ MONITORING_HEALTH_RESPONSE_TIME_WARNING = config(
 MONITORING_HEALTH_SECURITY_EVENTS_WARNING = config(
     "MONITORING_HEALTH_SECURITY_EVENTS_WARNING", default=5, cast=int
 )  # Unresolved high-severity events
+MONITORING_HEALTH_ALERT_COOLDOWN_WARNING_HOURS = config(
+    "MONITORING_HEALTH_ALERT_COOLDOWN_WARNING_HOURS", default=6, cast=int
+)  # Suppress duplicate warning health alerts
+MONITORING_HEALTH_ALERT_COOLDOWN_CRITICAL_HOURS = config(
+    "MONITORING_HEALTH_ALERT_COOLDOWN_CRITICAL_HOURS", default=1, cast=int
+)  # Suppress duplicate critical health alerts
 
 # Google Analytics Configuration (for dashboard metrics - uses GA4 Data API)
 # To enable GA integration:

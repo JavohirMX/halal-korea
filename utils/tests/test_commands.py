@@ -3,11 +3,11 @@ Tests for monitoring management commands.
 """
 from django.test import TestCase, override_settings
 from django.core.management import call_command
+from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from django.contrib.gis.geos import Point
-from utils.models import RequestLog, SystemMetric, AlertRule, SecurityEvent
-from places.models import HalalPlace
+from utils.models import RequestLog, SystemMetric, AlertRule
+from utils.management.commands.check_monitoring_health import Command as HealthCommand
 from io import StringIO
 from unittest.mock import patch
 
@@ -86,6 +86,36 @@ class AggregateMetricsCommandTests(TestCase):
         # Should handle gracefully
         self.assertIn('0', output)
 
+    def test_aggregate_metrics_writes_heartbeat_with_no_logs(self):
+        """Idle runs still write an aggregation_heartbeat SystemMetric."""
+        self.assertEqual(SystemMetric.objects.count(), 0)
+
+        call_command('aggregate_metrics', stdout=StringIO())
+
+        heartbeat = SystemMetric.objects.filter(
+            metric_type='aggregation_heartbeat',
+            metric_name='aggregate_metrics',
+        )
+        self.assertEqual(heartbeat.count(), 1)
+        self.assertEqual(heartbeat.first().value, 0.0)
+
+    def test_aggregate_metrics_writes_heartbeat_with_logs(self):
+        """Heartbeat is written alongside normal aggregation."""
+        now = timezone.now()
+        for _ in range(3):
+            RequestLog.objects.create(
+                path='/test/', method='GET', status_code=200,
+                response_time_ms=100, ip_hash='test', timestamp=now
+            )
+
+        call_command('aggregate_metrics', stdout=StringIO())
+
+        heartbeat = SystemMetric.objects.get(
+            metric_type='aggregation_heartbeat',
+            metric_name='aggregate_metrics',
+        )
+        self.assertEqual(heartbeat.value, 3.0)
+
 
 class CheckAlertsCommandTests(TestCase):
     """Test check_alerts management command."""
@@ -141,6 +171,9 @@ class CheckAlertsCommandTests(TestCase):
 
 class CheckMonitoringHealthCommandTests(TestCase):
     """Test check_monitoring_health management command."""
+
+    def setUp(self):
+        cache.clear()
     
     def test_check_monitoring_health_command_runs(self):
         """Test that check_monitoring_health command runs successfully."""
@@ -165,6 +198,93 @@ class CheckMonitoringHealthCommandTests(TestCase):
         output = out.getvalue()
         # Should indicate healthy or show some health status
         self.assertTrue('health' in output.lower())
+
+    def test_metrics_freshness_ok_when_idle_no_metrics(self):
+        """Idle site (no logs, no metrics) should not warn about freshness."""
+        cmd = HealthCommand()
+        result = cmd._check_metrics_freshness(hours=1)
+        self.assertEqual(result['status'], 'ok')
+        self.assertIn('idle', result['message'].lower())
+
+    def test_metrics_freshness_warns_when_logs_exist_but_metrics_stale(self):
+        """Warn only when request logs exist but metrics are missing/stale."""
+        RequestLog.objects.create(
+            path='/test/', method='GET', status_code=200,
+            response_time_ms=100, ip_hash='test', user_agent_hash='test',
+            timestamp=timezone.now()
+        )
+        cmd = HealthCommand()
+        result = cmd._check_metrics_freshness(hours=1)
+        self.assertEqual(result['status'], 'warning')
+        self.assertIn('No recent system metrics', result['message'])
+
+    def test_metrics_freshness_ok_with_heartbeat(self):
+        """Heartbeat metrics satisfy freshness even with request logs."""
+        now = timezone.now()
+        RequestLog.objects.create(
+            path='/test/', method='GET', status_code=200,
+            response_time_ms=100, ip_hash='test', user_agent_hash='test',
+            timestamp=now
+        )
+        SystemMetric.objects.create(
+            timestamp=now,
+            metric_type='aggregation_heartbeat',
+            metric_name='aggregate_metrics',
+            value=1.0,
+        )
+        cmd = HealthCommand()
+        result = cmd._check_metrics_freshness(hours=1)
+        self.assertEqual(result['status'], 'ok')
+
+    @override_settings(
+        ALERT_TELEGRAM_ENABLED=True,
+        ALERT_EMAIL_ENABLED=False,
+        MONITORING_HEALTH_ALERT_COOLDOWN_WARNING_HOURS=6,
+        MONITORING_HEALTH_ALERT_COOLDOWN_CRITICAL_HOURS=1,
+    )
+    @patch('utils.management.commands.check_monitoring_health.send_telegram_notification')
+    def test_health_alert_cooldown_suppresses_duplicate(self, mock_telegram):
+        """Same warning issue set is only sent once within cooldown window."""
+        cmd = HealthCommand()
+        messages = ['No recent system metrics - Run aggregate_metrics command']
+
+        cmd._send_health_alert('warning', messages)
+        cmd._send_health_alert('warning', messages)
+
+        self.assertEqual(mock_telegram.call_count, 1)
+
+    @override_settings(
+        ALERT_TELEGRAM_ENABLED=True,
+        ALERT_EMAIL_ENABLED=False,
+        MONITORING_HEALTH_ALERT_COOLDOWN_WARNING_HOURS=6,
+    )
+    @patch('utils.management.commands.check_monitoring_health.send_telegram_notification')
+    def test_health_alert_new_issue_set_bypasses_cooldown(self, mock_telegram):
+        """Content-hash means a different warning set still alerts."""
+        cmd = HealthCommand()
+
+        cmd._send_health_alert('warning', ['Issue A'])
+        cmd._send_health_alert('warning', ['Issue B'])
+
+        self.assertEqual(mock_telegram.call_count, 2)
+
+    @override_settings(
+        ALERT_TELEGRAM_ENABLED=True,
+        ALERT_EMAIL_ENABLED=False,
+        MONITORING_HEALTH_ALERT_COOLDOWN_CRITICAL_HOURS=1,
+    )
+    @patch('utils.management.commands.check_monitoring_health.send_telegram_notification')
+    def test_health_alert_uses_formatter_hashtags(self, mock_telegram):
+        """Health alerts use shared formatter with monitoring hashtags."""
+        cmd = HealthCommand()
+        cmd._send_health_alert('critical', ['No request logs in the last 1 hour(s)'])
+
+        self.assertTrue(mock_telegram.called)
+        sent = mock_telegram.call_args[0][0]
+        self.assertIn('#halalkorea', sent)
+        self.assertIn('#monitoring', sent)
+        self.assertIn('#critical', sent)
+        self.assertIn('<code>CRITICAL</code>', sent)
 
 
 class SendDailyDigestCommandTests(TestCase):
@@ -233,4 +353,3 @@ class CommandIntegrationTests(TestCase):
         
         # Should complete without errors
         self.assertTrue(True)
-

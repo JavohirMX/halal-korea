@@ -1558,38 +1558,46 @@ def _send_suggestion_notification(
 ):
     """Send Telegram notification for new suggestions"""
     try:
-        # Prepare notification message
         total_suggestions = (
             len(field_suggestions)
             + len(image_suggestions)
             + (1 if hours_suggestion else 0)
         )
 
-        message = (
-            "<b>🔔 New Place Edit Suggestions</b>\n\n"
-            f"<b>Place:</b> {place.name}\n"
-            f"<b>Submitted by:</b> {user.username}\n"
-            f"<b>Total suggestions:</b> {total_suggestions}\n\n"
-        )
+        body_lines = [
+            f"Place: {place.name}",
+            f"Submitted by: {user.username}",
+            f"Total suggestions: {total_suggestions}",
+        ]
 
         if field_suggestions:
-            message += f"<b>Field edits:</b> {len(field_suggestions)}\n"
-            for suggestion in field_suggestions[:3]:  # Show first 3
-                message += f" • {suggestion.get_field_name_display()}\n"
+            body_lines.append(f"Field edits: {len(field_suggestions)}")
+            for suggestion in field_suggestions[:3]:
+                body_lines.append(f" • {suggestion.get_field_name_display()}")
             if len(field_suggestions) > 3:
-                message += f" • ... and {len(field_suggestions) - 3} more\n"
+                body_lines.append(
+                    f" • ... and {len(field_suggestions) - 3} more"
+                )
 
         if image_suggestions:
-            message += f"<b>Images:</b> {len(image_suggestions)}\n"
+            body_lines.append(f"Images: {len(image_suggestions)}")
 
         if hours_suggestion:
-            message += "<b>Business Hours:</b> Updated\n"
+            body_lines.append("Business Hours: Updated")
 
-        message += "\nPlease review in <a href='https://halal-korea.com/admin/places/'>admin panel</a>."
+        from utils.telegram_notifications import (
+            format_telegram_message,
+            send_telegram_notification,
+        )
 
-        # Send notification (reuse existing notification system)
-        from utils.telegram_notifications import send_telegram_notification
-
+        message = format_telegram_message(
+            'New Place Edit Suggestions',
+            body_lines,
+            severity='info',
+            category='suggestions',
+            link='/admin/places/',
+            link_text='Review in admin panel',
+        )
         send_telegram_notification(message)
 
     except Exception as e:
