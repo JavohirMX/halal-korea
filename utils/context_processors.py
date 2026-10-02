@@ -42,3 +42,8 @@ def static_info_context(request):
             info[key] = None
     
     return {'STATIC_INFO': info}
+
+
+def turnstile_context(request):
+    """Expose Cloudflare Turnstile sitekey to all templates."""
+    return {"TURNSTILE_SITEKEY": settings.TURNSTILE_SITEKEY}

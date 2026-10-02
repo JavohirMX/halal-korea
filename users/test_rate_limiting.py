@@ -1,7 +1,9 @@
 """
 Tests for rate limiting functionality
 """
-from django.test import TestCase, Client
+from unittest.mock import patch
+
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
@@ -9,7 +11,14 @@ from users.rate_limiting import RateLimiter
 
 User = get_user_model()
 
+TURNSTILE_TOKEN = "test-turnstile-token"
+TURNSTILE_SETTINGS = {
+    "TURNSTILE_SITEKEY": "1x00000000000000000000AA",
+    "TURNSTILE_SECRET": "1x0000000000000000000000000000000AA",
+}
 
+
+@override_settings(**TURNSTILE_SETTINGS)
 class RateLimitingTestCase(TestCase):
     """Test rate limiting functionality"""
     
@@ -26,7 +35,8 @@ class RateLimitingTestCase(TestCase):
             email_verified=False
         )
     
-    def test_email_rate_limiting(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_email_rate_limiting(self, mock_verify):
         """Test email sending rate limiting"""
         # Clear cache to start fresh
         cache.clear()
@@ -34,20 +44,23 @@ class RateLimitingTestCase(TestCase):
         # Try to send multiple emails quickly (should hit rate limit)
         url = reverse('users:resend_activation')
         
-        # Send multiple requests - eventually should hit rate limit
+        # Anonymous resend checks IP limit (default 5/hour). Need more than
+        # the limit successful sends before the next request is redirected.
         rate_limited = False
-        for i in range(5):  # Try more than the limit
+        for i in range(8):
             response = self.client.post(url, {
-                'email': 'test@example.com'
+                'email': 'test@example.com',
+                'cf-turnstile-response': TURNSTILE_TOKEN,
             })
-            if response.status_code == 302 and 'rate-limited' in response.url:
+            if response.status_code == 302 and response.url and 'rate-limited' in response.url:
                 rate_limited = True
                 break
         
         # Should have been rate limited at some point
         self.assertTrue(rate_limited, "Rate limiting should have kicked in")
     
-    def test_registration_rate_limiting(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_registration_rate_limiting(self, mock_verify):
         """Test registration rate limiting"""
         cache.clear()
         
@@ -59,7 +72,8 @@ class RateLimitingTestCase(TestCase):
                 'username': f'testuser{i}',
                 'email': f'test{i}@example.com',
                 'password1': 'testpass123',
-                'password2': 'testpass123'
+                'password2': 'testpass123',
+                'cf-turnstile-response': TURNSTILE_TOKEN,
             })
             # First few should not be rate limited
         
@@ -68,7 +82,8 @@ class RateLimitingTestCase(TestCase):
             'username': 'testuser_extra',
             'email': 'testextra@example.com',
             'password1': 'testpass123',
-            'password2': 'testpass123'
+            'password2': 'testpass123',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         })
         
         # Check if redirected to rate limited page
@@ -76,7 +91,8 @@ class RateLimitingTestCase(TestCase):
             # Rate limiting is working
             self.assertIn('rate-limited', response.url)
     
-    def test_login_rate_limiting(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_login_rate_limiting(self, mock_verify):
         """Test login rate limiting"""
         cache.clear()
         
@@ -86,13 +102,15 @@ class RateLimitingTestCase(TestCase):
         for i in range(10):  # Default limit is 10 per IP per 30 min
             response = self.client.post(url, {
                 'username': 'nonexistent',
-                'password': 'wrongpass'
+                'password': 'wrongpass',
+                'cf-turnstile-response': TURNSTILE_TOKEN,
             })
         
         # Next login attempt should hit rate limit
         response = self.client.post(url, {
             'username': 'anothertry',
-            'password': 'wrongpass'
+            'password': 'wrongpass',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         })
         
         # Check if redirected to rate limited page

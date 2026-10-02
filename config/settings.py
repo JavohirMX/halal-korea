@@ -141,6 +141,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "utils.context_processors.user_location",
                 "utils.context_processors.static_info_context",
+                "utils.context_processors.turnstile_context",
                 "utils.language_utils.language_context_processor",
             ],
         },
@@ -528,6 +529,20 @@ AUTHENTICATION_BACKENDS = [
 
 GOOGLE_MAPS_API_KEY = config("GOOGLE_MAPS_API_KEY")
 GOOGLE_MAPS_ID = config("GOOGLE_MAPS_ID", default="DEMO_MAP_ID")
+
+# Cloudflare Turnstile (CAPTCHA)
+# Defaults are Cloudflare always-pass dummy keys for local/CI.
+# Production must set real TURNSTILE_SITEKEY / TURNSTILE_SECRET.
+TURNSTILE_SITEKEY = config(
+    "TURNSTILE_SITEKEY",
+    default="1x00000000000000000000AA",  # Cloudflare always-pass dummy
+)
+TURNSTILE_SECRET = config(
+    "TURNSTILE_SECRET",
+    default="1x0000000000000000000000000000000AA",
+)
+TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+TURNSTILE_TIMEOUT = 5  # seconds
 
 # Prayer Times API Configuration
 PRAYER_TIMES_API_BASE_URL = config(

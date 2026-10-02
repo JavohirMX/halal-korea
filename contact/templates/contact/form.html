@@ -58,6 +58,14 @@
         {% endif %}
         <div class="error-message text-red-500 text-sm mt-1 hidden" data-field="message"></div>
     </div>
+
+    <!-- Turnstile CAPTCHA (explicit render via HalalTurnstile) -->
+    <div>
+        <div id="contact-turnstile"
+             data-action="contact"
+             {% if TURNSTILE_SITEKEY %}data-sitekey="{{ TURNSTILE_SITEKEY }}"{% endif %}></div>
+        <div class="error-message text-red-500 text-sm mt-1 hidden" data-field="captcha"></div>
+    </div>
     
     <!-- Submit Button -->
     <div>

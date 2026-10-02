@@ -238,6 +238,14 @@
                     {% endif %}
                 </div>
 
+                <!-- Turnstile -->
+                <div>
+                    {{ form.captcha }}
+                    {% if form.captcha.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.captcha.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
                 <!-- Submit Button -->
                 <div class="pt-4">
                     <button type="submit" 
@@ -313,6 +321,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    if (window.HalalTurnstile) {
+        window.HalalTurnstile.render('#id_captcha', { action: 'register' });
+    }
 });
 </script>
 {% endblock %} 

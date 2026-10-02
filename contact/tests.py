@@ -1,10 +1,18 @@
-from django.test import TestCase
+from unittest.mock import patch
+
+from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 
 from .models import ContactMessage
 from .forms import ContactForm
 
 User = get_user_model()
+
+TURNSTILE_TOKEN = "test-turnstile-token"
+TURNSTILE_SETTINGS = {
+    "TURNSTILE_SITEKEY": "1x00000000000000000000AA",
+    "TURNSTILE_SECRET": "1x0000000000000000000000000000000AA",
+}
 
 
 class ContactModelTest(TestCase):
@@ -74,6 +82,7 @@ class ContactModelTest(TestCase):
         self.assertIsNotNone(message.responded_at)
 
 
+@override_settings(**TURNSTILE_SETTINGS)
 class ContactFormTest(TestCase):
     """Test the ContactForm"""
     
@@ -83,28 +92,44 @@ class ContactFormTest(TestCase):
             email='test@example.com',
             password='testpass123'
         )
+        self.valid_data = {
+            'name': 'Test User',
+            'email': 'test@example.com',
+            'subject': 'Test Subject',
+            'message': 'This is a test message.',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
+        }
     
-    def test_valid_form_anonymous_user(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_valid_form_anonymous_user(self, mock_verify):
         """Test valid form for anonymous user"""
-        form_data = {
-            'name': 'Test User',
-            'email': 'test@example.com',
-            'subject': 'Test Subject',
-            'message': 'This is a test message.'
-        }
-        form = ContactForm(data=form_data)
+        form = ContactForm(data=self.valid_data)
         self.assertTrue(form.is_valid())
     
-    def test_valid_form_authenticated_user(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_valid_form_authenticated_user(self, mock_verify):
         """Test valid form for authenticated user"""
-        form_data = {
+        form = ContactForm(data=self.valid_data, user=self.user)
+        self.assertTrue(form.is_valid())
+
+    def test_form_invalid_without_captcha(self):
+        """Contact form clean fails without a Turnstile token."""
+        data = {
             'name': 'Test User',
             'email': 'test@example.com',
             'subject': 'Test Subject',
-            'message': 'This is a test message.'
+            'message': 'This is a test message.',
         }
-        form = ContactForm(data=form_data, user=self.user)
-        self.assertTrue(form.is_valid())
+        form = ContactForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('captcha', form.errors)
+
+    @patch('utils.turnstile.verify_turnstile', return_value=False)
+    def test_form_invalid_captcha(self, mock_verify):
+        """Contact form clean fails when Turnstile verification fails."""
+        form = ContactForm(data=self.valid_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('captcha', form.errors)
     
     def test_empty_message(self):
         """Test form with empty message"""
@@ -112,7 +137,8 @@ class ContactFormTest(TestCase):
             'name': 'Test User',
             'email': 'test@example.com',
             'subject': 'Test Subject',
-            'message': ''
+            'message': '',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }
         form = ContactForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -124,7 +150,8 @@ class ContactFormTest(TestCase):
             'name': 'Test User',
             'email': 'test@example.com',
             'subject': 'Test Subject',
-            'message': '   '
+            'message': '   ',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }
         form = ContactForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -136,7 +163,8 @@ class ContactFormTest(TestCase):
             'name': 'T',
             'email': 'test@example.com',
             'subject': 'Test Subject',
-            'message': 'This is a test message.'
+            'message': 'This is a test message.',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }
         form = ContactForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -148,7 +176,8 @@ class ContactFormTest(TestCase):
             'name': 'Test User',
             'email': 'invalid-email',
             'subject': 'Test Subject',
-            'message': 'This is a test message.'
+            'message': 'This is a test message.',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }
         form = ContactForm(data=form_data)
         self.assertFalse(form.is_valid())

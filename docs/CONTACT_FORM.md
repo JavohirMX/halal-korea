@@ -12,6 +12,7 @@ A comprehensive contact form feature integrated into the Halal Korea website, al
 - **Real-time Validation**: Client-side and server-side validation
 
 ### 🛡️ **Security & Rate Limiting**
+- **Cloudflare Turnstile**: Bot protection on contact submissions (server-side siteverify). See [TURNSTILE.md](TURNSTILE.md).
 - **IP-based Rate Limiting**: 
   - 1 message per 5 minutes
   - 3 messages per hour (anonymous users)

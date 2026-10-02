@@ -148,6 +148,11 @@ function initializeContactForm() {
     const errorDiv = document.getElementById('contact-error');
     
     if (!form) return;
+
+    // Explicit Turnstile render after AJAX form inject (no cf-turnstile auto-implicit).
+    if (window.HalalTurnstile) {
+        window.HalalTurnstile.render('#contact-turnstile', { action: 'contact' });
+    }
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -160,6 +165,7 @@ function initializeContactForm() {
         // Show loading state
         setSubmitButtonLoading(true);
         
+        // FormData picks up cf-turnstile-response once the widget is inside the form.
         const formData = new FormData(form);
         
         fetch(form.dataset.submitUrl, {
@@ -178,15 +184,18 @@ function initializeContactForm() {
                 document.getElementById('success-message').textContent = data.message;
                 showMessage(successDiv);
                 
-                // Reset form
+                // Reset form + issue a fresh Turnstile token
                 form.reset();
+                if (window.HalalTurnstile) {
+                    window.HalalTurnstile.reset('#contact-turnstile');
+                }
                 
                 // Scroll to success message smoothly
                 setTimeout(() => {
                     successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 100);
             } else {
-                // Show field errors
+                // Show field errors (includes captcha when Turnstile fails)
                 if (data.field_errors) {
                     showFieldErrors(data.field_errors);
                 }
@@ -194,6 +203,11 @@ function initializeContactForm() {
                 // Show general error
                 document.getElementById('error-message').textContent = data.error;
                 showMessage(errorDiv);
+
+                // Spent/invalid token — reset so the user can retry
+                if (window.HalalTurnstile) {
+                    window.HalalTurnstile.reset('#contact-turnstile');
+                }
                 
                 // Scroll to error message smoothly
                 setTimeout(() => {
@@ -208,6 +222,10 @@ function initializeContactForm() {
             document.getElementById('error-message').textContent = 
                 "{% trans 'An unexpected error occurred. Please try again later.' %}";
             showMessage(errorDiv);
+
+            if (window.HalalTurnstile) {
+                window.HalalTurnstile.reset('#contact-turnstile');
+            }
         });
     });
 }

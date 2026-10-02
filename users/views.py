@@ -25,6 +25,8 @@ from utils.logging_utils import (
     log_user_action, log_security_event, sanitize_sensitive_data,
     get_request_id, log_execution
 )
+from utils.turnstile import require_turnstile
+from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +94,13 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
+
+        if not require_turnstile(request, action="login"):
+            messages.error(request, _('Please complete the security check.'))
+            return render(request, 'users/login.html', {
+                'next': request.POST.get('next') or request.GET.get('next', ''),
+            })
+
         # Enhanced security logging with request ID
         log_security_event(
             logger, 
@@ -166,7 +174,11 @@ def login_view(request):
                 extra_data={'username': username}
             )
             messages.error(request, 'Invalid username or password.')
-    
+
+        return render(request, 'users/login.html', {
+            'next': request.POST.get('next') or request.GET.get('next', ''),
+        })
+
     return render(request, 'users/login.html', {
         'next': request.GET.get('next', '')  # Pass the next parameter to the template
     })
@@ -378,7 +390,11 @@ def resend_activation_email(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         user_ip = request.META.get('REMOTE_ADDR')
-        
+
+        if not require_turnstile(request, action="resend_activation"):
+            messages.error(request, _('Please complete the security check.'))
+            return render(request, 'users/resend_activation.html')
+
         # Check email rate limiting first
         allowed, error_msg = check_email_rate_limit(request)
         if not allowed:
@@ -406,7 +422,9 @@ def resend_activation_email(request):
         except User.DoesNotExist:
             logger.warning(f"Resend activation attempt for non-existent email: {email} from IP: {user_ip}")
             messages.error(request, 'No account found with this email address.')
-    
+
+        return render(request, 'users/resend_activation.html')
+
     return render(request, 'users/resend_activation.html')
 
 

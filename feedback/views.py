@@ -6,6 +6,7 @@ import logging
 from .models import FeedbackResponse
 from .rate_limiting import check_feedback_rate_limit, record_feedback_attempt, get_client_ip
 from utils.telegram_notifications import send_telegram_notification
+from utils.turnstile import verify_turnstile, get_client_ip as get_turnstile_ip
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,17 @@ def submit_feedback(request):
         
         # Parse JSON data
         data = json.loads(request.body)
+
+        token = data.get('cf-turnstile-response')
+        if not verify_turnstile(
+            token,
+            remoteip=get_turnstile_ip(request),
+            action='feedback',
+        ):
+            return JsonResponse({
+                'success': False,
+                'error': 'Please complete the security check.',
+            }, status=400)
         
         # Validate required fields
         required_fields = ['rating', 'page_url', 'page_type', 'session_id', 

@@ -1,4 +1,6 @@
-from django.test import TestCase, Client
+from unittest.mock import patch
+
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Point
@@ -7,6 +9,13 @@ from reviews.models import Review
 from .forms import UserRegistrationForm, UserUpdateForm
 
 User = get_user_model()
+
+TURNSTILE_TOKEN = "test-turnstile-token"
+TURNSTILE_SETTINGS = {
+    "TURNSTILE_SITEKEY": "1x00000000000000000000AA",
+    "TURNSTILE_SECRET": "1x0000000000000000000000000000000AA",
+}
+
 
 class UserModelTest(TestCase):
     def setUp(self):
@@ -45,6 +54,7 @@ class UserModelTest(TestCase):
         self.user.save()
         self.assertEqual(self.user.preferred_language, 'ko')
 
+@override_settings(**TURNSTILE_SETTINGS)
 class UserViewTest(TestCase):
     def setUp(self):
         from django.core.cache import cache
@@ -123,16 +133,35 @@ class UserViewTest(TestCase):
         self.assertEqual(data['status'], 'removed')
         self.assertNotIn(self.place, self.user.favorite_places.all())
 
-    def test_login_view(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_login_view(self, mock_verify):
         """Test user login"""
         response = self.client.post(
             reverse('users:login'),
             {
                 'username': 'testuser',
-                'password': 'testpass123'
+                'password': 'testpass123',
+                'cf-turnstile-response': TURNSTILE_TOKEN,
             }
         )
         self.assertEqual(response.status_code, 302)  # Redirects to home
+        mock_verify.assert_called()
+
+    @patch('utils.turnstile.verify_turnstile', return_value=False)
+    def test_login_view_invalid_captcha(self, mock_verify):
+        """Login POST with invalid Turnstile must not authenticate."""
+        response = self.client.post(
+            reverse('users:login'),
+            {
+                'username': 'testuser',
+                'password': 'testpass123',
+                'cf-turnstile-response': 'bad-token',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'users/login.html')
+        self.assertNotIn('_auth_user_id', self.client.session)
+        self.assertContains(response, 'security check')
 
     def test_logout_view(self):
         """Test user logout"""
@@ -140,7 +169,8 @@ class UserViewTest(TestCase):
         response = self.client.get(reverse('users:logout'))
         self.assertEqual(response.status_code, 302)  # Redirects to home
 
-    def test_register_view(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_register_view(self, mock_verify):
         """Test user registration"""
         response = self.client.post(
             reverse('users:register'),
@@ -148,21 +178,43 @@ class UserViewTest(TestCase):
                 'username': 'newuser',
                 'email': 'newuser@example.com',
                 'password1': 'newpass123',
-                'password2': 'newpass123'
+                'password2': 'newpass123',
+                'cf-turnstile-response': TURNSTILE_TOKEN,
             }
         )
         # Can either redirect or render check_email page
         self.assertIn(response.status_code, [200, 302])
         self.assertTrue(User.objects.filter(username='newuser').exists())
+        mock_verify.assert_called()
 
+    @patch('utils.turnstile.verify_turnstile', return_value=False)
+    def test_register_view_invalid_captcha(self, mock_verify):
+        """Registration with invalid Turnstile must not create a user."""
+        response = self.client.post(
+            reverse('users:register'),
+            {
+                'username': 'captchafail',
+                'email': 'captchafail@example.com',
+                'password1': 'newpass123',
+                'password2': 'newpass123',
+                'cf-turnstile-response': 'bad-token',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(User.objects.filter(username='captchafail').exists())
+        self.assertContains(response, 'security check')
+
+@override_settings(**TURNSTILE_SETTINGS)
 class UserFormTest(TestCase):
-    def test_registration_form_valid(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_registration_form_valid(self, mock_verify):
         """Test registration form validation with valid data"""
         form_data = {
             'username': 'newuser',
             'email': 'newuser@example.com',
             'password1': 'newpass123',
-            'password2': 'newpass123'
+            'password2': 'newpass123',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }
         form = UserRegistrationForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -173,12 +225,27 @@ class UserFormTest(TestCase):
             'username': 'newuser',
             'email': 'invalid-email',
             'password1': 'newpass123',
-            'password2': 'differentpass'
+            'password2': 'differentpass',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }
         form = UserRegistrationForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('email', form.errors)
         self.assertIn('password2', form.errors)
+
+    @patch('utils.turnstile.verify_turnstile', return_value=False)
+    def test_registration_form_invalid_captcha(self, mock_verify):
+        """Registration form rejects invalid Turnstile token."""
+        form_data = {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'password1': 'newpass123',
+            'password2': 'newpass123',
+            'cf-turnstile-response': 'bad-token',
+        }
+        form = UserRegistrationForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('captcha', form.errors)
 
     def test_update_form_valid(self):
         """Test update form validation with valid data"""

@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -13,6 +13,12 @@ from .forms import PasswordResetRequestForm, PasswordResetConfirmForm
 from .rate_limiting import check_password_reset_rate_limit, record_password_reset_attempt
 
 User = get_user_model()
+
+TURNSTILE_TOKEN = "test-turnstile-token"
+TURNSTILE_SETTINGS = {
+    "TURNSTILE_SITEKEY": "1x00000000000000000000AA",
+    "TURNSTILE_SECRET": "1x0000000000000000000000000000000AA",
+}
 
 
 class PasswordResetTokenTest(TestCase):
@@ -59,6 +65,7 @@ class PasswordResetTokenTest(TestCase):
         self.assertFalse(password_reset_token.check_token(other_user, token))
 
 
+@override_settings(**TURNSTILE_SETTINGS)
 class PasswordResetFormsTest(TestCase):
     """Test password reset forms"""
     
@@ -69,26 +76,48 @@ class PasswordResetFormsTest(TestCase):
             password='testpass123'
         )
     
-    def test_password_reset_request_form_valid(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_password_reset_request_form_valid(self, mock_verify):
         """Test password reset request form with valid data"""
-        form_data = {'email': 'test@example.com'}
+        form_data = {
+            'email': 'test@example.com',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
+        }
         form = PasswordResetRequestForm(data=form_data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['email'], 'test@example.com')
     
-    def test_password_reset_request_form_email_normalization(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_password_reset_request_form_email_normalization(self, mock_verify):
         """Test that email is normalized (lowercased and stripped)"""
-        form_data = {'email': '  TEST@EXAMPLE.COM  '}
+        form_data = {
+            'email': '  TEST@EXAMPLE.COM  ',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
+        }
         form = PasswordResetRequestForm(data=form_data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['email'], 'test@example.com')
     
     def test_password_reset_request_form_invalid_email(self):
         """Test password reset request form with invalid email"""
-        form_data = {'email': 'invalid-email'}
+        form_data = {
+            'email': 'invalid-email',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
+        }
         form = PasswordResetRequestForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('email', form.errors)
+
+    @patch('utils.turnstile.verify_turnstile', return_value=False)
+    def test_password_reset_request_form_invalid_captcha(self, mock_verify):
+        """Password reset request form rejects invalid Turnstile token."""
+        form_data = {
+            'email': 'test@example.com',
+            'cf-turnstile-response': 'bad-token',
+        }
+        form = PasswordResetRequestForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('captcha', form.errors)
     
     def test_password_reset_confirm_form_valid(self):
         """Test password reset confirm form with valid passwords"""
@@ -151,6 +180,7 @@ class PasswordResetRateLimitingTest(TestCase):
         record_password_reset_attempt(request, 'test@example.com')
 
 
+@override_settings(**TURNSTILE_SETTINGS)
 class PasswordResetViewsTest(TestCase):
     """Test password reset views"""
     
@@ -172,10 +202,12 @@ class PasswordResetViewsTest(TestCase):
         self.assertContains(response, 'Reset your password')
         self.assertContains(response, 'email')
     
-    def test_password_reset_request_post_existing_user(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_password_reset_request_post_existing_user(self, mock_verify):
         """Test POST request with existing user email"""
         response = self.client.post(reverse('users:password_reset_request'), {
-            'email': 'test@example.com'
+            'email': 'test@example.com',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }, follow=True)
         
         self.assertEqual(response.status_code, 200)
@@ -186,10 +218,12 @@ class PasswordResetViewsTest(TestCase):
         self.assertIn('Reset', mail.outbox[0].subject)
         self.assertIn('test@example.com', mail.outbox[0].to)
     
-    def test_password_reset_request_post_nonexistent_user(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_password_reset_request_post_nonexistent_user(self, mock_verify):
         """Test POST request with non-existent user email (should still show success)"""
         response = self.client.post(reverse('users:password_reset_request'), {
-            'email': 'nonexistent@example.com'
+            'email': 'nonexistent@example.com',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }, follow=True)
         
         self.assertEqual(response.status_code, 200)
@@ -201,19 +235,22 @@ class PasswordResetViewsTest(TestCase):
     def test_password_reset_request_invalid_form(self):
         """Test POST request with invalid form data"""
         response = self.client.post(reverse('users:password_reset_request'), {
-            'email': 'invalid-email'
+            'email': 'invalid-email',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         })
         
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Enter a valid email address')
     
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
     @patch('users.views.check_password_reset_rate_limit')
-    def test_password_reset_request_rate_limited(self, mock_rate_limit):
+    def test_password_reset_request_rate_limited(self, mock_rate_limit, mock_verify):
         """Test password reset request when rate limited"""
         mock_rate_limit.return_value = (False, "Too many requests")
         
         response = self.client.post(reverse('users:password_reset_request'), {
-            'email': 'test@example.com'
+            'email': 'test@example.com',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         })
         
         self.assertEqual(response.status_code, 302)  # Redirect to rate limited page
@@ -298,6 +335,7 @@ class PasswordResetViewsTest(TestCase):
         self.assertContains(response, 'Invalid password reset link')
 
 
+@override_settings(**TURNSTILE_SETTINGS)
 class PasswordResetIntegrationTest(TestCase):
     """Integration tests for the complete password reset flow"""
     
@@ -310,11 +348,13 @@ class PasswordResetIntegrationTest(TestCase):
             email_verified=True
         )
     
-    def test_complete_password_reset_flow(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_complete_password_reset_flow(self, mock_verify):
         """Test the complete password reset flow from request to completion"""
         # Step 1: Request password reset
         response = self.client.post(reverse('users:password_reset_request'), {
-            'email': 'test@example.com'
+            'email': 'test@example.com',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         })
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(mail.outbox), 1)
@@ -363,6 +403,7 @@ class PasswordResetIntegrationTest(TestCase):
         self.assertContains(response, reverse('users:password_reset_request'))
 
 
+@override_settings(**TURNSTILE_SETTINGS)
 class PasswordResetSecurityTest(TestCase):
     """Security tests for password reset functionality"""
     
@@ -394,16 +435,19 @@ class PasswordResetSecurityTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Invalid reset link')
     
-    def test_no_user_enumeration(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_no_user_enumeration(self, mock_verify):
         """Test that the system doesn't reveal whether an email exists"""
         # Request reset for existing user
         response1 = self.client.post(reverse('users:password_reset_request'), {
-            'email': 'test@example.com'
+            'email': 'test@example.com',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }, follow=True)
         
         # Request reset for non-existing user
         response2 = self.client.post(reverse('users:password_reset_request'), {
-            'email': 'nonexistent@example.com'
+            'email': 'nonexistent@example.com',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }, follow=True)
         
         # Both should show the same success message
@@ -420,10 +464,12 @@ class PasswordResetSecurityTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'csrfmiddlewaretoken')
     
-    def test_email_contains_security_info(self):
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_email_contains_security_info(self, mock_verify):
         """Test that password reset emails contain security information"""
         self.client.post(reverse('users:password_reset_request'), {
-            'email': 'test@example.com'
+            'email': 'test@example.com',
+            'cf-turnstile-response': TURNSTILE_TOKEN,
         }, follow=True)
         
         self.assertEqual(len(mail.outbox), 1)

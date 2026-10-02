@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from utils.turnstile import TurnstileField
 from .models import User
 
 User = get_user_model()
@@ -112,7 +113,8 @@ class UserRegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional')
     last_name = forms.CharField(max_length=30, required=False, help_text='Optional')
     email = forms.EmailField()
-    
+    captcha = TurnstileField(action="register")
+
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
@@ -143,6 +145,7 @@ class PasswordResetRequestForm(forms.Form):
             'placeholder': 'Enter your email address'
         })
     )
+    captcha = TurnstileField(action="password_reset")
 
     def clean_email(self):
         email = self.cleaned_data.get('email')

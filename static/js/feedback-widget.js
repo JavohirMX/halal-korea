@@ -25,6 +25,7 @@ class FeedbackWidget {
 
         this.widget = null;
         this.container = null;
+        this.turnstileToken = '';
 
         this.init();
     }
@@ -116,6 +117,8 @@ class FeedbackWidget {
                         ></textarea>
                         <span class="char-count" id="char-count">0/500</span>
                     </div>
+
+                    <div id="feedback-turnstile" data-action="feedback" style="margin: 12px 0;"></div>
 
                     <button id="feedback-submit" class="feedback-submit-btn" disabled>
                         <i class="fas fa-paper-plane"></i>
@@ -260,6 +263,47 @@ class FeedbackWidget {
         this.button.classList.add('hidden');
         this.form.classList.remove('hidden');
         this.isExpanded = true;
+        this.renderTurnstile();
+    }
+
+    renderTurnstile() {
+        if (!window.HalalTurnstile) {
+            return;
+        }
+        window.HalalTurnstile.render('#feedback-turnstile', {
+            action: 'feedback',
+            callback: (token) => {
+                this.turnstileToken = token || '';
+            },
+            expiredCallback: () => {
+                this.turnstileToken = '';
+            },
+            errorCallback: () => {
+                this.turnstileToken = '';
+            },
+        });
+    }
+
+    getTurnstileToken() {
+        if (this.turnstileToken) {
+            return this.turnstileToken;
+        }
+        const el = document.getElementById('feedback-turnstile');
+        if (window.turnstile && el?.dataset?.turnstileWidgetId) {
+            try {
+                return window.turnstile.getResponse(el.dataset.turnstileWidgetId) || '';
+            } catch (e) {
+                return '';
+            }
+        }
+        return el?.querySelector('[name="cf-turnstile-response"]')?.value || '';
+    }
+
+    resetTurnstile() {
+        this.turnstileToken = '';
+        if (window.HalalTurnstile) {
+            window.HalalTurnstile.reset('#feedback-turnstile');
+        }
     }
 
     collapse() {
@@ -408,6 +452,14 @@ class FeedbackWidget {
         this.hideError();
         this.setSubmitLoading(true);
 
+        const turnstileToken = this.getTurnstileToken();
+        if (!turnstileToken) {
+            this.setSubmitLoading(false);
+            this.showError('Please complete the security check.');
+            this.resetTurnstile();
+            return;
+        }
+
         const data = {
             rating: this.selectedRating,
             comment: this.textarea.value.trim(),
@@ -424,6 +476,7 @@ class FeedbackWidget {
             screen_resolution: `${window.screen.width}x${window.screen.height}`,
             referrer: document.referrer,
             session_id: this.sessionId,
+            'cf-turnstile-response': turnstileToken,
         };
 
         try {
@@ -439,6 +492,7 @@ class FeedbackWidget {
             const result = await response.json();
 
             if (response.ok && result.success) {
+                this.resetTurnstile();
                 this.showSuccess();
                 localStorage.setItem('feedback_last_submitted', new Date().toISOString());
             } else {
@@ -447,6 +501,7 @@ class FeedbackWidget {
         } catch (error) {
             console.error('[Feedback] Submission error:', error);
             this.setSubmitLoading(false);
+            this.resetTurnstile();
             this.showError(error.message || 'Failed to submit. Please try again.');
         }
     }

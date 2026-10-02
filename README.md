@@ -1631,6 +1631,7 @@ class PlaceTestCase(TestCase):
   - `PASSWORD_RESET_IMPLEMENTATION.md` - Password reset flow documentation
   - `SEARCH_IMPROVEMENTS.md` - Advanced search with transliteration, autocomplete, and analytics
   - `TELEGRAM_NOTIFICATIONS.md` - Telegram bot integration guide
+  - `TURNSTILE.md` - Cloudflare Turnstile CAPTCHA setup and ops guide
   - `TESTING.md` - Testing guidelines and test coverage
   - `TRANSLATION_GUIDELINES.md` - i18n and localization best practices
   - `WATERMARK_FEATURE.md` - Image watermarking system documentation

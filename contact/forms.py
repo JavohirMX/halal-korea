@@ -1,11 +1,16 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+
+from utils.turnstile import TurnstileField
+
 from .models import ContactMessage
 
 
 class ContactForm(forms.ModelForm):
     """Contact form for both authenticated and anonymous users"""
-    
+
+    captcha = TurnstileField(action="contact")
+
     class Meta:
         model = ContactMessage
         fields = ['name', 'email', 'subject', 'message']
