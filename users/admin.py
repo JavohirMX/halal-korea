@@ -2,8 +2,8 @@ from django.contrib import admin, messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import path, reverse
 from django.utils.html import escape, linebreaks
 from django.utils.http import urlencode
@@ -22,6 +22,7 @@ from .forms import (
     parse_email_list,
     parse_id_list,
 )
+from .html_sanitizer import sanitize_email_html
 from .models import User
 from .utils import queue_admin_emails
 
@@ -50,6 +51,12 @@ DRAFT_KEYS = (
     'message',
     'send_as_html',
 )
+
+# Query params that represent a deliberate choice. If any is present the saved
+# draft must not be restored on top of it — otherwise a stale draft silently
+# overrides a deep link such as the changelist action's ?ids=1,2,3 and the admin
+# ends up sending to "All users" instead of the rows they ticked.
+EXPLICIT_PARAM_KEYS = ('ids', 'user_id')
 
 AUDIENCE_MODE_LABELS = {
     AUDIENCE_MODE_ALL: 'All users',
@@ -148,27 +155,32 @@ class UserAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect(f"{reverse('admin_email:hub')}?tab=compose")
             form = AdminEmailComposeForm(initial=self._initial_from_request(request))
 
+        selection = None
         if request.method == 'POST' and form.is_valid():
-            response = self._handle_send(request, form)
+            response, selection = self._handle_send(request, form)
             if response is not None:
                 return response
 
-        # Preview for GET and re-rendered POST forms
-        if form.is_bound and not form.is_valid():
-            selection = self._recipient_selection_from_bound_data(form)
-        elif form.is_bound:
-            selection = self._recipient_selection_from_form(form)
-        else:
-            selection = self._recipient_selection_from_initial(form)
+        # Preview for GET and re-rendered POST forms. Reuse the selection from
+        # _handle_send when we have one so an error page shows the same audience
+        # that triggered the error.
+        if selection is None:
+            if form.is_bound and not form.is_valid():
+                selection = self._recipient_selection_from_bound_data(form)
+            elif form.is_bound:
+                selection = self._recipient_selection_from_form(form)
+            else:
+                selection = self._recipient_selection_from_initial(form)
 
-        try:
-            recipients, skipped, ad_hoc_added = self._resolve_recipients(**selection)
-        except Http404:
-            recipients, skipped, ad_hoc_added = [], 0, 0
+        recipients, skipped, ad_hoc_added = self._resolve_recipients(**selection)
 
         total = len(recipients)
         needs_confirmation = self._needs_confirmation(selection['audience_mode'], total)
-        self._save_draft(request, form)
+
+        # A deep-link GET renders from the URL, so persisting it would overwrite
+        # the admin's real draft with whatever the link happened to carry.
+        if form.is_bound or not self._request_is_explicit(request):
+            self._save_draft(request, form)
 
         context = {
             **self.admin_site.each_context(request),
@@ -205,21 +217,22 @@ class UserAdmin(admin.ModelAdmin):
 
     def _handle_send(self, request, form):
         """
-        Queue the email and return a redirect, or None to re-render with errors.
+        Queue the email.
+
+        Returns (redirect_response_or_None, selection). The caller reuses the
+        returned selection when re-rendering: add_error() flips is_valid() to
+        False, which would otherwise switch the page to the lenient raw-payload
+        mapper and re-resolve a *different* audience than the error was raised
+        against.
         """
         selection = self._recipient_selection_from_form(form)
-        try:
-            recipients, skipped, ad_hoc_added = self._resolve_recipients(**selection)
-        except Http404:
-            # The deep-linked user was deleted between render and submit.
-            form.add_error('user_id', 'That user no longer exists. Pick another audience.')
-            return None
+        recipients, skipped, ad_hoc_added = self._resolve_recipients(**selection)
         total = len(recipients)
         mode = selection['audience_mode']
 
         if total == 0:
             messages.error(request, EMPTY_AUDIENCE_MESSAGES.get(mode, 'No recipients to email.'))
-            return None
+            return None, selection
 
         if self._needs_confirmation(mode, total):
             typed = (form.cleaned_data.get('confirm_send_count') or '').strip()
@@ -228,11 +241,21 @@ class UserAdmin(admin.ModelAdmin):
                     'confirm_send_count',
                     f'Type {total} to confirm sending to {total} recipients.',
                 )
-                return None
+                return None, selection
 
         body_plain = form.cleaned_data['message']
         if form.cleaned_data.get('send_as_html'):
-            body_html = body_plain
+            # Raw admin HTML would otherwise reach the template via |safe,
+            # which turns any staff account into a mass-phishing tool using the
+            # site's own branding.
+            body_html = sanitize_email_html(body_plain)
+            if not body_html.strip():
+                form.add_error(
+                    'message',
+                    'The HTML body was empty after removing unsafe markup. '
+                    'Use plain text, or only formatting tags.',
+                )
+                return None, selection
         else:
             body_html = linebreaks(escape(body_plain))
 
@@ -262,7 +285,7 @@ class UserAdmin(admin.ModelAdmin):
                 f"Skipped {result['skipped']}, failed {result['failed']}."
             ),
         )
-        return HttpResponseRedirect(f"{reverse('admin_email:hub')}?tab=recent")
+        return HttpResponseRedirect(f"{reverse('admin_email:hub')}?tab=recent"), selection
 
     def _needs_confirmation(self, audience_mode, total):
         """Broad modes over the threshold require typing the exact recipient count."""
@@ -292,9 +315,16 @@ class UserAdmin(admin.ModelAdmin):
             'send_as_html': _as_bool(source.get('send_as_html')),
         }
 
+    def _request_is_explicit(self, request):
+        """True when the URL itself names the audience rather than just the page."""
+        explicit = (*DRAFT_KEYS, *EXPLICIT_PARAM_KEYS)
+        return any(request.GET.get(key) for key in explicit)
+
     def _initial_from_request(self, request):
         initial = self._initial_from_source(request.GET)
-        if any(request.GET.get(key) for key in DRAFT_KEYS):
+
+        # An explicit choice in the URL wins outright over a saved draft.
+        if self._request_is_explicit(request):
             return initial
 
         # Bare GET: fall back to the saved draft so in-progress work is not lost.
@@ -349,13 +379,17 @@ class UserAdmin(admin.ModelAdmin):
         """
         valid_emails, _ = parse_email_list(mapping.get('additional_emails', ''))
         ids, _ = parse_id_list(mapping.get('selected_user_ids', '') or mapping.get('ids', ''))
-        user_id = str(mapping.get('user_id', '')).strip()
+        # Route user_id through parse_id_list so a non-numeric or absurdly large
+        # value becomes "no user" instead of a ValueError/OverflowError from the
+        # ORM. Previews render on attacker-supplied query strings.
+        user_ids, _ = parse_id_list(mapping.get('user_id', ''))
+        user_id = user_ids[0] if user_ids else ''
         return {
             'audience_mode': (
                 mapping.get('audience_mode')
                 or initial_audience_mode(user_id, mapping.get('ids', ''))
             ),
-            'user_id': int(user_id) if user_id.isdigit() else user_id,
+            'user_id': user_id,
             'selected_user_ids': ids,
             'filters_meta': self._filters_from_mapping(
                 mapping,
@@ -482,7 +516,13 @@ class UserAdmin(admin.ModelAdmin):
         additional_emails = additional_emails or []
 
         if audience_mode == AUDIENCE_MODE_SINGLE:
-            users = [get_object_or_404(User, pk=user_id)] if user_id else User.objects.none()
+            # user_id is already validated as a positive in-range int by the
+            # callers, so this cannot raise ValueError/OverflowError here.
+            users = (
+                User.objects.filter(pk=user_id).only(*RECIPIENT_FIELDS)
+                if user_id
+                else User.objects.none()
+            )
         elif audience_mode == AUDIENCE_MODE_USERS:
             ids = selected_user_ids or []
             users = (
@@ -537,26 +577,18 @@ class UserAdmin(admin.ModelAdmin):
         Resolve recipients for an unsent payload so the compose page can show a
         live count. Shares _resolve_recipients with the send path, so the
         previewed count is the count that gets sent.
-        """
-        form = AdminEmailComposeForm(request.POST)
-        if form.is_valid():
-            selection = self._recipient_selection_from_form(form)
-        else:
-            selection = self._recipient_selection_from_bound_data(form)
 
-        try:
-            recipients, skipped, ad_hoc_added = self._resolve_recipients(**selection)
-        except Http404:
-            return {
-                'audience_mode': selection['audience_mode'],
-                'count': 0,
-                'skipped': 0,
-                'ad_hoc_count': 0,
-                'needs_confirmation': False,
-                'threshold': LARGE_SEND_THRESHOLD,
-                'sample': [],
-                'error': 'Unknown user.',
-            }, 400
+        Deliberately skips AdminEmailComposeForm validation: the live-preview
+        payload carries only the audience fields, so subject/message are always
+        missing and the form would always fail anyway. Going straight to the
+        lenient mapper is both cheaper and free of that coupling.
+        """
+        payload = request.POST.copy()
+        if not payload.get('selected_user_ids'):
+            payload['selected_user_ids'] = payload.get('ids', '')
+
+        selection = self._selection_from_mapping(payload)
+        recipients, skipped, ad_hoc_added = self._resolve_recipients(**selection)
 
         total = len(recipients)
         return {
@@ -567,7 +599,7 @@ class UserAdmin(admin.ModelAdmin):
             'needs_confirmation': self._needs_confirmation(selection['audience_mode'], total),
             'threshold': LARGE_SEND_THRESHOLD,
             'sample': recipients[:PREVIEW_SAMPLE_SIZE],
-            'total_samples': len(recipients),
+            'total_samples': total,
         }, 200
 
     def _log_admin_action(self, request, *, subject, result, filters_meta, ad_hoc_count, mode, recipient_count):

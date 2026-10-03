@@ -1,9 +1,23 @@
 /**
  * Shared Cloudflare Turnstile helpers (explicit render mode).
  * Requires turnstile api.js with ?render=explicit and window.TURNSTILE_SITEKEY.
+ *
+ * Readiness contract
+ * ------------------
+ * api.js is loaded with `async defer`, so `window.turnstile` (and
+ * `turnstile.ready`) can exist while the script is still bootstrapping.
+ * Cloudflare throws from `turnstile.ready()` in that window, so we must never
+ * treat "turnstile.ready exists" as "turnstile is ready". We instead trust the
+ * script tag's own `load` event, which flips window.__turnstileApiLoaded.
+ *
+ * `render()` never rejects: callers all discard the promise, so a rejection
+ * becomes an unhandled rejection and the widget silently never appears.
  */
 (function (window) {
     'use strict';
+
+    var READY_POLL_MS = 100;
+    var READY_TIMEOUT_ATTEMPTS = 100; // ~10s before we give up
 
     function resolveContainer(container) {
         if (!container) {
@@ -22,72 +36,162 @@
         return window.TURNSTILE_SITEKEY || '';
     }
 
+    function apiIsLoaded() {
+        return window.__turnstileApiLoaded === true;
+    }
+
     function whenReady(callback) {
-        if (window.turnstile && typeof window.turnstile.ready === 'function') {
-            window.turnstile.ready(callback);
+        var fired = false;
+
+        function fire() {
+            if (fired) {
+                return;
+            }
+            fired = true;
+            callback();
+        }
+
+        // api.js is fully loaded: now — and only now — is ready() safe to call.
+        if (apiIsLoaded() && window.turnstile && typeof window.turnstile.ready === 'function') {
+            try {
+                window.turnstile.ready(fire);
+            } catch (err) {
+                // Belt and braces: ready() can still throw on odd load orders.
+                fire();
+            }
             return;
         }
-        // api.js may still be loading; retry briefly.
+
         var attempts = 0;
         var timer = setInterval(function () {
             attempts += 1;
-            if (window.turnstile && typeof window.turnstile.render === 'function') {
+
+            if (apiIsLoaded() && window.turnstile && typeof window.turnstile.render === 'function') {
                 clearInterval(timer);
-                callback();
-            } else if (attempts >= 50) {
+                try {
+                    window.turnstile.ready(fire);
+                } catch (err) {
+                    fire();
+                }
+                return;
+            }
+
+            if (attempts >= READY_TIMEOUT_ATTEMPTS) {
                 clearInterval(timer);
                 console.warn('HalalTurnstile: turnstile API failed to load');
+                fire();
             }
-        }, 100);
+        }, READY_POLL_MS);
+    }
+
+    /**
+     * Make a visible-noise-free notice in place of a widget that never rendered.
+     * A silently missing CAPTCHA just looks like a form that rejects for no reason.
+     */
+    function showUnavailable(el) {
+        if (!el || !el.parentNode) {
+            return;
+        }
+        var host = el.parentNode;
+        if (host.querySelector('.turnstile-unavailable')) {
+            return;
+        }
+        var notice = document.createElement('p');
+        notice.className = 'turnstile-unavailable';
+        notice.setAttribute('role', 'alert');
+        notice.textContent =
+            'Security check could not load. Please refresh the page or try again shortly.';
+        host.insertBefore(notice, el);
+    }
+
+    function hideUnavailable(el) {
+        if (!el || !el.parentNode) {
+            return;
+        }
+        var existing = el.parentNode.querySelector('.turnstile-unavailable');
+        if (existing) {
+            existing.remove();
+        }
     }
 
     window.HalalTurnstile = {
         /**
          * Render an explicit Turnstile widget into a container.
+         * Resolves with the widget id, or null if the widget could not be shown.
+         * Never rejects.
          * @param {string|HTMLElement} container
-         * @param {{action?: string, callback?: Function, errorCallback?: Function, expiredCallback?: Function}} [options]
+         * @param {{action?: string, callback?: Function, errorCallback?: Function,
+         *          expiredCallback?: Function, onUnavailable?: Function}} [options]
          * @returns {Promise<string|null>} widget id
          */
         render: function (container, options) {
             options = options || {};
-            var el = resolveContainer(container);
-            if (!el) {
-                console.warn('HalalTurnstile.render: container not found');
-                return Promise.resolve(null);
-            }
-
-            var sitekey = getSitekey(el);
-            if (!sitekey) {
-                console.warn('HalalTurnstile.render: missing sitekey');
-                return Promise.resolve(null);
-            }
-
-            var action = options.action || el.dataset.action || undefined;
 
             return new Promise(function (resolve) {
-                whenReady(function () {
-                    try {
-                        // Avoid double-render on the same node.
-                        if (el.dataset.turnstileWidgetId) {
-                            window.turnstile.reset(el.dataset.turnstileWidgetId);
-                            resolve(el.dataset.turnstileWidgetId);
-                            return;
-                        }
+                var settled = false;
 
-                        var widgetId = window.turnstile.render(el, {
-                            sitekey: sitekey,
-                            action: action,
-                            callback: options.callback,
-                            'error-callback': options.errorCallback,
-                            'expired-callback': options.expiredCallback,
-                        });
-                        el.dataset.turnstileWidgetId = widgetId;
-                        resolve(widgetId);
-                    } catch (err) {
-                        console.warn('HalalTurnstile.render failed:', err);
-                        resolve(null);
+                function finish(widgetId) {
+                    if (settled) {
+                        return;
                     }
-                });
+                    settled = true;
+                    resolve(widgetId === undefined ? null : widgetId);
+                }
+
+                function fail(message) {
+                    console.warn('HalalTurnstile:', message);
+                    if (typeof options.onUnavailable === 'function') {
+                        options.onUnavailable(message);
+                    } else {
+                        showUnavailable(el);
+                    }
+                    finish(null);
+                }
+
+                var el = resolveContainer(container);
+                if (!el) {
+                    console.warn('HalalTurnstile.render: container not found');
+                    return finish(null);
+                }
+
+                var sitekey = getSitekey(el);
+                if (!sitekey) {
+                    return fail('missing sitekey');
+                }
+
+                var action = options.action || el.dataset.action || undefined;
+
+                try {
+                    whenReady(function () {
+                        if (!window.turnstile || typeof window.turnstile.render !== 'function') {
+                            return fail('turnstile API unavailable');
+                        }
+                        try {
+                            hideUnavailable(el);
+
+                            // Avoid double-render on the same node.
+                            if (el.dataset.turnstileWidgetId) {
+                                window.turnstile.reset(el.dataset.turnstileWidgetId);
+                                return finish(el.dataset.turnstileWidgetId);
+                            }
+
+                            var widgetId = window.turnstile.render(el, {
+                                sitekey: sitekey,
+                                action: action,
+                                callback: options.callback,
+                                'error-callback': options.errorCallback,
+                                'expired-callback': options.expiredCallback,
+                            });
+                            el.dataset.turnstileWidgetId = widgetId;
+                            finish(widgetId);
+                        } catch (err) {
+                            fail('render failed: ' + err);
+                        }
+                    });
+                } catch (err) {
+                    // whenReady() itself must never turn into a rejected promise.
+                    fail('readiness check failed: ' + err);
+                }
             });
         },
 

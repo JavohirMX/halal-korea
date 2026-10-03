@@ -185,6 +185,25 @@ body {
     -ms-overflow-style: none;
 }
 
+/* Turnstile fallback notice — shown when the widget could not be rendered.
+   Without it a failed widget is invisible and the form just rejects silently. */
+.turnstile-unavailable {
+    margin: 8px 0 0;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #92400e;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+}
+
+.dark .turnstile-unavailable {
+    color: #fcd34d;
+    background: rgba(146, 64, 14, 0.25);
+    border-color: rgba(252, 211, 77, 0.45);
+}
+
 /* Scrollbar hide utility class */
 .scrollbar-hide {
     -ms-overflow-style: none;  /* IE and Edge */

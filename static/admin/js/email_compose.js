@@ -132,9 +132,10 @@
         function buildPayload() {
             var payload = new FormData();
 
-            modeInputs().forEach(function (input) {
-                payload.append('audience_mode', input.value);
-            });
+            // Only the checked radio. Appending all five would make the server's
+            // QueryDict.get() return the last choice ('manual') instead of the
+            // admin's actual selection.
+            payload.append('audience_mode', activeMode());
 
             var userIdField = root.querySelector('#id_user_id');
             payload.append('user_id', userIdField ? userIdField.value : '');

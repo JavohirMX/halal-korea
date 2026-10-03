@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth import get_user_model
@@ -14,6 +16,10 @@ BOOLEAN_FILTER_CHOICES = [
     ('false', 'No'),
 ]
 
+# BigAutoField tops out at 2**63 - 1; anything beyond that is a malformed id,
+# not a user that happens to be missing.
+MAX_PK = 2**63 - 1
+
 # Audience modes for the admin compose page. The picker is explicit so an admin
 # always knows who a send will reach before confirming it.
 AUDIENCE_MODE_ALL = 'all'
@@ -25,8 +31,14 @@ AUDIENCE_MODE_MANUAL = 'manual'
 # 'segment' is the safe landing default: it is a filtered send, never "everyone".
 DEFAULT_AUDIENCE_MODE = AUDIENCE_MODE_SEGMENT
 
-# Modes that can fan out to a large audience and therefore need typed confirmation.
-BROADCAST_AUDIENCE_MODES = (AUDIENCE_MODE_ALL, AUDIENCE_MODE_SEGMENT)
+# Modes that fan out across the registered user base, and therefore need the
+# typed-count interlock. "manual" is exempt: every address there was typed
+# deliberately by the admin and it is not a blast at the user base.
+BROADCAST_AUDIENCE_MODES = (
+    AUDIENCE_MODE_ALL,
+    AUDIENCE_MODE_SEGMENT,
+    AUDIENCE_MODE_USERS,
+)
 
 AUDIENCE_MODE_CHOICES = [
     (AUDIENCE_MODE_ALL, 'All users'),
@@ -77,20 +89,29 @@ def parse_email_list(raw):
 
 
 def parse_id_list(raw):
-    """Split a comma separated blob of primary keys into (ids, invalid_tokens)."""
+    """
+    Split a blob of primary keys into (ids, invalid_tokens).
+
+    Accepts commas and any whitespace as separators, so a pasted list of ids
+    works the same way a pasted list of emails does. Values outside the range a
+    BigAutoField can hold are reported invalid rather than passed to the ORM,
+    where int too big would raise OverflowError during a preview.
+    """
     if isinstance(raw, (list, tuple)):
         raw = ','.join(str(item) for item in raw)
 
     ids = []
     invalid = []
     seen = set()
-    for token in (raw or '').replace(' ', ',').split(','):
-        token = token.strip()
+    for token in re.split(r'[\s,]+', raw or ''):
         if not token:
             continue
         try:
             pk = int(token)
         except (TypeError, ValueError):
+            invalid.append(token)
+            continue
+        if pk <= 0 or pk > MAX_PK:
             invalid.append(token)
             continue
         if pk in seen:
@@ -126,7 +147,11 @@ class AdminEmailComposeForm(forms.Form):
         required=False,
         initial=False,
         label='Send message as HTML',
-        help_text='If checked, the message body is treated as HTML inside the branded template.',
+        help_text=(
+            'Formatting only. The body is sanitised before sending: scripts, '
+            'images, iframes, forms, event handlers, relative links and most '
+            'inline styles are stripped, and links are limited to http/https/mailto.'
+        ),
     )
     additional_emails = forms.CharField(
         required=False,

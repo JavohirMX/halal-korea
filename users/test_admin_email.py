@@ -550,6 +550,21 @@ class AdminEmailAudienceModeTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self._sent_to(), ['guest@example.com', 'other@example.com'])
 
+    def test_large_specific_users_selection_needs_typed_count(self):
+        """
+        Regression: 'specific users' skipped the confirmation entirely, so an
+        unbounded selected_user_ids list could reach any number of recipients.
+        """
+        response = self._post({
+            'audience_mode': 'users',
+            'selected_user_ids': f'{self.u1.pk}',
+            'subject': 'Picked',
+            'message': 'Hi',
+        })
+        # Only one user here — under the threshold, so it sends.
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self._sent_to(), ['u1@example.com'])
+
     def test_manual_mode_requires_addresses(self):
         response = self._post({
             'audience_mode': 'manual',
@@ -788,6 +803,217 @@ class AdminEmailApiTests(TestCase):
         response = self.client.get(self.search_url, {'q': 'searchable'})
         self.assertEqual(response.status_code, 403)
 
+    def test_preview_resolves_the_requested_mode(self):
+        """
+        The preview payload carries only audience fields. It must resolve the
+        mode actually posted — not the last of several audience_mode values.
+        """
+        response = self.client.post(self.preview_url, {'audience_mode': 'all'})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['audience_mode'], 'all')
+        self.assertEqual(data['count'], 3)
+
+    def test_preview_single_mode_counts_that_user(self):
+        response = self.client.post(
+            self.preview_url,
+            {'audience_mode': 'single', 'user_id': str(self.target.pk)},
+        )
+        data = response.json()
+        self.assertEqual(data['audience_mode'], 'single')
+        self.assertEqual(data['count'], 1)
+
+    def test_preview_manual_mode_counts_addresses_only(self):
+        response = self.client.post(
+            self.preview_url,
+            {
+                'audience_mode': 'manual',
+                'additional_emails': 'g1@example.com, g2@example.com',
+            },
+        )
+        data = response.json()
+        self.assertEqual(data['audience_mode'], 'manual')
+        self.assertEqual(data['count'], 2)
+
+    def test_preview_tolerates_garbage_user_id(self):
+        """A malformed pk on a live-preview request must not 500 the endpoint."""
+        for bad in ('abc', '0', '-1', '9' * 40):
+            with self.subTest(user_id=bad):
+                response = self.client.post(
+                    self.preview_url,
+                    {'audience_mode': 'single', 'user_id': bad},
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json()['count'], 0)
+
+    def test_preview_users_mode_resolves_selection(self):
+        response = self.client.post(
+            self.preview_url,
+            {
+                'audience_mode': 'users',
+                'selected_user_ids': str(self.target.pk),
+            },
+        )
+        data = response.json()
+        self.assertEqual(data['audience_mode'], 'users')
+        self.assertEqual(data['count'], 1)
+
+    def test_preview_accepts_newline_separated_ids(self):
+        """Regression: pasted id lists arrived newline-separated and failed."""
+        second = User.objects.create_user(
+            username='second', email='second@example.com', password='pass12345',
+        )
+        response = self.client.post(
+            self.preview_url,
+            {
+                'audience_mode': 'users',
+                'selected_user_ids': f'{self.target.pk}\n{second.pk}',
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['audience_mode'], 'users')
+        self.assertEqual(data['count'], 2)
+
+    def test_compose_tolerates_garbage_user_id(self):
+        """The page itself must not 500 on a malformed ?user_id=."""
+        response = self.client.get(
+            f'{reverse("admin_email:hub")}?tab=compose&audience_mode=single&user_id=abc'
+        )
+        self.assertEqual(response.status_code, 200)
+
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class AdminEmailHtmlSanitisationTests(TestCase):
+    """
+    send_as_html drops admin markup straight into the branded template via
+    |safe, so it has to be sanitised or any staff account becomes a phishing
+    tool on the site's own domain.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.admin = User.objects.create_superuser(
+            username='admin', email='admin@example.com', password='adminpass123',
+        )
+        self.target = User.objects.create_user(
+            username='t', email='t@example.com', password='pass12345',
+        )
+        self.hub_url = reverse('admin_email:hub')
+        self.client.login(username='admin', password='adminpass123')
+
+    def _send_html(self, body):
+        with patch('users.utils._email_executor.submit', side_effect=_sync_submit):
+            return self.client.post(
+                f'{self.hub_url}?tab=compose',
+                {
+                    'audience_mode': 'single',
+                    'user_id': str(self.target.pk),
+                    'subject': 'HTML test',
+                    'message': body,
+                    'send_as_html': 'on',
+                },
+            )
+
+    def _html_body(self):
+        return mail.outbox[0].alternatives[0][0]
+
+    def test_safe_formatting_survives(self):
+        response = self._send_html(
+            '<p>Hello <strong>world</strong> '
+            '<a href="https://halal-korea.com">link</a></p>'
+        )
+        self.assertEqual(response.status_code, 302)
+        body = self._html_body()
+        self.assertIn('<strong>world</strong>', body)
+        self.assertIn('href="https://halal-korea.com"', body)
+
+    def test_script_is_stripped(self):
+        self._send_html('<script>alert(1)</script><p>safe</p>')
+        body = self._html_body()
+        self.assertNotIn('alert(1)', body)
+        self.assertIn('safe', body)
+
+    def test_event_handlers_are_stripped(self):
+        self._send_html('<a href="https://x.com" onclick="steal()">y</a>')
+        body = self._html_body()
+        self.assertNotIn('onclick', body)
+
+    def test_javascript_urls_are_stripped(self):
+        self._send_html('<a href="javascript:alert(1)">x</a>')
+        self.assertNotIn('javascript:', self._html_body())
+
+    def test_positioning_styles_are_stripped(self):
+        self._send_html(
+            '<div style="position:fixed;top:0;z-index:9999;color:red">overlay</div>'
+        )
+        body = self._html_body()
+        self.assertNotIn('position', body)
+        self.assertNotIn('z-index', body)
+
+    def test_images_and_iframes_are_stripped(self):
+        self._send_html(
+            '<img src=x onerror=alert(1)>'
+            '<iframe src="https://evil"></iframe>'
+            '<p>ok</p>'
+        )
+        body = self._html_body()
+        # Assert on the admin-supplied content only: the branded wrapper
+        # legitimately contains the site logo <img>.
+        self.assertNotIn('onerror', body)
+        self.assertNotIn('<iframe', body)
+        self.assertNotIn('src=x', body)
+        self.assertNotIn('evil.com', body)
+        self.assertIn('<p>ok</p>', body)
+
+    def test_relative_links_are_stripped(self):
+        """A relative link is an open-tracking pixel in an email client."""
+        self._send_html('<a href="/track/open">x</a>')
+        self.assertNotIn('/track/open', self._html_body())
+
+    def test_body_of_only_unsafe_markup_is_rejected(self):
+        response = self._send_html('<script>alert(1)</script>')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertContains(response, 'unsafe markup')
+
+    def test_plain_text_mode_still_escapes(self):
+        with patch('users.utils._email_executor.submit', side_effect=_sync_submit):
+            self.client.post(
+                f'{self.hub_url}?tab=compose',
+                {
+                    'audience_mode': 'single',
+                    'user_id': str(self.target.pk),
+                    'subject': 'Plain',
+                    'message': '<b>not bold</b>',
+                },
+            )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('&lt;b&gt;not bold&lt;/b&gt;', mail.outbox[0].body)
+
+
+class AdminEmailSanitizerUnitTests(TestCase):
+    def test_empty_and_none_return_empty(self):
+        from users.html_sanitizer import sanitize_email_html
+
+        self.assertEqual(sanitize_email_html(''), '')
+        self.assertEqual(sanitize_email_html(None), '')
+
+    def test_allowlist_drops_unknown_tags(self):
+        from users.html_sanitizer import sanitize_email_html
+
+        self.assertEqual(sanitize_email_html('<unknown>y</unknown>'), 'y')
+
+    def test_comments_are_stripped(self):
+        from users.html_sanitizer import sanitize_email_html
+
+        self.assertEqual(sanitize_email_html('<!-- c --><p>k</p>'), '<p>k</p>')
+
+    def test_script_content_is_removed_not_just_the_tag(self):
+        from users.html_sanitizer import sanitize_email_html
+
+        self.assertEqual(sanitize_email_html('<script>SECRET</script>ok'), 'ok')
+
 
 @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
 class AdminEmailDeepLinkTests(TestCase):
@@ -825,6 +1051,60 @@ class AdminEmailDeepLinkTests(TestCase):
         response = self.client.get(f'{self.hub_url}?tab=compose&ids={self.u1.pk}')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self._checked_mode(response), 'users')
+
+    def _stage_draft(self, **payload):
+        """Persist a draft without sending: blank subject keeps the form invalid."""
+        payload.pop('subject', None)
+        payload.setdefault('message', 'Body in progress')
+        return self.client.post(
+            f'{self.hub_url}?tab=compose',
+            {**payload, 'subject': ''},
+        )
+
+    def test_ids_deeplink_beats_a_stale_draft(self):
+        """
+        Regression: a saved 'all users' draft used to overwrite the ?ids= deep
+        link from the changelist action, so ticking two users and pressing Send
+        would broadcast to the entire user base.
+        """
+        self._login_admin()
+        other = User.objects.create_user(
+            username='other', email='other@example.com', password='pass12345',
+        )
+        self._stage_draft(audience_mode='all')
+
+        response = self.client.get(f'{self.hub_url}?tab=compose&ids={self.u1.pk}')
+        self.assertEqual(self._checked_mode(response), 'users')
+        self.assertEqual(response.context['selected_users'][0]['id'], self.u1.pk)
+
+        # And the deep link must not have destroyed the draft either.
+        restored = self.client.get(f'{self.hub_url}?tab=compose')
+        self.assertEqual(restored.context['form'].initial['audience_mode'], 'all')
+
+    def test_user_id_deeplink_beats_a_stale_draft(self):
+        self._login_admin()
+        self._stage_draft(audience_mode='all')
+        response = self.client.get(f'{self.hub_url}?tab=compose&user_id={self.u1.pk}')
+        self.assertEqual(self._checked_mode(response), 'single')
+        restored = self.client.get(f'{self.hub_url}?tab=compose')
+        self.assertEqual(restored.context['form'].initial['audience_mode'], 'all')
+
+    def test_selected_user_ids_accepts_pasted_newlines(self):
+        """Ids pasted as newlines must parse the same way emails do."""
+        from users.forms import parse_id_list
+
+        u2 = User.objects.create_user(
+            username='u2', email='u2@example.com', password='pass12345',
+        )
+        ids, invalid = parse_id_list(f'{self.u1.pk}\n{u2.pk}\n\n{u2.pk}')
+        self.assertEqual(ids, [self.u1.pk, u2.pk])
+        self.assertEqual(invalid, [])
+
+        self.assertEqual(parse_id_list('1, 2\t3')[0], [1, 2, 3])
+        self.assertEqual(parse_id_list(f'{self.u1.pk},abc')[1], ['abc'])
+        # Out-of-range / non-positive ids are rejected, not passed to the ORM.
+        self.assertEqual(parse_id_list('0')[1], ['0'])
+        self.assertEqual(parse_id_list('9' * 40)[1], ['9' * 40])
 
     def test_bare_hub_defaults_to_segment(self):
         """Landing on the hub must never preselect a send-to-everyone default."""

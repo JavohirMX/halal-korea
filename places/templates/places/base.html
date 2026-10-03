@@ -819,7 +819,17 @@
     <script>
         window.TURNSTILE_SITEKEY = "{{ TURNSTILE_SITEKEY|escapejs }}";
     </script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    <!--
+        Turnstile api.js is loaded async/defer so it does not block first paint.
+        Because of that, turnstile.ready() throws if called before the script has
+        finished bootstrapping, so turnstile-helpers.js waits on this flag (set by
+        the tag's own load event) instead of testing whether window.turnstile exists.
+        The flag lives on window rather than on HalalTurnstile because with `async`
+        the helper script may not have run yet when onload fires.
+    -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer
+            onload="window.__turnstileApiLoaded = true"
+            onerror="window.__turnstileApiLoaded = false"></script>
     <script src="{% static 'js/turnstile-helpers.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
     <script src="{% static 'js/feedback-widget.js' %}"></script>
