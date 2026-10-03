@@ -60,61 +60,57 @@
 
             {# Specific users — search-as-you-type chips #}
             <div class="audience-panel" data-audience-panel="users" {% if audience_mode != 'users' %}hidden{% endif %}>
-                <h3 class="panel-title">{% trans "Pick users" %}</h3>
+                <div class="panel-head-flex">
+                    <h3 class="panel-title">{% trans "Pick users" %}</h3>
+                    <button type="button" class="btn-link text-muted" id="btn-clear-user-chips" style="display:none;">{% trans "Clear all" %}</button>
+                </div>
                 <div class="user-picker">
                     <input type="text"
                            class="form-control"
                            id="user-search-input"
-                           placeholder="{% trans 'Search by name, username or email…' %}"
+                           placeholder="{% trans 'Search by name, username or email… (use ↑↓ to navigate)' %}"
                            autocomplete="off"
                            role="combobox"
                            aria-expanded="false"
                            aria-controls="user-search-results">
                     <ul class="typeahead-results" id="user-search-results" role="listbox" hidden></ul>
                 </div>
-                <ul class="chip-list" id="user-chips">
-                    {% for row in selected_users %}
-                        <li class="chip" data-user-id="{{ row.id }}"{% if not row.has_email %} data-has-email="0"{% endif %}>
-                            <span class="chip-label">{{ row.name }}</span>
-                            <span class="chip-email">{{ row.email|default:_("no email — will be skipped") }}</span>
-                            <button type="button" class="chip-remove" aria-label="{% trans 'Remove' %}">&times;</button>
-                        </li>
-                    {% endfor %}
-                </ul>
+                <ul class="chip-list" id="user-chips">{% for row in selected_users %}<li class="chip" data-user-id="{{ row.id }}"{% if not row.has_email %} data-has-email="0"{% endif %}><span class="chip-label">{{ row.name }}</span><span class="chip-email">{{ row.email|default:_("no email — will be skipped") }}</span><button type="button" class="chip-remove" aria-label="{% trans 'Remove' %}">&times;</button></li>{% endfor %}</ul>
                 {% if form.selected_user_ids.errors %}
                     <ul class="errorlist">{{ form.selected_user_ids.errors }}</ul>
                 {% endif %}
                 <p class="help">{% trans "Users without an email address are counted as skipped." %}</p>
             </div>
 
-            {# Single user — arrives via ?user_id= from the change form #}
+            {# Single user — can search or arrives via ?user_id= #}
             <div class="audience-panel" data-audience-panel="single" {% if audience_mode != 'single' %}hidden{% endif %}>
                 <h3 class="panel-title">{% trans "Single user" %}</h3>
-                <ul class="chip-list">
-                    {% for row in selected_users %}
-                        <li class="chip" data-user-id="{{ row.id }}"{% if not row.has_email %} data-has-email="0"{% endif %}>
-                            <span class="chip-label">{{ row.name }}</span>
-                            <span class="chip-email">{{ row.email|default:_("no email — will be skipped") }}</span>
-                        </li>
-                    {% empty %}
-                        <li class="chip chip-warning" data-has-email="0">
-                            <span class="chip-label">{% trans "No user selected" %}</span>
-                            <span class="chip-email">{% trans "open this page from a user's change form" %}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
+                <div class="user-picker" id="single-user-picker-wrap"{% if selected_users %} style="display:none;"{% endif %}>
+                    <input type="text"
+                           class="form-control"
+                           id="single-user-search-input"
+                           placeholder="{% trans 'Search and select one user by name, username or email…' %}"
+                           autocomplete="off"
+                           role="combobox"
+                           aria-expanded="false"
+                           aria-controls="single-user-search-results">
+                    <ul class="typeahead-results" id="single-user-search-results" role="listbox" hidden></ul>
+                </div>
+                <ul class="chip-list" id="single-user-chips">{% for row in selected_users %}<li class="chip" data-user-id="{{ row.id }}"{% if not row.has_email %} data-has-email="0"{% endif %}><span class="chip-label">{{ row.name }}</span><span class="chip-email">{{ row.email|default:_("no email — will be skipped") }}</span><button type="button" class="chip-remove" id="btn-change-single-user" aria-label="{% trans 'Change user' %}">&times;</button></li>{% empty %}<li class="chip chip-warning chip-empty-single" data-has-email="0"><span class="chip-label">{% trans "No user selected" %}</span><span class="chip-email">{% trans "search above or open from a user's change form" %}</span></li>{% endfor %}</ul>
                 {{ form.user_id.errors }}
             </div>
 
-            {# Manual addresses — explained here, edited in the addresses card below #}
+            {# Manual addresses #}
             <div class="audience-panel" data-audience-panel="manual" {% if audience_mode != 'manual' %}hidden{% endif %}>
                 <h3 class="panel-title">{% trans "Manual addresses" %}</h3>
-                <p class="help">{% trans "Use the Addresses field below — it becomes required and is your only recipient source in this mode." %}</p>
+                <p class="help">{% trans "Type or paste email addresses below. One address per line or separated by commas." %}</p>
             </div>
 
             {# Addresses — additive in every mode except manual, where it is the sole source #}
             <div class="form-row addresses-row{% if audience_mode == 'manual' %} is-required{% endif %}" id="addresses-row">
-                <label for="{{ form.additional_emails.id_for_label }}">{% trans "Addresses" %}</label>
+                <label for="{{ form.additional_emails.id_for_label }}">
+                    <span id="addresses-label-text">{% if audience_mode == 'manual' %}{% trans "Recipient addresses" %}{% else %}{% trans "Additional addresses" %}{% endif %}</span>
+                </label>
                 {{ form.additional_emails.errors }}
                 {{ form.additional_emails }}
                 <p class="help" id="addresses-help">
@@ -129,23 +125,49 @@
 
         {# ---------- Message ---------- #}
         <div class="card">
-            <h2 class="card-title">{% trans "Message" %}</h2>
+            <div class="card-header-flex">
+                <h2 class="card-title" style="margin-bottom:0;">{% trans "Message" %}</h2>
+                <div class="message-quick-tools">
+                    <span class="autosave-indicator" id="autosave-status" aria-live="polite"></span>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-open-preview">
+                        <i class="fas fa-eye"></i> {% trans "Preview Email" %}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-open-test-send">
+                        <i class="fas fa-paper-plane"></i> {% trans "Send Test" %}
+                    </button>
+                </div>
+            </div>
 
-            <div class="form-row">
-                <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+            <div class="form-row" style="margin-top:16px;">
+                <div class="label-with-meta">
+                    <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+                    <span class="char-counter" id="subject-char-counter">0 / 200</span>
+                </div>
                 {{ form.subject.errors }}
                 {{ form.subject }}
             </div>
 
             <div class="form-row">
-                <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+                <div class="label-with-meta">
+                    <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+                    <span class="word-counter" id="message-word-counter">0 words</span>
+                </div>
+                <div class="format-toolbar" role="toolbar" aria-label="{% trans 'Text formatting tools' %}">
+                    <button type="button" class="toolbar-btn" data-format="b" title="{% trans 'Bold' %}"><strong>B</strong></button>
+                    <button type="button" class="toolbar-btn" data-format="i" title="{% trans 'Italic' %}"><em>I</em></button>
+                    <button type="button" class="toolbar-btn" data-format="h3" title="{% trans 'Heading' %}">H3</button>
+                    <button type="button" class="toolbar-btn" data-format="p" title="{% trans 'Paragraph' %}">&para;</button>
+                    <button type="button" class="toolbar-btn" data-format="ul" title="{% trans 'Bullet list' %}">&bull; List</button>
+                    <button type="button" class="toolbar-btn" data-format="a" title="{% trans 'Link' %}">&#128279; Link</button>
+                    <button type="button" class="toolbar-btn" data-format="blockquote" title="{% trans 'Quote' %}">&ldquo;&rdquo;</button>
+                </div>
                 {{ form.message.errors }}
                 {{ form.message }}
             </div>
 
             <div class="form-row">
-                <label>
-                    {{ form.send_as_html }} {{ form.send_as_html.label }}
+                <label class="checkbox-label">
+                    {{ form.send_as_html }} <span>{{ form.send_as_html.label }}</span>
                 </label>
                 {% if form.send_as_html.help_text %}<p class="help">{{ form.send_as_html.help_text }}</p>{% endif %}
             </div>
@@ -191,9 +213,14 @@
                 {% blocktrans with n=recipient_count %}This reaches {{ n }} recipients. Type the number below to confirm.{% endblocktrans %}
             </p>
             <div class="form-row">
-                <label for="{{ form.confirm_send_count.id_for_label }}">{{ form.confirm_send_count.label }}</label>
-                {{ form.confirm_send_count.errors }}
-                {{ form.confirm_send_count }}
+                <div class="confirm-input-wrap">
+                    <label for="{{ form.confirm_send_count.id_for_label }}">{{ form.confirm_send_count.label }}</label>
+                    {{ form.confirm_send_count.errors }}
+                    <div class="confirm-field-flex">
+                        {{ form.confirm_send_count }}
+                        <span class="confirm-status-icon" id="confirm-match-icon" aria-live="polite"></span>
+                    </div>
+                </div>
                 {% if form.confirm_send_count.help_text %}
                     <p class="help">{{ form.confirm_send_count.help_text }}</p>
                 {% endif %}
@@ -201,11 +228,65 @@
         </div>
 
         <div class="actions">
-            <input type="submit" class="default" value="{% trans 'Send email' %}">
-            <a href="{% url 'admin_email:hub' %}?tab=recent">{% trans 'Cancel' %}</a>
+            <input type="submit" class="default btn-send" id="btn-submit-send" value="{% trans 'Send email' %}">
+            <button type="button" class="btn btn-outline-info" id="btn-actions-preview">{% trans "Preview Email" %}</button>
+            <a href="{% url 'admin_email:hub' %}?tab=recent" class="btn-cancel">{% trans 'Cancel' %}</a>
             <a href="{% url 'admin_email:hub' %}?tab=compose&amp;discard=1" class="discard-draft" id="discard-draft">{% trans 'Discard draft' %}</a>
         </div>
     </form>
+
+    {# ---------- Modal: Branded Email Live Preview ---------- #}
+    <div class="modal-backdrop" id="email-preview-modal" hidden>
+        <div class="modal-dialog modal-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title">
+            <div class="modal-header">
+                <h3 class="modal-title" id="preview-modal-title">
+                    <i class="fas fa-envelope-open-text"></i> {% trans "Branded Email Preview" %}
+                </h3>
+                <div class="modal-viewport-toggle">
+                    <button type="button" class="btn btn-sm btn-light active" id="viewport-desktop" title="Desktop 600px">
+                        <i class="fas fa-desktop"></i> Desktop
+                    </button>
+                    <button type="button" class="btn btn-sm btn-light" id="viewport-mobile" title="Mobile 360px">
+                        <i class="fas fa-mobile-alt"></i> Mobile
+                    </button>
+                </div>
+                <button type="button" class="modal-close" id="btn-close-preview" aria-label="{% trans 'Close' %}">&times;</button>
+            </div>
+            <div class="modal-meta">
+                <div class="preview-subject-line">
+                    <span class="preview-label">{% trans "Subject:" %}</span>
+                    <strong id="preview-modal-subject">—</strong>
+                </div>
+            </div>
+            <div class="modal-body preview-frame-container desktop" id="preview-frame-container">
+                <iframe id="email-preview-iframe" title="{% trans 'Email HTML Preview' %}" sandbox="allow-same-origin"></iframe>
+            </div>
+        </div>
+    </div>
+
+    {# ---------- Modal: Send Test Email ---------- #}
+    <div class="modal-backdrop" id="test-send-modal" hidden>
+        <div class="modal-dialog modal-test-dialog" role="dialog" aria-modal="true" aria-labelledby="test-modal-title">
+            <div class="modal-header">
+                <h3 class="modal-title" id="test-modal-title">
+                    <i class="fas fa-paper-plane"></i> {% trans "Send Test Email" %}
+                </h3>
+                <button type="button" class="modal-close" id="btn-close-test-send" aria-label="{% trans 'Close' %}">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="help" style="margin-top:0;">{% trans "Send a single branded test email with your current subject and message to verify layout and delivery." %}</p>
+                <div class="form-row">
+                    <label for="test-send-email-input">{% trans "Destination email:" %}</label>
+                    <input type="email" id="test-send-email-input" class="form-control" placeholder="admin@example.com">
+                </div>
+                <div id="test-send-status" class="test-status-box" hidden></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btn-do-test-send">{% trans "Send test now" %}</button>
+                <button type="button" class="btn btn-secondary" id="btn-cancel-test-send">{% trans "Close" %}</button>
+            </div>
+        </div>
+    </div>
 
     {{ compose_js_config|json_script:"email-compose-config" }}
     <script src="{% static 'admin/js/email_compose.js' %}" defer></script>

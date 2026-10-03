@@ -219,8 +219,10 @@ class AdminEmailComposeForm(forms.Form):
         return valid
 
     def clean_selected_user_ids(self):
-        ids, invalid = parse_id_list(self.cleaned_data.get('selected_user_ids'))
-        if invalid:
+        raw = self.cleaned_data.get('selected_user_ids')
+        ids, invalid = parse_id_list(raw)
+        mode = self.data.get('audience_mode') or self.initial.get('audience_mode') or DEFAULT_AUDIENCE_MODE
+        if invalid and mode == AUDIENCE_MODE_USERS:
             raise ValidationError(
                 'Invalid user id(s): %(ids)s',
                 code='invalid',
@@ -232,10 +234,13 @@ class AdminEmailComposeForm(forms.Form):
         raw = (self.cleaned_data.get('user_id') or '').strip()
         if not raw:
             return ''
+        mode = self.data.get('audience_mode') or self.initial.get('audience_mode') or DEFAULT_AUDIENCE_MODE
         try:
             return int(raw)
         except (TypeError, ValueError):
-            raise ValidationError('Invalid user id.', code='invalid')
+            if mode == AUDIENCE_MODE_SINGLE:
+                raise ValidationError('Invalid user id.', code='invalid')
+            return ''
 
     def clean(self):
         cleaned = super().clean()

@@ -14,4 +14,6 @@ urlpatterns = [
     path('compose/', admin_email_views.email_compose, name='compose'),
     path('api/preview/', admin_email_views.email_preview, name='preview'),
     path('api/users/', admin_email_views.email_user_search, name='user_search'),
+    path('api/render-preview/', admin_email_views.email_render_preview, name='render_preview'),
+    path('api/test-send/', admin_email_views.email_test_send, name='test_send'),
 ]

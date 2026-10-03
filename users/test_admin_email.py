@@ -1219,3 +1219,89 @@ class AdminEmailDraftTests(TestCase):
         after = self.client.get(f'{self.hub_url}?tab=compose')
         self.assertEqual(after.status_code, 200)
         self.assertNotEqual(after.context['form'].initial.get('subject'), 'Sent already')
+
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class AdminEmailEnhancedFeaturesTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin = User.objects.create_superuser(
+            username='admin', email='admin@example.com', password='adminpass123',
+        )
+        self.u1 = User.objects.create_user(
+            username='alice', email='alice@example.com', password='pass12345',
+        )
+        self.hub_url = reverse('admin_email:hub')
+        self.preview_render_url = reverse('admin_email:render_preview')
+        self.test_send_url = reverse('admin_email:test_send')
+        self.client.login(username='admin', password='adminpass123')
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_send_as_html_strips_tags_for_plain_text_fallback(self, _mock_submit):
+        response = self.client.post(
+            f'{self.hub_url}?tab=compose',
+            {
+                'audience_mode': 'manual',
+                'additional_emails': 'recipient@example.com',
+                'subject': 'Rich HTML Email',
+                'message': '<p>Hello <b>World</b>! <a href="https://example.com">Click</a></p>',
+                'send_as_html': 'on',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        sent = mail.outbox[0]
+        # HTML alternative body contains formatted HTML
+        self.assertTrue(len(sent.alternatives) > 0)
+        self.assertIn('<b>World</b>', sent.alternatives[0][0])
+        # Plain body must NOT have raw HTML tags
+        self.assertNotIn('<p>', sent.body)
+        self.assertNotIn('<b>', sent.body)
+        self.assertNotIn('</a>', sent.body)
+        self.assertIn('Hello World! Click', sent.body)
+
+    def test_render_email_preview_api(self):
+        response = self.client.post(
+            self.preview_render_url,
+            {
+                'subject': 'Preview Subject',
+                'message': '<p>Preview <strong>Message</strong></p>',
+                'send_as_html': 'on',
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn('html', data)
+        self.assertIn('plain', data)
+        self.assertEqual(data['subject'], 'Preview Subject')
+        self.assertIn('<strong>Message</strong>', data['html'])
+        self.assertNotIn('<strong>', data['plain'])
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_test_send_api(self, _mock_submit):
+        response = self.client.post(
+            self.test_send_url,
+            {
+                'test_email': 'tester@example.com',
+                'subject': 'Test Campaign',
+                'message': 'Testing message body',
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data.get('ok'))
+        self.assertEqual(data.get('email'), 'tester@example.com')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['tester@example.com'])
+        self.assertIn('[TEST]', mail.outbox[0].subject)
+
+    def test_stale_ids_tolerated_in_all_audience_mode(self):
+        form = AdminEmailComposeForm(
+            data={
+                'audience_mode': 'all',
+                'selected_user_ids': 'invalid_id_999999999999999999999',
+                'subject': 'All users test',
+                'message': 'Message to all',
+            }
+        )
+        self.assertTrue(form.is_valid())

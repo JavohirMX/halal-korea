@@ -22,54 +22,76 @@
 
 {% block content %}
 <div class="email-hub">
-    <h1>{% trans "Email" %}</h1>
+    <div class="hub-header-flex">
+        <h1>{% trans "Email Hub" %}</h1>
+        {% if tab == 'recent' %}
+            <a href="{% url 'admin_email:hub' %}?tab=compose" class="btn btn-primary btn-compose-shortcut">
+                <i class="fas fa-paper-plane"></i> &nbsp; {% trans "Compose Email" %}
+            </a>
+        {% endif %}
+    </div>
 
     <nav class="email-hub-tabs" aria-label="{% trans 'Email sections' %}">
         <a href="{% url 'admin_email:hub' %}?tab=compose"
            class="{% if tab == 'compose' %}active{% endif %}">
-            {% trans "Compose" %}
+            <i class="fas fa-edit"></i> {% trans "Compose" %}
         </a>
         <a href="{% url 'admin_email:hub' %}?tab=recent"
            class="{% if tab == 'recent' %}active{% endif %}">
-            {% trans "Recent sends" %}
+            <i class="fas fa-history"></i> {% trans "Recent sends" %}
         </a>
     </nav>
 
     {% if tab == 'compose' %}
         {% include "admin/users/_compose_email_form.html" %}
     {% else %}
-        <div class="email-compose-actions">
-            <a href="{% url 'admin_email:hub' %}?tab=compose" class="btn btn-info">
-                <i class="fa fa-envelope"></i> &nbsp; {% trans "Compose" %}
-            </a>
-        </div>
         <div class="card">
-            <h2 style="margin-top:0;">{% trans "Recent sends" %}</h2>
+            <h2 style="margin-top:0;">{% trans "Recent email deliveries" %}</h2>
             {% if recent_sends %}
                 <table class="recent-table">
                     <thead>
                         <tr>
-                            <th>{% trans "When" %}</th>
+                            <th>{% trans "Date & Time" %}</th>
                             <th>{% trans "Subject" %}</th>
-                            <th>{% trans "Recipients" %}</th>
+                            <th>{% trans "Audience" %}</th>
                             <th>{% trans "Admin" %}</th>
-                            <th>{% trans "Result" %}</th>
+                            <th>{% trans "Delivery Status" %}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for action in recent_sends %}
                         <tr>
-                            <td>
-                                {{ action.timestamp|date:"Y-m-d H:i" }}
-                                <div class="muted">{{ action.changes.audience_label|default:action.changes.mode|default:"" }}</div>
+                            <td class="nowrap">
+                                <strong>{{ action.timestamp|date:"Y-m-d H:i" }}</strong>
                             </td>
-                            <td>{{ action.changes.subject|default:action.object_repr }}</td>
-                            <td>{{ action.changes.recipient_count|default:"—" }}</td>
-                            <td>{{ action.admin_user.username }}</td>
                             <td>
-                                <span class="muted">
-                                    {% blocktrans with sent=action.changes.sent|default:0 skipped=action.changes.skipped|default:0 failed=action.changes.failed|default:0 %}sent {{ sent }}, skipped {{ skipped }}, failed {{ failed }}{% endblocktrans %}
-                                </span>
+                                <div class="recent-subject">{{ action.changes.subject|default:action.object_repr }}</div>
+                            </td>
+                            <td>
+                                <span class="badge-audience">{{ action.changes.audience_label|default:action.changes.mode|default:"broadcast" }}</span>
+                                <div class="muted" style="margin-top:2px;">
+                                    {% blocktrans with n=action.changes.recipient_count|default:0 %}{{ n }} recipient(s){% endblocktrans %}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-admin">{{ action.admin_user.username }}</span>
+                            </td>
+                            <td>
+                                <div class="status-pills">
+                                    <span class="pill pill-sent" title="Queued/Sent">
+                                        <i class="fas fa-check-circle"></i> {{ action.changes.sent|default:0 }}
+                                    </span>
+                                    {% if action.changes.skipped %}
+                                        <span class="pill pill-skipped" title="Skipped (no email or duplicate)">
+                                            <i class="fas fa-minus-circle"></i> {{ action.changes.skipped }}
+                                        </span>
+                                    {% endif %}
+                                    {% if action.changes.failed %}
+                                        <span class="pill pill-failed" title="Failed to queue">
+                                            <i class="fas fa-exclamation-circle"></i> {{ action.changes.failed }}
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}

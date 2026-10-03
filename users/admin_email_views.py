@@ -110,3 +110,23 @@ def email_user_search(request):
     """GET ?q=… typeahead over username, name and email for the user chips."""
     results = _user_admin().search_users(request.GET.get('q', ''))
     return JsonResponse({'results': results, 'count': len(results)})
+
+
+@_json_staff_gate
+def email_render_preview(request):
+    """POST subject/message to get the rendered branded HTML email preview."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required.'}, status=405)
+
+    payload, status = _user_admin().render_email_preview(request)
+    return JsonResponse(payload, status=status)
+
+
+@_json_staff_gate
+def email_test_send(request):
+    """POST subject/message/test_email to send a one-off test email."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required.'}, status=405)
+
+    payload, status = _user_admin().test_send_email(request)
+    return JsonResponse(payload, status=status)

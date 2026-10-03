@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import path, reverse
-from django.utils.html import escape, linebreaks
+from django.utils.html import escape, linebreaks, strip_tags
 from django.utils.http import urlencode
 
 from utils.models import AdminAction, hash_ip
@@ -24,7 +24,7 @@ from .forms import (
 )
 from .html_sanitizer import sanitize_email_html
 from .models import User
-from .utils import queue_admin_emails
+from .utils import _render_admin_email, queue_admin_emails, send_admin_email_to_address
 
 
 LARGE_SEND_THRESHOLD = 50
@@ -207,6 +207,9 @@ class UserAdmin(admin.ModelAdmin):
             'compose_js_config': {
                 'previewUrl': reverse('admin_email:preview'),
                 'searchUrl': reverse('admin_email:user_search'),
+                'renderPreviewUrl': reverse('admin_email:render_preview'),
+                'testSendUrl': reverse('admin_email:test_send'),
+                'userEmail': getattr(request.user, 'email', '') or '',
                 'confirmThreshold': LARGE_SEND_THRESHOLD,
                 'sampleSize': PREVIEW_SAMPLE_SIZE,
                 'defaultMode': DEFAULT_AUDIENCE_MODE,
@@ -243,12 +246,12 @@ class UserAdmin(admin.ModelAdmin):
                 )
                 return None, selection
 
-        body_plain = form.cleaned_data['message']
+        body_input = form.cleaned_data['message']
         if form.cleaned_data.get('send_as_html'):
             # Raw admin HTML would otherwise reach the template via |safe,
             # which turns any staff account into a mass-phishing tool using the
             # site's own branding.
-            body_html = sanitize_email_html(body_plain)
+            body_html = sanitize_email_html(body_input)
             if not body_html.strip():
                 form.add_error(
                     'message',
@@ -256,7 +259,11 @@ class UserAdmin(admin.ModelAdmin):
                     'Use plain text, or only formatting tags.',
                 )
                 return None, selection
+            # Strip tags for the plain text multipart fallback so clients without
+            # HTML email rendering don't see raw HTML tags.
+            body_plain = strip_tags(body_html).strip() or body_input
         else:
+            body_plain = body_input
             body_html = linebreaks(escape(body_plain))
 
         result = queue_admin_emails(
@@ -601,6 +608,74 @@ class UserAdmin(admin.ModelAdmin):
             'sample': recipients[:PREVIEW_SAMPLE_SIZE],
             'total_samples': total,
         }, 200
+
+    def render_email_preview(self, request):
+        """Render the branded HTML email for live visual preview in the compose UI."""
+        payload = request.POST
+        subject = (payload.get('subject') or '').strip() or 'Email Subject Preview'
+        body_input = (payload.get('message') or '').strip() or 'Your message will appear here…'
+        send_as_html = _as_bool(payload.get('send_as_html'))
+
+        if send_as_html:
+            body_html = sanitize_email_html(body_input)
+            if not body_html.strip():
+                body_html = '<p><em>(Empty or unsafe markup removed)</em></p>'
+            body_plain = strip_tags(body_html).strip() or body_input
+        else:
+            body_plain = body_input
+            body_html = linebreaks(escape(body_plain))
+
+        display_name = getattr(request.user, 'full_name', '') or request.user.username or 'Recipient'
+        plain_message, html_message = _render_admin_email(
+            subject=subject,
+            body_plain=body_plain,
+            body_html=body_html,
+            display_name=display_name,
+            recipient_email=request.user.email or 'recipient@example.com',
+        )
+        return {
+            'subject': subject,
+            'html': html_message,
+            'plain': plain_message,
+        }, 200
+
+    def test_send_email(self, request):
+        """Send a one-off test email to the current admin or specified address."""
+        payload = request.POST
+        target_email = (payload.get('test_email') or getattr(request.user, 'email', '') or '').strip()
+        if not target_email:
+            return {'error': 'No test email address provided.'}, 400
+
+        try:
+            from django.core.validators import validate_email
+            validate_email(target_email)
+        except Exception:
+            return {'error': f'Invalid email address: {target_email}'}, 400
+
+        subject = (payload.get('subject') or '').strip() or 'Test: Admin message'
+        body_input = (payload.get('message') or '').strip() or 'This is a test message from Halal Korea admin.'
+        send_as_html = _as_bool(payload.get('send_as_html'))
+
+        if send_as_html:
+            body_html = sanitize_email_html(body_input)
+            if not body_html.strip():
+                return {'error': 'The HTML body was empty after removing unsafe markup.'}, 400
+            body_plain = strip_tags(body_html).strip() or body_input
+        else:
+            body_plain = body_input
+            body_html = linebreaks(escape(body_plain))
+
+        display_name = getattr(request.user, 'full_name', '') or request.user.username
+        ok = send_admin_email_to_address(
+            target_email,
+            f"[TEST] {subject}",
+            body_plain,
+            body_html=body_html,
+            display_name=display_name,
+        )
+        if ok:
+            return {'ok': True, 'email': target_email}, 200
+        return {'error': f'Failed to send test email to {target_email}.'}, 500
 
     def _log_admin_action(self, request, *, subject, result, filters_meta, ad_hoc_count, mode, recipient_count):
         try:
