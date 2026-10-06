@@ -507,9 +507,11 @@ services:
 | `ALERT_EMAIL_RECIPIENTS` | Comma-separated alert emails | N/A |
 | `WATERMARK_ENABLED` | Enable image watermarking | `True` |
 | `WATERMARK_OPACITY` | Watermark opacity (0.0-1.0) | `0.25` |
-| `EMAIL_BACKEND` | Email backend class | Console in dev |
+| `EMAIL_BACKEND` | Email backend class (`utils.email_backends.brevo_api.BrevoAPIBackend` or SMTP) | Console in dev |
+| `BREVO_API_KEY` | Brevo REST API Key (v3) | N/A |
 | `EMAIL_HOST` | SMTP server host | `smtp-relay.brevo.com` |
-| `EMAIL_PORT` | SMTP port | `587` |
+| `EMAIL_PORT` | SMTP port (`587`, `2525`, `465`) | `587` |
+| `EMAIL_USE_SSL` | Enable SSL for port 465 | `False` |
 | `EMAIL_HOST_USER` | Brevo SMTP login | N/A |
 | `EMAIL_HOST_PASSWORD` | Brevo SMTP key | N/A |
 
@@ -518,25 +520,26 @@ services:
 The project uses a dual-service email setup:
 
 **Sending Emails (Brevo/Sendinblue)**
-- Transactional emails (password reset, verification, notifications)
-- SMTP relay via `smtp-relay.brevo.com:587`
-- Requires Brevo account with SMTP credentials
+- Transactional emails (password reset, verification, notifications, admin messaging)
+- **Recommended for DigitalOcean / VPS**: Brevo REST API via HTTPS (Port 443). DigitalOcean blocks outbound SMTP ports (25, 465, 587, 2525); using the HTTPS REST API backend bypasses all host port restrictions.
+- **Alternative**: SMTP relay via `smtp-relay.brevo.com` on port 587, 2525 (TLS), or 465 (SSL).
+
+```env
+# Email Configuration (Production - Recommended Brevo REST API)
+EMAIL_BACKEND=utils.email_backends.brevo_api.BrevoAPIBackend
+BREVO_API_KEY=xkeysib-your-brevo-api-key
+DEFAULT_FROM_EMAIL=Halal Korea <noreply@halal-korea.com>
+
+# Diagnostic Tool:
+# Run diagnostic port probe and email test:
+# docker-compose exec web python manage.py test_email --check-ports
+# docker-compose exec web python manage.py test_email --to you@example.com
+```
 
 **Receiving Emails (Cloudflare Email Routing)**
 - Cloudflare handles inbound email routing
 - Custom domain email addresses (e.g., `contact@halal-korea.com`)
 - Forwards to designated mailboxes
-
-```env
-# Email Configuration (Production)
-EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp-relay.brevo.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-brevo-smtp-login
-EMAIL_HOST_PASSWORD=your-brevo-smtp-key
-DEFAULT_FROM_EMAIL=Halal Korea <noreply@halal-korea.com>
-```
 
 ## 📱 Apps & Modules
 

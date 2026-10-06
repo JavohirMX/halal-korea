@@ -10,6 +10,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from .tokens import email_verification_token, password_reset_token
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -132,19 +133,34 @@ def queue_admin_emails(recipients, subject, body_plain, *, body_html=None):
     return {'sent': sent, 'skipped': skipped, 'failed': failed}
 
 
-def _deliver_email(subject, plain_message, html_message, recipient, success_log, error_log):
-    try:
-        send_mail(
-            subject=subject,
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[recipient],
-            html_message=html_message,
-            fail_silently=False,
-        )
-        logger.info(success_log)
-    except Exception:
-        logger.exception(error_log)
+def _deliver_email(subject, plain_message, html_message, recipient, success_log, error_log, max_retries=2):
+    attempts = max_retries + 1
+    for attempt in range(1, attempts + 1):
+        try:
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[recipient],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            logger.info(success_log)
+            return
+        except Exception as e:
+            if attempt < attempts:
+                wait_secs = attempt * 1.5
+                logger.warning(
+                    "Email send attempt %d/%d failed for %s (%s). Retrying in %.1fs...",
+                    attempt,
+                    attempts,
+                    recipient,
+                    e,
+                    wait_secs,
+                )
+                time.sleep(wait_secs)
+            else:
+                logger.exception("%s (after %d attempts)", error_log, attempts)
 
 
 def send_activation_email(user, request):
