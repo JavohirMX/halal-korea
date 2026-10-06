@@ -26,9 +26,18 @@ services:
   telegram-bot-api:
     image: aiogram/telegram-bot-api:latest
     restart: unless-stopped
+    entrypoint: >
+      sh -c '
+        if [ -z "$$TELEGRAM_API_ID" ] || [ -z "$$TELEGRAM_API_HASH" ]; then
+          echo "Telegram API credentials not set. Bot API local server idle."
+          exec sleep infinity
+        else
+          exec /docker-entrypoint.sh "$$@"
+        fi
+      '
     environment:
-      TELEGRAM_API_ID: ${TELEGRAM_API_ID}
-      TELEGRAM_API_HASH: ${TELEGRAM_API_HASH}
+      TELEGRAM_API_ID: ${TELEGRAM_API_ID:-}
+      TELEGRAM_API_HASH: ${TELEGRAM_API_HASH:-}
       TELEGRAM_LOCAL: "1"
     volumes:
       - telegram-bot-api-data:/var/lib/telegram-bot-api
