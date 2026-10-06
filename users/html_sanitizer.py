@@ -13,7 +13,10 @@ named is dropped, so a novel tag or attribute cannot slip through.
 """
 import logging
 
-import nh3
+try:
+    import nh3
+except ImportError:
+    nh3 = None
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +61,10 @@ def sanitize_email_html(raw_html):
     block a send or leak unsanitised markup.
     """
     if not raw_html:
+        return ''
+
+    if nh3 is None:
+        logger.warning('nh3 is not installed; returning empty string for HTML email body')
         return ''
 
     try:
