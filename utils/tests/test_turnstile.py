@@ -6,7 +6,9 @@ from unittest.mock import MagicMock, patch
 
 import requests
 from django import forms
+from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.utils.safestring import SafeData
 
 from utils.turnstile import (
     TurnstileField,
@@ -182,6 +184,36 @@ class TurnstileFieldTests(SimpleTestCase):
         self.assertIn('data-sitekey="%s"' % DUMMY_SITEKEY, html)
         self.assertIn('data-action="register"', html)
         self.assertIn('class="cf-turnstile"', html)
+
+    def test_widget_render_returns_safe_string(self):
+        """A custom Widget.render() must mark its output safe.
+
+        Django's base Widget.render() finishes with mark_safe(). An override
+        that returns a plain str is auto-escaped by the template engine, so
+        {{ form.captcha }} prints the div as visible text and the widget never
+        reaches the DOM.
+        """
+        field = TurnstileField(action="register")
+        self.assertIsInstance(field.widget.render("captcha", None), SafeData)
+
+    def test_form_template_renders_unescaped_div(self):
+        """Regression: the container must survive template rendering."""
+
+        class CaptchaForm(forms.Form):
+            captcha = TurnstileField(action="register")
+
+        rendered = Template("{{ form.captcha }}").render(
+            Context({"form": CaptchaForm()})
+        )
+        self.assertIn('<div class="cf-turnstile"', rendered)
+        self.assertNotIn("&lt;div", rendered)
+
+    def test_widget_escapes_interpolated_values(self):
+        """Interpolated values are escaped even though the result is safe."""
+        field = TurnstileField(action='reg" onload="alert(1)')
+        html = field.widget.render("captcha", None)
+        self.assertNotIn('onload="alert(1)"', html)
+        self.assertIn("&quot;", html)
 
 
 class GetClientIpTests(SimpleTestCase):

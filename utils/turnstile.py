@@ -12,6 +12,7 @@ import logging
 import requests
 from django import forms
 from django.conf import settings
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
@@ -96,10 +97,16 @@ class TurnstileWidget(forms.Widget):
         action = final_attrs.pop("data-action", None) or self.action
         sitekey = settings.TURNSTILE_SITEKEY
         widget_id = final_attrs.get("id") or "cf-turnstile"
-        action_attr = f' data-action="{action}"' if action else ""
-        return (
-            f'<div class="cf-turnstile" id="{widget_id}" '
-            f'data-sitekey="{sitekey}"{action_attr}></div>'
+        # format_html escapes each interpolated value and marks the result safe.
+        # Overriding render() bypasses the mark_safe() that Django's base
+        # Widget.render() applies, so without this {{ form.captcha }} would emit
+        # the container as escaped text and the widget would never reach the DOM.
+        action_attr = format_html(' data-action="{}"', action) if action else ""
+        return format_html(
+            '<div class="cf-turnstile" id="{}" data-sitekey="{}"{}></div>',
+            widget_id,
+            sitekey,
+            action_attr,
         )
 
     def value_from_datadict(self, data, files, name):
