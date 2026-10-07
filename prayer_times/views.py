@@ -101,7 +101,10 @@ def get_prayer_times_data(request):
     try:
         calculation_method = request.session.get('calculation_method', 3)
         asr_method = request.session.get('asr_method', 1)
-        location_context = get_user_location_context(request)
+        # This endpoint cannot answer without coordinates, so allow a short wait
+        # for the background IP lookup. Visitors who declined the browser prompt
+        # still get prayer times for their approximate city.
+        location_context = get_user_location_context(request, wait_for_lookup=True)
         location = location_context['location']
         is_in_korea = location_context['is_in_korea']
         

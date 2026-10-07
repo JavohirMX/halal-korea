@@ -2,11 +2,21 @@ from utils.location import (
     get_client_ip,
     get_ip_location,
     is_bot_or_non_page_request,
+    schedule_geo_lookup,
+    wait_for_ip_location,
 )
 import time
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Upper bound for the opt-in wait, in seconds. Only endpoints that cannot answer
+# without coordinates pass wait_for_lookup=True.
+LOCATION_LOOKUP_WAIT_SECONDS = 2.0
+
+
+def _FALLBACK_LOCATION():
+    return {"city": "Unknown", "country": "Unknown", "is_fallback": True}
 
 
 def is_user_in_korea(location_data):
@@ -75,13 +85,17 @@ def is_user_in_korea(location_data):
     return False  # Default to international if unclear
 
 
-def get_user_location_context(request):
+def get_user_location_context(request, wait_for_lookup=False):
     """
     Get comprehensive location context including whether user is in Korea.
     Returns a dictionary with location info and user context.
+
+    wait_for_lookup=True lets this call wait up to LOCATION_LOOKUP_WAIT_SECONDS
+    for a background lookup to finish. Only endpoints that cannot produce an
+    answer without coordinates should set it.
     """
     logger.debug("Getting user location context")
-    location = get_user_location(request)
+    location = get_user_location(request, wait_for_lookup=wait_for_lookup)
     is_in_korea = is_user_in_korea(location)
 
     user_type = "local" if is_in_korea else "international"
@@ -92,16 +106,43 @@ def get_user_location_context(request):
     return {"location": location, "is_in_korea": is_in_korea, "user_type": user_type}
 
 
-def get_user_location(request):
+def _promote_cached_location(request, location):
+    """Store a usable cached location in the session and return it.
+
+    Returns None when the cached value is a failure marker or has no city.
     """
-    Get user's location from session or fallback to IP-based location.
-    Returns a dictionary with location information.
-    Enhanced to better handle international users.
+    if not location or location.get("lookup_failed") or not location.get("city"):
+        return None
+
+    location = dict(location)
+    location["is_fallback"] = False
+    location["timestamp"] = time.time()
+    request.session["user_location"] = location
+    return location
+
+
+def get_user_location(request, wait_for_lookup=False):
     """
-    # Skip external lookups entirely for bots and non-page requests
+    Get the user's location. This function makes no network call of its own.
+
+    Resolution order:
+      1. Bot or non-page request, or a development override -> immediate return
+      2. Session value that is less than 1 hour old
+      3. Shared cache lookup for the client IP
+      4. Cache miss -> schedule a background lookup and return the fallback
+
+    The fallback is never written to the session, so the next request can pick up
+    the real result as soon as the background task has finished.
+
+    wait_for_lookup=True additionally waits for the background task to publish a
+    result, up to LOCATION_LOOKUP_WAIT_SECONDS. This keeps the prayer times
+    endpoint working for visitors who decline the browser location prompt.
+    """
+    # Skip lookups entirely for bots and non-page requests. Do not schedule a
+    # background task for these either.
     if is_bot_or_non_page_request(request):
         logger.debug("Bot or non-page request detected, using fallback location")
-        return {"city": "Unknown", "country": "Unknown", "is_fallback": True}
+        return _FALLBACK_LOCATION()
 
     # Development override for testing international users
     if request.GET.get("force_international"):
@@ -134,16 +175,16 @@ def get_user_location(request):
     session_loc = request.session.get("user_location")
 
     if (
-        session_loc and time.time() - session_loc["timestamp"] < 3600
+        session_loc and time.time() - session_loc.get("timestamp", 0) < 3600
     ):  # Check if not expired (1 hour)
         logger.debug(
             f"Using cached location from session: {session_loc.get('city', 'Unknown')}, {session_loc.get('country', 'Unknown')}"
         )
         return session_loc
 
-    logger.debug("No valid cached location, fetching from IP")
+    logger.debug("No valid cached location in session, checking shared cache")
 
-    # If no valid session location, try to get location from IP
+    # Cache read only. This call never makes a network request.
     ip = get_client_ip(request)
     logger.debug(f"Detected client IP: {ip}")
     location = get_ip_location(ip)
@@ -155,24 +196,38 @@ def get_user_location(request):
         or location.get("lookup_failed")
         or not location.get("city")
     ):
-        logger.warning(f"Failed to get location from IP {ip}, using fallback")
-        # For development/unknown cases, provide a neutral fallback
-        location = {"city": "Unknown", "country": "Unknown", "is_fallback": True}
-    else:
-        # Mark as detected from IP
-        location["is_fallback"] = False
-        logger.info(
-            f"Successfully retrieved location from IP {ip}: {location.get('city')}, {location.get('country')}"
-        )
+        # Cache miss, cached failure, or unusable result. Schedule the lookup for
+        # the background and return the fallback now. The visitor does not wait.
+        schedule_geo_lookup(ip)
+        logger.info(f"No cached location for IP {ip}, returning fallback")
 
-    # Add timestamp to location data
-    location["timestamp"] = time.time()
+        if wait_for_lookup:
+            # This endpoint cannot answer without coordinates, so give the
+            # background task a short window to publish a result.
+            waited = wait_for_ip_location(ip, LOCATION_LOOKUP_WAIT_SECONDS)
+            promoted = _promote_cached_location(request, waited)
+            if promoted:
+                logger.info(
+                    f"Waited for the background lookup: {promoted.get('city')}, {promoted.get('country')}"
+                )
+                return promoted
+            logger.warning(
+                f"Waited {LOCATION_LOOKUP_WAIT_SECONDS}s for IP {ip} with no usable result"
+            )
 
-    # Save to session
-    request.session["user_location"] = location
+        # For development/unknown cases, provide a neutral fallback.
+        # This value is deliberately NOT stored in the session. Storing it would
+        # hide the real result for the next hour.
+        return _FALLBACK_LOCATION()
+
+    # Mark as detected from IP
+    promoted = _promote_cached_location(request, location)
+    logger.info(
+        f"Successfully retrieved location from IP {ip}: {promoted.get('city')}, {promoted.get('country')}"
+    )
     logger.debug("Location saved to session")
 
-    return location
+    return promoted
 
 
 def get_default_korea_location():
