@@ -262,3 +262,19 @@ class TinyMCEUploadViewDetailedTest(TestCase):
                 media_path = location.split('/media/')[-1]
                 if default_storage.exists(media_path):
                     default_storage.delete(media_path)
+
+
+class UploadExtensionHardeningTests(TestCase):
+    def test_html_extension_is_replaced_by_content_type_extension(self):
+        User = get_user_model()
+        User.objects.create_user(username='hs', email='hs@example.com', password='pw12345!', is_staff=True)
+        self.client.login(username='hs', password='pw12345!')
+        f = SimpleUploadedFile('evil.html', b'\x89PNG\r\n\x1a\n', content_type='image/png')
+        response = self.client.post('/tinymce/upload/', {'file': f})
+        self.assertEqual(response.status_code, 200)
+        location = json.loads(response.content)['location']
+        self.assertTrue(location.endswith('.png'))
+        self.assertNotIn('.html', location)
+        media_path = location.split('/media/')[-1]
+        if default_storage.exists(media_path):
+            default_storage.delete(media_path)

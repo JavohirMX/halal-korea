@@ -44,6 +44,12 @@ def set_language(request):
         supported_languages = dict(settings.LANGUAGES)
         if language not in supported_languages:
             logger.warning(f"Invalid language requested: {language}")
+            if not url_has_allowed_host_and_scheme(
+                url=next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                next_url = '/'
             return HttpResponseRedirect(next_url)
         
         # Validate next URL for security
@@ -105,6 +111,12 @@ def set_language(request):
         logger.error(f"Error in set_language view: {str(e)}", exc_info=True)
         # Fall back to original URL or home page
         fallback_url = request.POST.get('next', '/')
+        if not url_has_allowed_host_and_scheme(
+            url=fallback_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            fallback_url = '/'
         return HttpResponseRedirect(fallback_url)
 
 
