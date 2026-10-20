@@ -651,19 +651,35 @@
     setInterval(updateCurrentTime, 1000);
     updateCurrentTime();
 
-    function getZonedNow() {
-        // Wall-clock "now" in the prayer-times location's zone, expressed as a
-        // local Date. The shifted-Date idiom keeps all existing comparisons
-        // and countdown math valid in the location's zone rather than the
-        // browser's zone; falls back to browser-local when no zone is known.
-        if (!locationTimezone) {
-            return new Date();
+    // Real-epoch timezone helpers (DST-safe): all countdown/comparison math
+    // runs on true instants; only the *meaning* of "today" and the wall times
+    // come from the prayer-times location's zone.
+    function tzParts(date, tz) {
+        const dtf = new Intl.DateTimeFormat('en-US', {
+            timeZone: tz, hour12: false,
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        const o = {};
+        for (const part of dtf.formatToParts(date)) {
+            o[part.type] = part.value;
         }
-        try {
-            return new Date(new Date().toLocaleString('en-US', { timeZone: locationTimezone }));
-        } catch (e) {
-            return new Date();
+        return o;
+    }
+
+    function tzOffsetMs(date, tz) {
+        const p = tzParts(date, tz);
+        return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - date.getTime();
+    }
+
+    function zonedWallTimeToDate(year, month, day, hours, minutes, tz) {
+        // The real instant of a wall-clock time in tz. Refining twice keeps
+        // this correct across DST transitions (offset depends on the instant).
+        let utc = Date.UTC(year, month - 1, day, hours, minutes, 0);
+        for (let i = 0; i < 2; i++) {
+            utc = Date.UTC(year, month - 1, day, hours, minutes, 0) - tzOffsetMs(new Date(utc), tz);
         }
+        return new Date(utc);
     }
 
     function parseTime(timeStr) {
@@ -679,8 +695,17 @@
         if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
             throw new Error('Invalid time values');
         }
-        const now = getZonedNow();
-        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+        if (!locationTimezone) {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+        }
+        try {
+            const p = tzParts(new Date(), locationTimezone);
+            return zonedWallTimeToDate(+p.year, +p.month, +p.day, hours, minutes, locationTimezone);
+        } catch (e) {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+        }
     }
     
     function updateCountdown() {
@@ -690,7 +715,7 @@
             countdownInterval = null;
         }
         
-        const now = getZonedNow();
+        const now = new Date();
         const prayerTimes = [];
         const prayerNames = [];
         const prayerRows = [];
@@ -738,8 +763,17 @@
         const firstPrayerElement = document.querySelector('td[data-time]');
         if (firstPrayerElement && firstPrayerElement.dataset.time) {
             try {
-                const fajrTimeTomorrow = parseTime(firstPrayerElement.dataset.time);
-                fajrTimeTomorrow.setDate(fajrTimeTomorrow.getDate() + 1);
+                let fajrTimeTomorrow = parseTime(firstPrayerElement.dataset.time);
+                if (locationTimezone) {
+                    const p = tzParts(new Date(), locationTimezone);
+                    const tomorrow = new Date(Date.UTC(+p.year, +p.month - 1, +p.day + 1));
+                    const parts = firstPrayerElement.dataset.time.split(':');
+                    fajrTimeTomorrow = zonedWallTimeToDate(
+                        tomorrow.getUTCFullYear(), tomorrow.getUTCMonth() + 1, tomorrow.getUTCDate(),
+                        parseInt(parts[0], 10), parseInt(parts[1], 10), locationTimezone);
+                } else {
+                    fajrTimeTomorrow.setDate(fajrTimeTomorrow.getDate() + 1);
+                }
                 prayerTimes.push(fajrTimeTomorrow);
                 prayerNames.push("{% translate 'Fajr (Tomorrow)'|escapejs %}");
             } catch (error) {
@@ -796,7 +830,7 @@
     
         function updateTimer() {
             if (!countdownDisplay) return;
-            const timeDiff = nextPrayerTime - getZonedNow();
+            const timeDiff = nextPrayerTime - new Date();
             if (timeDiff <= 0) return updateCountdown();
     
             const hours = String(Math.floor(timeDiff / (1000 * 60 * 60))).padStart(2, '0');
