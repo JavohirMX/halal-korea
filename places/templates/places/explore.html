@@ -321,10 +321,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hidden CSRF Token Form -->
-<form id="csrf-form" style="display: none;">
-    {% csrf_token %}
-</form>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
@@ -1403,7 +1399,7 @@
         // Update user location and refresh places
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
                     
@@ -1412,7 +1408,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
+                            'X-CSRFToken': await window.ensureCSRFToken()
                         },
                         body: JSON.stringify({ latitude: lat, longitude: lng })
                     })
@@ -1804,7 +1800,7 @@
         });
         
         // Log search for analytics
-        function logSearch(query) {
+        async function logSearch(query) {
             if (!query || query.length < 2) return;
             
             const category = document.querySelector('select[name="category"]')?.value || '';
@@ -1813,7 +1809,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'X-CSRFToken': await window.ensureCSRFToken()
                 },
                 body: JSON.stringify({
                     query: query,
@@ -1931,9 +1927,9 @@ if (desktopLocationBtn) {
 // Shared location update function
 function updateLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            // Get CSRF token from the hidden form
-            const csrfToken = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
+        navigator.geolocation.getCurrentPosition(async function(position) {
+            // Fetch a CSRF token on demand (page renders without one)
+            const csrfToken = await window.ensureCSRFToken();
             
             fetch("{% url 'places:set_location' %}", {
                 method: 'POST',

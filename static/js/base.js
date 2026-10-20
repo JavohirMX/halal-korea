@@ -100,3 +100,34 @@ window.getMapColorScheme = function() {
     const isDark = document.documentElement.classList.contains('dark');
     return isDark ? google.maps.ColorScheme.DARK : google.maps.ColorScheme.LIGHT;
 }
+
+/* ------------------------------------------------------------------ */
+/* Lazy CSRF token helpers.                                            */
+/* Pages aimed at anonymous visitors render without a CSRF token so    */
+/* Django does not set the csrftoken cookie on every page view (which  */
+/* blocks CDN edge caching of HTML). Code that needs a token fetches   */
+/* one on demand from /api/csrf/.                                      */
+/* ------------------------------------------------------------------ */
+window.getCSRFTokenSync = function () {
+    var match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : '';
+};
+
+window.ensureCSRFToken = async function () {
+    var token = window.getCSRFTokenSync();
+    if (token) return token;
+    try {
+        await fetch('/api/csrf/', { credentials: 'same-origin' });
+    } catch (e) { /* fall through - POST will fail with 403 if still missing */ }
+    return window.getCSRFTokenSync();
+};
+
+/* Language switcher: POST to the CSRF-exempt AJAX endpoint, then reload. */
+window.hkSetLanguage = function (languageCode) {
+    var form = new FormData();
+    form.append('language', languageCode);
+    fetch('/i18n/setlang-ajax/', { method: 'POST', body: form, credentials: 'same-origin' })
+        .then(function () { window.location.reload(); })
+        .catch(function () { window.location.reload(); });
+    return false;
+};

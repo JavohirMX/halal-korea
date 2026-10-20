@@ -154,7 +154,7 @@ function initializeContactForm() {
         window.HalalTurnstile.render('#contact-turnstile', { action: 'contact' });
     }
     
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         // Clear previous messages
@@ -167,6 +167,12 @@ function initializeContactForm() {
         
         // FormData picks up cf-turnstile-response once the widget is inside the form.
         const formData = new FormData(form);
+
+        // The form renders without a CSRF token; fetch one on demand.
+        if (window.ensureCSRFToken) {
+            const csrfToken = await window.ensureCSRFToken();
+            if (csrfToken) formData.set('csrfmiddlewaretoken', csrfToken);
+        }
         
         fetch(form.dataset.submitUrl, {
             method: 'POST',

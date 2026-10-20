@@ -360,11 +360,7 @@
                             <div class="py-1">
                                 {% for lang in languages_info %}
                                     {% if lang.code != CURRENT_LANGUAGE_CODE %}
-                                        <form action="{% url 'set_language' %}" method="post" class="w-full">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="next" value="{{ request.path }}">
-                                            <input type="hidden" name="language" value="{{ lang.code }}">
-                                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <button type="button" data-language="{{ lang.code }}" onclick="hkSetLanguage(this.dataset.language)" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
                                                 {% if lang.code == 'en' %}<span class="flag">🇺🇸</span>
                                                 {% elif lang.code == 'ko' %}<span class="flag">🇰🇷</span>
                                                 {% elif lang.code == 'uz' %}<span class="flag">🇺🇿</span>
@@ -376,7 +372,6 @@
                                                     {% else %}{{ lang.name_local }}{% endif %}
                                                 </span>
                                             </button>
-                                        </form>
                                     {% endif %}
                                 {% endfor %}
                             </div>
@@ -419,11 +414,7 @@
                             <div class="py-1">
                                 {% for lang in languages_info %}
                                     {% if lang.code != CURRENT_LANGUAGE_CODE %}
-                                        <form action="{% url 'set_language' %}" method="post" class="w-full">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="next" value="{{ request.path }}">
-                                            <input type="hidden" name="language" value="{{ lang.code }}">
-                                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <button type="button" data-language="{{ lang.code }}" onclick="hkSetLanguage(this.dataset.language)" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
                                                 {% if lang.code == 'en' %}<span class="flag">🇺🇸</span>
                                                 {% elif lang.code == 'ko' %}<span class="flag">🇰🇷</span>
                                                 {% elif lang.code == 'uz' %}<span class="flag">🇺🇿</span>
@@ -435,7 +426,6 @@
                                                     {% else %}{{ lang.name_local }}{% endif %}
                                                 </span>
                                             </button>
-                                        </form>
                                     {% endif %}
                                 {% endfor %}
                             </div>
@@ -587,11 +577,7 @@
                                 <div class="py-1">
                                     {% for lang in languages_info %}
                                         {% if lang.code != CURRENT_LANGUAGE_CODE %}
-                                            <form action="{% url 'set_language' %}" method="post" class="w-full">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="next" value="{{ request.path }}">
-                                                <input type="hidden" name="language" value="{{ lang.code }}">
-                                                <button type="submit" class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                            <button type="button" data-language="{{ lang.code }}" onclick="hkSetLanguage(this.dataset.language)" class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
                                                     {% if lang.code == 'en' %}<span class="flag">🇺🇸</span>
                                                     {% elif lang.code == 'ko' %}<span class="flag">🇰🇷</span>
                                                     {% elif lang.code == 'uz' %}<span class="flag">🇺🇿</span>
@@ -603,7 +589,6 @@
                                                         {% else %}{{ lang.name_local }}{% endif %}
                                                     </span>
                                                 </button>
-                                            </form>
                                         {% endif %}
                                     {% endfor %}
                                 </div>
