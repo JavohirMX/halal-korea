@@ -163,6 +163,18 @@ class UserViewTest(TestCase):
         self.assertNotIn('_auth_user_id', self.client.session)
         self.assertContains(response, 'security check')
 
+    def test_edit_profile_page_renders_all_form_fields(self):
+        """The edit form must render every required UserUpdateForm field.
+
+        Regression: the template omitted preferred_language (a required
+        form field), so every browser save failed validation and the
+        error was rendered nowhere - profile editing was fully broken.
+        """
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(reverse('users:edit_profile'))
+        for field in ('first_name', 'last_name', 'username', 'email', 'preferred_language'):
+            self.assertContains(response, f'name="{field}"')
+
     def test_edit_profile_without_password_fields(self):
         """Plain profile edits must not require a password."""
         self.client.login(username='testuser', password='testpass123')
