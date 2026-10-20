@@ -243,6 +243,8 @@
                             <img src="{{ photo_url }}" 
                                  alt="{{ place.name }}" 
                                  class="w-full h-64 sm:h-80 lg:h-96 object-cover"
+                                 {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                                 decoding="async"
                                  onclick="openImageModal({{ forloop.counter0 }})">
                         </div>
                         {% endfor %}
@@ -290,7 +292,7 @@
                     <div class="swiper-wrapper">
                         {% for photo_url in place.photo_urls %}
                         <div class="swiper-slide">
-                            <img src="{{ photo_url }}" alt="{{ place.name }}">
+                            <img src="{{ photo_url }}" alt="{{ place.name }}" loading="lazy" decoding="async">
                         </div>
                         {% endfor %}
                     </div>
