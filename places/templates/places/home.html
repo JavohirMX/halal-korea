@@ -228,10 +228,16 @@
             <a href="{% url 'places:place_detail' place.id %}" class="block min-w-[85%] sm:min-w-0 snap-center">
                 <div class="glass-card rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg h-full">
                     {% if place.photo_urls %}
-                    <img src="{{ place.photo_urls.0 }}" 
-                         alt="{{ place.name }}" 
-                         loading="lazy"
-                         class="w-full h-48 object-cover">
+                    <div class="relative w-full h-48">
+                        <img src="{{ place.photo_urls.0 }}" 
+                             alt="{{ place.name }}" 
+                             loading="lazy" decoding="async"
+                             onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden'); this.nextElementSibling.classList.add('flex');"
+                             class="w-full h-48 object-cover">
+                        <div class="hidden absolute inset-0 bg-primary-50 dark:bg-primary-900/30 items-center justify-center" aria-hidden="true">
+                            <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque {% elif place.category == 'prayer_room' %}fa-pray{% endif %} text-4xl text-primary-400 dark:text-primary-500"></i>
+                        </div>
+                    </div>
                     {% endif %}
                     <div class="p-4">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
