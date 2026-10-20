@@ -39,6 +39,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
 from utils.location_manager import get_user_location_context, update_user_location
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils.translation import get_language
 from django.template.loader import render_to_string
 import json
 from datetime import datetime
@@ -177,7 +178,12 @@ def home(request):
 def _get_explore_cache_key(
     request, category, search_query, city_filter, sort, page, location_context
 ):
-    """Generate a cache key for explore view based on query parameters and location."""
+    """Generate a cache key for explore view based on query parameters and location.
+
+    The active language is part of the key because the cached value is the
+    fully rendered page: without it, anonymous visitors would be served the
+    page in whichever language happened to be cached first.
+    """
     is_in_korea = location_context.get("is_in_korea", False)
     location = location_context.get("location", {})
     # Round coordinates to reduce cache fragmentation
@@ -186,6 +192,7 @@ def _get_explore_cache_key(
 
     cache_parts = [
         "explore",
+        get_language() or "en",
         category or "",
         search_query or "",
         city_filter or "",

@@ -152,3 +152,32 @@ class HalalPlaceFormTest(TestCase):
         self.assertIn(('market', 'Market'), form.fields['category'].choices)
         self.assertIn(('mosque', 'Mosque'), form.fields['category'].choices)
         self.assertIn(('prayer_room', 'Prayer Space'), form.fields['category'].choices)
+
+
+class ExploreCacheLanguageTest(TestCase):
+    """The anonymous explore response cache must vary by active language.
+
+    Regression test: the cached value is the fully rendered page, so a cache
+    key without the language served Korean/Uzbek visitors whichever language
+    was cached first.
+    """
+
+    def _cache_key(self, language):
+        from django.test import RequestFactory
+        from django.utils import translation
+        from .views import _get_explore_cache_key
+
+        request = RequestFactory().get(reverse('places:explore'))
+        location_context = {'is_in_korea': False, 'location': {}}
+        with translation.override(language):
+            return _get_explore_cache_key(
+                request, None, '', '', 'distance', 1, location_context
+            )
+
+    def test_explore_cache_key_includes_language(self):
+        key_en = self._cache_key('en')
+        key_ko = self._cache_key('ko')
+        key_uz = self._cache_key('uz')
+        self.assertNotEqual(key_en, key_ko)
+        self.assertNotEqual(key_en, key_uz)
+        self.assertNotEqual(key_ko, key_uz)
