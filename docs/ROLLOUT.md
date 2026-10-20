@@ -181,3 +181,13 @@ The same section 3 local verification applies before each batch.
   dashboard - optional, not required for this rollout.
 - The Google Maps API key's HTTP referrer restrictions: if you ever rotate the
   key, the new key must allow the production domain.
+
+## Standalone follow-ups (deliberately NOT in #25)
+
+- **#37 (Django 5.1.6 -> 5.2.18 LTS)** - framework upgrade, merge separately
+  after #25 with its own deploy window and smoke pass (home, explore, place
+  detail, login/register, Google login, submit-place, blog, admin). Rollback:
+  revert the single commit, reinstall requirements, restart.
+- **allauth bump PR** (django-allauth 0.57.0 -> 65.x + `SOCIALACCOUNT_LOGIN_ON_GET=False`) -
+  separate PR; verify Google social login manually after deploy since OAuth
+  can't be exercised by the test suite.
