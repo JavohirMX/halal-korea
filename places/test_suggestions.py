@@ -148,15 +148,20 @@ class PlaceSuggestionFormTest(TestCase):
         self.assertEqual(suggestions[0]['field_name'], 'name')
         self.assertEqual(suggestions[1]['field_name'], 'description')
     
-    def test_form_requires_at_least_one_suggestion(self):
-        """Test that form requires at least one suggestion"""
-        form_data = {
-            'reason': 'Some reason'
-        }
-        
-        form = PlaceSuggestionForm(place=self.place, data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('Please suggest at least one change', str(form.non_field_errors()))
+    def test_submission_requires_at_least_one_suggestion(self):
+        """A submission with no field, image or hours change is rejected.
+
+        The "at least one change" rule lives in the view (it spans image
+        uploads and business-hours suggestions, which the form does not
+        own), so this exercises the view rather than form validation.
+        """
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('places:suggest_place_edit', args=[self.place.pk])
+
+        response = self.client.post(url, {'reason': 'Some reason'})
+
+        self.assertEqual(response.status_code, 302)  # redirect back to the form
+        self.assertEqual(PlaceEditSuggestion.objects.count(), 0)
     
     def test_form_requires_value_when_field_suggested(self):
         """Test that form requires value when field is suggested"""
