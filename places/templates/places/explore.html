@@ -2118,6 +2118,12 @@ document.addEventListener('DOMContentLoaded', function() {
             this.isActive = true;
             this.backdrop.classList.add('active');
             document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            // The spotlight ring and popover can momentarily extend a few px past the
+            // viewport while animating; on mobile browsers that expands the layout
+            // viewport (w-full nav grows, page shifts). Clamp horizontal overflow at
+            // the document level for the duration of the walkthrough.
+            this.prevHtmlOverflowX = document.documentElement.style.overflowX;
+            document.documentElement.style.overflowX = 'hidden';
             this.showStep(0);
         }
 
@@ -2195,11 +2201,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const rect = element.getBoundingClientRect();
             const padding = 8;
 
-            // Position Spotlight
-            this.spotlight.style.width = `${rect.width + (padding * 2)}px`;
+            // Position Spotlight, clamped horizontally to the viewport so the
+            // spotlight (and its 4px ::after ring) cannot cause horizontal overflow
+            // when the highlighted element touches the screen edge (e.g. the map).
+            const ring = 4; // ::after ring extends 4px past the spotlight
+            let spotlightLeft = rect.left + window.scrollX - padding;
+            let spotlightWidth = rect.width + (padding * 2);
+            const minLeft = window.scrollX + ring;
+            const maxRight = window.scrollX + document.documentElement.clientWidth - ring;
+            if (spotlightLeft < minLeft) {
+                spotlightWidth -= (minLeft - spotlightLeft);
+                spotlightLeft = minLeft;
+            }
+            if (spotlightLeft + spotlightWidth > maxRight) {
+                spotlightWidth = maxRight - spotlightLeft;
+            }
+
+            this.spotlight.style.width = `${Math.max(spotlightWidth, 0)}px`;
             this.spotlight.style.height = `${rect.height + (padding * 2)}px`;
             this.spotlight.style.top = `${rect.top + window.scrollY - padding}px`;
-            this.spotlight.style.left = `${rect.left + window.scrollX - padding}px`;
+            this.spotlight.style.left = `${spotlightLeft}px`;
             this.spotlight.classList.add('active');
 
             // Position Popover
@@ -2276,6 +2297,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.spotlight.classList.remove('active');
             this.popover.classList.remove('active');
             document.body.style.overflow = ''; // Restore scrolling
+            document.documentElement.style.overflowX = this.prevHtmlOverflowX || '';
             
             // Save to localStorage
             localStorage.setItem('explore_tutorial_seen_v1', 'true');
