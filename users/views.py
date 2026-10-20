@@ -56,13 +56,39 @@ def profile(request, username=None):
 @login_required
 def edit_profile(request):
     from allauth.socialaccount.models import SocialAccount
+    from django.contrib.auth import update_session_auth_hash
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError
     
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, instance=request.user)
+        current_password = request.POST.get('current_password', '')
+        new_password = request.POST.get('new_password', '')
+        password_change_requested = bool(current_password or new_password)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('users:profile')
+            password_error = None
+            if password_change_requested:
+                if not current_password or not new_password:
+                    password_error = _('To change your password, fill in both the current and new password fields.')
+                elif request.user.has_usable_password() and not request.user.check_password(current_password):
+                    password_error = _('Your current password is incorrect.')
+                else:
+                    try:
+                        validate_password(new_password, request.user)
+                    except ValidationError as e:
+                        password_error = ' '.join(e.messages)
+            if password_error:
+                messages.error(request, password_error)
+            else:
+                form.save()
+                if password_change_requested:
+                    request.user.set_password(new_password)
+                    request.user.save()
+                    update_session_auth_hash(request, request.user)
+                    messages.success(request, _('Profile and password updated successfully!'))
+                else:
+                    messages.success(request, _('Profile updated successfully!'))
+                return redirect('users:profile')
     else:
         form = UserUpdateForm(instance=request.user)
     
