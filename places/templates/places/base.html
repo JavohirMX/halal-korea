@@ -316,7 +316,8 @@
                 <!-- Right side -->
                 <div class="flex items-center space-x-2 sm:space-x-4">
                     <!-- Theme Toggle -->
-                    <button onclick="toggleTheme()" 
+                    <button type="button" onclick="toggleTheme()" 
+                            aria-label="{% translate 'Toggle color theme' %}"
                             class="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
                         <i class="fas fa-sun text-yellow-500 theme-toggle-icon hidden dark:inline-block"></i>
                         <i class="fas fa-moon text-gray-700 dark:text-gray-400 theme-toggle-icon dark:hidden"></i>
@@ -497,7 +498,9 @@
 
                     <!-- Mobile menu button -->
                     <div class="flex items-center xl:hidden ml-2 lg:ml-4">
-                        <button @click="isOpen = !isOpen" 
+                        <button type="button" @click="isOpen = !isOpen" 
+                                aria-label="{% translate 'Toggle navigation menu' %}"
+                                :aria-expanded="isOpen.toString()"
                                 class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
                             <svg class="h-6 w-6" x-bind:class="{'hidden': isOpen, 'block': !isOpen }" 
                                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -744,7 +747,7 @@
 
                 <!-- Quick Links -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Quick Links" %}</h3>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Quick Links" %}</h2>
                     <ul class="space-y-3">
                         <li>
                             <a href="{% url 'places:explore' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
@@ -771,7 +774,7 @@
 
                 <!-- Contact Info -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Contact" %}</h3>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Contact" %}</h2>
                     <ul class="space-y-3">
                         <li class="flex items-start text-gray-600 dark:text-gray-400">
                             <i class="fas fa-envelope w-5 mt-1"></i>
