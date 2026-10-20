@@ -75,7 +75,7 @@
                             {% translate "Ramadan starts in" %} {{ ramadan.days_until }} {% translate "days" %}
                         </span>
                     </div>
-                    <a href="{% url 'prayer_times:ramadan_timetable' %}" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                    <a href="{% url 'prayer_times:ramadan_timetable' %}" class="text-xs text-primary-700 dark:text-primary-400 underline">
                         {% translate "View timetable" %} <i class="fas fa-arrow-right ml-0.5"></i>
                     </a>
                 </div>
@@ -99,7 +99,7 @@
                         </span>
                         {% endif %}
                     </div>
-                    <a href="{% url 'prayer_times:ramadan_timetable' %}" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                    <a href="{% url 'prayer_times:ramadan_timetable' %}" class="text-xs text-primary-700 dark:text-primary-400 underline">
                         {% translate "Full timetable" %} <i class="fas fa-arrow-right ml-0.5"></i>
                     </a>
                 </div>
@@ -187,6 +187,8 @@
             <!-- Settings Button -->
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" 
+                        aria-label="{% translate 'Prayer time settings' %}"
+                        :aria-expanded="open.toString()"
                         class="h-[38px] px-4 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 glass-card flex items-center justify-center transition-colors duration-200">
                     <i class="fas fa-gear text-lg" :class="{ 'fa-spin': open }"></i>
                 </button>
@@ -476,7 +478,7 @@
             <div class="text-red-600 dark:text-red-400">
                 <i class="fas fa-exclamation-circle text-2xl"></i>
                 <p class="mt-2">{% translate "Failed to load prayer times" %}</p>
-                <button onclick="loadPrayerTimes()" class="mt-2 text-sm text-primary-600 dark:text-primary-400 hover:underline">
+                <button onclick="loadPrayerTimes()" class="mt-2 text-sm text-primary-700 dark:text-primary-400 underline">
                     {% translate "Try Again" %}
                 </button>
             </div>
