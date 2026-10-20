@@ -4790,15 +4790,12 @@ msgid "%(counter)s user skipped (no email)"
 msgid_plural "%(counter)s users skipped (no email)"
 msgstr[0] ""
 "%(counter)s ta foydalanuvchi o'tkazib yuborildi (email manzil yo'q)"
-msgstr[1] ""
-"%(counter)s ta foydalanuvchi o'tkazib yuborildi (email manzil yo'q)"
 
 #: users/templates/admin/users/_compose_email_form.html:193
 #, python-format
 msgid "%(counter)s additional address"
 msgid_plural "%(counter)s additional addresses"
 msgstr[0] "%(counter)s ta qo'shimcha manzil"
-msgstr[1] "%(counter)s ta qo'shimcha manzillar"
 
 #: users/templates/admin/users/_compose_email_form.html:205
 #, python-format
