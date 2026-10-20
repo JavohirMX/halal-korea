@@ -141,6 +141,28 @@ def get_user_location(request):
         )
         return session_loc
 
+    # Cloudflare resolves the visitor's country on every request for free.
+    # The exact city/lat/lng from IP geolocation is only used for Korean
+    # visitors (distance features are Korea-only; international visitors are
+    # sorted relative to Seoul/tourist areas instead), so for non-Korean
+    # visitors we can skip the blocking external geolocation lookup entirely.
+    cf_country = (request.META.get("HTTP_CF_IPCOUNTRY") or "").strip().upper()
+    if cf_country and cf_country not in ("XX", "T1", "KR"):
+        location = {
+            "country_code": cf_country,
+            "is_fallback": False,
+            "source": "cloudflare",
+            "timestamp": time.time(),
+        }
+        # Deliberately not saved to the session: the header is present on
+        # every request, and skipping the write avoids a session-store
+        # insert (and Set-Cookie) for every anonymous international visit.
+        logger.debug(
+            f"Using Cloudflare country header ({cf_country}), "
+            "skipping external IP geolocation lookup"
+        )
+        return location
+
     logger.debug("No valid cached location, fetching from IP")
 
     # If no valid session location, try to get location from IP
@@ -168,9 +190,15 @@ def get_user_location(request):
     # Add timestamp to location data
     location["timestamp"] = time.time()
 
-    # Save to session
-    request.session["user_location"] = location
-    logger.debug("Location saved to session")
+    if location.get("is_fallback"):
+        # Don't persist fallback locations: failures are already cached
+        # in the cache backend, and writing here would create a session
+        # row + Set-Cookie for every anonymous bot/probe visit.
+        logger.debug("Fallback location not saved to session")
+    else:
+        # Save successful IP lookups to the session (the expensive path).
+        request.session["user_location"] = location
+        logger.debug("Location saved to session")
 
     return location
 
