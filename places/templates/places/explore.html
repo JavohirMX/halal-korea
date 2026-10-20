@@ -357,7 +357,7 @@
                             {% endif %}
                         </p>
                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                            {% if location_context.location.city %}
+                            {% if location_context.location.city and not location_context.location.is_fallback %}
                                 {{ location_context.location.city }}
                             {% else %}
                                 {% translate "Unknown Location" %}
@@ -402,7 +402,7 @@
                 class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-xs flex-shrink-0">
                 <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
                 <span class="font-medium truncate max-w-[80px]">
-                    {% if location_context.location.city %}
+                    {% if location_context.location.city and not location_context.location.is_fallback %}
                         {{ location_context.location.city }}
                     {% else %}
                         {% translate "Set Location" %}
@@ -443,7 +443,7 @@
                         {% endif %}
                     </p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">
-                        {% if location_context.location.city %}
+                        {% if location_context.location.city and not location_context.location.is_fallback %}
                             {{ location_context.location.city }}
                         {% else %}
                             {% translate "Unknown Location" %}
