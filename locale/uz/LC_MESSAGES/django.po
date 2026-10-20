@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: blog/templates/blog/archive.html:6
 msgid "Browse the Halal Korea blog archive. Find past articles about halal lifestyle, travel guides, and community updates for Muslims in Korea."
@@ -63,7 +63,6 @@ msgstr "Blog arxivi"
 msgid "%(counter)s article"
 msgid_plural "%(counter)s articles"
 msgstr[0] "%(counter)s maqola"
-msgstr[1] "%(counter)s maqola"
 
 #: blog/templates/blog/archive.html:56
 msgid "in this month"
@@ -235,7 +234,6 @@ msgstr "Maqolalar, toifalar, teglarni qidirish..."
 msgid "%(counter)s result for \"%(query)s\""
 msgid_plural "%(counter)s results for \"%(query)s\""
 msgstr[0] "\"%(query)s\" uchun %(counter)s natija"
-msgstr[1] "\"%(query)s\" uchun %(counter)s natija"
 
 #: blog/templates/blog/search.html:64
 #, python-format
@@ -1321,7 +1319,6 @@ msgstr "Tavsiya etilgan joylar"
 msgid "(%(review_count)s review)"
 msgid_plural "(%(review_count)s reviews)"
 msgstr[0] "(%(review_count)s sharh)"
-msgstr[1] "(%(review_count)s sharh)"
 
 #: places/templates/places/home.html:292
 msgid "Check the latest prayer times for your location."
