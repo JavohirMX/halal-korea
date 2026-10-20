@@ -127,10 +127,11 @@
                         class="w-full flex items-center justify-between px-4 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 glass-card">
                     <div class="flex items-center space-x-2">
                         <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
-                        <span id="location-display">{{ location.city }}, {{ location.country }}</span>
+                        <span id="location-display">{% if location_context.location.city and not location_context.location.is_fallback %}{{ location_context.location.city }}, {{ location_context.location.country }}{% else %}{% translate "Set Location" %}{% endif %}</span>
                     </div>
                     <i class="fas fa-chevron-down text-xs"></i>
                 </button>
+                {% csrf_token %}
 
                 <!-- Location Loading Skeleton -->
                 <div id="location-skeleton" class="hidden w-full flex items-center justify-between px-4 py-2 rounded-md glass-card">
