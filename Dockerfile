@@ -31,8 +31,13 @@ COPY . .
 # Create media directory
 RUN mkdir -p media/places/photos
 
-# Collect static files
-# RUN python manage.py collectstatic --noinput --clear
+# Collect static files (fingerprinted via ManifestStaticFilesStorage in
+# non-DEBUG mode; dummy env vars are only for the build step, no DB needed)
+RUN DJANGO_DEBUG=False \
+    DJANGO_SECRET_KEY=collectstatic-build-only \
+    ALLOWED_HOSTS=localhost \
+    DB_NAME=build DB_USER=build DB_PASSWORD=build DB_HOST=localhost \
+    python manage.py collectstatic --noinput --clear
 
 # Compile translations
 # RUN python manage.py compilemessages
