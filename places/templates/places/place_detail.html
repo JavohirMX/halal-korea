@@ -580,6 +580,7 @@
                 </div>
                 {% endif %}
 
+                {% if place.google_map_link or place.naver_map_link or place.kakao_map_link %}
                 <!-- Map Links Section -->
                 <div id="map-links-section" class="mt-6">
                     <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
@@ -643,6 +644,7 @@
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
             </div>
 
             <!-- Desktop CTA: No Photos Banner (only shown on desktop when no photos) -->
