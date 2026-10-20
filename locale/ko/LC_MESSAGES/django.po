@@ -3974,12 +3974,10 @@ msgid "Failed to load prayer times"
 msgstr "기도 시간 로드 실패"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:492
-#, fuzzy
-#| msgid "Could not determine location. Please select a city manually."
 msgid ""
 "Unable to determine your location. Please enable location services or set "
 "your location manually."
-msgstr "위치를 확인할 수 없습니다. 수동으로 도시를 선택해주세요."
+msgstr "위치를 확인할 수 없습니다. 위치 서비스를 활성화하거나 수동으로 위치를 설정하세요."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:538
 msgid "Calculating..."

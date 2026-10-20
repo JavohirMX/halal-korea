@@ -4099,12 +4099,10 @@ msgid "Failed to load prayer times"
 msgstr "Namoz vaqtlarini yuklash amalga oshmadi"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:492
-#, fuzzy
-#| msgid "Could not determine location. Please select a city manually."
 msgid ""
 "Unable to determine your location. Please enable location services or set "
 "your location manually."
-msgstr "Manzilni aniqlay olmadik. Iltimos, shaharni qo'lda tanlang."
+msgstr "Joylashuvingizni aniqlab bo'lmadi. Joylashuv xizmatlarini yoqing yoki joylashuvni qo'lda sozlang."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:538
 msgid "Calculating..."
