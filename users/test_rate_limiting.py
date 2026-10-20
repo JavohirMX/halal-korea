@@ -167,10 +167,10 @@ class RateLimitingTestCase(TestCase):
         url = reverse('users:rate_limited')
         response = self.client.get(url)
         
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Rate Limit Exceeded')
+        self.assertEqual(response.status_code, 429)
+        self.assertContains(response, 'Rate Limit Exceeded', status_code=429)
         
         # Test with error message
         response = self.client.get(url + '?error=Test error message')
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Test error message')
+        self.assertEqual(response.status_code, 429)
+        self.assertContains(response, 'Test error message', status_code=429)
