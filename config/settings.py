@@ -704,17 +704,26 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # OAuth Client Credentials (to be set in environment variables)
-# Google OAuth
-SOCIALACCOUNT_PROVIDERS["google"]["APP"] = {
-    "client_id": config("GOOGLE_OAUTH_CLIENT_ID", default=""),
-    "secret": config("GOOGLE_OAUTH_CLIENT_SECRET", default=""),
-}
+# Only register a settings-backed app when credentials are actually set:
+# an empty-credential APP entry would conflict with (or silently replace)
+# a SocialApp configured through the admin, and allauth raises
+# MultipleObjectsReturned when both exist.
+_google_client_id = config("GOOGLE_OAUTH_CLIENT_ID", default="")
+_google_client_secret = config("GOOGLE_OAUTH_CLIENT_SECRET", default="")
+if _google_client_id and _google_client_secret:
+    SOCIALACCOUNT_PROVIDERS["google"]["APP"] = {
+        "client_id": _google_client_id,
+        "secret": _google_client_secret,
+    }
 
 # GitHub OAuth
-SOCIALACCOUNT_PROVIDERS["github"]["APP"] = {
-    "client_id": config("GITHUB_CLIENT_ID", default=""),
-    "secret": config("GITHUB_CLIENT_SECRET", default=""),
-}
+_github_client_id = config("GITHUB_CLIENT_ID", default="")
+_github_client_secret = config("GITHUB_CLIENT_SECRET", default="")
+if _github_client_id and _github_client_secret:
+    SOCIALACCOUNT_PROVIDERS["github"]["APP"] = {
+        "client_id": _github_client_id,
+        "secret": _github_client_secret,
+    }
 
 # ============================================================================
 # MONITORING CONFIGURATION
