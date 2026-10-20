@@ -31,7 +31,7 @@
     <div class="mb-6 sm:mb-8">
         <div class="flex items-center space-x-2 sm:space-x-4 mb-3 sm:mb-4">
             <a href="{% url 'users:profile' %}" 
-               class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 text-sm sm:text-base">
+               class="inline-flex items-center text-primary-700 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 text-sm sm:text-base">
                 <i class="fas fa-arrow-left mr-1 sm:mr-2"></i>
                 <span class="hidden sm:inline">{% translate "Back to Profile" %}</span>
                 <span class="sm:hidden">{% translate "Back" %}</span>
@@ -57,13 +57,13 @@
                 </div>
             </div>
             <div class="mb-3">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Places Submitted" %}</h3>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Places Submitted" %}</h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400">{% translate "Places you've added to our community" %}</p>
             </div>
             {% if stats.total_submitted > 0 %}
             <div class="space-y-2">
                 <div class="flex justify-between text-sm">
-                    <span class="text-green-600 dark:text-green-400">
+                    <span class="text-green-700 dark:text-green-400">
                         <i class="fas fa-check-circle mr-1"></i>{% translate "Approved" %}
                     </span>
                     <span class="font-medium">{{ stats.approved_places }}/{{ stats.total_submitted }}</span>
@@ -80,7 +80,7 @@
             <div class="text-center py-2">
                 <p class="text-sm text-gray-500 dark:text-gray-400">{% translate "No places submitted yet" %}</p>
                 <a href="{% url 'places:submit_place' %}" 
-                   class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                   class="text-xs text-primary-700 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                     {% translate "Submit your first place" %} →
                 </a>
             </div>
@@ -99,13 +99,13 @@
                 </div>
             </div>
             <div class="mb-3">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Field Edits" %}</h3>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Field Edits" %}</h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400">{% translate "Improvements to place information" %}</p>
             </div>
             {% if stats.total_field_suggestions > 0 %}
             <div class="space-y-2">
                 <div class="flex justify-between text-sm">
-                    <span class="text-green-600 dark:text-green-400">
+                    <span class="text-green-700 dark:text-green-400">
                         <i class="fas fa-check-circle mr-1"></i>{% translate "Approved" %}
                     </span>
                     <span class="font-medium">{{ stats.approved_field_suggestions }}/{{ stats.total_field_suggestions }}</span>
@@ -122,7 +122,7 @@
             <div class="text-center py-2">
                 <p class="text-sm text-gray-500 dark:text-gray-400">{% translate "No field edits yet" %}</p>
                 <a href="{% url 'places:explore' %}" 
-                   class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                   class="text-xs text-primary-700 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                     {% translate "Find places to improve" %} →
                 </a>
             </div>
@@ -141,13 +141,13 @@
                 </div>
             </div>
             <div class="mb-3">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Images Uploaded" %}</h3>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Images Uploaded" %}</h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400">{% translate "Photos you've shared with the community" %}</p>
             </div>
             {% if stats.total_image_suggestions > 0 %}
             <div class="space-y-2">
                 <div class="flex justify-between text-sm">
-                    <span class="text-green-600 dark:text-green-400">
+                    <span class="text-green-700 dark:text-green-400">
                         <i class="fas fa-check-circle mr-1"></i>{% translate "Approved" %}
                     </span>
                     <span class="font-medium">{{ stats.approved_image_suggestions }}/{{ stats.total_image_suggestions }}</span>
@@ -164,7 +164,7 @@
             <div class="text-center py-2">
                 <p class="text-sm text-gray-500 dark:text-gray-400">{% translate "No images uploaded yet" %}</p>
                 <a href="{% url 'places:explore' %}" 
-                   class="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                   class="text-xs text-primary-700 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                     {% translate "Add photos to places" %} →
                 </a>
             </div>
@@ -181,7 +181,7 @@
                     <i class="fas fa-hands-helping text-xl"></i>
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Community Impact" %}</h3>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{% translate "Community Impact" %}</h2>
                     <p class="text-sm text-gray-600 dark:text-gray-400">{% translate "Your total contributions to the community" %}</p>
                 </div>
             </div>
