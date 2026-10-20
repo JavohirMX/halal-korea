@@ -41,7 +41,8 @@ class CloudflareCountryShortCircuitTests(SimpleTestCase):
         self.assertEqual(location["country_code"], "US")
         self.assertFalse(location["is_fallback"])
         self.assertFalse(is_user_in_korea(location))
-        self.assertEqual(request.session["user_location"], location)
+        # Header-derived locations must not create a session row
+        self.assertNotIn("user_location", request.session)
 
     @patch("utils.location_manager.get_ip_location")
     @patch("utils.location_manager.get_client_ip", return_value="1.2.3.4")
@@ -90,3 +91,34 @@ class CloudflareCountryShortCircuitTests(SimpleTestCase):
         self.assertIs(location, cached)
         mock_client_ip.assert_not_called()
         mock_ip_location.assert_not_called()
+
+
+class SessionWritePolicyTests(SimpleTestCase):
+    @patch("utils.location_manager.get_ip_location")
+    @patch("utils.location_manager.get_client_ip", return_value="1.2.3.4")
+    def test_successful_lookup_is_saved_to_session(
+        self, mock_client_ip, mock_ip_location
+    ):
+        mock_ip_location.return_value = {
+            "country_code": "KR",
+            "city": "Seoul",
+            "lat": 37.56,
+            "lng": 126.97,
+        }
+        request = _request()
+
+        get_user_location(request)
+
+        self.assertIn("user_location", request.session)
+
+    @patch("utils.location_manager.get_ip_location", return_value=None)
+    @patch("utils.location_manager.get_client_ip", return_value="1.2.3.4")
+    def test_failed_lookup_is_not_saved_to_session(
+        self, mock_client_ip, mock_ip_location
+    ):
+        request = _request()
+
+        location = get_user_location(request)
+
+        self.assertTrue(location["is_fallback"])
+        self.assertNotIn("user_location", request.session)

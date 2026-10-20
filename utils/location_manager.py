@@ -154,7 +154,9 @@ def get_user_location(request):
             "source": "cloudflare",
             "timestamp": time.time(),
         }
-        request.session["user_location"] = location
+        # Deliberately not saved to the session: the header is present on
+        # every request, and skipping the write avoids a session-store
+        # insert (and Set-Cookie) for every anonymous international visit.
         logger.debug(
             f"Using Cloudflare country header ({cf_country}), "
             "skipping external IP geolocation lookup"
@@ -188,9 +190,15 @@ def get_user_location(request):
     # Add timestamp to location data
     location["timestamp"] = time.time()
 
-    # Save to session
-    request.session["user_location"] = location
-    logger.debug("Location saved to session")
+    if location.get("is_fallback"):
+        # Don't persist fallback locations: failures are already cached
+        # in the cache backend, and writing here would create a session
+        # row + Set-Cookie for every anonymous bot/probe visit.
+        logger.debug("Fallback location not saved to session")
+    else:
+        # Save successful IP lookups to the session (the expensive path).
+        request.session["user_location"] = location
+        logger.debug("Location saved to session")
 
     return location
 
