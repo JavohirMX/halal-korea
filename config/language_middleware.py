@@ -76,14 +76,18 @@ class SmartLanguageMiddleware(MiddlewareMixin):
                 translation.activate(final_language)
                 request.LANGUAGE_CODE = final_language
             
-                # Always update session when language changes
-                try:
-                    if hasattr(request, 'session'):
-                        request.session[LANGUAGE_SESSION_KEY] = final_language
-                    else:
-                        logger.debug("Session not available for language storage")
-                except Exception as e:
-                    logger.debug(f"Error storing language in session: {e}")
+                # Only persist explicit language choices (URL param or the
+                # user action that set them). Persisting the browser-detected
+                # language would create a session row + Set-Cookie on every
+                # anonymous first visit with a non-default Accept-Language.
+                if url_lang:
+                    try:
+                        if hasattr(request, 'session'):
+                            request.session[LANGUAGE_SESSION_KEY] = final_language
+                        else:
+                            logger.debug("Session not available for language storage")
+                    except Exception as e:
+                        logger.debug(f"Error storing language in session: {e}")
                 
                 # Update user's preferred language if they're authenticated and language changed via URL
                 if url_lang and hasattr(request, 'user') and request.user and request.user.is_authenticated:

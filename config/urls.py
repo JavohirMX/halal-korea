@@ -25,6 +25,7 @@ from blog.upload_views import tinymce_upload_view
 from utils.language_views import (
     set_language,
     set_language_ajax,
+    csrf_token_ping,
     get_user_language_preferences,
 )
 from config.sitemaps import sitemaps
@@ -47,6 +48,7 @@ urlpatterns = [
     # Enhanced language switching with user preference updates
     path("i18n/setlang/", set_language, name="set_language"),
     path("i18n/setlang-ajax/", set_language_ajax, name="set_language_ajax"),
+    path("api/csrf/", csrf_token_ping, name="csrf_token_ping"),
     path(
         "i18n/preferences/",
         get_user_language_preferences,

@@ -14,7 +14,7 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.utils import translation
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
@@ -270,3 +270,16 @@ def _get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip or 'unknown'
+
+
+@require_GET
+@ensure_csrf_cookie
+def csrf_token_ping(request):
+    """
+    Lightweight endpoint that only exists to issue the CSRF cookie on demand.
+
+    Anonymous-targeted pages render without {% csrf_token %} so first visits
+    do not set the csrftoken cookie; client JS calls this endpoint right
+    before it needs to POST (feedback widget, location updates, favorites).
+    """
+    return JsonResponse({"detail": "csrf cookie set"})
