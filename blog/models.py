@@ -1,4 +1,7 @@
+import logging
 from django.db import models
+
+logger = logging.getLogger(__name__)
 from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
@@ -144,7 +147,47 @@ class BlogPost(models.Model):
     def __str__(self):
         return self.title
     
+    # Maximum width for featured images (hero renders at ~1280px wide max)
+    FEATURED_IMAGE_MAX_WIDTH = 1600
+
+    def _resize_featured_image(self):
+        """Downscale oversized featured images on upload to keep pages light."""
+        from PIL import Image
+        from django.core.files.base import ContentFile
+        import io
+
+        img = Image.open(self.featured_image)
+        if img.width <= self.FEATURED_IMAGE_MAX_WIDTH:
+            return
+        img_format = img.format or 'JPEG'
+        ratio = self.FEATURED_IMAGE_MAX_WIDTH / img.width
+        new_size = (self.FEATURED_IMAGE_MAX_WIDTH, round(img.height * ratio))
+        img = img.resize(new_size, Image.LANCZOS)
+        buffer = io.BytesIO()
+        save_kwargs = {'optimize': True} if img_format == 'JPEG' else {}
+        img.save(buffer, format=img_format, **save_kwargs)
+        self.featured_image.save(
+            self.featured_image.name, ContentFile(buffer.getvalue()), save=False
+        )
+
     def save(self, *args, **kwargs):
+        # Resize featured image when it is newly uploaded or replaced
+        if self.featured_image:
+            old_image = None
+            if self.pk:
+                old_image = (
+                    BlogPost.objects.filter(pk=self.pk)
+                    .values_list('featured_image', flat=True)
+                    .first()
+                )
+            if not old_image or old_image != self.featured_image.name:
+                try:
+                    self._resize_featured_image()
+                except Exception:
+                    logger.exception(
+                        'Failed to resize featured image for post "%s"', self.title
+                    )
+
         # Auto-generate slug if not provided
         if not self.slug:
             self.slug = slugify(self.title)
