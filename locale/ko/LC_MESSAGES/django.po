@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 01:15+0900\n"
+"POT-Creation-Date: 2026-10-21 01:47+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -593,6 +593,51 @@ msgstr "양식의 오류를 확인해주세요."
 #: contact/views.py:104
 msgid "You have exceeded the rate limit for contact messages."
 msgstr "연락처 메시지의 요청 제한을 초과했습니다."
+
+#: places/forms.py:29
+msgid "Enter new name"
+msgstr "새 이름 입력"
+
+#: places/forms.py:36
+msgid "Enter new description"
+msgstr "새 설명 입력"
+
+#: places/forms.py:47
+msgid "Enter new address"
+msgstr "새 주소 입력"
+
+#: places/forms.py:53
+msgid "Enter new phone number"
+msgstr "새 전화번호 입력"
+
+#: places/forms.py:59
+msgid "Enter new website URL"
+msgstr "새 웹사이트 URL 입력"
+
+#: places/forms.py:65
+msgid "Enter new Google Map link"
+msgstr "새 Google 지도 링크 입력"
+
+#: places/forms.py:71
+msgid "Enter new Kakao Map link"
+msgstr "새 Kakao 지도 링크 입력"
+
+#: places/forms.py:77
+msgid "Enter new Naver Map link"
+msgstr "새 Naver 지도 링크 입력"
+
+#: places/forms.py:99
+msgid "Please explain why these changes are needed..."
+msgstr "변경이 필요한 이유를 설명해 주세요..."
+
+#: places/forms.py:110 places/forms.py:112 places/forms.py:114
+#: places/forms.py:116
+msgid "Current:"
+msgstr "현재:"
+
+#: places/forms.py:226
+msgid "Optional caption for this image"
+msgstr "이 이미지의 설명(선택 사항)"
 
 #: places/models.py:12 places/templates/places/explore.html:963
 #: places/templates/places/explore.html:1588
@@ -3545,7 +3590,7 @@ msgstr "임삭"
 
 #: prayer_times/ramadan_image.py:347
 #: prayer_times/templates/prayer_times/prayer_times.html:418
-#: prayer_times/templates/prayer_times/prayer_times.html:946
+#: prayer_times/templates/prayer_times/prayer_times.html:980
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:281
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:364
 msgid "Fajr"
@@ -3553,7 +3598,7 @@ msgstr "파즈르"
 
 #: prayer_times/ramadan_image.py:348
 #: prayer_times/templates/prayer_times/prayer_times.html:430
-#: prayer_times/templates/prayer_times/prayer_times.html:948
+#: prayer_times/templates/prayer_times/prayer_times.html:982
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:282
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:368
 msgid "Dhuhr"
@@ -3561,7 +3606,7 @@ msgstr "두흐르"
 
 #: prayer_times/ramadan_image.py:349
 #: prayer_times/templates/prayer_times/prayer_times.html:436
-#: prayer_times/templates/prayer_times/prayer_times.html:949
+#: prayer_times/templates/prayer_times/prayer_times.html:983
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:283
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:372
 msgid "Asr"
@@ -3569,14 +3614,14 @@ msgstr "아스르"
 
 #: prayer_times/ramadan_image.py:350
 #: prayer_times/templates/prayer_times/prayer_times.html:442
-#: prayer_times/templates/prayer_times/prayer_times.html:950
+#: prayer_times/templates/prayer_times/prayer_times.html:984
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:284
 msgid "Maghrib"
 msgstr "마그리브"
 
 #: prayer_times/ramadan_image.py:351
 #: prayer_times/templates/prayer_times/prayer_times.html:448
-#: prayer_times/templates/prayer_times/prayer_times.html:951
+#: prayer_times/templates/prayer_times/prayer_times.html:985
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:285
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:376
 msgid "Isha"
@@ -3955,7 +4000,7 @@ msgid "Time"
 msgstr "시간"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:424
-#: prayer_times/templates/prayer_times/prayer_times.html:947
+#: prayer_times/templates/prayer_times/prayer_times.html:981
 msgid "Sunrise"
 msgstr "일출"
 
@@ -3969,7 +4014,7 @@ msgid "Loading prayer times..."
 msgstr "기도 시간 로딩 중..."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:481
-#: prayer_times/templates/prayer_times/prayer_times.html:986
+#: prayer_times/templates/prayer_times/prayer_times.html:1020
 msgid "Failed to load prayer times"
 msgstr "기도 시간 로드 실패"
 
@@ -3977,7 +4022,9 @@ msgstr "기도 시간 로드 실패"
 msgid ""
 "Unable to determine your location. Please enable location services or set "
 "your location manually."
-msgstr "위치를 확인할 수 없습니다. 위치 서비스를 활성화하거나 수동으로 위치를 설정하세요."
+msgstr ""
+"위치를 확인할 수 없습니다. 위치 서비스를 활성화하거나 수동으로 위치를 설정하"
+"세요."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:538
 msgid "Calculating..."
@@ -4002,83 +4049,83 @@ msgstr ""
 "rel=\"noopener\" class=\"underline hover:text-primary-600 dark:hover:text-"
 "primary-400\">aladhan.com</a>에서 제공됩니다"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:744
+#: prayer_times/templates/prayer_times/prayer_times.html:778
 msgid "Fajr (Tomorrow)"
 msgstr "파즈르 (내일)"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:773
+#: prayer_times/templates/prayer_times/prayer_times.html:807
 msgid "No prayer times available."
 msgstr "기도 시간 정보가 없습니다."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:785
+#: prayer_times/templates/prayer_times/prayer_times.html:819
 msgid "All prayer times have passed."
 msgstr "모든 기도 시간이 지났습니다."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:943
+#: prayer_times/templates/prayer_times/prayer_times.html:977
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:131
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:353
 msgid "Suhoor ends"
 msgstr "수후르 종료"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:950
+#: prayer_times/templates/prayer_times/prayer_times.html:984
 msgid "Iftar (Maghrib)"
 msgstr "이프타르 (마그리브)"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:989
+#: prayer_times/templates/prayer_times/prayer_times.html:1023
 msgid "Error loading prayer times:"
 msgstr "기도 시간 로딩 오류:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1004
-#: prayer_times/templates/prayer_times/prayer_times.html:1040
-#: prayer_times/templates/prayer_times/prayer_times.html:1095
-#: prayer_times/templates/prayer_times/prayer_times.html:1130
+#: prayer_times/templates/prayer_times/prayer_times.html:1038
+#: prayer_times/templates/prayer_times/prayer_times.html:1074
+#: prayer_times/templates/prayer_times/prayer_times.html:1129
+#: prayer_times/templates/prayer_times/prayer_times.html:1164
 msgid "CSRF token not found"
 msgstr "CSRF 토큰을 찾을 수 없습니다"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1029
+#: prayer_times/templates/prayer_times/prayer_times.html:1063
 msgid "Failed to update location:"
 msgstr "위치 업데이트 실패:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1033
+#: prayer_times/templates/prayer_times/prayer_times.html:1067
 msgid "Error updating location:"
 msgstr "위치 업데이트 오류:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1041
+#: prayer_times/templates/prayer_times/prayer_times.html:1075
 msgid "Error: CSRF token not found. Please refresh the page."
 msgstr "오류: CSRF 토큰을 찾을 수 없습니다. 페이지를 새로고침해주세요."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1049
-#: prayer_times/templates/prayer_times/prayer_times.html:1074
+#: prayer_times/templates/prayer_times/prayer_times.html:1083
+#: prayer_times/templates/prayer_times/prayer_times.html:1108
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:501
 msgid "Could not determine location. Please select a city manually."
 msgstr "위치를 확인할 수 없습니다. 수동으로 도시를 선택해주세요."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1078
-#: prayer_times/templates/prayer_times/prayer_times.html:1083
+#: prayer_times/templates/prayer_times/prayer_times.html:1112
+#: prayer_times/templates/prayer_times/prayer_times.html:1117
 msgid "Error getting location:"
 msgstr "위치 가져오기 오류:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1079
-#: prayer_times/templates/prayer_times/prayer_times.html:1084
+#: prayer_times/templates/prayer_times/prayer_times.html:1113
+#: prayer_times/templates/prayer_times/prayer_times.html:1118
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:504
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:511
 msgid "Error getting your location. Please select a city manually."
 msgstr "위치를 가져오는 중 오류가 발생했습니다. 수동으로 도시를 선택해주세요."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1088
+#: prayer_times/templates/prayer_times/prayer_times.html:1122
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:471
 msgid ""
 "Geolocation is not supported by your browser. Please select a city manually."
 msgstr ""
 "브라우저에서 지리적 위치를 지원하지 않습니다. 수동으로 도시를 선택해주세요."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1119
-#: prayer_times/templates/prayer_times/prayer_times.html:1154
+#: prayer_times/templates/prayer_times/prayer_times.html:1153
+#: prayer_times/templates/prayer_times/prayer_times.html:1188
 msgid "Failed to update settings:"
 msgstr "설정 업데이트 실패:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1123
-#: prayer_times/templates/prayer_times/prayer_times.html:1158
+#: prayer_times/templates/prayer_times/prayer_times.html:1157
+#: prayer_times/templates/prayer_times/prayer_times.html:1192
 msgid "Error updating settings:"
 msgstr "설정 업데이트 오류:"
 
@@ -4359,6 +4406,40 @@ msgid ""
 msgstr ""
 "이 기능에 접근하려면 이메일 주소를 인증해주세요. 인증 이메일을 받은 편지함을 "
 "확인하세요."
+
+#: users/forms.py:138
+msgid "Email subject"
+msgstr "이메일 제목"
+
+#: users/forms.py:144
+msgid "Write your message…"
+msgstr "메시지를 작성하세요…"
+
+#: users/forms.py:163
+#| msgid ""
+#| "Optional. Comma- or newline-separated; they do not need to be registered "
+#| "users."
+msgid ""
+"Comma- or newline-separated addresses (not required to be registered users)"
+msgstr ""
+"선택 사항입니다. 쉼표 또는 줄바꿈으로 구분하며, 등록된 사용자일 필요는 없습니"
+"다."
+
+#: users/forms.py:205
+msgid "Type the recipient count to confirm"
+msgstr "확인하려면 수신자 수를 입력하세요"
+
+#: users/forms.py:306 users/templates/users/resend_activation.html:97
+msgid "Enter your email address"
+msgstr "이메일 주소를 입력하세요"
+
+#: users/forms.py:325
+msgid "Enter your new password"
+msgstr "새 비밀번호를 입력하세요"
+
+#: users/forms.py:334
+msgid "Confirm your new password"
+msgstr "새 비밀번호 확인"
 
 #: users/templates/admin/email/hub.html:4
 #: users/templates/admin/users/compose_email.html:4
@@ -5303,10 +5384,6 @@ msgstr "다음 주소로 인증 이메일을 보내드리겠습니다:"
 #: users/templates/users/resend_activation.html:77
 msgid "Send Verification Email"
 msgstr "인증 이메일 보내기"
-
-#: users/templates/users/resend_activation.html:97
-msgid "Enter your email address"
-msgstr "이메일 주소를 입력하세요"
 
 #: users/templates/users/resend_activation.html:124
 msgid "or"

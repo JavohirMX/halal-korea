@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 01:15+0900\n"
+"POT-Creation-Date: 2026-10-21 01:47+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -598,6 +598,51 @@ msgstr "Iltimos, shakldagi xatolarni tekshiring."
 #: contact/views.py:104
 msgid "You have exceeded the rate limit for contact messages."
 msgstr "Siz aloqa xabarlari uchun belgilangan cheklovni oshirdingiz."
+
+#: places/forms.py:29
+msgid "Enter new name"
+msgstr "Yangi nom kiriting"
+
+#: places/forms.py:36
+msgid "Enter new description"
+msgstr "Yangi tavsif kiriting"
+
+#: places/forms.py:47
+msgid "Enter new address"
+msgstr "Yangi manzil kiriting"
+
+#: places/forms.py:53
+msgid "Enter new phone number"
+msgstr "Yangi telefon raqam kiriting"
+
+#: places/forms.py:59
+msgid "Enter new website URL"
+msgstr "Yangi veb-sayt URL kiriting"
+
+#: places/forms.py:65
+msgid "Enter new Google Map link"
+msgstr "Yangi Google Maps havolasini kiriting"
+
+#: places/forms.py:71
+msgid "Enter new Kakao Map link"
+msgstr "Yangi Kakao Maps havolasini kiriting"
+
+#: places/forms.py:77
+msgid "Enter new Naver Map link"
+msgstr "Yangi Naver Maps havolasini kiriting"
+
+#: places/forms.py:99
+msgid "Please explain why these changes are needed..."
+msgstr "Nega bu o'zgarishlar kerakligini tushuntiring..."
+
+#: places/forms.py:110 places/forms.py:112 places/forms.py:114
+#: places/forms.py:116
+msgid "Current:"
+msgstr "Joriy:"
+
+#: places/forms.py:226
+msgid "Optional caption for this image"
+msgstr "Bu rasm uchun izoh (ixtiyoriy)"
 
 #: places/models.py:12 places/templates/places/explore.html:963
 #: places/templates/places/explore.html:1588
@@ -3668,7 +3713,7 @@ msgstr "Og'iz yopish"
 
 #: prayer_times/ramadan_image.py:347
 #: prayer_times/templates/prayer_times/prayer_times.html:418
-#: prayer_times/templates/prayer_times/prayer_times.html:946
+#: prayer_times/templates/prayer_times/prayer_times.html:980
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:281
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:364
 msgid "Fajr"
@@ -3676,7 +3721,7 @@ msgstr "Bomdod"
 
 #: prayer_times/ramadan_image.py:348
 #: prayer_times/templates/prayer_times/prayer_times.html:430
-#: prayer_times/templates/prayer_times/prayer_times.html:948
+#: prayer_times/templates/prayer_times/prayer_times.html:982
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:282
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:368
 msgid "Dhuhr"
@@ -3684,7 +3729,7 @@ msgstr "Peshin"
 
 #: prayer_times/ramadan_image.py:349
 #: prayer_times/templates/prayer_times/prayer_times.html:436
-#: prayer_times/templates/prayer_times/prayer_times.html:949
+#: prayer_times/templates/prayer_times/prayer_times.html:983
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:283
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:372
 msgid "Asr"
@@ -3692,14 +3737,14 @@ msgstr "Asr"
 
 #: prayer_times/ramadan_image.py:350
 #: prayer_times/templates/prayer_times/prayer_times.html:442
-#: prayer_times/templates/prayer_times/prayer_times.html:950
+#: prayer_times/templates/prayer_times/prayer_times.html:984
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:284
 msgid "Maghrib"
 msgstr "Shom"
 
 #: prayer_times/ramadan_image.py:351
 #: prayer_times/templates/prayer_times/prayer_times.html:448
-#: prayer_times/templates/prayer_times/prayer_times.html:951
+#: prayer_times/templates/prayer_times/prayer_times.html:985
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:285
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:376
 msgid "Isha"
@@ -4080,7 +4125,7 @@ msgid "Time"
 msgstr "Vaqt"
 
 #: prayer_times/templates/prayer_times/prayer_times.html:424
-#: prayer_times/templates/prayer_times/prayer_times.html:947
+#: prayer_times/templates/prayer_times/prayer_times.html:981
 msgid "Sunrise"
 msgstr "Quyosh chiqishi"
 
@@ -4094,7 +4139,7 @@ msgid "Loading prayer times..."
 msgstr "Namoz vaqtlari yuklanmoqda..."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:481
-#: prayer_times/templates/prayer_times/prayer_times.html:986
+#: prayer_times/templates/prayer_times/prayer_times.html:1020
 msgid "Failed to load prayer times"
 msgstr "Namoz vaqtlarini yuklash amalga oshmadi"
 
@@ -4102,7 +4147,9 @@ msgstr "Namoz vaqtlarini yuklash amalga oshmadi"
 msgid ""
 "Unable to determine your location. Please enable location services or set "
 "your location manually."
-msgstr "Joylashuvingizni aniqlab bo'lmadi. Joylashuv xizmatlarini yoqing yoki joylashuvni qo'lda sozlang."
+msgstr ""
+"Joylashuvingizni aniqlab bo'lmadi. Joylashuv xizmatlarini yoqing yoki "
+"joylashuvni qo'lda sozlang."
 
 #: prayer_times/templates/prayer_times/prayer_times.html:538
 msgid "Calculating..."
@@ -4127,70 +4174,70 @@ msgstr ""
 "rel=\"noopener\" class=\"underline hover:text-primary-600 dark:hover:text-"
 "primary-400\">aladhan.com</a> tomonidan taqdim etiladi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:744
+#: prayer_times/templates/prayer_times/prayer_times.html:778
 msgid "Fajr (Tomorrow)"
 msgstr "Bomdod (Ertaga)"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:773
+#: prayer_times/templates/prayer_times/prayer_times.html:807
 msgid "No prayer times available."
 msgstr "Namoz vaqtlari mavjud emas."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:785
+#: prayer_times/templates/prayer_times/prayer_times.html:819
 msgid "All prayer times have passed."
 msgstr "Barcha namoz vaqtlari o'tdi."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:943
+#: prayer_times/templates/prayer_times/prayer_times.html:977
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:131
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:353
 msgid "Suhoor ends"
 msgstr "Saharlik tugashi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:950
+#: prayer_times/templates/prayer_times/prayer_times.html:984
 msgid "Iftar (Maghrib)"
 msgstr "Iftor (Shom)"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:989
+#: prayer_times/templates/prayer_times/prayer_times.html:1023
 msgid "Error loading prayer times:"
 msgstr "Namoz vaqtlarini yuklashda xatolik:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1004
-#: prayer_times/templates/prayer_times/prayer_times.html:1040
-#: prayer_times/templates/prayer_times/prayer_times.html:1095
-#: prayer_times/templates/prayer_times/prayer_times.html:1130
+#: prayer_times/templates/prayer_times/prayer_times.html:1038
+#: prayer_times/templates/prayer_times/prayer_times.html:1074
+#: prayer_times/templates/prayer_times/prayer_times.html:1129
+#: prayer_times/templates/prayer_times/prayer_times.html:1164
 msgid "CSRF token not found"
 msgstr "CSRF token topilmadi"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1029
+#: prayer_times/templates/prayer_times/prayer_times.html:1063
 msgid "Failed to update location:"
 msgstr "Manzilni yangilash amalga oshmadi:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1033
+#: prayer_times/templates/prayer_times/prayer_times.html:1067
 msgid "Error updating location:"
 msgstr "Manzilni yangilashda xatolik:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1041
+#: prayer_times/templates/prayer_times/prayer_times.html:1075
 msgid "Error: CSRF token not found. Please refresh the page."
 msgstr "Xatolik: CSRF token topilmadi. Iltimos, sahifani yangilang."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1049
-#: prayer_times/templates/prayer_times/prayer_times.html:1074
+#: prayer_times/templates/prayer_times/prayer_times.html:1083
+#: prayer_times/templates/prayer_times/prayer_times.html:1108
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:501
 msgid "Could not determine location. Please select a city manually."
 msgstr "Manzilni aniqlay olmadik. Iltimos, shaharni qo'lda tanlang."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1078
-#: prayer_times/templates/prayer_times/prayer_times.html:1083
+#: prayer_times/templates/prayer_times/prayer_times.html:1112
+#: prayer_times/templates/prayer_times/prayer_times.html:1117
 msgid "Error getting location:"
 msgstr "Manzilni olishda xatolik:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1079
-#: prayer_times/templates/prayer_times/prayer_times.html:1084
+#: prayer_times/templates/prayer_times/prayer_times.html:1113
+#: prayer_times/templates/prayer_times/prayer_times.html:1118
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:504
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:511
 msgid "Error getting your location. Please select a city manually."
 msgstr "Manzilingizni olishda xatolik. Iltimos, shaharni qo'lda tanlang."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1088
+#: prayer_times/templates/prayer_times/prayer_times.html:1122
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:471
 msgid ""
 "Geolocation is not supported by your browser. Please select a city manually."
@@ -4198,13 +4245,13 @@ msgstr ""
 "Geolokatsiya brauzeringiz tomonidan qo'llab-quvvatlanmaydi. Iltimos, "
 "shaharni qo'lda tanlang."
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1119
-#: prayer_times/templates/prayer_times/prayer_times.html:1154
+#: prayer_times/templates/prayer_times/prayer_times.html:1153
+#: prayer_times/templates/prayer_times/prayer_times.html:1188
 msgid "Failed to update settings:"
 msgstr "Sozlamalarni yangilash amalga oshmadi:"
 
-#: prayer_times/templates/prayer_times/prayer_times.html:1123
-#: prayer_times/templates/prayer_times/prayer_times.html:1158
+#: prayer_times/templates/prayer_times/prayer_times.html:1157
+#: prayer_times/templates/prayer_times/prayer_times.html:1192
 msgid "Error updating settings:"
 msgstr "Sozlamalarni yangilashda xatolik:"
 
@@ -4487,6 +4534,40 @@ msgid ""
 msgstr ""
 "Bu xususiyatdan foydalanish uchun iltimos, elektron pochta manzilingizni "
 "tasdiqlang. Tasdiqlash uchun elektron pochta qutingizni tekshiring."
+
+#: users/forms.py:138
+msgid "Email subject"
+msgstr "Email mavzusi"
+
+#: users/forms.py:144
+msgid "Write your message…"
+msgstr "Xabaringizni yozing…"
+
+#: users/forms.py:163
+#| msgid ""
+#| "Optional. Comma- or newline-separated; they do not need to be registered "
+#| "users."
+msgid ""
+"Comma- or newline-separated addresses (not required to be registered users)"
+msgstr ""
+"Ixtiyoriy. Vergul yoki yangi qator bilan ajrating; ular ro'yxatdan o'tgan "
+"foydalanuvchilar bo'lishi shart emas."
+
+#: users/forms.py:205
+msgid "Type the recipient count to confirm"
+msgstr "Tasdiqlash uchun qabul qiluvchilar sonini kiriting"
+
+#: users/forms.py:306 users/templates/users/resend_activation.html:97
+msgid "Enter your email address"
+msgstr "Elektron pochta manzilingizni kiriting"
+
+#: users/forms.py:325
+msgid "Enter your new password"
+msgstr "Yangi parolingizni kiriting"
+
+#: users/forms.py:334
+msgid "Confirm your new password"
+msgstr "Yangi parolingizni tasdiqlang"
 
 #: users/templates/admin/email/hub.html:4
 #: users/templates/admin/users/compose_email.html:4
@@ -5457,10 +5538,6 @@ msgstr "Biz tasdiqlash xabarini ushbu emailga yuboramiz:"
 #: users/templates/users/resend_activation.html:77
 msgid "Send Verification Email"
 msgstr "Tasdiqlash xabarini yuborish"
-
-#: users/templates/users/resend_activation.html:97
-msgid "Enter your email address"
-msgstr "Elektron pochta manzilingizni kiriting"
 
 #: users/templates/users/resend_activation.html:124
 msgid "or"
