@@ -446,3 +446,56 @@ class BlogIntegrationTest(TestCase):
         response = self.client.get('/blog/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Multilingual Test Post')
+
+
+class BlogQueryCountTest(TestCase):
+    """Regression tests: blog views must not issue duplicate/N+1 queries."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='qcuser', email='qc@example.com', password='testpass123'
+        )
+        self.category = Category.objects.create(name='QC Category')
+        self.category2 = Category.objects.create(name='QC Category 2')
+        self.tag = Tag.objects.create(name='qc-tag')
+        self.post = BlogPost.objects.create(
+            title='QC Post',
+            author=self.user,
+            category=self.category,
+            excerpt='excerpt',
+            content='<p>content</p>',
+            status='published',
+            language='en'
+        )
+        self.post.tags.add(self.tag)
+        # A second post in a second category: with a single post the page
+        # slice coincidentally compiles to the same LIMIT 1 SQL as
+        # .first(), which is not a real duplicate
+        self.post2 = BlogPost.objects.create(
+            title='QC Post 2',
+            author=self.user,
+            category=self.category2,
+            excerpt='excerpt 2',
+            content='<p>content 2</p>',
+            status='published',
+            language='en'
+        )
+        self.post2.tags.add(self.tag)
+
+    def _count_dupes(self, url):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+        with CaptureQueriesContext(connection) as ctx:
+            response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        sqls = [q['sql'] for q in ctx.captured_queries]
+        dupes = len(sqls) - len(set(sqls))
+        return len(sqls), dupes
+
+    def test_blog_home_no_duplicate_queries(self):
+        _, dupes = self._count_dupes('/blog/')
+        self.assertEqual(dupes, 0, 'blog home issues duplicate SQL queries')
+
+    def test_blog_detail_no_duplicate_queries(self):
+        _, dupes = self._count_dupes(f'/blog/{self.post.slug}/')
+        self.assertEqual(dupes, 0, 'blog detail issues duplicate SQL queries')
