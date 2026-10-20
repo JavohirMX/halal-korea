@@ -252,7 +252,7 @@
                 <!-- Left side -->
                 <div class="flex items-center flex-shrink-0">
                     <div class="flex items-center">
-                        <a href="{% url 'places:home' %}" class="text-lg sm:text-xl font-bold flex items-center">
+                        <a href="{% url 'places:home' %}" class="text-lg sm:text-xl font-bold flex items-center py-2">
                             <img src="{% static STATIC_INFO.logo_marker %}" alt="{{ STATIC_INFO.site_name }} Logo" class="h-6 sm:h-8 w-auto mr-1 sm:mr-2">
                             <span class="bg-gradient-to-r from-primary-500 via-primary-400 to-teal-400 bg-clip-text text-transparent truncate max-w-[120px] sm:max-w-none">
                                 {{ STATIC_INFO.site_name }}
@@ -317,7 +317,7 @@
                 <div class="flex items-center space-x-2 sm:space-x-4">
                     <!-- Theme Toggle -->
                     <button onclick="toggleTheme()" 
-                            class="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                            class="p-1.5 sm:p-2 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
                         <i class="fas fa-sun text-yellow-500 theme-toggle-icon hidden dark:inline-block"></i>
                         <i class="fas fa-moon text-gray-700 dark:text-gray-400 theme-toggle-icon dark:hidden"></i>
                     </button>
@@ -330,7 +330,7 @@
                         {% get_language_info for CURRENT_LANGUAGE_CODE as current_lang_info %}
 
                         <button @click="open = !open" 
-                                class="flex items-center space-x-1 px-2 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
+                                class="flex items-center space-x-1 px-2 py-2 min-h-[44px] rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
                             {% if current_lang_info.code == 'en' %}<span class="flag">🇺🇸</span>
                             {% elif current_lang_info.code == 'ko' %}<span class="flag">🇰🇷</span>
                             {% elif current_lang_info.code == 'uz' %}<span class="flag">🇺🇿</span>
@@ -498,7 +498,7 @@
                     <!-- Mobile menu button -->
                     <div class="flex items-center xl:hidden ml-2 lg:ml-4">
                         <button @click="isOpen = !isOpen" 
-                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
+                                class="inline-flex items-center justify-center p-2 min-w-[44px] min-h-[44px] rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
                             <svg class="h-6 w-6" x-bind:class="{'hidden': isOpen, 'block': !isOpen }" 
                                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -747,22 +747,22 @@
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Quick Links" %}</h3>
                     <ul class="space-y-3">
                         <li>
-                            <a href="{% url 'places:explore' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <a href="{% url 'places:explore' %}" class="inline-block py-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                                 {% translate "Explore Places" %}
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'places:submit_place' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <a href="{% url 'places:submit_place' %}" class="inline-block py-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                                 {% translate "Submit a Place" %}
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'blog:home' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <a href="{% url 'blog:home' %}" class="inline-block py-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                                 {% translate "Blog" %}
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'places:about' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <a href="{% url 'places:about' %}" class="inline-block py-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                                 {% translate "About Us" %}
                             </a>
                         </li>
@@ -800,13 +800,13 @@
                         {{ STATIC_INFO.copyright_text|safe }}
                     </p>
                     <div class="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
-                        <a href="{{ STATIC_INFO.footer_links.privacy_policy }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                        <a href="{{ STATIC_INFO.footer_links.privacy_policy }}" class="inline-block py-1.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
                             {% translate "Privacy Policy" %}
                         </a>
-                        <a href="{{ STATIC_INFO.footer_links.terms_of_service }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                        <a href="{{ STATIC_INFO.footer_links.terms_of_service }}" class="inline-block py-1.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
                             {% translate "Terms of Service" %}
                         </a>
-                        <a href="{{ STATIC_INFO.footer_links.cookie_policy }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                        <a href="{{ STATIC_INFO.footer_links.cookie_policy }}" class="inline-block py-1.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
                             {% translate "Cookie Policy" %}
                         </a>
                     </div>
