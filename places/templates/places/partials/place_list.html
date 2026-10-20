@@ -12,10 +12,15 @@
     <div class="lg:hidden flex gap-3 p-3">
         <!-- Image (Left Side) -->
         {% if place.photo_urls %}
-        <div class="flex-shrink-0">
+        <div class="flex-shrink-0 relative w-24 h-24">
             <img src="{{ place.photo_urls.0 }}" 
                  alt="{{ place.name }}" 
+                 loading="lazy" decoding="async"
+                 onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden'); this.nextElementSibling.classList.add('flex');"
                  class="w-24 h-24 object-cover rounded-lg ring-1 ring-gray-200 dark:ring-gray-700">
+            <div class="hidden absolute inset-0 bg-primary-50 dark:bg-primary-900/30 rounded-lg items-center justify-center ring-1 ring-primary-200 dark:ring-primary-800" aria-hidden="true">
+                <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} text-2xl text-primary-400 dark:text-primary-500"></i>
+            </div>
         </div>
         {% else %}
         <div class="flex-shrink-0 w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center ring-1 ring-gray-200 dark:ring-gray-600">
@@ -96,9 +101,16 @@
     <!-- Desktop Vertical Layout (>= lg) -->
     <div class="hidden lg:block p-4">
         {% if place.photo_urls %}
-        <img src="{{ place.photo_urls.0 }}" 
-             alt="{{ place.name }}" 
-             class="w-full h-48 object-cover rounded-lg mb-4">
+        <div class="relative w-full h-48 mb-4">
+            <img src="{{ place.photo_urls.0 }}" 
+                 alt="{{ place.name }}" 
+                 loading="lazy" decoding="async"
+                 onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden'); this.nextElementSibling.classList.add('flex');"
+                 class="w-full h-48 object-cover rounded-lg">
+            <div class="hidden absolute inset-0 bg-primary-50 dark:bg-primary-900/30 rounded-lg items-center justify-center" aria-hidden="true">
+                <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} text-4xl text-primary-400 dark:text-primary-500"></i>
+            </div>
+        </div>
         {% endif %}
         
         <div class="flex justify-between items-start">
