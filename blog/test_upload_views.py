@@ -48,25 +48,23 @@ class TinyMCEUploadViewDetailedTest(TestCase):
     
     def test_upload_permissions(self):
         """Test various user permission levels"""
-        image = self.create_test_image()
-        
         # Test anonymous user
-        response = self.client.post(self.upload_url, {'file': image})
+        response = self.client.post(self.upload_url, {'file': self.create_test_image()})
         self.assertEqual(response.status_code, 302)  # Redirect to login
         
         # Test regular user (not staff)
         self.client.login(username='regularuser', password='testpass123')
-        response = self.client.post(self.upload_url, {'file': image})
+        response = self.client.post(self.upload_url, {'file': self.create_test_image()})
         self.assertEqual(response.status_code, 302)  # Redirect to login
         
         # Test staff user
         self.client.login(username='staffuser', password='testpass123')
-        response = self.client.post(self.upload_url, {'file': image})
+        response = self.client.post(self.upload_url, {'file': self.create_test_image()})
         self.assertEqual(response.status_code, 200)
         
         # Test superuser
         self.client.login(username='admin', password='adminpass123')
-        response = self.client.post(self.upload_url, {'file': image})
+        response = self.client.post(self.upload_url, {'file': self.create_test_image()})
         self.assertEqual(response.status_code, 200)
     
     def test_image_format_validation(self):
@@ -236,12 +234,12 @@ class TinyMCEUploadViewDetailedTest(TestCase):
             if default_storage.exists(media_path):
                 default_storage.delete(media_path)
     
-    def test_file_extension_preservation(self):
-        """Test that file extensions are preserved correctly"""
+    def test_file_extension_derived_from_real_format(self):
+        """Stored extension comes from the verified image format, not the filename"""
         self.client.login(username='staffuser', password='testpass123')
         
         test_cases = [
-            ('JPEG', '.jpeg'),
+            ('JPEG', '.jpg'),
             ('PNG', '.png'),
             ('GIF', '.gif'),
         ]
@@ -262,3 +260,31 @@ class TinyMCEUploadViewDetailedTest(TestCase):
                 media_path = location.split('/media/')[-1]
                 if default_storage.exists(media_path):
                     default_storage.delete(media_path)
+
+
+    def test_disguised_non_image_rejected(self):
+        """HTML/content spoofed with an image content_type must be rejected"""
+        self.client.login(username='staffuser', password='testpass123')
+        fake = SimpleUploadedFile(
+            name='evil.png',
+            content=b'<html><script>alert(1)</script></html>',
+            content_type='image/png'
+        )
+        response = self.client.post(self.upload_url, {'file': fake})
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.content)
+        self.assertEqual(data['error'], 'Invalid image file')
+
+    def test_filename_extension_is_ignored(self):
+        """A real image named .html must be stored with its real image extension"""
+        self.client.login(username='staffuser', password='testpass123')
+        image = self.create_test_image(format='PNG')
+        image.name = 'evil.html'
+        response = self.client.post(self.upload_url, {'file': image})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        filename = data['location'].split('/')[-1]
+        self.assertTrue(filename.endswith('.png'))
+        media_path = data['location'].split('/media/')[-1]
+        if default_storage.exists(media_path):
+            default_storage.delete(media_path)

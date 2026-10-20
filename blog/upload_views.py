@@ -1,4 +1,3 @@
-import os
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.files.storage import default_storage
 from django.http import JsonResponse
@@ -6,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import View
 import uuid
+from PIL import Image
 
 
 @method_decorator(staff_member_required, name='dispatch')
@@ -29,8 +29,23 @@ class TinyMCEImageUploadView(View):
             if file.size > 5 * 1024 * 1024:
                 return JsonResponse({'error': 'File too large'}, status=400)
             
+            # Verify the actual bytes decode as a raster image - the
+            # content_type header is client-supplied and cannot be trusted.
+            # The stored extension is derived from the real format, never
+            # from the user-supplied filename.
+            try:
+                file.seek(0)
+                with Image.open(file) as img:
+                    img.verify()
+                    real_format = (img.format or '').lower()
+                file.seek(0)
+            except Exception:
+                return JsonResponse({'error': 'Invalid image file'}, status=400)
+            ext = {'jpeg': '.jpg', 'png': '.png', 'gif': '.gif', 'webp': '.webp'}.get(real_format)
+            if not ext:
+                return JsonResponse({'error': 'Invalid file type'}, status=400)
+            
             # Generate unique filename
-            ext = os.path.splitext(file.name)[1]
             filename = f"blog/uploads/{uuid.uuid4()}{ext}"
             
             # Save file
