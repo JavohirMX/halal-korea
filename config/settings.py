@@ -818,6 +818,12 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
+    # Browsers must not guess content types (protects /media/ uploads)
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    # Don't leak full URLs (may contain search queries/place names) to third parties
+    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
 # ============================================================================
 # JAZZMIN ADMIN THEME CONFIGURATION
 # ============================================================================
