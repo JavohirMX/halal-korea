@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q, Case, When, IntegerField
+from django.db.models import Q, Case, When, IntegerField, Count
 from django.http import Http404
 from django.utils import translation
 from utils.logging_utils import log_user_action, log_execution
@@ -51,10 +51,11 @@ def blog_home(request):
         total_posts = paginator.count
         recent_posts = posts[1:7] if total_posts > 1 else []
         
-        # Get categories with post counts (all languages)
+        # Get categories with post counts (all languages) - annotated to
+        # avoid a per-category COUNT query when rendering the sidebar
         categories = Category.objects.filter(
             posts__status='published'
-        ).distinct().order_by('name')
+        ).annotate(post_count=Count('posts')).distinct().order_by('name')
         
         # Add language information
         language_choices = dict(BlogPost.LANGUAGE_CHOICES)

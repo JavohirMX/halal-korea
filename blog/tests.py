@@ -456,6 +456,7 @@ class BlogQueryCountTest(TestCase):
             username='qcuser', email='qc@example.com', password='testpass123'
         )
         self.category = Category.objects.create(name='QC Category')
+        self.category2 = Category.objects.create(name='QC Category 2')
         self.tag = Tag.objects.create(name='qc-tag')
         self.post = BlogPost.objects.create(
             title='QC Post',
@@ -467,6 +468,19 @@ class BlogQueryCountTest(TestCase):
             language='en'
         )
         self.post.tags.add(self.tag)
+        # A second post in a second category: with a single post the page
+        # slice coincidentally compiles to the same LIMIT 1 SQL as
+        # .first(), which is not a real duplicate
+        self.post2 = BlogPost.objects.create(
+            title='QC Post 2',
+            author=self.user,
+            category=self.category2,
+            excerpt='excerpt 2',
+            content='<p>content 2</p>',
+            status='published',
+            language='en'
+        )
+        self.post2.tags.add(self.tag)
 
     def _count_dupes(self, url):
         from django.db import connection
