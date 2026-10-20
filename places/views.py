@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import (
@@ -1127,7 +1128,7 @@ def submit_place(request):
                         except Exception as e:
                             logger.error(f"Error uploading photo: {str(e)}")
                             messages.error(
-                                request, f"Error uploading photo: {photo.name}"
+                                request, _("Error uploading photo: %(name)s") % {"name": photo.name}
                             )
                     place.photo_urls = photo_urls
 
@@ -1212,7 +1213,7 @@ def submit_place(request):
 
                 messages.success(
                     request,
-                    "Place submitted successfully! It will be reviewed by our team.",
+                    _("Place submitted successfully! It will be reviewed by our team."),
                 )
                 return redirect("places:explore")
             else:
@@ -1227,7 +1228,7 @@ def submit_place(request):
                         )
                     },
                 )
-                messages.error(request, "Please correct the errors below.")
+                messages.error(request, _("Please correct the errors below."))
         else:
             form = HalalPlaceForm()
             existing_hours_data = None
@@ -1257,7 +1258,7 @@ def submit_place(request):
             exc_info=True,
         )
         messages.error(
-            request, "An error occurred while submitting the place. Please try again."
+            request, _("An error occurred while submitting the place. Please try again.")
         )
         return redirect("places:home")
 
@@ -1496,7 +1497,7 @@ def _process_place_suggestions(request, form, place, parsed_hours_data=None):
         if total_suggestions == 0:
             messages.warning(
                 request,
-                "Please suggest at least one change, upload an image, or update business hours.",
+                _("Please suggest at least one change, upload an image, or update business hours."),
             )
             return redirect("places:suggest_place_edit", pk=place.pk)
 
@@ -1528,7 +1529,7 @@ def _process_place_suggestions(request, form, place, parsed_hours_data=None):
         # Success message
         messages.success(
             request,
-            f"Thank you! Your {total_suggestions} suggestion(s) have been submitted for review.",
+            _("Thank you! Your %(count)s suggestion(s) have been submitted for review.") % {"count": total_suggestions},
         )
 
         return redirect("places:place_detail", pk=place.pk)
@@ -1545,7 +1546,7 @@ def _process_place_suggestions(request, form, place, parsed_hours_data=None):
             exc_info=True,
         )
         messages.error(
-            request, "There was an error processing your suggestions. Please try again."
+            request, _("There was an error processing your suggestions. Please try again.")
         )
         return redirect("places:suggest_place_edit", pk=place.pk)
 
