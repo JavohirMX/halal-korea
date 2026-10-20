@@ -32,7 +32,7 @@
         <div class="flex-1 min-w-0 flex flex-col">
             <!-- Header -->
             <div class="flex items-start justify-between gap-2 mb-1">
-                <h2 class="text-base font-semibold text-gray-900 dark:text-white truncate"><a href="{% url 'places:place_detail' place.id %}" onclick="event.stopPropagation()">{{ place.name }}</a></h2>
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white truncate"><a href="{% url 'places:place_detail' place.id %}" onclick="event.stopPropagation()" class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-800 rounded-sm">{{ place.name }}</a></h2>
                 {% if place.reviews_count > 0 %}
                 <div class="flex items-center bg-amber-50 dark:bg-amber-900/30 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800 flex-shrink-0">
                     <svg class="w-3 h-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
@@ -115,7 +115,7 @@
         
         <div class="flex justify-between items-start">
             <div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white"><a href="{% url 'places:place_detail' place.id %}" onclick="event.stopPropagation()">{{ place.name }}</a></h2>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white"><a href="{% url 'places:place_detail' place.id %}" onclick="event.stopPropagation()" class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-800 rounded-sm">{{ place.name }}</a></h2>
                 <p class="text-sm text-primary-600 dark:text-primary-400">
                     <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1"></i>
                     {{ place.get_category_display }}
