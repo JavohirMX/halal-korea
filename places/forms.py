@@ -108,7 +108,7 @@ class PlaceSuggestionForm(forms.Form):
         # If place is provided, set current values as placeholders
         if place:
             self.fields['name'].widget.attrs['placeholder'] = f"{_('Current:')} {place.name}"
-            self.fields['description'].widget.attrs['placeholder'] = f'Current: {place.description[:50]}...'
+            self.fields['description'].widget.attrs['placeholder'] = f"{_('Current:')} {place.description[:50]}..."
             self.fields['address'].widget.attrs['placeholder'] = f"{_('Current:')} {place.address}"
             if place.phone_number:
                 self.fields['phone_number'].widget.attrs['placeholder'] = f"{_('Current:')} {place.phone_number}"
