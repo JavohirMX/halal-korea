@@ -485,6 +485,17 @@
             </div>
         </div>
 
+        <!-- Location Needed State (expected when location is unknown) -->
+        <div id="location-needed-state" class="mt-4 max-w-md w-full mx-auto text-center hidden">
+            <div class="text-gray-600 dark:text-gray-300">
+                <i class="fas fa-location-dot text-2xl text-primary-600 dark:text-primary-400"></i>
+                <p class="mt-2">{% translate "Unable to determine your location. Please enable location services or set your location manually." %}</p>
+                <button onclick="const b = document.getElementById('location-button'); if (b) { b.click(); }" class="mt-2 text-sm text-primary-700 dark:text-primary-400 underline">
+                    {% translate "Set Location" %}
+                </button>
+            </div>
+        </div>
+
         <!-- Content Container -->
         <div id="content-container" class="hidden">
             <!-- Date and Time Display -->
@@ -563,6 +574,11 @@
 <script>
     // Store countdown interval ID to prevent memory leaks
     let countdownInterval = null;
+
+    // IANA timezone of the currently displayed prayer times, from the API's
+    // meta.timezone (e.g. "Asia/Seoul"). null until the first successful load,
+    // which keeps the historical browser-local behavior as the fallback.
+    let locationTimezone = null;
     
     // Method names mapping for Alpine.js
     const methodNames = {
@@ -626,11 +642,29 @@
         if (currentTimeElement) {
             const now = new Date();
             const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            if (locationTimezone) {
+                options.timeZone = locationTimezone;
+            }
             currentTimeElement.textContent = now.toLocaleTimeString([], options);
         }
     }
     setInterval(updateCurrentTime, 1000);
     updateCurrentTime();
+
+    function getZonedNow() {
+        // Wall-clock "now" in the prayer-times location's zone, expressed as a
+        // local Date. The shifted-Date idiom keeps all existing comparisons
+        // and countdown math valid in the location's zone rather than the
+        // browser's zone; falls back to browser-local when no zone is known.
+        if (!locationTimezone) {
+            return new Date();
+        }
+        try {
+            return new Date(new Date().toLocaleString('en-US', { timeZone: locationTimezone }));
+        } catch (e) {
+            return new Date();
+        }
+    }
 
     function parseTime(timeStr) {
         if (!timeStr || typeof timeStr !== 'string') {
@@ -645,7 +679,7 @@
         if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
             throw new Error('Invalid time values');
         }
-        const now = new Date();
+        const now = getZonedNow();
         return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
     }
     
@@ -656,7 +690,7 @@
             countdownInterval = null;
         }
         
-        const now = new Date();
+        const now = getZonedNow();
         const prayerTimes = [];
         const prayerNames = [];
         const prayerRows = [];
@@ -762,7 +796,7 @@
     
         function updateTimer() {
             if (!countdownDisplay) return;
-            const timeDiff = nextPrayerTime - new Date();
+            const timeDiff = nextPrayerTime - getZonedNow();
             if (timeDiff <= 0) return updateCountdown();
     
             const hours = String(Math.floor(timeDiff / (1000 * 60 * 60))).padStart(2, '0');
@@ -792,6 +826,7 @@
         const contentContainer = document.getElementById('content-container');
         const locationButton = document.getElementById('location-button');
         const locationSkeleton = document.getElementById('location-skeleton');
+        const locationNeededState = document.getElementById('location-needed-state');
         
         if (!loadingState || !errorState || !contentContainer || !locationButton || !locationSkeleton) {
             console.error('Required DOM elements not found');
@@ -803,6 +838,9 @@
         // Show loading state
         loadingState.classList.remove('hidden');
         errorState.classList.add('hidden');
+        if (locationNeededState) {
+            locationNeededState.classList.add('hidden');
+        }
         contentContainer.classList.add('hidden');
         
         // Show location skeleton
@@ -812,15 +850,29 @@
         try {
             const response = await fetch('/prayer/get-prayer-times/');
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
             let data;
             try {
                 data = await response.json();
             } catch (jsonError) {
                 throw new Error('Invalid JSON response from server');
+            }
+            
+            if (!response.ok) {
+                if (data && data.show_error_ui) {
+                    // Expected state, not a failure: the user's location is
+                    // unknown - prompt them to set it instead of showing the
+                    // generic error.
+                    loadingState.classList.add('hidden');
+                    if (locationNeededState) {
+                        locationNeededState.classList.remove('hidden');
+                    } else {
+                        errorState.classList.remove('hidden');
+                    }
+                    locationSkeleton.classList.add('hidden');
+                    locationButton.classList.remove('hidden');
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             if (!data || typeof data !== 'object') {
@@ -839,6 +891,13 @@
                 // Hide location skeleton, show button
                 locationSkeleton.classList.add('hidden');
                 locationButton.classList.remove('hidden');
+                
+                // Remember the zone these times belong to so the current-time
+                // display and the next-prayer countdown use it (not the
+                // browser's zone, which differs for travel-planning users).
+                if (data.data && data.data.meta && data.data.meta.timezone) {
+                    locationTimezone = data.data.meta.timezone;
+                }
                 
                 // Validate and update dates
                 if (data.data && data.data.date) {
