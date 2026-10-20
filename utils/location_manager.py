@@ -141,6 +141,26 @@ def get_user_location(request):
         )
         return session_loc
 
+    # Cloudflare resolves the visitor's country on every request for free.
+    # The exact city/lat/lng from IP geolocation is only used for Korean
+    # visitors (distance features are Korea-only; international visitors are
+    # sorted relative to Seoul/tourist areas instead), so for non-Korean
+    # visitors we can skip the blocking external geolocation lookup entirely.
+    cf_country = (request.META.get("HTTP_CF_IPCOUNTRY") or "").strip().upper()
+    if cf_country and cf_country not in ("XX", "T1", "KR"):
+        location = {
+            "country_code": cf_country,
+            "is_fallback": False,
+            "source": "cloudflare",
+            "timestamp": time.time(),
+        }
+        request.session["user_location"] = location
+        logger.debug(
+            f"Using Cloudflare country header ({cf_country}), "
+            "skipping external IP geolocation lookup"
+        )
+        return location
+
     logger.debug("No valid cached location, fetching from IP")
 
     # If no valid session location, try to get location from IP
