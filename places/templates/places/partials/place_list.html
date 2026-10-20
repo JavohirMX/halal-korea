@@ -65,7 +65,7 @@
             <div class="flex gap-1.5 mt-auto">
                 {% if place.google_map_link %}
                 <a href="{{ place.google_map_link }}" target="_blank" 
-                   class="inline-flex items-center justify-center min-w-[36px] min-h-[36px] rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors shadow-sm p-1.5"
+                   class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors shadow-sm p-1.5"
                    onclick="event.stopPropagation()"
                    title="Google Maps">
                     <img src="{% static 'images/google-maps-logo.svg' %}" class="w-4 h-4" alt="Google Maps">
@@ -74,7 +74,7 @@
                 {% if location_context.is_in_korea %}
                     {% if place.naver_map_link %}
                     <a href="{{ place.naver_map_link }}" target="_blank" 
-                       class="inline-flex items-center justify-center min-w-[36px] min-h-[36px] rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors shadow-sm p-1.5"
+                       class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors shadow-sm p-1.5"
                        onclick="event.stopPropagation()"
                        title="Naver Maps">
                         <img src="{% static 'images/naver-maps-logo.png' %}" class="w-4 h-4" alt="Naver Maps">
@@ -82,7 +82,7 @@
                     {% endif %}
                     {% if place.kakao_map_link %}
                     <a href="{{ place.kakao_map_link }}" target="_blank" 
-                       class="inline-flex items-center justify-center min-w-[36px] min-h-[36px] rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors shadow-sm p-1.5"
+                       class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors shadow-sm p-1.5"
                        onclick="event.stopPropagation()"
                        title="Kakao Maps">
                         <img src="{% static 'images/kakao-map-logo.png' %}" class="w-4 h-4" alt="Kakao Maps">

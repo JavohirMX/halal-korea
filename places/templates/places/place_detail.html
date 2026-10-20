@@ -352,7 +352,7 @@
                 <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                     <!-- Mobile: Collapsible -->
                     <div class="lg:hidden">
-                        <button onclick="toggleNotice()" class="w-full flex items-start justify-between text-left focus:outline-none group">
+                        <button onclick="toggleNotice()" class="w-full flex items-start justify-between text-left focus:outline-none group min-h-[44px]">
                             <div class="flex items-start flex-1">
                                 <div class="flex-shrink-0">
                                     <svg class="h-5 w-5 text-yellow-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
@@ -722,7 +722,7 @@
                     </div>
                     {% if user.is_authenticated %}
                     <a href="{% url 'places:suggest_place_edit' place.pk %}?tab=images" 
-                       class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors shadow-sm">
+                       class="flex-shrink-0 inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors shadow-sm">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -730,7 +730,7 @@
                     </a>
                     {% else %}
                     <a href="{% url 'account_login' %}?next={% url 'places:suggest_place_edit' place.pk %}%3Ftab%3Dimages" 
-                       class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors shadow-sm">
+                       class="flex-shrink-0 inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors shadow-sm">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
