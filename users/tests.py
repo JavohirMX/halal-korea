@@ -187,6 +187,29 @@ class UserViewTest(TestCase):
         self.assertTrue(User.objects.filter(username='newuser').exists())
         mock_verify.assert_called()
 
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_register_view_auto_login(self, mock_verify):
+        """Registration auto-logs the user in and shows the check-email page.
+
+        Regression test: with multiple AUTHENTICATION_BACKENDS configured,
+        a bare login(request, user) raises ValueError, which the view caught
+        and reported as a generic registration error even though the user
+        was created.
+        """
+        response = self.client.post(
+            reverse('users:register'),
+            {
+                'username': 'autologin',
+                'email': 'autologin@example.com',
+                'password1': 'newpass123',
+                'password2': 'newpass123',
+                'cf-turnstile-response': TURNSTILE_TOKEN,
+            }
+        )
+        self.assertTrue(User.objects.filter(username='autologin').exists())
+        self.assertIn('_auth_user_id', self.client.session)
+        self.assertTemplateUsed(response, 'users/check_email.html')
+
     @patch('utils.turnstile.verify_turnstile', return_value=False)
     def test_register_view_invalid_captcha(self, mock_verify):
         """Registration with invalid Turnstile must not create a user."""
