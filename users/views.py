@@ -459,7 +459,7 @@ def rate_limited_view(request):
     error_message = request.GET.get('error', '')
     return render(request, 'users/rate_limited.html', {
         'error_message': error_message
-    })
+    }, status=429)
 
 
 def password_reset_request(request):
