@@ -8,30 +8,12 @@
     
     <link rel="icon" type="image/svg+xml" href="{% static 'images/logo-square.svg' %}">
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/tailwind.build.css' %}">
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <script>
-        // Dark mode configuration for Tailwind
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                dark: {
-                    bg: '#111827',
-                    card: '#1f2937',
-                    border: '#374151',
-                    text: '#f9fafb',
-                    muted: '#9ca3af',
-                }
-                    }
-                }
-            }
-        }
-        
         // Initialize dark mode from localStorage
         if (localStorage.getItem('darkMode') === 'enabled' || 
             (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
