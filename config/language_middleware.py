@@ -62,12 +62,13 @@ class SmartLanguageMiddleware(MiddlewareMixin):
             # Get current language from various sources
             url_lang = self._get_url_language_param(request)
             user_lang = self._get_user_preferred_language(request)
+            cookie_lang = self._get_cookie_language(request)
             session_lang = self._get_session_language(request)
             browser_lang = self._get_browser_preferred_language(request)
             
             # Determine final language based on priority
             final_language = self._determine_language(
-                url_lang, user_lang, session_lang, browser_lang
+                url_lang, user_lang, cookie_lang, session_lang, browser_lang
             )
             
             # Set the language if it's different from current
@@ -137,6 +138,22 @@ class SmartLanguageMiddleware(MiddlewareMixin):
             pass
         return None
     
+    def _get_cookie_language(self, request):
+        """Get language from the language cookie (set by the switcher).
+
+        This is what lets anonymous visitors switch language without a
+        session: set_language(_ajax) sets the cookie, and we honor it here.
+        """
+        try:
+            cookie_name = getattr(settings, 'LANGUAGE_COOKIE_NAME', 'django_language')
+            cookie_lang = request.COOKIES.get(cookie_name)
+            if cookie_lang and cookie_lang in self.supported_languages:
+                logger.debug(f"Language from cookie: {cookie_lang}")
+                return cookie_lang
+        except Exception as e:
+            logger.debug(f"Error getting cookie language: {e}")
+        return None
+
     def _get_session_language(self, request):
         """Get language from session"""
         try:
@@ -190,13 +207,14 @@ class SmartLanguageMiddleware(MiddlewareMixin):
         
         return None
     
-    def _determine_language(self, url_lang, user_lang, session_lang, browser_lang):
+    def _determine_language(self, url_lang, user_lang, cookie_lang, session_lang, browser_lang):
         """
         Determine final language based on priority order
         
         Args:
             url_lang: Language from URL parameter
             user_lang: Language from user profile
+            cookie_lang: Language from the language cookie
             session_lang: Language from session
             browser_lang: Language from browser
             
@@ -213,12 +231,18 @@ class SmartLanguageMiddleware(MiddlewareMixin):
             logger.debug(f"Using user preferred language: {user_lang}")
             return user_lang
         
-        # Priority 3: Session language (previous choice)
+        # Priority 3: Language cookie (explicit switch, works for
+        # anonymous visitors without a session)
+        if cookie_lang:
+            logger.debug(f"Using cookie language: {cookie_lang}")
+            return cookie_lang
+        
+        # Priority 4: Session language (previous choice)
         if session_lang:
             logger.debug(f"Using session language: {session_lang}")
             return session_lang
         
-        # Priority 4: Browser preference
+        # Priority 5: Browser preference
         if browser_lang:
             logger.debug(f"Using browser language: {browser_lang}")
             return browser_lang

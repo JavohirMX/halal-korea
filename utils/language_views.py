@@ -60,8 +60,10 @@ def set_language(request):
         # Create response
         response = HttpResponseRedirect(next_url)
         
-        # Set session language
-        if hasattr(request, 'session'):
+        # Set session language only for authenticated users; anonymous
+        # visitors are served from the language cookie (LocaleMiddleware),
+        # keeping their responses free of a sessionid Set-Cookie.
+        if request.user.is_authenticated and hasattr(request, 'session'):
             request.session[LANGUAGE_SESSION_KEY] = language
         
         # Set language cookie as fallback (with fallback values)
@@ -131,8 +133,9 @@ def set_language_ajax(request):
         # Activate language
         translation.activate(language)
         
-        # Update session
-        if hasattr(request, 'session'):
+        # Update session (authenticated users only - anonymous visitors
+        # rely on the language cookie set below)
+        if request.user.is_authenticated and hasattr(request, 'session'):
             request.session[LANGUAGE_SESSION_KEY] = language
         
         # Update user preference if authenticated
