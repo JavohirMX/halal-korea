@@ -46,7 +46,7 @@
                             <li>• {% trans "Wait a few minutes and try again" %}</li>
                             <li>• {% trans "Check if you already sent a similar message" %}</li>
                             {% if not user.is_authenticated %}
-                            <li>• <a href="{% url 'users:register' %}" class="text-primary-600 dark:text-primary-400 hover:underline">{% trans "Create an account" %}</a> {% trans "for higher limits" %}</li>
+                            <li>• <a href="{% url 'users:register' %}" class="text-primary-700 dark:text-primary-400 underline">{% trans "Create an account" %}</a> {% trans "for higher limits" %}</li>
                             {% endif %}
                         </ul>
                     </div>
