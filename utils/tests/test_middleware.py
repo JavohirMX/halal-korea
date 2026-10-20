@@ -54,12 +54,17 @@ class MonitoringMiddlewareTests(TestCase):
     @override_settings(MONITORING_ENABLED=False)
     def test_middleware_disabled(self):
         """Test that middleware can be disabled."""
+        # The middleware captures MONITORING_ENABLED when it is constructed,
+        # so build it here, under the override - using self.middleware (built
+        # in setUp, before the override applies) leaves it enabled and the
+        # 1% sampling makes this test flaky.
+        middleware = MonitoringMiddleware(lambda request: HttpResponse('OK'))
         request = self.factory.get('/test/')
         request.user = self.user
         
         initial_count = RequestLog.objects.count()
         
-        response = self.middleware(request)
+        response = middleware(request)
         
         # Should not create log entry when disabled
         self.assertEqual(RequestLog.objects.count(), initial_count)
