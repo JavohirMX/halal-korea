@@ -1552,7 +1552,13 @@ def _process_place_suggestions(request, form, place, parsed_hours_data=None):
 
 
 def _is_valid_image(image):
-    """Validate uploaded image file"""
+    """Validate uploaded image file.
+
+    content_type is client-supplied and cannot be trusted on its own, so the
+    file content is verified with Pillow as well - this keeps polyglot or
+    renamed non-image files (e.g. HTML served later from /media/) out of
+    storage.
+    """
     try:
         # Check file size (max 5MB)
         if image.size > 5 * 1024 * 1024:
@@ -1569,8 +1575,21 @@ def _is_valid_image(image):
         if image.content_type not in allowed_types:
             return False
 
+        # Verify the actual bytes decode as a raster image
+        from PIL import Image
+        image.seek(0)
+        with Image.open(image) as img:
+            img.verify()
+            if (img.format or "").lower() not in ("jpeg", "png", "gif", "webp"):
+                return False
+        image.seek(0)
+
         return True
     except Exception:
+        try:
+            image.seek(0)
+        except Exception:
+            pass
         return False
 
 
