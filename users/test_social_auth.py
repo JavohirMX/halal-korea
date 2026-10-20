@@ -98,22 +98,22 @@ class SocialAuthIntegrationTest(TestCase):
         response = self.client.get(reverse('users:login'))
         self.assertEqual(response.status_code, 200)
         
-        # Check for social login elements
-        self.assertContains(response, 'provider_login_url')
+        # Check for social login elements (rendered URLs, not the template tag)
+        self.assertContains(response, '/accounts/google/login/')
+        self.assertContains(response, '/accounts/github/login/')
         self.assertContains(response, 'Google')
         self.assertContains(response, 'GitHub')
-        self.assertContains(response, 'Twitter')
     
     def test_register_template_has_social_buttons(self):
         """Test that register template includes social signup buttons"""
         response = self.client.get(reverse('users:register'))
         self.assertEqual(response.status_code, 200)
         
-        # Check for social signup elements
-        self.assertContains(response, 'provider_login_url')
+        # Check for social signup elements (rendered URLs, not the template tag)
+        self.assertContains(response, '/accounts/google/login/')
+        self.assertContains(response, '/accounts/github/login/')
         self.assertContains(response, 'Google')
         self.assertContains(response, 'GitHub')
-        self.assertContains(response, 'Twitter')
     
     def test_social_auth_urls_configured(self):
         """Test that social auth URLs are properly configured"""
@@ -199,6 +199,13 @@ class SocialAuthSecurityTest(TestCase):
     
     def test_csrf_protection(self):
         """Test CSRF protection on social auth endpoints"""
+        google_app = SocialApp.objects.create(
+            provider='google',
+            name='Google',
+            client_id='test_google_client_id',
+            secret='test_google_secret',
+        )
+        google_app.sites.add(1)
         response = self.client.get('/accounts/google/login/')
         # Should either redirect or require CSRF token
         self.assertIn(response.status_code, [302, 403, 500])

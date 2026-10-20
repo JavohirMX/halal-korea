@@ -13,6 +13,7 @@ Tests cover:
 """
 
 from django.test import TestCase, Client
+from django.core.cache import cache as django_cache
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Point
@@ -405,6 +406,10 @@ class SearchAnalyticsTest(TestCase):
     
     def setUp(self):
         self.client = Client()
+        # The explore view serves anonymous requests from a shared cache;
+        # without clearing it, a cached response from an earlier test would
+        # skip view execution (and with it search logging) entirely.
+        django_cache.clear()
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
