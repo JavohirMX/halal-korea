@@ -677,7 +677,7 @@
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Upload Images" %}</h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 {% translate "Drag and drop your images here, or" %}
-                                <label for="images" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 cursor-pointer font-medium">
+                                <label for="images" class="text-primary-700 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 cursor-pointer font-medium">
                                     {% translate "browse files" %}
                                 </label>
                             </p>
@@ -716,7 +716,7 @@
                         {% translate "Help reviewers understand your suggestions" %}
                     </p>
                 </div>
-                <span class="ml-auto px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-full">
+                <span class="ml-auto px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm rounded-full">
                     {% translate "Required" %}
                 </span>
             </div>
@@ -743,7 +743,7 @@
                     </label>
                     <div class="relative">
                         {{ form.reason }}
-                        <div class="absolute bottom-3 right-3 text-xs text-gray-400 pointer-events-none">
+                        <div class="absolute bottom-3 right-3 text-xs text-gray-500 dark:text-gray-300 pointer-events-none">
                             <span id="char-count">0</span>/500
                         </div>
                     </div>
@@ -793,7 +793,7 @@
                                     <span id="summary-count-mobile" class="text-primary-600 dark:text-primary-400">0</span> {% translate "changes" %}
                                 </span>
                             </div>
-                            <button type="button" onclick="toggleMobileSummary()" class="text-primary-600 dark:text-primary-400 text-sm">
+                            <button type="button" onclick="toggleMobileSummary()" aria-label="{% translate 'Toggle changes summary' %}" aria-expanded="false" class="text-primary-600 dark:text-primary-400 text-sm">
                                 <i class="fas fa-chevron-down transform transition-transform" id="mobile-summary-chevron"></i>
                             </button>
                         </div>
@@ -1257,8 +1257,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.toggleMobileSummary = function() {
         const content = document.getElementById('mobile-summary-content');
         const chevron = document.getElementById('mobile-summary-chevron');
+        const btn = chevron.closest('button');
         
-        if (content.classList.contains('hidden')) {
+        const willShow = content.classList.contains('hidden');
+        if (btn) btn.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+        if (willShow) {
             content.classList.remove('hidden');
             chevron.classList.add('rotate-180');
         } else {
@@ -1413,8 +1416,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.toggleMobileSummary = function() {
         const content = document.getElementById('mobile-summary-content');
         const chevron = document.getElementById('mobile-summary-chevron');
+        const btn = chevron.closest('button');
         
-        if (content.classList.contains('hidden')) {
+        const willShow = content.classList.contains('hidden');
+        if (btn) btn.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+        if (willShow) {
             content.classList.remove('hidden');
             chevron.style.transform = 'rotate(180deg)';
         } else {
