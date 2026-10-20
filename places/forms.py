@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.geos import Point
 from .models import HalalPlace, PlaceEditSuggestion, PlaceImageSuggestion
 
@@ -25,14 +26,14 @@ class PlaceSuggestionForm(forms.Form):
     suggest_name = forms.BooleanField(required=False, label="Suggest name change")
     name = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={
         'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
-        'placeholder': 'Enter new name'
+        'placeholder': _('Enter new name')
     }))
     
     suggest_description = forms.BooleanField(required=False, label="Suggest description change")
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={
         'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
         'rows': 4,
-        'placeholder': 'Enter new description'
+        'placeholder': _('Enter new description')
     }))
     
     suggest_category = forms.BooleanField(required=False, label="Suggest category change")
@@ -43,37 +44,37 @@ class PlaceSuggestionForm(forms.Form):
     suggest_address = forms.BooleanField(required=False, label="Suggest address change")
     address = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={
         'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
-        'placeholder': 'Enter new address'
+        'placeholder': _('Enter new address')
     }))
     
     suggest_phone_number = forms.BooleanField(required=False, label="Suggest phone number change")
     phone_number = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={
         'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
-        'placeholder': 'Enter new phone number'
+        'placeholder': _('Enter new phone number')
     }))
     
     suggest_website = forms.BooleanField(required=False, label="Suggest website change")
     website = forms.URLField(required=False, widget=forms.URLInput(attrs={
         'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
-        'placeholder': 'Enter new website URL'
+        'placeholder': _('Enter new website URL')
     }))
     
     suggest_google_map_link = forms.BooleanField(required=False, label="Suggest Google Map link change")
     google_map_link = forms.URLField(required=False, widget=forms.URLInput(attrs={
         'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
-        'placeholder': 'Enter new Google Map link'
+        'placeholder': _('Enter new Google Map link')
     }))
     
     suggest_kakao_map_link = forms.BooleanField(required=False, label="Suggest Kakao Map link change")
     kakao_map_link = forms.URLField(required=False, widget=forms.URLInput(attrs={
         'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
-        'placeholder': 'Enter new Kakao Map link'
+        'placeholder': _('Enter new Kakao Map link')
     }))
     
     suggest_naver_map_link = forms.BooleanField(required=False, label="Suggest Naver Map link change")
     naver_map_link = forms.URLField(required=False, widget=forms.URLInput(attrs={
         'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
-        'placeholder': 'Enter new Naver Map link'
+        'placeholder': _('Enter new Naver Map link')
     }))
     
     suggest_location = forms.BooleanField(required=False, label="Suggest location change")
@@ -95,7 +96,7 @@ class PlaceSuggestionForm(forms.Form):
         widget=forms.Textarea(attrs={
             'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
             'rows': 3,
-            'placeholder': 'Please explain why these changes are needed...'
+            'placeholder': _('Please explain why these changes are needed...')
         }),
         help_text="Please explain why these changes or additions are needed"
     )
@@ -106,13 +107,13 @@ class PlaceSuggestionForm(forms.Form):
         
         # If place is provided, set current values as placeholders
         if place:
-            self.fields['name'].widget.attrs['placeholder'] = f'Current: {place.name}'
-            self.fields['description'].widget.attrs['placeholder'] = f'Current: {place.description[:50]}...'
-            self.fields['address'].widget.attrs['placeholder'] = f'Current: {place.address}'
+            self.fields['name'].widget.attrs['placeholder'] = f"{_('Current:')} {place.name}"
+            self.fields['description'].widget.attrs['placeholder'] = f"{_('Current:')} {place.description[:50]}..."
+            self.fields['address'].widget.attrs['placeholder'] = f"{_('Current:')} {place.address}"
             if place.phone_number:
-                self.fields['phone_number'].widget.attrs['placeholder'] = f'Current: {place.phone_number}'
+                self.fields['phone_number'].widget.attrs['placeholder'] = f"{_('Current:')} {place.phone_number}"
             if place.website:
-                self.fields['website'].widget.attrs['placeholder'] = f'Current: {place.website}'
+                self.fields['website'].widget.attrs['placeholder'] = f"{_('Current:')} {place.website}"
     
     def clean(self):
         cleaned_data = super().clean()
@@ -222,6 +223,6 @@ class PlaceImageSuggestionForm(forms.ModelForm):
             }),
             'caption': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500',
-                'placeholder': 'Optional caption for this image'
+                'placeholder': _('Optional caption for this image')
             })
         } 
