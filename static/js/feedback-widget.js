@@ -418,6 +418,13 @@ class FeedbackWidget {
                document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
     }
 
+    async ensureCSRFToken() {
+        let token = this.getCSRFToken();
+        if (token) return token;
+        if (window.ensureCSRFToken) return window.ensureCSRFToken();
+        return '';
+    }
+
     showError(message) {
         this.errorEl.textContent = message;
         this.errorEl.classList.remove('hidden');
@@ -484,7 +491,7 @@ class FeedbackWidget {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': this.getCSRFToken(),
+                    'X-CSRFToken': await this.ensureCSRFToken(),
                 },
                 body: JSON.stringify(data)
             });
