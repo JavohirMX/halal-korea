@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 01:47+0900\n"
+"POT-Creation-Date: 2026-10-21 03:03+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -630,8 +630,8 @@ msgstr "새 Naver 지도 링크 입력"
 msgid "Please explain why these changes are needed..."
 msgstr "변경이 필요한 이유를 설명해 주세요..."
 
-#: places/forms.py:110 places/forms.py:112 places/forms.py:114
-#: places/forms.py:116
+#: places/forms.py:110 places/forms.py:111 places/forms.py:112
+#: places/forms.py:114 places/forms.py:116
 msgid "Current:"
 msgstr "현재:"
 
@@ -2887,7 +2887,7 @@ msgid "Please enter a valid address (at least 5 characters)"
 msgstr "유효한 주소를 입력해주세요 (최소 5자)"
 
 #: places/templates/places/submit_place.html:652
-#: places/templates/places/suggest_edit.html:1514
+#: places/templates/places/suggest_edit.html:1520
 msgid "Submitting..."
 msgstr "제출 중..."
 
@@ -3090,10 +3090,14 @@ msgstr "다음 문제들을 수정해주세요:"
 msgid "changes"
 msgstr "변경사항"
 
+#: places/templates/places/suggest_edit.html:796
+msgid "Toggle changes summary"
+msgstr "변경 사항 요약 전환"
+
 #: places/templates/places/suggest_edit.html:803
 #: places/templates/places/suggest_edit.html:822
-#: places/templates/places/suggest_edit.html:1321
-#: places/templates/places/suggest_edit.html:1327
+#: places/templates/places/suggest_edit.html:1324
+#: places/templates/places/suggest_edit.html:1330
 msgid "Select fields to edit or upload images to create suggestions."
 msgstr "편집할 필드를 선택하거나 이미지를 업로드하여 제안을 만드세요."
 
@@ -3117,39 +3121,39 @@ msgstr "파일이 너무 큽니다. 최대 크기는 5MB입니다."
 msgid "File is not a valid image."
 msgstr "유효한 이미지 파일이 아닙니다."
 
-#: places/templates/places/suggest_edit.html:1338
+#: places/templates/places/suggest_edit.html:1341
 msgid "Field edit"
 msgstr "필드 편집"
 
-#: places/templates/places/suggest_edit.html:1339
+#: places/templates/places/suggest_edit.html:1342
 msgid "Field edits"
 msgstr "필드 편집"
 
-#: places/templates/places/suggest_edit.html:1340
+#: places/templates/places/suggest_edit.html:1343
 msgid "Photo upload"
 msgstr "사진 업로드"
 
-#: places/templates/places/suggest_edit.html:1341
+#: places/templates/places/suggest_edit.html:1344
 msgid "Photo uploads"
 msgstr "사진 업로드"
 
-#: places/templates/places/suggest_edit.html:1358
+#: places/templates/places/suggest_edit.html:1361
 msgid "Empty fields"
 msgstr "빈 필드"
 
-#: places/templates/places/suggest_edit.html:1376
+#: places/templates/places/suggest_edit.html:1379
 msgid "Business hours update"
 msgstr "영업 시간 업데이트"
 
-#: places/templates/places/suggest_edit.html:1385
+#: places/templates/places/suggest_edit.html:1388
 msgid "Ready to submit"
 msgstr "제출 준비됨"
 
-#: places/templates/places/suggest_edit.html:1396
+#: places/templates/places/suggest_edit.html:1399
 msgid "Ready"
 msgstr "준비됨"
 
-#: places/templates/places/suggest_edit.html:1489
+#: places/templates/places/suggest_edit.html:1495
 msgid ""
 "Please make at least one change, upload an image, or update business hours "
 "before submitting."
@@ -3157,36 +3161,36 @@ msgstr ""
 "제출하기 전에 최소한 하나의 변경, 이미지 업로드 또는 영업 시간 업데이트를 해"
 "주세요."
 
-#: places/templates/places/suggest_edit.html:1497
+#: places/templates/places/suggest_edit.html:1503
 msgid "You have 1 empty field. Continue anyway?"
 msgstr "빈 필드가 1개 있습니다. 계속하시겠습니까?"
 
-#: places/templates/places/suggest_edit.html:1498
+#: places/templates/places/suggest_edit.html:1504
 msgid "You have"
 msgstr "빈 필드가"
 
-#: places/templates/places/suggest_edit.html:1498
+#: places/templates/places/suggest_edit.html:1504
 msgid "empty fields. Continue anyway?"
 msgstr "개 있습니다. 계속하시겠습니까?"
 
-#: places/views.py:1138
+#: places/views.py:1140
 #, python-format
 msgid "Error uploading photo: %(name)s"
 msgstr "사진 업로드 오류: %(name)s"
 
-#: places/views.py:1223
+#: places/views.py:1225
 msgid "Place submitted successfully! It will be reviewed by our team."
 msgstr "장소가 성공적으로 제출되었습니다! 저희 팀이 검토할 예정입니다."
 
-#: places/views.py:1238
+#: places/views.py:1240
 msgid "Please correct the errors below."
 msgstr "아래 오류를 수정해 주세요."
 
-#: places/views.py:1268
+#: places/views.py:1270
 msgid "An error occurred while submitting the place. Please try again."
 msgstr "장소를 제출하는 중 오류가 발생했습니다. 다시 시도해 주세요."
 
-#: places/views.py:1507
+#: places/views.py:1509
 msgid ""
 "Please suggest at least one change, upload an image, or update business "
 "hours."
@@ -3194,12 +3198,12 @@ msgstr ""
 "하나 이상의 수정을 제안하거나, 이미지를 업로드하거나, 영업시간을 업데이트해 "
 "주세요."
 
-#: places/views.py:1539
+#: places/views.py:1541
 #, python-format
 msgid "Thank you! Your %(count)s suggestion(s) have been submitted for review."
 msgstr "감사합니다! 제안 %(count)s건이 검토를 위해 제출되었습니다."
 
-#: places/views.py:1556
+#: places/views.py:1558
 msgid "There was an error processing your suggestions. Please try again."
 msgstr "제안을 처리하는 중 오류가 발생했습니다. 다시 시도해 주세요."
 
@@ -4416,9 +4420,6 @@ msgid "Write your message…"
 msgstr "메시지를 작성하세요…"
 
 #: users/forms.py:163
-#| msgid ""
-#| "Optional. Comma- or newline-separated; they do not need to be registered "
-#| "users."
 msgid ""
 "Comma- or newline-separated addresses (not required to be registered users)"
 msgstr ""
@@ -5042,10 +5043,15 @@ msgid "Enter your password"
 msgstr "비밀번호를 입력하세요"
 
 #: users/templates/users/login.html:63 users/templates/users/login.html:64
+#: users/templates/users/register.html:197
+#: users/templates/users/register.html:198
+#: users/templates/users/register.html:235
+#: users/templates/users/register.html:236
 msgid "Show password"
 msgstr "비밀번호 표시"
 
-#: users/templates/users/login.html:65
+#: users/templates/users/login.html:65 users/templates/users/register.html:199
+#: users/templates/users/register.html:237
 msgid "Hide password"
 msgstr "비밀번호 숨기기"
 
@@ -5341,27 +5347,27 @@ msgstr "hong@example.com"
 msgid "Create a strong password"
 msgstr "강력한 비밀번호 만들기"
 
-#: users/templates/users/register.html:205
+#: users/templates/users/register.html:208
 msgid "Password must be at least 8 characters with letters and numbers"
 msgstr "비밀번호는 문자와 숫자를 포함하여 최소 8자 이상이어야 합니다"
 
-#: users/templates/users/register.html:217
+#: users/templates/users/register.html:220
 msgid "Confirm Password"
 msgstr "비밀번호 확인"
 
-#: users/templates/users/register.html:228
+#: users/templates/users/register.html:231
 msgid "Confirm your password"
 msgstr "비밀번호를 확인하세요"
 
-#: users/templates/users/register.html:256
+#: users/templates/users/register.html:262
 msgid "Create Account"
 msgstr "계정 만들기"
 
-#: users/templates/users/register.html:272
+#: users/templates/users/register.html:278
 msgid "Already have an account?"
 msgstr "이미 계정이 있으신가요?"
 
-#: users/templates/users/register.html:283
+#: users/templates/users/register.html:289
 msgid "Sign In"
 msgstr "로그인"
 

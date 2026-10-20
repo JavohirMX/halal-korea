@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 01:47+0900\n"
+"POT-Creation-Date: 2026-10-21 03:03+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -635,8 +635,8 @@ msgstr "Yangi Naver Maps havolasini kiriting"
 msgid "Please explain why these changes are needed..."
 msgstr "Nega bu o'zgarishlar kerakligini tushuntiring..."
 
-#: places/forms.py:110 places/forms.py:112 places/forms.py:114
-#: places/forms.py:116
+#: places/forms.py:110 places/forms.py:111 places/forms.py:112
+#: places/forms.py:114 places/forms.py:116
 msgid "Current:"
 msgstr "Joriy:"
 
@@ -2983,7 +2983,7 @@ msgid "Please enter a valid address (at least 5 characters)"
 msgstr "Iltimos, to'g'ri manzil kiriting (kamida 5 ta belgi)"
 
 #: places/templates/places/submit_place.html:652
-#: places/templates/places/suggest_edit.html:1514
+#: places/templates/places/suggest_edit.html:1520
 msgid "Submitting..."
 msgstr "Yuborilmoqda..."
 
@@ -3190,10 +3190,14 @@ msgstr "Iltimos, bu muammolarni tuzating:"
 msgid "changes"
 msgstr "o'zgarishlar"
 
+#: places/templates/places/suggest_edit.html:796
+msgid "Toggle changes summary"
+msgstr "O'zgarishlar xulosasini almashtirish"
+
 #: places/templates/places/suggest_edit.html:803
 #: places/templates/places/suggest_edit.html:822
-#: places/templates/places/suggest_edit.html:1321
-#: places/templates/places/suggest_edit.html:1327
+#: places/templates/places/suggest_edit.html:1324
+#: places/templates/places/suggest_edit.html:1330
 msgid "Select fields to edit or upload images to create suggestions."
 msgstr ""
 "Taklif yaratish uchun tahrirlanadigan maydonlarni tanlang yoki rasmlar "
@@ -3219,39 +3223,39 @@ msgstr "Fayl juda katta. Maksimal hajmi 5MB."
 msgid "File is not a valid image."
 msgstr "Fayl yaroqli rasm emas."
 
-#: places/templates/places/suggest_edit.html:1338
+#: places/templates/places/suggest_edit.html:1341
 msgid "Field edit"
 msgstr "Maydon tahriri"
 
-#: places/templates/places/suggest_edit.html:1339
+#: places/templates/places/suggest_edit.html:1342
 msgid "Field edits"
 msgstr "Maydon tahrirlari"
 
-#: places/templates/places/suggest_edit.html:1340
+#: places/templates/places/suggest_edit.html:1343
 msgid "Photo upload"
 msgstr "Foto yuklash"
 
-#: places/templates/places/suggest_edit.html:1341
+#: places/templates/places/suggest_edit.html:1344
 msgid "Photo uploads"
 msgstr "Foto yuklashlar"
 
-#: places/templates/places/suggest_edit.html:1358
+#: places/templates/places/suggest_edit.html:1361
 msgid "Empty fields"
 msgstr "Bo'sh maydonlar"
 
-#: places/templates/places/suggest_edit.html:1376
+#: places/templates/places/suggest_edit.html:1379
 msgid "Business hours update"
 msgstr "Ish vaqtlarini yangilash"
 
-#: places/templates/places/suggest_edit.html:1385
+#: places/templates/places/suggest_edit.html:1388
 msgid "Ready to submit"
 msgstr "Yuborishga tayyor"
 
-#: places/templates/places/suggest_edit.html:1396
+#: places/templates/places/suggest_edit.html:1399
 msgid "Ready"
 msgstr "Tayyor"
 
-#: places/templates/places/suggest_edit.html:1489
+#: places/templates/places/suggest_edit.html:1495
 msgid ""
 "Please make at least one change, upload an image, or update business hours "
 "before submitting."
@@ -3259,36 +3263,36 @@ msgstr ""
 "Yuborishdan oldin kamida bitta o'zgartirish kiriting, rasm yuklang yoki ish "
 "vaqtlarini yangilang."
 
-#: places/templates/places/suggest_edit.html:1497
+#: places/templates/places/suggest_edit.html:1503
 msgid "You have 1 empty field. Continue anyway?"
 msgstr "Sizda 1 ta bo'sh maydon bor. Baribir davom etasizmi?"
 
-#: places/templates/places/suggest_edit.html:1498
+#: places/templates/places/suggest_edit.html:1504
 msgid "You have"
 msgstr "Sizda"
 
-#: places/templates/places/suggest_edit.html:1498
+#: places/templates/places/suggest_edit.html:1504
 msgid "empty fields. Continue anyway?"
 msgstr "ta bo'sh maydon bor. Baribir davom etasizmi?"
 
-#: places/views.py:1138
+#: places/views.py:1140
 #, python-format
 msgid "Error uploading photo: %(name)s"
 msgstr "Rasmni yuklashda xatolik: %(name)s"
 
-#: places/views.py:1223
+#: places/views.py:1225
 msgid "Place submitted successfully! It will be reviewed by our team."
 msgstr "Joy muvaffaqiyatli yuborildi! Jamoamiz uni ko'rib chiqadi."
 
-#: places/views.py:1238
+#: places/views.py:1240
 msgid "Please correct the errors below."
 msgstr "Quyidagi xatolarni tuzating."
 
-#: places/views.py:1268
+#: places/views.py:1270
 msgid "An error occurred while submitting the place. Please try again."
 msgstr "Joyni yuborishda xatolik yuz berdi. Qaytadan urinib ko'ring."
 
-#: places/views.py:1507
+#: places/views.py:1509
 msgid ""
 "Please suggest at least one change, upload an image, or update business "
 "hours."
@@ -3296,12 +3300,12 @@ msgstr ""
 "Kamida bitta o'zgartirish taklif qiling, rasm yuklang yoki ish vaqtini "
 "yangilang."
 
-#: places/views.py:1539
+#: places/views.py:1541
 #, python-format
 msgid "Thank you! Your %(count)s suggestion(s) have been submitted for review."
 msgstr "Rahmat! %(count)s ta taklifingiz ko'rib chiqish uchun yuborildi."
 
-#: places/views.py:1556
+#: places/views.py:1558
 msgid "There was an error processing your suggestions. Please try again."
 msgstr ""
 "Takliflaringizni qayta ishlashda xatolik yuz berdi. Qayta urinib ko'ring."
@@ -4544,9 +4548,6 @@ msgid "Write your message…"
 msgstr "Xabaringizni yozing…"
 
 #: users/forms.py:163
-#| msgid ""
-#| "Optional. Comma- or newline-separated; they do not need to be registered "
-#| "users."
 msgid ""
 "Comma- or newline-separated addresses (not required to be registered users)"
 msgstr ""
@@ -5188,10 +5189,15 @@ msgid "Enter your password"
 msgstr "Parolingizni kiriting"
 
 #: users/templates/users/login.html:63 users/templates/users/login.html:64
+#: users/templates/users/register.html:197
+#: users/templates/users/register.html:198
+#: users/templates/users/register.html:235
+#: users/templates/users/register.html:236
 msgid "Show password"
 msgstr "Parolni ko'rsatish"
 
-#: users/templates/users/login.html:65
+#: users/templates/users/login.html:65 users/templates/users/register.html:199
+#: users/templates/users/register.html:237
 msgid "Hide password"
 msgstr "Parolni yashirish"
 
@@ -5490,29 +5496,29 @@ msgstr "ali@namuna.com"
 msgid "Create a strong password"
 msgstr "Kuchli parol yarating"
 
-#: users/templates/users/register.html:205
+#: users/templates/users/register.html:208
 msgid "Password must be at least 8 characters with letters and numbers"
 msgstr ""
 "Parol kamida 8 belgidan iborat bo'lib, harf va raqamlardan tashkil topishi "
 "kerak"
 
-#: users/templates/users/register.html:217
+#: users/templates/users/register.html:220
 msgid "Confirm Password"
 msgstr "Parolni tasdiqlash"
 
-#: users/templates/users/register.html:228
+#: users/templates/users/register.html:231
 msgid "Confirm your password"
 msgstr "Parolingizni tasdiqlang"
 
-#: users/templates/users/register.html:256
+#: users/templates/users/register.html:262
 msgid "Create Account"
 msgstr "Hisob yaratish"
 
-#: users/templates/users/register.html:272
+#: users/templates/users/register.html:278
 msgid "Already have an account?"
 msgstr "Hisobingiz bormi?"
 
-#: users/templates/users/register.html:283
+#: users/templates/users/register.html:289
 msgid "Sign In"
 msgstr "Kirish"
 
