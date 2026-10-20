@@ -27,7 +27,7 @@
     <meta name="geo.placename" content="South Korea">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <link rel="canonical" href="{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
     
     <!-- Hreflang Tags for International SEO -->
     <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
@@ -40,7 +40,7 @@
     <meta property="og:title" content="{% block og_title %}{% translate 'Halal Korea' %} - {% translate 'Find Halal Places in Korea' %}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}{% endblock %}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
     <meta property="og:locale" content="{{ LANGUAGE_CODE }}_{{ LANGUAGE_CODE|upper }}">
     <meta property="og:locale:alternate" content="en_US">
     <meta property="og:locale:alternate" content="ko_KR">
