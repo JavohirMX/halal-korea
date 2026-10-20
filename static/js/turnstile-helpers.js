@@ -40,6 +40,26 @@
         return window.__turnstileApiLoaded === true;
     }
 
+    var apiRequested = false;
+
+    /**
+     * Inject api.js on demand instead of shipping it in every page's <body>.
+     * Readiness is still tracked exclusively through the tag's load event
+     * (window.__turnstileApiLoaded), exactly like the old declarative tag, so
+     * the async-by-default nature of injected scripts is safe here.
+     */
+    function ensureApi() {
+        if (apiRequested || apiIsLoaded()) {
+            return;
+        }
+        apiRequested = true;
+        var s = document.createElement('script');
+        s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+        s.onload = function () { window.__turnstileApiLoaded = true; };
+        s.onerror = function () { window.__turnstileApiLoaded = false; };
+        document.head.appendChild(s);
+    }
+
     function whenReady(callback) {
         var fired = false;
 
@@ -161,8 +181,9 @@
 
                 var action = options.action || el.dataset.action || undefined;
 
-                try {
-                    whenReady(function () {
+                function renderWidget() {
+                    try {
+                        whenReady(function () {
                         if (!window.turnstile || typeof window.turnstile.render !== 'function') {
                             return fail('turnstile API unavailable');
                         }
@@ -187,10 +208,35 @@
                         } catch (err) {
                             fail('render failed: ' + err);
                         }
-                    });
-                } catch (err) {
-                    // whenReady() itself must never turn into a rejected promise.
-                    fail('readiness check failed: ' + err);
+                        });
+                    } catch (err) {
+                        // whenReady() itself must never turn into a rejected promise.
+                        fail('readiness check failed: ' + err);
+                    }
+                }
+
+                function start() {
+                    ensureApi();
+                    renderWidget();
+                }
+
+                // Lazy: api.js (~84KB) plus the challenge traffic it triggers
+                // (~1MB of XHR on the home page) cost every page view even when
+                // the visitor never reaches the form. Defer both until the
+                // container is near the viewport; the readiness contract above
+                // covers the load time once injection starts.
+                if ('IntersectionObserver' in window) {
+                    var io = new IntersectionObserver(function (entries) {
+                        entries.forEach(function (entry) {
+                            if (entry.isIntersecting) {
+                                io.disconnect();
+                                start();
+                            }
+                        });
+                    }, { rootMargin: '50% 0px' });
+                    io.observe(el);
+                } else {
+                    start();
                 }
             });
         },
