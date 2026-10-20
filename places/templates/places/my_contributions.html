@@ -217,7 +217,7 @@
             <div class="border-b border-gray-200 dark:border-gray-700">
                 <nav class="-mb-px flex space-x-1 overflow-x-auto scrollbar-hide pb-2">
                     <a href="#submitted-places" 
-                       class="tab-link active border-primary-500 text-primary-600 dark:text-primary-400 flex-shrink-0 py-2 px-3 border-b-2 font-medium text-xs rounded-t-lg bg-primary-50 dark:bg-primary-900/20">
+                       class="tab-link active border-primary-500 text-primary-700 dark:text-primary-400 flex-shrink-0 py-2 px-3 border-b-2 font-medium text-xs rounded-t-lg bg-primary-50 dark:bg-primary-900/20">
                         <div class="flex items-center">
                             <i class="fas fa-map-marker-alt text-sm"></i>
                             <span class="ml-1">{% translate "Places" %}</span>
@@ -255,7 +255,7 @@
             <div class="border-b border-gray-200 dark:border-gray-700">
                 <nav class="-mb-px flex space-x-8">
                     <a href="#submitted-places" 
-                       class="tab-link active border-primary-500 text-primary-600 dark:text-primary-400 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                       class="tab-link active border-primary-500 text-primary-700 dark:text-primary-400 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
                         <i class="fas fa-map-marker-alt mr-2"></i>{% translate "Submitted Places" %}
                         {% if submitted_places.paginator.count > 0 %}
                         <span class="bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 ml-2 py-0.5 px-2 rounded-full text-xs">{{ submitted_places.paginator.count }}</span>
@@ -319,7 +319,7 @@
                             {{ place.get_status_display }}
                         </span>
                     </div>
-                    <p class="text-sm text-primary-600 dark:text-primary-400 mb-2">
+                    <p class="text-sm text-primary-700 dark:text-primary-400 mb-2">
                         <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque{% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1"></i>
                         {{ place.get_category_display }}
                     </p>
@@ -327,7 +327,7 @@
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-gray-500 dark:text-gray-400">{{ place.created_at|date:"M d, Y" }}</span>
                         {% comment %} <a href="{% url 'places:place_detail' place.pk %}" 
-                           class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
+                           class="text-sm text-primary-700 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                             {% translate "View Details" %} →
                         </a> {% endcomment %}
                     </div>
@@ -681,12 +681,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Remove active class from all tabs
             tabLinks.forEach(tab => {
-                tab.classList.remove('active', 'border-primary-500', 'text-primary-600');
+                tab.classList.remove('active', 'border-primary-500', 'text-primary-700');
                 tab.classList.add('border-transparent', 'text-gray-500');
             });
             
             // Add active class to clicked tab
-            this.classList.add('active', 'border-primary-500', 'text-primary-600');
+            this.classList.add('active', 'border-primary-500', 'text-primary-700');
             this.classList.remove('border-transparent', 'text-gray-500');
             
             // Hide all tab contents
