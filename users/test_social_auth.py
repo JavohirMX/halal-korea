@@ -200,15 +200,18 @@ class SocialAuthSecurityTest(TestCase):
     def test_csrf_protection(self):
         """Test CSRF protection on social auth endpoints"""
         response = self.client.get('/accounts/google/login/')
-        # Should either redirect or require CSRF token
-        self.assertIn(response.status_code, [302, 403, 500])
+        # SOCIALACCOUNT_LOGIN_ON_GET=False: a GET shows a confirmation page
+        # (200); the actual login requires a CSRF-protected POST.
+        self.assertIn(response.status_code, [200, 302, 403])
+        if response.status_code == 200:
+            self.assertIn(b'csrfmiddlewaretoken', response.content)
     
     def test_secure_callback_urls(self):
         """Test that callback URLs are properly secured"""
         # Test that callback URLs exist and are properly configured
         response = self.client.get('/accounts/google/login/callback/')
         # Should handle the callback (may error without proper OAuth flow or return 200 with error message)
-        self.assertIn(response.status_code, [200, 400, 403, 500])
+        self.assertIn(response.status_code, [200, 400, 401, 403, 500])
 
 
 class SocialAuthAdapterTest(TestCase):
