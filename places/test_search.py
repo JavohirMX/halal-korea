@@ -611,3 +611,27 @@ class ExploreViewSearchTest(TestCase):
         
         data = json.loads(response.content)
         self.assertIn('places', data)
+
+
+class NulByteQueryParamTest(TestCase):
+    """Regression: NUL bytes in explore filter params must not 500.
+
+    PostgreSQL text columns reject NUL (0x00); unsanitized q/category
+    values reached ORM filters and raised ValueError -> 500.
+    """
+
+    def test_explore_q_with_nul_returns_200(self):
+        response = Client().get('/explore/', {'q': 'halal\x00'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_explore_category_with_nul_returns_200(self):
+        response = Client().get('/explore/', {'category': 'restaurant\x00'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_places_json_q_with_nul_returns_200(self):
+        response = Client().get('/api/places/', {'q': '\x00'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_places_json_category_with_nul_returns_200(self):
+        response = Client().get('/api/places/', {'category': '\x00'})
+        self.assertEqual(response.status_code, 200)
