@@ -1165,6 +1165,8 @@ msgid ""
 "Please try again in a moment. If the problem persists, let us know through "
 "the feedback form."
 msgstr ""
+"Iltimos, birozdan so'ng qayta urinib ko'ring. Muammo davom etsa, "
+"fikr-mulohaza shakli orqali bizga xabar bering."
 
 #: places/templates/places/error.html:17
 msgid "Back to home"
@@ -4308,6 +4310,7 @@ msgstr "Yuklab olish"
 msgid "Iftar"
 msgstr "Iftor"
 
+# Reserved for native religious translator review (dua/niyyat) - intentionally left untranslated.
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:156
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:192
 msgid ""
@@ -4325,6 +4328,7 @@ msgstr ""
 "Ramazon oyining ro'zasini subhdan to kun botguncha tutmoqni niyat qildim. "
 "Xolis Alloh uchun, Alloh buyukdir."
 
+# Reserved for native religious translator review (dua/niyyat) - intentionally left untranslated.
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:165
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:217
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:246
@@ -4344,6 +4348,7 @@ msgstr ""
 "tavakkal qildim va bergan rizqing bilan iftor qildim. Ey Mag'firat qiluvchi, "
 "avvalgi va keyingi gunohlarimni mag'firat qilgil."
 
+# Reserved for native religious translator review (dua/niyyat) - intentionally left untranslated.
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:236
 msgid ""
 "Navaytu an asuvma sovma shahri Ramazona minal fajri ilal mag\\'ribi, xolisan "
@@ -4787,7 +4792,9 @@ msgstr "yangilanmoqda…"
 msgid "%(counter)s user skipped (no email)"
 msgid_plural "%(counter)s users skipped (no email)"
 msgstr[0] ""
+"%(counter)s ta foydalanuvchi o'tkazib yuborildi (email manzil yo'q)"
 msgstr[1] ""
+"%(counter)s ta foydalanuvchi o'tkazib yuborildi (email manzil yo'q)"
 
 #: users/templates/admin/users/_compose_email_form.html:193
 #, python-format
@@ -5557,6 +5564,8 @@ msgstr "Kirishga qaytish"
 msgid ""
 "To change your password, fill in both the current and new password fields."
 msgstr ""
+"Parolni o'zgartirish uchun joriy va yangi parol maydonlarining ikkalasini "
+"ham to'ldiring."
 
 #: users/views.py:74
 msgid "Your current password is incorrect."
@@ -5587,6 +5596,8 @@ msgid ""
 "Account created successfully, but we could not send the verification email. "
 "You can request a new one from your profile."
 msgstr ""
+"Hisob muvaffaqiyatli yaratildi, lekin tasdiqlash xatini yuborib bo'lmadi. "
+"Profilingiz orqali yangisini so'rashingiz mumkin."
 
 #: users/views.py:315
 #, python-format
@@ -5594,6 +5605,8 @@ msgid ""
 "Account created successfully, but verification email was not sent due to "
 "rate limiting: %(err)s"
 msgstr ""
+"Hisob muvaffaqiyatli yaratildi, lekin so'rovlar cheklovi tufayli "
+"tasdiqlash xati yuborilmadi: %(err)s"
 
 #: users/views.py:330
 msgid "An error occurred during registration. Please try again."

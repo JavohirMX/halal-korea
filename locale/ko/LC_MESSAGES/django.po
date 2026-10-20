@@ -1141,7 +1141,7 @@ msgstr "문제가 발생했습니다"
 msgid ""
 "Please try again in a moment. If the problem persists, let us know through "
 "the feedback form."
-msgstr ""
+msgstr "잠시 후 다시 시도해 주세요. 문제가 계속되면 피드백 양식을 통해 알려 주세요."
 
 #: places/templates/places/error.html:17
 msgid "Back to home"
@@ -4182,6 +4182,7 @@ msgstr "다운로드"
 msgid "Iftar"
 msgstr "이프타르"
 
+# Reserved for native religious translator review (dua/niyyat) - intentionally left untranslated.
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:156
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:192
 msgid ""
@@ -4199,6 +4200,7 @@ msgstr ""
 "라마단 달의 단식을 새벽부터 해질녘까지, 지고하신 알라를 위해 진심으로 의도합"
 "니다. 알라후 아크바르."
 
+# Reserved for native religious translator review (dua/niyyat) - intentionally left untranslated.
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:165
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:217
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:246
@@ -4218,6 +4220,7 @@ msgstr ""
 "로 단식을 마칩니다. 용서하시는 분이여, 제 지난 죄와 앞으로의 죄를 용서해 주소"
 "서."
 
+# Reserved for native religious translator review (dua/niyyat) - intentionally left untranslated.
 #: prayer_times/templates/prayer_times/ramadan_timetable.html:236
 msgid ""
 "Navaytu an asuvma sovma shahri Ramazona minal fajri ilal mag\\'ribi, xolisan "
@@ -4650,8 +4653,8 @@ msgstr "업데이트 중…"
 #, python-format
 msgid "%(counter)s user skipped (no email)"
 msgid_plural "%(counter)s users skipped (no email)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "이메일이 없어 %(counter)s명의 사용자를 건너뛰었습니다"
+msgstr[1] "이메일이 없어 %(counter)s명의 사용자를 건너뛰었습니다"
 
 #: users/templates/admin/users/_compose_email_form.html:193
 #, python-format
@@ -5402,7 +5405,7 @@ msgstr "로그인으로 돌아가기"
 #: users/views.py:72
 msgid ""
 "To change your password, fill in both the current and new password fields."
-msgstr ""
+msgstr "비밀번호를 변경하려면 현재 비밀번호와 새 비밀번호 필드를 모두 입력하세요."
 
 #: users/views.py:74
 msgid "Your current password is incorrect."
@@ -5432,14 +5435,14 @@ msgstr "사용자 이름 또는 비밀번호가 올바르지 않습니다."
 msgid ""
 "Account created successfully, but we could not send the verification email. "
 "You can request a new one from your profile."
-msgstr ""
+msgstr "계정이 생성되었지만 인증 이메일을 보낼 수 없습니다. 프로필에서 새 인증 이메일을 요청할 수 있습니다."
 
 #: users/views.py:315
 #, python-format
 msgid ""
 "Account created successfully, but verification email was not sent due to "
 "rate limiting: %(err)s"
-msgstr ""
+msgstr "계정이 생성되었지만 요청 제한으로 인해 인증 이메일이 발송되지 않았습니다: %(err)s"
 
 #: users/views.py:330
 msgid "An error occurred during registration. Please try again."
