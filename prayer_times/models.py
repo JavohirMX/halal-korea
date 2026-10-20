@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from datetime import datetime, date
 
 
@@ -24,7 +25,7 @@ class RamadanConfig(models.Model):
 
     def clean(self):
         if self.start_date and self.end_date and self.start_date >= self.end_date:
-            raise ValidationError("End date must be after start date.")
+            raise ValidationError(_("End date must be after start date."))
 
     @property
     def total_days(self):
