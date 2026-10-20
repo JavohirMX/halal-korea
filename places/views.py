@@ -181,11 +181,13 @@ def _get_explore_cache_key(
 def explore(request):
     from .search import build_search_query, parse_proximity_phrase, log_search_query
 
-    # Get filter parameters
-    category = request.GET.get("category")
-    search_query = request.GET.get("q", "")
-    city_filter = request.GET.get("city", "")  # New city filter
-    sort = request.GET.get("sort", "distance")  # Default to distance sorting
+    # Get filter parameters. PostgreSQL text columns reject NUL bytes, so
+    # strip them up front - a NUL in any of these reaches an ORM filter
+    # below and would otherwise raise ValueError (-> 500).
+    category = (request.GET.get("category") or "").replace("\x00", "") or None
+    search_query = request.GET.get("q", "").replace("\x00", "")
+    city_filter = request.GET.get("city", "").replace("\x00", "")  # New city filter
+    sort = request.GET.get("sort", "distance").replace("\x00", "")  # Default to distance sorting
     page = request.GET.get("page", 1)
 
     # Get location context early for cache key and smart defaults
@@ -505,11 +507,11 @@ def get_places_json(request):
     """API endpoint to get places as JSON for map and dynamic loading"""
     from .search import build_search_query, parse_proximity_phrase
 
-    # Get filter parameters
-    category = request.GET.get("category")
-    search_query = request.GET.get("q", "")
-    city_filter = request.GET.get("city", "")  # Add city filter
-    sort = request.GET.get("sort", "distance")  # Default to distance sorting
+    # Get filter parameters (NUL stripped - see explore() for why)
+    category = (request.GET.get("category") or "").replace("\x00", "") or None
+    search_query = request.GET.get("q", "").replace("\x00", "")
+    city_filter = request.GET.get("city", "").replace("\x00", "")  # Add city filter
+    sort = request.GET.get("sort", "distance").replace("\x00", "")  # Default to distance sorting
     page = request.GET.get("page", 1)
 
     # Log API request with parameters
