@@ -135,7 +135,7 @@ def login_view(request):
         
         if user is not None:
             if user.is_active:
-                login(request, user)
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 
                 # Enhanced success logging
                 log_security_event(
@@ -260,7 +260,7 @@ def register_view(request):
                             extra={'user_id': user.id, 'username': user.username}
                         )
                         # Auto-login the user
-                        login(request, user)
+                        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                         logger.info(
                             f"Auto-login after registration for user: {user.username}",
                             extra={'user_id': user.id}
@@ -272,7 +272,7 @@ def register_view(request):
                             extra={'user_id': user.id}
                         )
                         # Still login the user even if email fails
-                        login(request, user)
+                        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                         messages.warning(request, 'Account created successfully, but we could not send the verification email. You can request a new one from your profile.')
                         return redirect('places:home')
                 else:
@@ -285,7 +285,7 @@ def register_view(request):
                         severity='warning',
                         extra_data={'error': email_error_msg}
                     )
-                    login(request, user)
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                     messages.warning(request, f'Account created successfully, but verification email was not sent due to rate limiting: {email_error_msg}')
                     return redirect('places:home')
                     
@@ -499,7 +499,7 @@ def password_reset_confirm(request, uidb64, token):
                     from django.contrib.auth import get_backends
                     backend = get_backends()[0]
                     user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
-                    login(request, user)
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                     messages.success(request, 'Your password has been reset successfully!')
                     
                     return redirect('places:home')
