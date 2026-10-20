@@ -828,9 +828,9 @@
         was never shown. This script sits at the end of <body>, so a blocking
         load costs nothing in first paint.
     -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-            onload="window.__turnstileApiLoaded = true"
-            onerror="window.__turnstileApiLoaded = false"></script>
+    <!-- Turnstile api.js is injected lazily by turnstile-helpers.js (ensureApi)
+         the first time a widget container nears the viewport. Do not re-add an
+         eager tag here: it costs ~84KB + ~1MB of challenge XHR on every page. -->
     <script src="{% static 'js/turnstile-helpers.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
     <script src="{% static 'js/feedback-widget.js' %}"></script>
