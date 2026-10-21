@@ -9,7 +9,8 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialAccount, SocialApp
+from django.http import Http404
 from allauth.account.utils import user_email, user_username
 import requests
 from PIL import Image
@@ -48,7 +49,20 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     """
     Custom social account adapter for auto-merging accounts and profile data import
     """
-    
+
+    def get_app(self, request, provider, client_id=None):
+        """
+        allauth 65.x raises an uncaught SocialApp.DoesNotExist when a provider
+        login/callback URL is hit without a configured SocialApp, producing a
+        500 on stray or bot requests. Convert it to a handled 404 instead.
+        """
+        try:
+            return super().get_app(request, provider, client_id=client_id)
+        except SocialApp.DoesNotExist:
+            raise Http404(
+                f"No OAuth app configured for provider '{getattr(provider, 'id', provider)}'"
+            )
+
     def is_open_for_signup(self, request, sociallogin):
         """
         Allow social signups

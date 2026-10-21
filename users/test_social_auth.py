@@ -116,11 +116,16 @@ class SocialAuthIntegrationTest(TestCase):
         self.assertContains(response, 'Twitter')
     
     def test_social_auth_urls_configured(self):
-        """Test that social auth URLs are properly configured"""
-        # Test that allauth URLs are included
+        """Provider login URL serves the CSRF-protected confirmation page.
+
+        SOCIALACCOUNT_LOGIN_ON_GET=False (allauth security recommendation):
+        a GET must not log anyone in - allauth renders a confirmation page
+        whose POST form (with CSRF token) starts the OAuth flow.
+        """
         response = self.client.get('/accounts/google/login/')
-        # Should redirect to Google OAuth (or show error if not configured)
-        self.assertIn(response.status_code, [302, 500])  # 302 redirect or 500 if not configured
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'csrfmiddlewaretoken', response.content)
+        self.assertIn(b'method="post"', response.content.lower())
     
     def test_account_merging_logic(self):
         """Test account merging functionality"""
@@ -200,15 +205,35 @@ class SocialAuthSecurityTest(TestCase):
     def test_csrf_protection(self):
         """Test CSRF protection on social auth endpoints"""
         response = self.client.get('/accounts/google/login/')
-        # Should either redirect or require CSRF token
-        self.assertIn(response.status_code, [302, 403, 500])
+        # SOCIALACCOUNT_LOGIN_ON_GET=False: a GET shows a confirmation page
+        # (200); the actual login requires a CSRF-protected POST.
+        self.assertIn(response.status_code, [200, 302, 403])
+        if response.status_code == 200:
+            self.assertIn(b'csrfmiddlewaretoken', response.content)
     
-    def test_secure_callback_urls(self):
-        """Test that callback URLs are properly secured"""
-        # Test that callback URLs exist and are properly configured
+    def test_callback_without_configured_app_returns_404(self):
+        """Callback/login URLs with no configured SocialApp return a handled
+        404 (CustomSocialAccountAdapter.get_app guard), never a 500."""
         response = self.client.get('/accounts/google/login/callback/')
-        # Should handle the callback (may error without proper OAuth flow or return 200 with error message)
-        self.assertIn(response.status_code, [200, 400, 403, 500])
+        self.assertEqual(response.status_code, 404)
+        response = self.client.get('/accounts/github/login/callback/')
+        self.assertEqual(response.status_code, 404)
+        response = self.client.post('/accounts/google/login/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_callback_with_configured_app_is_handled(self):
+        """With a configured SocialApp, a stateless callback hit is handled
+        by allauth's normal error flow - never a 500."""
+        from allauth.socialaccount.models import SocialApp
+        app = SocialApp.objects.create(
+            provider='google', name='Google',
+            client_id='test_client_id', secret='test_secret',
+        )
+        from django.contrib.sites.models import Site
+        app.sites.add(Site.objects.get_current())
+        response = self.client.get('/accounts/google/login/callback/')
+        self.assertIn(response.status_code, [200, 302, 400, 401, 403])
+        self.assertNotEqual(response.status_code, 500)
 
 
 class SocialAuthAdapterTest(TestCase):
