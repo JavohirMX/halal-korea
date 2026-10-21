@@ -507,6 +507,19 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Fingerprinted static files in production: content-hashed filenames make
+# the long-lived browser/CDN cache headers safe (a deploy changes the URL
+# of every changed asset, so nothing stale is ever served).
+if not DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        },
+    }
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
