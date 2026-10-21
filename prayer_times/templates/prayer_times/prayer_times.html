@@ -892,7 +892,7 @@
             }
             
             if (!response.ok) {
-                if (data && data.show_error_ui) {
+                if (response.status === 400 && data && data.show_error_ui) {
                     // Expected state, not a failure: the user's location is
                     // unknown - prompt them to set it instead of showing the
                     // generic error.

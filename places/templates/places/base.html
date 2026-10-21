@@ -141,8 +141,9 @@
     {% endblock structured_data %}
 
     <!-- External CSS -->
-    <link rel="stylesheet" href="{% static 'css/tailwind.build.css' %}">
+    <!-- Icon defaults precede utilities so hidden/dark:hidden can hide icons. -->
     <link rel="stylesheet" href="{% static 'css/fontawesome-subset.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tailwind.build.css' %}">
     
     <!-- Base Styles -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
