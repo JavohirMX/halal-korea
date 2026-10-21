@@ -647,15 +647,14 @@ TINYMCE_DEFAULT_CONFIG = {
 # ============================================================================
 
 # AllAuth Account Configuration
-ACCOUNT_AUTHENTICATION_METHOD = "email"  # Use email instead of username
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {"email"}  # Use email instead of username
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "optional"  # We handle verification ourselves
-ACCOUNT_USERNAME_REQUIRED = True  # Keep usernames for our existing system
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 
 # Social Account Configuration - Skip intermediate pages for better UX
-SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip the "Continue" confirmation page
+SOCIALACCOUNT_LOGIN_ON_GET = False  # Show the confirmation page (allauth security recommendation)
 SOCIALACCOUNT_QUERY_EMAIL = True  # Always request email from providers
 SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens (privacy)
 
