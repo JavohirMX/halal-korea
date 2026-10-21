@@ -85,7 +85,8 @@ body {
 }
 
 .gradient-text {
-    background: linear-gradient(135deg, #22c55e, #10b981);
+    /* Darker stops for large text contrast on white (404 numeral). */
+    background: linear-gradient(135deg, #15803d, #047857);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

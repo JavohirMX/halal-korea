@@ -471,7 +471,7 @@
                            name="q"
                            value="{{ request.GET.q }}"
                            autocomplete="off"
-                           class="pl-9 sm:pl-10 w-full h-10 sm:h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out text-sm sm:text-base"
+                           class="pl-9 sm:pl-10 w-full h-10 sm:h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-700 transition duration-150 ease-in-out text-sm sm:text-base"
                            aria-label="{% translate 'Search places' %}"
                            placeholder="{% translate 'Search places...' %}">
                     
@@ -549,7 +549,7 @@
                     </div>
                     <select name="category"
                             aria-label="{% translate 'Filter by category' %}" 
-                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
+                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-700 transition duration-150 ease-in-out appearance-none">
                         <option value="">{% translate "All Categories" %}</option>
                         <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>{% translate "Restaurants" %}</option>
                         <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>{% translate "Markets" %}</option>
@@ -567,7 +567,7 @@
                     </div>
                     <select name="sort"
                             aria-label="{% translate 'Sort places' %}" 
-                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
+                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-700 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
                         {% if location_context.is_in_korea %}
                             <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
                             <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>

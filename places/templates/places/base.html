@@ -401,7 +401,7 @@
                         {% if user.is_authenticated %}
                             <div class="relative" x-data="{ open: false }">
                                 <button @click="open = !open" 
-                                        class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900">
+                                        class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-700 dark:focus:ring-offset-gray-900">
                                     {% if user.profile.avatar %}
                                         <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="h-8 w-8 rounded-full">
                                     {% else %}
