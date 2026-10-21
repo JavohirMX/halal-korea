@@ -59,7 +59,9 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         try:
             return super().get_app(request, provider, client_id=client_id)
         except SocialApp.DoesNotExist:
-            raise Http404(f"No OAuth app configured for provider '{provider.id}'")
+            raise Http404(
+                f"No OAuth app configured for provider '{getattr(provider, 'id', provider)}'"
+            )
 
     def is_open_for_signup(self, request, sociallogin):
         """
