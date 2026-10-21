@@ -218,12 +218,15 @@ These were folded into #25 on 2026-10-21. Read these notes before merging:
   package migrations (account up to 0009, socialaccount up to 0006). They are
   package-owned schema/data changes; take a DB backup before deploying as a
   rollback safety net.
-- **Rollback (verified locally on a scratch database, 2026-10-21):**
-  the new allauth package migrations unapply cleanly (`migrate account 0005`,
-  `migrate socialaccount 0005`) and re-apply cleanly afterward, and the OLD
-  code (main + allauth 0.57.0 + Django 5.1.6) passes `manage.py check` and
-  serves pages against the fully upgraded database. So a code-only revert +
-  rebuild is a viable rollback. Two irreversible data normalizations remain
-  (their reverse is a no-op by design): account/0006 lowercases existing
-  email addresses, account/0008 unsets duplicate primary-email flags - both
-  benign, but take a DB backup before deploying anyway.
+- **Rollback (smoke-tested locally on a scratch fixture DB, 2026-10-21):**
+  the new allauth package migrations unapply and re-apply cleanly
+  (`migrate account 0005`, `migrate socialaccount 0005`), and the old code
+  (main + allauth 0.57.0 + Django 5.1.6) passed `manage.py check` and served
+  a few tested routes against the upgraded database. That is a smoke test of
+  a code-only revert on a fixture DB, not a guarantee of full old-code
+  compatibility with allauth 0.57.0 across every feature. Two package data
+  normalizations are NOT reversible (their reverse is a no-op by design):
+  account/0006 lowercases existing email addresses, and account/0008 unsets
+  duplicate primary-email flags. Returning to exactly the pre-upgrade data
+  requires restoring the verified pre-deploy backup - take one before
+  deploying.
