@@ -1,4 +1,10 @@
-# Rollout checklist: merging the combined PR (#25, PRs #8-#32)
+# Rollout checklist: merging the combined PR (#25, PRs #7-#57)
+
+> Updated 2026-10-21: the Django 5.2 (#37), allauth 65.14.1 (#38) and
+> Pillow/certifi security (#57) upgrades are now folded INTO #25 (John's
+> one-merge preference, WhatsApp Oct 20). The old 'standalone follow-ups'
+> section below is kept for its rollback notes but no longer reflects the
+> plan - read the 'Upgrades included' section instead.
 
 How this site deploys today (verified against `.github/workflows/deploy.yml` and
 `docker-compose.yaml` on main):
@@ -36,10 +42,14 @@ How this site deploys today (verified against `.github/workflows/deploy.yml` and
   container start. Both take effect via the normal `docker-compose up -d --build`.
 - **CI:** #23 adds `.github/workflows/ci.yml`. The first workflow run on this repo
   needs a one-time "Approve and run" click on the Actions tab (fork-PR gate).
-- **Dependencies:** unchanged. `requirements.txt` is untouched by every PR
-  (verified). #32 uses Pillow, already pinned (`Pillow==11.3.0`). The Docker image
-  already installs `gettext`, so `compilemessages`/`makemessages` work in the
-  container.
+- **Dependencies:** `requirements.txt` now moves four pins (all verified locally
+  on Python 3.12 with the full 603-test suite green):
+  `Django==5.1.6 -> 5.2.18` (LTS; 5.1 is end-of-life and 3 advisories have no
+  5.1.x fix), `django-allauth==0.57.0 -> 65.14.1`, `Pillow==11.3.0 -> 13.0.0`,
+  `certifi==2025.1.31 -> 2026.10.19`. Pillow 13 requires Python >= 3.11 - the
+  Dockerfile already runs `python:3.12-slim`, so no Docker change is needed.
+  The Docker image already installs `gettext`, so `compilemessages`/`makemessages`
+  work in the container.
 - **Static/media:** #9 commits a prebuilt `static/css/tailwind.build.css`; #15
   commits a Font Awesome subset. Both are picked up by collectstatic. No media
   (user-uploaded) files are touched by any PR.
@@ -182,12 +192,35 @@ The same section 3 local verification applies before each batch.
 - The Google Maps API key's HTTP referrer restrictions: if you ever rotate the
   key, the new key must allow the production domain.
 
-## Standalone follow-ups (deliberately NOT in #25)
+## Upgrades included in #25 (previously standalone #37, #38, #57)
 
-- **#37 (Django 5.1.6 -> 5.2.18 LTS)** - framework upgrade, merge separately
-  after #25 with its own deploy window and smoke pass (home, explore, place
-  detail, login/register, Google login, submit-place, blog, admin). Rollback:
-  revert the single commit, reinstall requirements, restart.
-- **allauth bump PR** (django-allauth 0.57.0 -> 65.x + `SOCIALACCOUNT_LOGIN_ON_GET=False`) -
-  separate PR; verify Google social login manually after deploy since OAuth
-  can't be exercised by the test suite.
+These were folded into #25 on 2026-10-21. Read these notes before merging:
+
+- **Django 5.1.6 -> 5.2.18 (LTS)** (#37). 5.1 is end-of-life: 19 open
+  advisories, three of which (PYSEC-2026-198/-199/-201) have no 5.1.x fix at
+  all. No project code changes were needed; the full 603-test suite passes on
+  the folded branch. Smoke pass after deploy: home, explore, place detail,
+  login/register, Google login, submit-place, blog, admin.
+- **django-allauth 0.57.0 -> 65.14.1** (#38) + settings migration
+  (`ACCOUNT_LOGIN_METHODS` / `ACCOUNT_SIGNUP_FIELDS` replace removed keys) +
+  `SOCIALACCOUNT_LOGIN_ON_GET=True -> False`. The last one is a deliberate
+  behavior change: a GET to `/accounts/<provider>/login/` now shows a
+  CSRF-protected confirmation page instead of logging in directly.
+  A new adapter guard returns a handled 404 (instead of allauth 65.x's
+  uncaught 500) when a provider login/callback URL is hit with no configured
+  SocialApp. **Verify Google social login manually after deploy** - real OAuth
+  cannot be exercised by the test suite.
+- **Pillow 11.3.0 -> 13.0.0 + certifi 2025.1.31 -> 2026.10.19** (#57):
+  security fixes (5 High + 3 Low Pillow advisories affecting the old pin;
+  compromised emSign intermediate CAs in certifi). Pillow 13 drops Python
+  3.10; the Dockerfile already uses Python 3.12.
+- **Package migrations:** the deploy's `migrate` will apply new allauth
+  package migrations (account up to 0009, socialaccount up to 0006). They are
+  package-owned schema/data changes; take a DB backup before deploying as a
+  rollback safety net.
+- **Rollback:** if the upgraded stack misbehaves after deploy, revert the
+  merge of #25 (or redeploy the previous main commit) and restore the DB
+  backup if allauth migrations already ran - reversing package migrations is
+  the riskiest part, which is why the backup matters. `pip install` of the old
+  requirements plus a container rebuild returns the app to Django 5.1 /
+  allauth 0.57.
