@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 03:03+0900\n"
+"POT-Creation-Date: 2026-10-21 11:50+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1163,8 +1163,8 @@ msgid ""
 "Please try again in a moment. If the problem persists, let us know through "
 "the feedback form."
 msgstr ""
-"Iltimos, birozdan so'ng qayta urinib ko'ring. Muammo davom etsa, "
-"fikr-mulohaza shakli orqali bizga xabar bering."
+"Iltimos, birozdan so'ng qayta urinib ko'ring. Muammo davom etsa, fikr-"
+"mulohaza shakli orqali bizga xabar bering."
 
 #: places/templates/places/error.html:17
 msgid "Back to home"
@@ -4533,6 +4533,35 @@ msgstr ""
 "Ijtimoiy tarmoq hisoblarini ulash orqali mavjud hisoblaringiz bilan tez "
 "kirishingiz mumkin. Ularni istalgan vaqtda uzib qo'yishingiz mumkin."
 
+#: templates/socialaccount/login.html:4 templates/socialaccount/login.html:11
+#, python-format
+msgid "Connect %(pname)s"
+msgstr "%(pname)s ni ulash"
+
+#: templates/socialaccount/login.html:4 templates/socialaccount/login.html:14
+#, python-format
+msgid "Sign in with %(pname)s"
+msgstr "%(pname)s orqali kirish"
+
+#: templates/socialaccount/login.html:12
+#, python-format
+msgid "You are about to connect a new third-party account from %(pname)s."
+msgstr "%(pname)s dan yangi uchinchi tomon hisobini ulash arafasizdasiz."
+
+#: templates/socialaccount/login.html:15
+#, python-format
+msgid "You are about to sign in using a third-party account from %(pname)s."
+msgstr "%(pname)s hisobi orqali kirish arafasizdasiz."
+
+#: templates/socialaccount/login.html:23
+#, python-format
+msgid "Continue with %(pname)s"
+msgstr "%(pname)s orqali davom etish"
+
+#: templates/socialaccount/login.html:30
+msgid "Cancel and go back to log in"
+msgstr "Bekor qilish va kirishga qaytish"
+
 #: users/decorators.py:16
 msgid ""
 "Please verify your email address to access this feature. Check your inbox "
@@ -4788,8 +4817,7 @@ msgstr "yangilanmoqda…"
 #, python-format
 msgid "%(counter)s user skipped (no email)"
 msgid_plural "%(counter)s users skipped (no email)"
-msgstr[0] ""
-"%(counter)s ta foydalanuvchi o'tkazib yuborildi (email manzil yo'q)"
+msgstr[0] "%(counter)s ta foydalanuvchi o'tkazib yuborildi (email manzil yo'q)"
 
 #: users/templates/admin/users/_compose_email_form.html:193
 #, python-format
@@ -5599,8 +5627,8 @@ msgid ""
 "Account created successfully, but verification email was not sent due to "
 "rate limiting: %(err)s"
 msgstr ""
-"Hisob muvaffaqiyatli yaratildi, lekin so'rovlar cheklovi tufayli "
-"tasdiqlash xati yuborilmadi: %(err)s"
+"Hisob muvaffaqiyatli yaratildi, lekin so'rovlar cheklovi tufayli tasdiqlash "
+"xati yuborilmadi: %(err)s"
 
 #: users/views.py:330
 msgid "An error occurred during registration. Please try again."

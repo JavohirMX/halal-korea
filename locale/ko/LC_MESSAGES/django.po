@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-21 03:03+0900\n"
+"POT-Creation-Date: 2026-10-21 11:50+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1139,7 +1139,8 @@ msgstr "문제가 발생했습니다"
 msgid ""
 "Please try again in a moment. If the problem persists, let us know through "
 "the feedback form."
-msgstr "잠시 후 다시 시도해 주세요. 문제가 계속되면 피드백 양식을 통해 알려 주세요."
+msgstr ""
+"잠시 후 다시 시도해 주세요. 문제가 계속되면 피드백 양식을 통해 알려 주세요."
 
 #: places/templates/places/error.html:17
 msgid "Back to home"
@@ -4403,6 +4404,35 @@ msgstr ""
 "소셜 계정을 연결하면 기존 계정으로 빠르게 로그인할 수 있습니다. 언제든지 연결"
 "을 해제할 수 있습니다."
 
+#: templates/socialaccount/login.html:4 templates/socialaccount/login.html:11
+#, python-format
+msgid "Connect %(pname)s"
+msgstr "%(pname)s 연결"
+
+#: templates/socialaccount/login.html:4 templates/socialaccount/login.html:14
+#, python-format
+msgid "Sign in with %(pname)s"
+msgstr "%(pname)s(으)로 로그인"
+
+#: templates/socialaccount/login.html:12
+#, python-format
+msgid "You are about to connect a new third-party account from %(pname)s."
+msgstr "%(pname)s의 새 타사 계정을 연결하려고 합니다."
+
+#: templates/socialaccount/login.html:15
+#, python-format
+msgid "You are about to sign in using a third-party account from %(pname)s."
+msgstr "%(pname)s의 타사 계정으로 로그인하려고 합니다."
+
+#: templates/socialaccount/login.html:23
+#, python-format
+msgid "Continue with %(pname)s"
+msgstr "%(pname)s(으)로 계속하기"
+
+#: templates/socialaccount/login.html:30
+msgid "Cancel and go back to log in"
+msgstr "취소하고 로그인으로 돌아가기"
+
 #: users/decorators.py:16
 msgid ""
 "Please verify your email address to access this feature. Check your inbox "
@@ -5400,7 +5430,8 @@ msgstr "로그인으로 돌아가기"
 #: users/views.py:72
 msgid ""
 "To change your password, fill in both the current and new password fields."
-msgstr "비밀번호를 변경하려면 현재 비밀번호와 새 비밀번호 필드를 모두 입력하세요."
+msgstr ""
+"비밀번호를 변경하려면 현재 비밀번호와 새 비밀번호 필드를 모두 입력하세요."
 
 #: users/views.py:74
 msgid "Your current password is incorrect."
@@ -5430,14 +5461,18 @@ msgstr "사용자 이름 또는 비밀번호가 올바르지 않습니다."
 msgid ""
 "Account created successfully, but we could not send the verification email. "
 "You can request a new one from your profile."
-msgstr "계정이 생성되었지만 인증 이메일을 보낼 수 없습니다. 프로필에서 새 인증 이메일을 요청할 수 있습니다."
+msgstr ""
+"계정이 생성되었지만 인증 이메일을 보낼 수 없습니다. 프로필에서 새 인증 이메일"
+"을 요청할 수 있습니다."
 
 #: users/views.py:315
 #, python-format
 msgid ""
 "Account created successfully, but verification email was not sent due to "
 "rate limiting: %(err)s"
-msgstr "계정이 생성되었지만 요청 제한으로 인해 인증 이메일이 발송되지 않았습니다: %(err)s"
+msgstr ""
+"계정이 생성되었지만 요청 제한으로 인해 인증 이메일이 발송되지 않았습니다: "
+"%(err)s"
 
 #: users/views.py:330
 msgid "An error occurred during registration. Please try again."
