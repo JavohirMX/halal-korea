@@ -50,7 +50,7 @@ Older test counts and earlier green runs do not certify a newer head.
 
 ## Schema changes and backup
 
-The batch includes Django 5.2 and allauth 65.14.1. Even where there are no new
+The batch includes Django 5.2 and allauth 65.20.1. Even where there are no new
 project migration files, package migrations still apply. Allauth account
 migrations through 0009 and socialaccount through 0006 must be reviewed against
 the actual database's migration state.
@@ -92,3 +92,19 @@ The droplet's live environment, backup health, production provider credentials,
 Cloudflare settings, monitoring delivery, and a complete container image build
 are not established by reading repository files. Do not describe them as checked
 without corresponding current evidence.
+
+## Allauth security follow-up (2026-10-21)
+
+Allauth65.20.1 permits oauthlib4.0.0, fixing the moderate PKCE comparison
+advisory GHSA-xpv3-w29h-x7cv without overriding upstream constraints. It also
+includes provider-bound authorization state and aborted-login record fixes.
+Python>=3.11 is required, matching CI3.11 and Docker3.12. No custom
+SocialLogin stash_state/unstash_state calls were found in this project.
+The installed Google/GitHub providers are not the Bitbucket/Pinterest/Tumblr
+providers whose identifiers changed in intervening releases. No new package
+migration operations were planned against the upgraded local fixture DB.
+Real OAuth callbacks still need verification in an authorized environment.
+
+Sources:
+- https://docs.allauth.org/en/latest/release-notes/recent.html
+- https://github.com/advisories/GHSA-xpv3-w29h-x7cv
