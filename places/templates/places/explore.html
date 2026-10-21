@@ -216,7 +216,7 @@
 
         /* Popover Card */
         #tutorial-popover {
-            position: absolute;
+            position: fixed;
             z-index: 1002;
             width: 90%;
             max-width: 320px;
@@ -321,10 +321,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hidden CSRF Token Form -->
-<form id="csrf-form" style="display: none;">
-    {% csrf_token %}
-</form>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
@@ -357,7 +353,7 @@
                             {% endif %}
                         </p>
                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                            {% if location_context.location.city %}
+                            {% if location_context.location.city and not location_context.location.is_fallback %}
                                 {{ location_context.location.city }}
                             {% else %}
                                 {% translate "Unknown Location" %}
@@ -369,7 +365,7 @@
                 <!-- Action Buttons -->
                 <div class="flex items-center gap-2 border-l border-gray-200 dark:border-gray-700 pl-3">
                     <button id="update-location-btn-desktop" type="button"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium shadow-sm"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary-800 dark:bg-primary-700 text-white hover:bg-primary-900 dark:hover:bg-primary-800 transition-colors text-sm font-medium shadow-sm"
                         title="{% translate 'Update my location' %}">
                         <i class="fas fa-crosshairs text-sm"></i>
                         <span>{% translate "Update" %}</span>
@@ -402,7 +398,7 @@
                 class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-xs flex-shrink-0">
                 <i class="fas fa-location-dot text-primary-600 dark:text-primary-400"></i>
                 <span class="font-medium truncate max-w-[80px]">
-                    {% if location_context.location.city %}
+                    {% if location_context.location.city and not location_context.location.is_fallback %}
                         {{ location_context.location.city }}
                     {% else %}
                         {% translate "Set Location" %}
@@ -443,7 +439,7 @@
                         {% endif %}
                     </p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">
-                        {% if location_context.location.city %}
+                        {% if location_context.location.city and not location_context.location.is_fallback %}
                             {{ location_context.location.city }}
                         {% else %}
                             {% translate "Unknown Location" %}
@@ -456,7 +452,7 @@
             </div>
             <div class="flex gap-2">
                 <button id="update-location-btn-mobile" type="button"
-                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium w-full">
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-800 dark:bg-primary-700 text-white hover:bg-primary-900 dark:hover:bg-primary-800 transition-colors text-sm font-medium w-full">
                     <i class="fas fa-crosshairs"></i>
                     <span>{% translate "Update" %}</span>
                 </button>
@@ -475,7 +471,8 @@
                            name="q"
                            value="{{ request.GET.q }}"
                            autocomplete="off"
-                           class="pl-9 sm:pl-10 w-full h-10 sm:h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out text-sm sm:text-base"
+                           class="pl-9 sm:pl-10 w-full h-10 sm:h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-700 transition duration-150 ease-in-out text-sm sm:text-base"
+                           aria-label="{% translate 'Search places' %}"
                            placeholder="{% translate 'Search places...' %}">
                     
                     <!-- Autocomplete Dropdown -->
@@ -550,8 +547,9 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-filter text-gray-400"></i>
                     </div>
-                    <select name="category" 
-                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none">
+                    <select name="category"
+                            aria-label="{% translate 'Filter by category' %}" 
+                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-700 transition duration-150 ease-in-out appearance-none">
                         <option value="">{% translate "All Categories" %}</option>
                         <option value="restaurant" {% if request.GET.category == 'restaurant' %}selected{% endif %}>{% translate "Restaurants" %}</option>
                         <option value="market" {% if request.GET.category == 'market' %}selected{% endif %}>{% translate "Markets" %}</option>
@@ -567,8 +565,9 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-sort text-gray-400"></i>
                     </div>
-                    <select name="sort" 
-                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-500 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
+                    <select name="sort"
+                            aria-label="{% translate 'Sort places' %}" 
+                            class="pl-10 w-full h-11 rounded border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-primary-500 focus:ring-primary-700 transition duration-150 ease-in-out appearance-none hover:bg-gray-100 dark:hover:bg-gray-600">
                         {% if location_context.is_in_korea %}
                             <option value="distance" {% if request.GET.sort == 'distance' %}selected{% endif %}>{% translate "Sort by Distance" %}</option>
                             <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% translate "Sort by Rating" %}</option>
@@ -599,7 +598,7 @@
         <div class="overflow-x-auto pb-1">
             <div class="flex gap-2 min-w-max sm:min-w-0 sm:flex-wrap">
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Seoul"
                         data-lat="37.5665"
                         data-lng="126.9780">
@@ -607,7 +606,7 @@
                     {% translate "Seoul" %}
                 </button>
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Busan"
                         data-lat="35.1796"
                         data-lng="129.0756">
@@ -615,7 +614,7 @@
                     {% translate "Busan" %}
                 </button>
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Jeju"
                         data-lat="33.4996"
                         data-lng="126.5312">
@@ -623,7 +622,7 @@
                     {% translate "Jeju Island" %}
                 </button>
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Incheon"
                         data-lat="37.4563"
                         data-lng="126.7052">
@@ -631,7 +630,7 @@
                     {% translate "Incheon" %}
                 </button>
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Gyeonggi"
                         data-lat="37.4138"
                         data-lng="127.5183">
@@ -639,7 +638,7 @@
                     {% translate "Gyeonggi" %}
                 </button>
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Daegu"
                         data-lat="35.8714"
                         data-lng="128.6014">
@@ -647,7 +646,7 @@
                     {% translate "Daegu" %}
                 </button>
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Daejeon"
                         data-lat="36.3504"
                         data-lng="127.3845">
@@ -655,7 +654,7 @@
                     {% translate "Daejeon" %}
                 </button>
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Gwangju"
                         data-lat="35.1601"
                         data-lng="126.8515">
@@ -663,7 +662,7 @@
                     {% translate "Gwangju" %}
                 </button>
                 <button type="button" 
-                        class="tourist-area-btn inline-flex items-center px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
+                        class="tourist-area-btn inline-flex items-center min-h-[44px] sm:min-h-0 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900/30 border border-gray-300 dark:border-gray-600 transition-colors whitespace-nowrap flex-shrink-0"
                         data-city="Ulsan"
                         data-lat="35.5395"
                         data-lng="129.3114">
@@ -687,7 +686,7 @@
                     <span class="font-medium text-gray-900 dark:text-white" id="total-count">{{ places.paginator.count }}</span>
                     <span>{% translate "places" %}</span>
                 </p>
-                <div id="map-places-counter" class="text-xs text-gray-500 dark:text-gray-500">
+                <div id="map-places-counter" class="text-xs text-gray-500 dark:text-gray-400">
                     <i class="fas fa-map-marker-alt mr-1"></i>
                     <span id="map-marker-count">0</span> {% translate "on map" %}
                 </div>
@@ -1010,7 +1009,7 @@
                 
                 <!-- CTA Button -->
                 <a href="/place/${place.id}/" 
-                   class="inline-flex items-center justify-center w-full px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors duration-200">
+                   class="inline-flex items-center justify-center w-full px-3 py-1.5 bg-primary-800 hover:bg-primary-900 text-white text-xs font-medium rounded-md transition-colors duration-200">
                     {% translate "View Details"|escapejs %}
                     <i class="fas fa-chevron-right ml-1 text-xs"></i>
                 </a>
@@ -1403,7 +1402,7 @@
         // Update user location and refresh places
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
                     
@@ -1412,7 +1411,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
+                            'X-CSRFToken': await window.ensureCSRFToken()
                         },
                         body: JSON.stringify({ latitude: lat, longitude: lng })
                     })
@@ -1804,7 +1803,7 @@
         });
         
         // Log search for analytics
-        function logSearch(query) {
+        async function logSearch(query) {
             if (!query || query.length < 2) return;
             
             const category = document.querySelector('select[name="category"]')?.value || '';
@@ -1813,7 +1812,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'X-CSRFToken': await window.ensureCSRFToken()
                 },
                 body: JSON.stringify({
                     query: query,
@@ -1931,9 +1930,9 @@ if (desktopLocationBtn) {
 // Shared location update function
 function updateLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            // Get CSRF token from the hidden form
-            const csrfToken = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
+        navigator.geolocation.getCurrentPosition(async function(position) {
+            // Fetch a CSRF token on demand (page renders without one)
+            const csrfToken = await window.ensureCSRFToken();
             
             fetch("{% url 'places:set_location' %}", {
                 method: 'POST',
@@ -2024,7 +2023,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="flex gap-1" id="tutorial-dots">
             <!-- Dots will be generated here -->
         </div>
-        <button id="tutorial-next-btn" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors">
+        <button id="tutorial-next-btn" class="px-3 py-1.5 min-h-[44px] bg-primary-800 hover:bg-primary-900 text-white text-xs font-medium rounded-md transition-colors">
             {% translate "Next" %}
         </button>
     </div>
@@ -2118,6 +2117,12 @@ document.addEventListener('DOMContentLoaded', function() {
             this.isActive = true;
             this.backdrop.classList.add('active');
             document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            // The spotlight ring and popover can momentarily extend a few px past the
+            // viewport while animating; on mobile browsers that expands the layout
+            // viewport (w-full nav grows, page shifts). Clamp horizontal overflow at
+            // the document level for the duration of the walkthrough.
+            this.prevHtmlOverflowX = document.documentElement.style.overflowX;
+            document.documentElement.style.overflowX = 'hidden';
             this.showStep(0);
         }
 
@@ -2195,11 +2200,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const rect = element.getBoundingClientRect();
             const padding = 8;
 
-            // Position Spotlight
-            this.spotlight.style.width = `${rect.width + (padding * 2)}px`;
+            // Position Spotlight, clamped horizontally to the viewport so the
+            // spotlight (and its 4px ::after ring) cannot cause horizontal overflow
+            // when the highlighted element touches the screen edge (e.g. the map).
+            const ring = 4; // ::after ring extends 4px past the spotlight
+            let spotlightLeft = rect.left + window.scrollX - padding;
+            let spotlightWidth = rect.width + (padding * 2);
+            const minLeft = window.scrollX + ring;
+            const maxRight = window.scrollX + document.documentElement.clientWidth - ring;
+            if (spotlightLeft < minLeft) {
+                spotlightWidth -= (minLeft - spotlightLeft);
+                spotlightLeft = minLeft;
+            }
+            if (spotlightLeft + spotlightWidth > maxRight) {
+                spotlightWidth = maxRight - spotlightLeft;
+            }
+
+            this.spotlight.style.width = `${Math.max(spotlightWidth, 0)}px`;
             this.spotlight.style.height = `${rect.height + (padding * 2)}px`;
             this.spotlight.style.top = `${rect.top + window.scrollY - padding}px`;
-            this.spotlight.style.left = `${rect.left + window.scrollX - padding}px`;
+            this.spotlight.style.left = `${spotlightLeft}px`;
             this.spotlight.classList.add('active');
 
             // Position Popover
@@ -2242,7 +2262,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 popoverLeft = window.innerWidth - popoverRect.width - margin;
             }
 
-            this.popover.style.top = `${popoverTop + window.scrollY}px`;
+            // Keep controls reachable when a tall or off-screen target leaves
+            // neither side enough room, including during smooth scrolling.
+            const unclampedTop = popoverTop;
+            popoverTop = Math.max(margin, Math.min(
+                popoverTop, window.innerHeight - popoverRect.height - margin
+            ));
+            if (popoverTop !== unclampedTop) {
+                this.popover.classList.remove('arrow-top', 'arrow-bottom');
+            }
+
+            this.popover.style.top = `${popoverTop}px`;
             this.popover.style.left = `${popoverLeft}px`;
             this.popover.classList.add('active');
         }
@@ -2261,7 +2291,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.dotsContainer.innerHTML = '';
             for (let i = 0; i < this.steps.length; i++) {
                 const dot = document.createElement('div');
-                dot.className = `w-1.5 h-1.5 rounded-full transition-colors ${i === this.currentStepIndex ? 'bg-primary-600 dark:bg-primary-400' : 'bg-gray-300 dark:bg-gray-600'}`;
+                dot.className = `w-1.5 h-1.5 rounded-full transition-colors ${i === this.currentStepIndex ? 'bg-primary-800 dark:bg-primary-400' : 'bg-gray-300 dark:bg-gray-600'}`;
                 this.dotsContainer.appendChild(dot);
             }
         }
@@ -2276,6 +2306,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.spotlight.classList.remove('active');
             this.popover.classList.remove('active');
             document.body.style.overflow = ''; // Restore scrolling
+            document.documentElement.style.overflowX = this.prevHtmlOverflowX || '';
             
             // Save to localStorage
             localStorage.setItem('explore_tutorial_seen_v1', 'true');

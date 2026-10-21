@@ -1,6 +1,7 @@
 import re
 
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -134,13 +135,13 @@ class AdminEmailComposeForm(forms.Form):
     )
     subject = forms.CharField(
         max_length=200,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Email subject'}),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Email subject')}),
     )
     message = forms.CharField(
         widget=forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 10,
-            'placeholder': 'Write your message…',
+            'placeholder': _('Write your message…'),
         }),
     )
     send_as_html = forms.BooleanField(
@@ -159,7 +160,7 @@ class AdminEmailComposeForm(forms.Form):
         widget=forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 4,
-            'placeholder': 'Comma- or newline-separated addresses (not required to be registered users)',
+            'placeholder': _('Comma- or newline-separated addresses (not required to be registered users)'),
         }),
         help_text='Optional. Addresses that are not required to be registered users.',
     )
@@ -201,7 +202,7 @@ class AdminEmailComposeForm(forms.Form):
         label='Confirm recipient count',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Type the recipient count to confirm',
+            'placeholder': _('Type the recipient count to confirm'),
             'autocomplete': 'off',
             'inputmode': 'numeric',
         }),
@@ -302,7 +303,7 @@ class PasswordResetRequestForm(forms.Form):
         max_length=254,
         widget=forms.EmailInput(attrs={
             'class': 'block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400',
-            'placeholder': 'Enter your email address'
+            'placeholder': _('Enter your email address')
         })
     )
     captcha = TurnstileField(action="password_reset")
@@ -321,7 +322,7 @@ class PasswordResetConfirmForm(SetPasswordForm):
         label="New password",
         widget=forms.PasswordInput(attrs={
             'class': 'block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400',
-            'placeholder': 'Enter your new password'
+            'placeholder': _('Enter your new password')
         }),
         strip=False,
     )
@@ -330,6 +331,6 @@ class PasswordResetConfirmForm(SetPasswordForm):
         strip=False,
         widget=forms.PasswordInput(attrs={
             'class': 'block w-full h-12 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 transition duration-200 ease-in-out placeholder-gray-400',
-            'placeholder': 'Confirm your new password'
+            'placeholder': _('Confirm your new password')
         }),
     )

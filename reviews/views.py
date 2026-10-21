@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_http_methods
@@ -41,7 +42,7 @@ def add_review(request, place_id):
                 'place_name': place.name
             }
         )
-        messages.error(request, 'You have already reviewed this place.')
+        messages.error(request, _('You have already reviewed this place.'))
         return redirect('places:place_detail', pk=place_id)
     
     try:
@@ -82,7 +83,7 @@ def add_review(request, place_id):
                 'rating': rating
             }
         )
-        messages.success(request, 'Your review has been added successfully!')
+        messages.success(request, _('Your review has been added successfully!'))
         
         # Return JSON response for AJAX requests
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -107,11 +108,11 @@ def add_review(request, place_id):
             }, status=400)
     except Exception as e:
         logger.error(f"Error adding review by user {request.user.username} for place {place.name}: {str(e)}", exc_info=True)
-        messages.error(request, 'An error occurred while submitting your review.')
+        messages.error(request, _('An error occurred while submitting your review.'))
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'status': 'error',
-                'message': 'An error occurred while submitting your review.'
+                'message': _('An error occurred while submitting your review.')
             }, status=500)
     
     return redirect('places:place_detail', pk=place_id)
@@ -137,7 +138,7 @@ def edit_review(request, review_id):
             review.comment = comment
             review.save()
             
-            messages.success(request, 'Your review has been updated successfully!')
+            messages.success(request, _('Your review has been updated successfully!'))
             
             # Return JSON response for AJAX requests
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -159,11 +160,11 @@ def edit_review(request, review_id):
                     'message': str(e)
                 }, status=400)
         except Exception:
-            messages.error(request, 'An error occurred while updating your review.')
+            messages.error(request, _('An error occurred while updating your review.'))
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'status': 'error',
-                    'message': 'An error occurred while updating your review.'
+                    'message': _('An error occurred while updating your review.')
                 }, status=500)
     
     return redirect('places:place_detail', pk=place_id)
@@ -178,7 +179,7 @@ def delete_review(request, review_id):
     
     try:
         review.delete()
-        messages.success(request, 'Your review has been deleted successfully!')
+        messages.success(request, _('Your review has been deleted successfully!'))
         
         # Return JSON response for AJAX requests
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -188,11 +189,11 @@ def delete_review(request, review_id):
             })
             
     except Exception:
-        messages.error(request, 'An error occurred while deleting your review.')
+        messages.error(request, _('An error occurred while deleting your review.'))
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'status': 'error',
-                'message': 'An error occurred while deleting your review.'
+                'message': _('An error occurred while deleting your review.')
             }, status=500)
     
     return redirect('places:place_detail', pk=place_id)

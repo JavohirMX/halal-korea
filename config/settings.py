@@ -507,6 +507,19 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Fingerprinted static files in production: content-hashed filenames make
+# the long-lived browser/CDN cache headers safe (a deploy changes the URL
+# of every changed asset, so nothing stale is ever served).
+if not DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        },
+    }
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -634,15 +647,14 @@ TINYMCE_DEFAULT_CONFIG = {
 # ============================================================================
 
 # AllAuth Account Configuration
-ACCOUNT_AUTHENTICATION_METHOD = "email"  # Use email instead of username
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {"email"}  # Use email instead of username
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "optional"  # We handle verification ourselves
-ACCOUNT_USERNAME_REQUIRED = True  # Keep usernames for our existing system
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 
 # Social Account Configuration - Skip intermediate pages for better UX
-SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip the "Continue" confirmation page
+SOCIALACCOUNT_LOGIN_ON_GET = False  # Show the confirmation page (allauth security recommendation)
 SOCIALACCOUNT_QUERY_EMAIL = True  # Always request email from providers
 SOCIALACCOUNT_STORE_TOKENS = False  # Don't store OAuth tokens (privacy)
 
@@ -691,17 +703,26 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # OAuth Client Credentials (to be set in environment variables)
-# Google OAuth
-SOCIALACCOUNT_PROVIDERS["google"]["APP"] = {
-    "client_id": config("GOOGLE_OAUTH_CLIENT_ID", default=""),
-    "secret": config("GOOGLE_OAUTH_CLIENT_SECRET", default=""),
-}
+# Only register a settings-backed app when credentials are actually set:
+# an empty-credential APP entry would conflict with (or silently replace)
+# a SocialApp configured through the admin, and allauth raises
+# MultipleObjectsReturned when both exist.
+_google_client_id = config("GOOGLE_OAUTH_CLIENT_ID", default="")
+_google_client_secret = config("GOOGLE_OAUTH_CLIENT_SECRET", default="")
+if _google_client_id and _google_client_secret:
+    SOCIALACCOUNT_PROVIDERS["google"]["APP"] = {
+        "client_id": _google_client_id,
+        "secret": _google_client_secret,
+    }
 
 # GitHub OAuth
-SOCIALACCOUNT_PROVIDERS["github"]["APP"] = {
-    "client_id": config("GITHUB_CLIENT_ID", default=""),
-    "secret": config("GITHUB_CLIENT_SECRET", default=""),
-}
+_github_client_id = config("GITHUB_CLIENT_ID", default="")
+_github_client_secret = config("GITHUB_CLIENT_SECRET", default="")
+if _github_client_id and _github_client_secret:
+    SOCIALACCOUNT_PROVIDERS["github"]["APP"] = {
+        "client_id": _github_client_id,
+        "secret": _github_client_secret,
+    }
 
 # ============================================================================
 # MONITORING CONFIGURATION
@@ -817,6 +838,12 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+    # Browsers must not guess content types (protects /media/ uploads)
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    # Don't leak full URLs (may contain search queries/place names) to third parties
+    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # ============================================================================
 # JAZZMIN ADMIN THEME CONFIGURATION

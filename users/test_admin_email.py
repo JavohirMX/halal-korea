@@ -8,6 +8,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from utils.models import AdminAction
+from users.forms import AdminEmailComposeForm
 
 User = get_user_model()
 

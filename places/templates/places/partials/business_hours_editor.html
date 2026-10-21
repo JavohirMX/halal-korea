@@ -38,7 +38,7 @@
         <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
             <label class="flex items-center gap-3 cursor-pointer">
                 <input type="checkbox" id="is_24_hours" name="is_24_hours" 
-                       class="w-5 h-5 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
+                       class="w-5 h-5 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-700 dark:bg-gray-700"
                        onchange="toggle24Hours(this.checked)">
                 <div>
                     <span class="font-medium text-gray-900 dark:text-white">{% translate "Open 24 Hours" %}</span>
@@ -74,11 +74,11 @@
                 
                 <div class="time-slots-container">
                     <div class="time-slot flex items-center gap-2 mb-2">
-                        <input type="text" class="open-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
+                        <input type="text" class="open-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-700 focus:border-primary-500 text-center font-mono"
                                placeholder="09:00" value="09:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                                oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
                         <span class="text-gray-500">—</span>
-                        <input type="text" class="close-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
+                        <input type="text" class="close-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-700 focus:border-primary-500 text-center font-mono"
                                placeholder="22:00" value="22:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                                oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
                         <button type="button" class="remove-slot hidden p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
@@ -102,7 +102,7 @@
                 {% translate "Notes" %} <span class="text-gray-400 font-normal">{% translate "(optional)" %}</span>
             </label>
             <input type="text" name="business_hours_notes" id="business_hours_notes"
-                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-700 focus:border-primary-500"
                    placeholder="{% translate 'e.g., Last order 30 min before close' %}"
                    maxlength="255"
                    oninput="markHoursModified()">

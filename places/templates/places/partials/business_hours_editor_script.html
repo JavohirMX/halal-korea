@@ -127,11 +127,11 @@
             const newSlot = document.createElement('div');
             newSlot.className = 'time-slot flex items-center gap-2 mb-2';
             newSlot.innerHTML = `
-                <input type="text" class="open-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
+                <input type="text" class="open-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-700 focus:border-primary-500 text-center font-mono"
                        placeholder="14:00" value="14:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                        oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
                 <span class="text-gray-500">—</span>
-                <input type="text" class="close-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-500 focus:border-primary-500 text-center font-mono"
+                <input type="text" class="close-time time-input flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-primary-700 focus:border-primary-500 text-center font-mono"
                        placeholder="22:00" value="22:00" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                        oninput="formatTimeInput(this)" onblur="validateTimeInput(this)">
                 <button type="button" class="remove-slot p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"

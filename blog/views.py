@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q, Case, When, IntegerField
+from django.db.models import Q, Case, When, IntegerField, Count
 from django.http import Http404
 from django.utils import translation
 from utils.logging_utils import log_user_action, log_execution
@@ -38,9 +38,6 @@ def blog_home(request):
         # Get featured post (latest one)
         featured_post = posts.first()
         
-        # Get recent posts (excluding featured)
-        recent_posts = posts[1:7] if posts.count() > 1 else []
-        
         # Pagination for all posts
         paginator = Paginator(posts, 6)
         page = request.GET.get('page', 1)
@@ -50,10 +47,15 @@ def blog_home(request):
         except (PageNotAnInteger, EmptyPage):
             posts_page = paginator.page(1)
         
-        # Get categories with post counts (all languages)
+        # Reuse the paginator's cached count - avoids a duplicate COUNT(*) query
+        total_posts = paginator.count
+        recent_posts = posts[1:7] if total_posts > 1 else []
+        
+        # Get categories with post counts (all languages) - annotated to
+        # avoid a per-category COUNT query when rendering the sidebar
         categories = Category.objects.filter(
             posts__status='published'
-        ).distinct().order_by('name')
+        ).annotate(post_count=Count('posts')).distinct().order_by('name')
         
         # Add language information
         language_choices = dict(BlogPost.LANGUAGE_CHOICES)
@@ -61,7 +63,7 @@ def blog_home(request):
         logger.info(
             "Blog home rendered successfully",
             extra={
-                'total_posts': posts.count(),
+                'total_posts': total_posts,
                 'page_number': posts_page.number,
                 'has_featured': bool(featured_post),
                 'categories_count': categories.count()
@@ -105,7 +107,7 @@ def post_detail(request, slug):
         
         # Get post regardless of language
         post = get_object_or_404(
-            BlogPost,
+            BlogPost.objects.select_related('author', 'category').prefetch_related('tags'),
             slug=slug,
             status='published'
         )

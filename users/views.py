@@ -56,13 +56,39 @@ def profile(request, username=None):
 @login_required
 def edit_profile(request):
     from allauth.socialaccount.models import SocialAccount
+    from django.contrib.auth import update_session_auth_hash
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError
     
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, instance=request.user)
+        current_password = request.POST.get('current_password', '')
+        new_password = request.POST.get('new_password', '')
+        password_change_requested = bool(current_password or new_password)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('users:profile')
+            password_error = None
+            if password_change_requested:
+                if not current_password or not new_password:
+                    password_error = _('To change your password, fill in both the current and new password fields.')
+                elif request.user.has_usable_password() and not request.user.check_password(current_password):
+                    password_error = _('Your current password is incorrect.')
+                else:
+                    try:
+                        validate_password(new_password, request.user)
+                    except ValidationError as e:
+                        password_error = ' '.join(e.messages)
+            if password_error:
+                messages.error(request, password_error)
+            else:
+                form.save()
+                if password_change_requested:
+                    request.user.set_password(new_password)
+                    request.user.save()
+                    update_session_auth_hash(request, request.user)
+                    messages.success(request, _('Profile and password updated successfully!'))
+                else:
+                    messages.success(request, _('Profile updated successfully!'))
+                return redirect('users:profile')
     else:
         form = UserUpdateForm(instance=request.user)
     
@@ -135,7 +161,7 @@ def login_view(request):
         
         if user is not None:
             if user.is_active:
-                login(request, user)
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 
                 # Enhanced success logging
                 log_security_event(
@@ -164,7 +190,7 @@ def login_view(request):
                     severity='warning',
                     extra_data={'username': username}
                 )
-                messages.error(request, 'Your account is inactive. Please contact support.')
+                messages.error(request, _('Your account is inactive. Please contact support.'))
         else:
             log_security_event(
                 logger,
@@ -173,7 +199,7 @@ def login_view(request):
                 severity='warning',
                 extra_data={'username': username}
             )
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, _('Invalid username or password.'))
 
         return render(request, 'users/login.html', {
             'next': request.POST.get('next') or request.GET.get('next', ''),
@@ -260,7 +286,7 @@ def register_view(request):
                             extra={'user_id': user.id, 'username': user.username}
                         )
                         # Auto-login the user
-                        login(request, user)
+                        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                         logger.info(
                             f"Auto-login after registration for user: {user.username}",
                             extra={'user_id': user.id}
@@ -272,8 +298,8 @@ def register_view(request):
                             extra={'user_id': user.id}
                         )
                         # Still login the user even if email fails
-                        login(request, user)
-                        messages.warning(request, 'Account created successfully, but we could not send the verification email. You can request a new one from your profile.')
+                        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                        messages.warning(request, _('Account created successfully, but we could not send the verification email. You can request a new one from your profile.'))
                         return redirect('places:home')
                 else:
                     # Email rate limited - still create account but warn user
@@ -285,8 +311,8 @@ def register_view(request):
                         severity='warning',
                         extra_data={'error': email_error_msg}
                     )
-                    login(request, user)
-                    messages.warning(request, f'Account created successfully, but verification email was not sent due to rate limiting: {email_error_msg}')
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    messages.warning(request, _("Account created successfully, but verification email was not sent due to rate limiting: %(err)s") % {"err": email_error_msg})
                     return redirect('places:home')
                     
             except Exception as e:
@@ -301,7 +327,7 @@ def register_view(request):
                         'error_message': str(e)
                     }
                 )
-                messages.error(request, 'An error occurred during registration. Please try again.')
+                messages.error(request, _('An error occurred during registration. Please try again.'))
         else:
             # Sanitize form errors before logging
             safe_errors = sanitize_sensitive_data({'errors': form.errors.as_data()})
@@ -329,13 +355,13 @@ def activate_account(request, uidb64, token):
                 user.save()
                 
                 logger.info(f"Email verified for user: {user.username}")
-                messages.success(request, 'Your email has been verified successfully!')
+                messages.success(request, _('Your email has been verified successfully!'))
                 
                 return render(request, 'users/activation_result.html', {'success': True})
             else:
                 # User email is already verified
                 logger.info(f"Activation attempt for already verified user: {user.username}")
-                messages.info(request, 'Your email is already verified.')
+                messages.info(request, _('Your email is already verified.'))
                 return render(request, 'users/activation_result.html', {'success': True})
         else:
             # Invalid or expired token
@@ -364,7 +390,7 @@ def resend_activation_email(request):
         
         # Check if already verified
         if user.email_verified:
-            messages.info(request, 'Your email is already verified!')
+            messages.info(request, _('Your email is already verified!'))
             return redirect('places:home')
         
         # For authenticated users, we can resend immediately on GET request
@@ -379,11 +405,11 @@ def resend_activation_email(request):
                 # Record the email attempt
                 record_email_attempt(request, user)
                 logger.info(f"Activation email resent to authenticated user {user.username} from IP: {user_ip}")
-                messages.success(request, 'Activation email has been sent to your email address. Please check your inbox.')
+                messages.success(request, _('Activation email has been sent to your email address. Please check your inbox.'))
                 return render(request, 'users/check_email.html', {'email': user.email})
             else:
                 logger.error(f"Failed to resend activation email to authenticated user {user.username}")
-                messages.error(request, 'Unable to send activation email. Please try again later.')
+                messages.error(request, _('Unable to send activation email. Please try again later.'))
                 return redirect('places:home')
     
     # For non-authenticated users, show the email form
@@ -405,7 +431,7 @@ def resend_activation_email(request):
             user = User.objects.get(email=email)
             
             if user.email_verified:
-                messages.info(request, 'This email is already verified.')
+                messages.info(request, _('This email is already verified.'))
                 return redirect('users:login')
             
             # Send activation email
@@ -413,15 +439,15 @@ def resend_activation_email(request):
                 # Record the email attempt
                 record_email_attempt(request, user)
                 logger.info(f"Activation email resent to {email} from IP: {user_ip}")
-                messages.success(request, 'Activation email has been sent. Please check your inbox.')
+                messages.success(request, _('Activation email has been sent. Please check your inbox.'))
                 return render(request, 'users/check_email.html', {'email': email})
             else:
                 logger.error(f"Failed to resend activation email to {email}")
-                messages.error(request, 'Unable to send activation email. Please try again later.')
+                messages.error(request, _('Unable to send activation email. Please try again later.'))
                 
         except User.DoesNotExist:
             logger.warning(f"Resend activation attempt for non-existent email: {email} from IP: {user_ip}")
-            messages.error(request, 'No account found with this email address.')
+            messages.error(request, _('No account found with this email address.'))
 
         return render(request, 'users/resend_activation.html')
 
@@ -433,7 +459,7 @@ def rate_limited_view(request):
     error_message = request.GET.get('error', '')
     return render(request, 'users/rate_limited.html', {
         'error_message': error_message
-    })
+    }, status=429)
 
 
 def password_reset_request(request):
@@ -499,8 +525,8 @@ def password_reset_confirm(request, uidb64, token):
                     from django.contrib.auth import get_backends
                     backend = get_backends()[0]
                     user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
-                    login(request, user)
-                    messages.success(request, 'Your password has been reset successfully!')
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    messages.success(request, _('Your password has been reset successfully!'))
                     
                     return redirect('places:home')
             else:

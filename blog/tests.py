@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.base import ContentFile
 import json
 from PIL import Image
 from io import BytesIO
@@ -446,3 +447,107 @@ class BlogIntegrationTest(TestCase):
         response = self.client.get('/blog/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Multilingual Test Post')
+
+
+class BlogQueryCountTest(TestCase):
+    """Regression tests: blog views must not issue duplicate/N+1 queries."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='qcuser', email='qc@example.com', password='testpass123'
+        )
+        self.category = Category.objects.create(name='QC Category')
+        self.category2 = Category.objects.create(name='QC Category 2')
+        self.tag = Tag.objects.create(name='qc-tag')
+        self.post = BlogPost.objects.create(
+            title='QC Post',
+            author=self.user,
+            category=self.category,
+            excerpt='excerpt',
+            content='<p>content</p>',
+            status='published',
+            language='en'
+        )
+        self.post.tags.add(self.tag)
+        # A second post in a second category: with a single post the page
+        # slice coincidentally compiles to the same LIMIT 1 SQL as
+        # .first(), which is not a real duplicate
+        self.post2 = BlogPost.objects.create(
+            title='QC Post 2',
+            author=self.user,
+            category=self.category2,
+            excerpt='excerpt 2',
+            content='<p>content 2</p>',
+            status='published',
+            language='en'
+        )
+        self.post2.tags.add(self.tag)
+
+    def _count_dupes(self, url):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+        with CaptureQueriesContext(connection) as ctx:
+            response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        sqls = [q['sql'] for q in ctx.captured_queries]
+        dupes = len(sqls) - len(set(sqls))
+        return len(sqls), dupes
+
+    def test_blog_home_no_duplicate_queries(self):
+        _, dupes = self._count_dupes('/blog/')
+        self.assertEqual(dupes, 0, 'blog home issues duplicate SQL queries')
+
+    def test_blog_detail_no_duplicate_queries(self):
+        _, dupes = self._count_dupes(f'/blog/{self.post.slug}/')
+        self.assertEqual(dupes, 0, 'blog detail issues duplicate SQL queries')
+class BlogFeaturedImageResizeTest(TestCase):
+    """Featured images must be downscaled on upload to keep pages light."""
+
+    def _make_image(self, width, height, fmt='JPEG'):
+        from PIL import Image
+        import io
+        buffer = io.BytesIO()
+        Image.new('RGB', (width, height), (200, 100, 50)).save(buffer, format=fmt)
+        return ContentFile(buffer.getvalue(), name=f'test.{fmt.lower() if fmt != "JPEG" else "jpg"}')
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='imguser', email='img@example.com', password='testpass123'
+        )
+
+    def test_oversized_image_is_downscaled(self):
+        post = BlogPost.objects.create(
+            title='Big Image Post', author=self.user, excerpt='e',
+            content='<p>c</p>', status='published', language='en',
+            featured_image=self._make_image(3200, 2400),
+        )
+        from PIL import Image
+        post.featured_image.open()
+        img = Image.open(post.featured_image)
+        self.assertLessEqual(img.width, BlogPost.FEATURED_IMAGE_MAX_WIDTH)
+        self.assertEqual(img.height, round(2400 * BlogPost.FEATURED_IMAGE_MAX_WIDTH / 3200))
+
+    def test_small_image_is_not_resaved(self):
+        small = self._make_image(800, 600)
+        original_bytes = small.read()
+        small.seek(0)
+        post = BlogPost.objects.create(
+            title='Small Image Post', author=self.user, excerpt='e',
+            content='<p>c</p>', status='published', language='en',
+            featured_image=small,
+        )
+        post.featured_image.open()
+        self.assertEqual(post.featured_image.read(), original_bytes)
+
+    def test_replacing_image_resizes_new_upload(self):
+        post = BlogPost.objects.create(
+            title='Replace Image Post', author=self.user, excerpt='e',
+            content='<p>c</p>', status='published', language='en',
+            featured_image=self._make_image(800, 600),
+        )
+        post.featured_image = self._make_image(4000, 1000)
+        post.save()
+        from PIL import Image
+        post.featured_image.open()
+        img = Image.open(post.featured_image)
+        self.assertLessEqual(img.width, BlogPost.FEATURED_IMAGE_MAX_WIDTH)

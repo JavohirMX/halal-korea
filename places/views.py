@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import (
@@ -38,6 +39,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
 from utils.location_manager import get_user_location_context, update_user_location
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils.translation import get_language
 from django.template.loader import render_to_string
 import json
 from datetime import datetime
@@ -86,44 +88,64 @@ def home(request):
                 },
             )
 
-        # Get featured places with different logic for Korea vs international users
-        # Use cached rating fields for better performance, with fallback to annotation
-        featured_places = HalalPlace.objects.filter(status="approved").annotate(
-            # Use cached values if available, otherwise calculate from reviews
-            average_rating=Coalesce(
-                "cached_average_rating",
-                Round(Avg("reviews__rating"), 1),
-                output_field=DecimalField(max_digits=3, decimal_places=1),
-            ),
-            reviews_count=Coalesce(
-                "cached_reviews_count", Count("reviews"), output_field=IntegerField()
-            ),
-        )
-
-        # Different sorting logic based on user location
+        # Cache the featured-places result; the underlying query annotates
+        # ratings (and distance for Korean users) on every homepage visit.
+        # International visitors all share one cache entry; Korean users are
+        # bucketed to an ~11km grid so distance sorting stays local.
         if is_in_korea and user_location:
-            # For Korea users: distance-based recommendations
-            featured_places = featured_places.annotate(
-                distance=Distance("location", user_location)
-            ).order_by("distance")[:6]
-            logger.debug(
-                "Featured places ordered by distance",
-                extra={"sort_method": "distance", "user_type": "korea"},
-            )
+            _grid = f"{round(user_location.y, 1)}_{round(user_location.x, 1)}"
+            featured_cache_key = f"home_featured_kr_{_grid}"
         else:
-            # For international users: popular/highly-rated places
-            # Use Coalesce to ensure places with no ratings appear last
-            featured_places = featured_places.annotate(
-                rating_for_sort=Coalesce(
-                    "average_rating", Value(-1.0), output_field=FloatField()
-                )
-            ).order_by("-rating_for_sort", "-created_at")[:6]
-            logger.debug(
-                "Featured places ordered by rating",
-                extra={"sort_method": "rating", "user_type": "international"},
+            featured_cache_key = "home_featured_intl"
+
+        featured_places = cache.get(featured_cache_key)
+
+        if featured_places is None:
+            # Get featured places with different logic for Korea vs
+            # international users. Use cached rating fields for better
+            # performance, with fallback to annotation.
+            featured_places = HalalPlace.objects.filter(status="approved").annotate(
+                # Use cached values if available, otherwise calculate from reviews
+                average_rating=Coalesce(
+                    "cached_average_rating",
+                    Round(Avg("reviews__rating"), 1),
+                    output_field=DecimalField(max_digits=3, decimal_places=1),
+                ),
+                reviews_count=Coalesce(
+                    "cached_reviews_count", Count("reviews"), output_field=IntegerField()
+                ),
             )
 
-        featured_places = list(featured_places)
+            # Different sorting logic based on user location
+            if is_in_korea and user_location:
+                # For Korea users: distance-based recommendations
+                featured_places = featured_places.annotate(
+                    distance=Distance("location", user_location)
+                ).order_by("distance")[:6]
+                logger.debug(
+                    "Featured places ordered by distance",
+                    extra={"sort_method": "distance", "user_type": "korea"},
+                )
+            else:
+                # For international users: popular/highly-rated places
+                # Use Coalesce to ensure places with no ratings appear last
+                featured_places = featured_places.annotate(
+                    rating_for_sort=Coalesce(
+                        "average_rating", Value(-1.0), output_field=FloatField()
+                    )
+                ).order_by("-rating_for_sort", "-created_at")[:6]
+                logger.debug(
+                    "Featured places ordered by rating",
+                    extra={"sort_method": "rating", "user_type": "international"},
+                )
+
+            featured_places = list(featured_places)
+
+            cache.set(
+                featured_cache_key,
+                featured_places,
+                getattr(settings, "CACHE_TIMEOUTS", {}).get("home_featured", 300),
+            )
 
         logger.info(
             "Home page rendered successfully",
@@ -156,7 +178,12 @@ def home(request):
 def _get_explore_cache_key(
     request, category, search_query, city_filter, sort, page, location_context
 ):
-    """Generate a cache key for explore view based on query parameters and location."""
+    """Generate a cache key for explore view based on query parameters and location.
+
+    The active language is part of the key because the cached value is the
+    fully rendered page: without it, anonymous visitors would be served the
+    page in whichever language happened to be cached first.
+    """
     is_in_korea = location_context.get("is_in_korea", False)
     location = location_context.get("location", {})
     # Round coordinates to reduce cache fragmentation
@@ -165,6 +192,7 @@ def _get_explore_cache_key(
 
     cache_parts = [
         "explore",
+        get_language() or "en",
         category or "",
         search_query or "",
         city_filter or "",
@@ -181,11 +209,13 @@ def _get_explore_cache_key(
 def explore(request):
     from .search import build_search_query, parse_proximity_phrase, log_search_query
 
-    # Get filter parameters
-    category = request.GET.get("category")
-    search_query = request.GET.get("q", "")
-    city_filter = request.GET.get("city", "")  # New city filter
-    sort = request.GET.get("sort", "distance")  # Default to distance sorting
+    # Get filter parameters. PostgreSQL text columns reject NUL bytes, so
+    # strip them up front - a NUL in any of these reaches an ORM filter
+    # below and would otherwise raise ValueError (-> 500).
+    category = (request.GET.get("category") or "").replace("\x00", "") or None
+    search_query = request.GET.get("q", "").replace("\x00", "")
+    city_filter = request.GET.get("city", "").replace("\x00", "")  # New city filter
+    sort = request.GET.get("sort", "distance").replace("\x00", "")  # Default to distance sorting
     page = request.GET.get("page", 1)
 
     # Get location context early for cache key and smart defaults
@@ -505,11 +535,11 @@ def get_places_json(request):
     """API endpoint to get places as JSON for map and dynamic loading"""
     from .search import build_search_query, parse_proximity_phrase
 
-    # Get filter parameters
-    category = request.GET.get("category")
-    search_query = request.GET.get("q", "")
-    city_filter = request.GET.get("city", "")  # Add city filter
-    sort = request.GET.get("sort", "distance")  # Default to distance sorting
+    # Get filter parameters (NUL stripped - see explore() for why)
+    category = (request.GET.get("category") or "").replace("\x00", "") or None
+    search_query = request.GET.get("q", "").replace("\x00", "")
+    city_filter = request.GET.get("city", "").replace("\x00", "")  # Add city filter
+    sort = request.GET.get("sort", "distance").replace("\x00", "")  # Default to distance sorting
     page = request.GET.get("page", 1)
 
     # Log API request with parameters
@@ -1107,7 +1137,7 @@ def submit_place(request):
                         except Exception as e:
                             logger.error(f"Error uploading photo: {str(e)}")
                             messages.error(
-                                request, f"Error uploading photo: {photo.name}"
+                                request, _("Error uploading photo: %(name)s") % {"name": photo.name}
                             )
                     place.photo_urls = photo_urls
 
@@ -1192,7 +1222,7 @@ def submit_place(request):
 
                 messages.success(
                     request,
-                    "Place submitted successfully! It will be reviewed by our team.",
+                    _("Place submitted successfully! It will be reviewed by our team."),
                 )
                 return redirect("places:explore")
             else:
@@ -1207,7 +1237,7 @@ def submit_place(request):
                         )
                     },
                 )
-                messages.error(request, "Please correct the errors below.")
+                messages.error(request, _("Please correct the errors below."))
         else:
             form = HalalPlaceForm()
             existing_hours_data = None
@@ -1237,7 +1267,7 @@ def submit_place(request):
             exc_info=True,
         )
         messages.error(
-            request, "An error occurred while submitting the place. Please try again."
+            request, _("An error occurred while submitting the place. Please try again.")
         )
         return redirect("places:home")
 
@@ -1476,7 +1506,7 @@ def _process_place_suggestions(request, form, place, parsed_hours_data=None):
         if total_suggestions == 0:
             messages.warning(
                 request,
-                "Please suggest at least one change, upload an image, or update business hours.",
+                _("Please suggest at least one change, upload an image, or update business hours."),
             )
             return redirect("places:suggest_place_edit", pk=place.pk)
 
@@ -1508,7 +1538,7 @@ def _process_place_suggestions(request, form, place, parsed_hours_data=None):
         # Success message
         messages.success(
             request,
-            f"Thank you! Your {total_suggestions} suggestion(s) have been submitted for review.",
+            _("Thank you! Your %(count)s suggestion(s) have been submitted for review.") % {"count": total_suggestions},
         )
 
         return redirect("places:place_detail", pk=place.pk)
@@ -1525,13 +1555,19 @@ def _process_place_suggestions(request, form, place, parsed_hours_data=None):
             exc_info=True,
         )
         messages.error(
-            request, "There was an error processing your suggestions. Please try again."
+            request, _("There was an error processing your suggestions. Please try again.")
         )
         return redirect("places:suggest_place_edit", pk=place.pk)
 
 
 def _is_valid_image(image):
-    """Validate uploaded image file"""
+    """Validate uploaded image file.
+
+    content_type is client-supplied and cannot be trusted on its own, so the
+    file content is verified with Pillow as well - this keeps polyglot or
+    renamed non-image files (e.g. HTML served later from /media/) out of
+    storage.
+    """
     try:
         # Check file size (max 5MB)
         if image.size > 5 * 1024 * 1024:
@@ -1548,8 +1584,21 @@ def _is_valid_image(image):
         if image.content_type not in allowed_types:
             return False
 
+        # Verify the actual bytes decode as a raster image
+        from PIL import Image
+        image.seek(0)
+        with Image.open(image) as img:
+            img.verify()
+            if (img.format or "").lower() not in ("jpeg", "png", "gif", "webp"):
+                return False
+        image.seek(0)
+
         return True
     except Exception:
+        try:
+            image.seek(0)
+        except Exception:
+            pass
         return False
 
 

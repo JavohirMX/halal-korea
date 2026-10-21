@@ -163,6 +163,73 @@ class UserViewTest(TestCase):
         self.assertNotIn('_auth_user_id', self.client.session)
         self.assertContains(response, 'security check')
 
+    def test_edit_profile_page_renders_all_form_fields(self):
+        """The edit form must render every required UserUpdateForm field.
+
+        Regression: the template omitted preferred_language (a required
+        form field), so every browser save failed validation and the
+        error was rendered nowhere - profile editing was fully broken.
+        """
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(reverse('users:edit_profile'))
+        for field in ('first_name', 'last_name', 'username', 'email', 'preferred_language'):
+            self.assertContains(response, f'name="{field}"')
+
+    def test_edit_profile_without_password_fields(self):
+        """Plain profile edits must not require a password."""
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(
+            reverse('users:edit_profile'),
+            {
+                'first_name': 'Newname',
+                'last_name': 'Newsurname',
+                'username': 'testuser',
+                'email': 'test@example.com',
+                'preferred_language': 'en',
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(User.objects.get(username='testuser').first_name, 'Newname')
+
+    def test_edit_profile_password_change_works(self):
+        """The change-password section must actually change the password."""
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(
+            reverse('users:edit_profile'),
+            {
+                'first_name': '',
+                'last_name': '',
+                'username': 'testuser',
+                'email': 'test@example.com',
+                'preferred_language': 'en',
+                'current_password': 'testpass123',
+                'new_password': 'brand-new-pass-456',
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+        user = User.objects.get(username='testuser')
+        self.assertTrue(user.check_password('brand-new-pass-456'))
+        # Session must stay valid after the password change
+        self.assertIn('_auth_user_id', self.client.session)
+
+    def test_edit_profile_password_change_wrong_current(self):
+        """Wrong current password: no change, error shown."""
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(
+            reverse('users:edit_profile'),
+            {
+                'first_name': '',
+                'last_name': '',
+                'username': 'testuser',
+                'email': 'test@example.com',
+                'preferred_language': 'en',
+                'current_password': 'WRONG',
+                'new_password': 'brand-new-pass-456',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(User.objects.get(username='testuser').check_password('testpass123'))
+
     def test_logout_view(self):
         """Test user logout"""
         self.client.login(username='testuser', password='testpass123')
@@ -186,6 +253,29 @@ class UserViewTest(TestCase):
         self.assertIn(response.status_code, [200, 302])
         self.assertTrue(User.objects.filter(username='newuser').exists())
         mock_verify.assert_called()
+
+    @patch('utils.turnstile.verify_turnstile', return_value=True)
+    def test_register_view_auto_login(self, mock_verify):
+        """Registration auto-logs the user in and shows the check-email page.
+
+        Regression test: with multiple AUTHENTICATION_BACKENDS configured,
+        a bare login(request, user) raises ValueError, which the view caught
+        and reported as a generic registration error even though the user
+        was created.
+        """
+        response = self.client.post(
+            reverse('users:register'),
+            {
+                'username': 'autologin',
+                'email': 'autologin@example.com',
+                'password1': 'newpass123',
+                'password2': 'newpass123',
+                'cf-turnstile-response': TURNSTILE_TOKEN,
+            }
+        )
+        self.assertTrue(User.objects.filter(username='autologin').exists())
+        self.assertIn('_auth_user_id', self.client.session)
+        self.assertTemplateUsed(response, 'users/check_email.html')
 
     @patch('utils.turnstile.verify_turnstile', return_value=False)
     def test_register_view_invalid_captcha(self, mock_verify):

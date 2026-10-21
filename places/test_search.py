@@ -13,6 +13,7 @@ Tests cover:
 """
 
 from django.test import TestCase, Client
+from django.core.cache import cache as django_cache
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Point
@@ -405,6 +406,10 @@ class SearchAnalyticsTest(TestCase):
     
     def setUp(self):
         self.client = Client()
+        # The explore view serves anonymous requests from a shared cache;
+        # without clearing it, a cached response from an earlier test would
+        # skip view execution (and with it search logging) entirely.
+        django_cache.clear()
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
@@ -611,3 +616,27 @@ class ExploreViewSearchTest(TestCase):
         
         data = json.loads(response.content)
         self.assertIn('places', data)
+
+
+class NulByteQueryParamTest(TestCase):
+    """Regression: NUL bytes in explore filter params must not 500.
+
+    PostgreSQL text columns reject NUL (0x00); unsanitized q/category
+    values reached ORM filters and raised ValueError -> 500.
+    """
+
+    def test_explore_q_with_nul_returns_200(self):
+        response = Client().get('/explore/', {'q': 'halal\x00'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_explore_category_with_nul_returns_200(self):
+        response = Client().get('/explore/', {'category': 'restaurant\x00'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_places_json_q_with_nul_returns_200(self):
+        response = Client().get('/api/places/', {'q': '\x00'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_places_json_category_with_nul_returns_200(self):
+        response = Client().get('/api/places/', {'category': '\x00'})
+        self.assertEqual(response.status_code, 200)

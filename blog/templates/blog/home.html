@@ -54,7 +54,7 @@
                          alt="{{ featured_post.title }}"
                          class="w-full h-64 lg:h-80 object-cover rounded-lg shadow-lg">
                     {% else %}
-                    <div class="w-full h-64 lg:h-80 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg shadow-lg flex items-center justify-center">
+                    <div class="w-full h-64 lg:h-80 bg-gradient-to-br from-primary-400 to-primary-800 rounded-lg shadow-lg flex items-center justify-center">
                         <i class="fas fa-newspaper text-6xl text-white opacity-50"></i>
                     </div>
                     {% endif %}
@@ -81,7 +81,7 @@
                         </a>
                     </h1>
                     <p class="text-gray-600 dark:text-gray-300 text-lg mb-6">
-                        {{ featured_post.excerpt|safe }}
+                        {{ featured_post.excerpt }}
                     </p>
                     <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-6">
                         <div class="flex items-center mr-6">
@@ -103,7 +103,7 @@
                         {% endif %}
                     </div>
                     <a href="{{ featured_post.get_absolute_url }}" 
-                       class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition duration-200">
+                       class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-800 hover:bg-primary-900 transition duration-200">
                         {% translate "Read More" %}
                         <i class="fas fa-arrow-right ml-2"></i>
                     </a>
@@ -167,7 +167,7 @@
                                 </a>
                             </h2>
                             <p class="text-gray-600 dark:text-gray-300 mb-4">
-                                {{ post.excerpt|truncatechars:150|safe }}
+                                {{ post.excerpt|truncatechars:150 }}
                             </p>
                             <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                                 <div class="flex items-center">
@@ -222,9 +222,9 @@
                     <div class="text-6xl text-gray-300 dark:text-gray-600 mb-4">
                         <i class="fas fa-newspaper"></i>
                     </div>
-                    <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2">
+                    <h2 class="text-xl font-medium text-gray-900 dark:text-white mb-2">
                         {% translate "No blog posts yet" %}
-                    </h3>
+                    </h2>
                     <p class="text-gray-500 dark:text-gray-400">
                         {% translate "Check back soon for new articles!" %}
                     </p>
@@ -247,7 +247,7 @@
                                class="flex items-center justify-between text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition duration-200">
                                 <span>{{ category.name }}</span>
                                 <span class="text-sm text-gray-400 dark:text-gray-500">
-                                    {{ category.posts.count }}
+                                    {{ category.post_count }}
                                 </span>
                             </a>
                         </li>
@@ -265,14 +265,15 @@
                         <div class="relative">
                             <input type="text" 
                                    name="q" 
+                                   aria-label="{% translate 'Search articles' %}"
                                    placeholder="{% translate 'Search articles...' %}"
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-700 focus:border-primary-500">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
                         </div>
                         <button type="submit" 
-                                class="w-full mt-3 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition duration-200">
+                                class="w-full mt-3 px-4 py-2 bg-primary-700 text-white rounded-md hover:bg-primary-800 transition duration-200">
                             {% translate "Search" %}
                         </button>
                     </form>

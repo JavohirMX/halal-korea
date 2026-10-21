@@ -677,7 +677,7 @@
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Upload Images" %}</h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 {% translate "Drag and drop your images here, or" %}
-                                <label for="images" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 cursor-pointer font-medium">
+                                <label for="images" class="text-primary-700 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 cursor-pointer font-medium">
                                     {% translate "browse files" %}
                                 </label>
                             </p>
@@ -705,7 +705,7 @@
         <!-- Reason Section (Combined for all changes) -->
         <div class="section-card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 sm:p-6 shadow-sm">
             <div class="flex items-center mb-6">
-                <div class="p-3 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white mr-4">
+                <div class="p-3 rounded-lg bg-gradient-to-r from-primary-700 to-primary-800 text-white mr-4">
                     <i class="fas fa-comment-dots text-xl"></i>
                 </div>
                 <div>
@@ -716,7 +716,7 @@
                         {% translate "Help reviewers understand your suggestions" %}
                     </p>
                 </div>
-                <span class="ml-auto px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-full">
+                <span class="ml-auto px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm rounded-full">
                     {% translate "Required" %}
                 </span>
             </div>
@@ -743,7 +743,7 @@
                     </label>
                     <div class="relative">
                         {{ form.reason }}
-                        <div class="absolute bottom-3 right-3 text-xs text-gray-400 pointer-events-none">
+                        <div class="absolute bottom-3 right-3 text-xs text-gray-500 dark:text-gray-300 pointer-events-none">
                             <span id="char-count">0</span>/500
                         </div>
                     </div>
@@ -793,7 +793,7 @@
                                     <span id="summary-count-mobile" class="text-primary-600 dark:text-primary-400">0</span> {% translate "changes" %}
                                 </span>
                             </div>
-                            <button type="button" onclick="toggleMobileSummary()" class="text-primary-600 dark:text-primary-400 text-sm">
+                            <button type="button" onclick="toggleMobileSummary()" aria-label="{% translate 'Toggle changes summary' %}" aria-expanded="false" class="text-primary-600 dark:text-primary-400 text-sm">
                                 <i class="fas fa-chevron-down transform transition-transform" id="mobile-summary-chevron"></i>
                             </button>
                         </div>
@@ -841,7 +841,7 @@
                             <i class="fas fa-times mr-1 sm:mr-2"></i>{% translate "Cancel" %}
                         </a>
                         <button type="submit" id="submit-button"
-                                class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 gradient-bg-hover text-white rounded-lg sm:rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                class="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 gradient-bg-hover text-white rounded-lg sm:rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                             <i class="fas fa-paper-plane mr-1 sm:mr-2"></i>
                             <span id="submit-text">{% translate "Submit" %}<span class="hidden sm:inline"> {% translate "Suggestions" %}</span></span>
                         </button>
@@ -1257,8 +1257,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.toggleMobileSummary = function() {
         const content = document.getElementById('mobile-summary-content');
         const chevron = document.getElementById('mobile-summary-chevron');
+        const btn = chevron.closest('button');
         
-        if (content.classList.contains('hidden')) {
+        const willShow = content.classList.contains('hidden');
+        if (btn) btn.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+        if (willShow) {
             content.classList.remove('hidden');
             chevron.classList.add('rotate-180');
         } else {
@@ -1413,8 +1416,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.toggleMobileSummary = function() {
         const content = document.getElementById('mobile-summary-content');
         const chevron = document.getElementById('mobile-summary-chevron');
+        const btn = chevron.closest('button');
         
-        if (content.classList.contains('hidden')) {
+        const willShow = content.classList.contains('hidden');
+        if (btn) btn.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+        if (willShow) {
             content.classList.remove('hidden');
             chevron.style.transform = 'rotate(180deg)';
         } else {

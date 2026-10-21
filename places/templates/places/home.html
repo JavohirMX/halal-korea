@@ -146,10 +146,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hidden CSRF Token Form -->
-<form id="csrf-form" style="display: none;">
-    {% csrf_token %}
-</form>
 
 <!-- Hero Section -->
 <div class="relative bg-gradient-to-br from-green-400 to-green-600 overflow-hidden">
@@ -208,10 +204,11 @@
                 <form action="{% url 'places:explore' %}" method="GET" class="flex rounded-full shadow-lg overflow-hidden">
                     <input type="text" 
                            name="q"
-                           class="flex-1 min-w-0 px-4 sm:px-5 py-2.5 sm:py-3 border-0 focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 text-sm" 
+                           class="flex-1 min-w-0 px-4 sm:px-5 py-3 sm:py-3.5 border-0 focus:ring-2 focus:ring-primary-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400 text-sm" 
+                           aria-label="{% translate 'Search places by name' %}"
                            placeholder="{% translate 'Search by name...' %}">
                     <button type="submit" 
-                            class="shrink-0 inline-flex items-center justify-center px-4 sm:px-5 py-2.5 sm:py-3 border border-transparent text-sm font-medium text-white gradient-bg-hover"
+                            class="shrink-0 inline-flex items-center justify-center px-4 sm:px-5 py-3 sm:py-3.5 border border-transparent text-sm font-medium text-white gradient-bg-hover"
                             aria-label="{% translate 'Search' %}">
                         <i class="fas fa-search"></i>
                     </button>
@@ -232,16 +229,22 @@
             <a href="{% url 'places:place_detail' place.id %}" class="block min-w-[85%] sm:min-w-0 snap-center">
                 <div class="glass-card rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg h-full">
                     {% if place.photo_urls %}
-                    <img src="{{ place.photo_urls.0 }}" 
-                         alt="{{ place.name }}" 
-                         loading="lazy"
-                         class="w-full h-48 object-cover">
+                    <div class="relative w-full h-48">
+                        <img src="{{ place.photo_urls.0 }}" 
+                             alt="{{ place.name }}" 
+                             loading="lazy" decoding="async"
+                             onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden'); this.nextElementSibling.classList.add('flex');"
+                             class="w-full h-48 object-cover">
+                        <div class="hidden absolute inset-0 bg-primary-50 dark:bg-primary-900/30 items-center justify-center" aria-hidden="true">
+                            <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque {% elif place.category == 'prayer_room' %}fa-pray{% endif %} text-4xl text-primary-400 dark:text-primary-500"></i>
+                        </div>
+                    </div>
                     {% endif %}
                     <div class="p-4">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                             {{ place.name }}
                         </h3>
-                        <p class="text-sm text-primary-600 dark:text-primary-400">
+                        <p class="text-sm text-primary-700 dark:text-primary-400">
                             <i class="fas {% if place.category == 'restaurant' %}fa-utensils{% elif place.category == 'market' %}fa-shopping-basket{% elif place.category == 'mosque' %}fa-mosque {% elif place.category == 'prayer_room' %}fa-pray{% endif %} mr-1"></i>
                             {{ place.get_category_display }}
                         </p>
@@ -291,7 +294,7 @@
                     <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3">
                         {% translate "Check the latest prayer times for your location." %}
                     </p>
-                    <span class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400">
+                    <span class="inline-flex items-center text-sm font-medium text-primary-700 dark:text-primary-400">
                         {% translate "View Times" %}
                         <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
                     </span>
@@ -318,7 +321,7 @@
                     <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3">
                         {% translate "Help us grow our community by submitting halal places you know!" %}
                     </p>
-                    <span class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm font-medium text-primary-600 dark:text-primary-400 shadow-sm group-hover:shadow-md transition-shadow">
+                    <span class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm font-medium text-primary-700 dark:text-primary-400 shadow-sm group-hover:shadow-md transition-shadow">
                         {% translate "Submit Place" %}
                         <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
                     </span>
@@ -337,9 +340,9 @@
 // Find Nearest Places Button
 document.getElementById('find-nearest-btn').onclick = function() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            // Get CSRF token from the hidden form
-            const csrfToken = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]').value;
+        navigator.geolocation.getCurrentPosition(async function(position) {
+            // Fetch a CSRF token on demand (page renders without one)
+            const csrfToken = await window.ensureCSRFToken();
             
             fetch("{% url 'places:set_location' %}", {
                 method: 'POST',

@@ -945,8 +945,10 @@ Imported CSV Place,From CSV import,market,456 CSV Import,37.6,127.6,pending"""
             },
         )
 
-        self.assertEqual(response.status_code, 302)
-        # Count should not have changed
+        # Dry run renders the preview page (200) rather than redirecting,
+        # and must not create anything.
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Dry Run Place")
         self.assertEqual(HalalPlace.objects.count(), initial_count)
 
     def test_validate_ajax_endpoint_valid(self):

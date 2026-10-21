@@ -27,7 +27,7 @@
     <meta name="geo.placename" content="South Korea">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <link rel="canonical" href="{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
     
     <!-- Hreflang Tags for International SEO -->
     <link rel="alternate" hreflang="en" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
@@ -40,7 +40,7 @@
     <meta property="og:title" content="{% block og_title %}{% translate 'Halal Korea' %} - {% translate 'Find Halal Places in Korea' %}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{% translate 'Discover halal restaurants, markets, and prayer spaces across South Korea. Your comprehensive guide to halal dining and Islamic facilities in Korea.' %}{% endblock %}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
     <meta property="og:locale" content="{{ LANGUAGE_CODE }}_{{ LANGUAGE_CODE|upper }}">
     <meta property="og:locale:alternate" content="en_US">
     <meta property="og:locale:alternate" content="ko_KR">
@@ -141,8 +141,9 @@
     {% endblock structured_data %}
 
     <!-- External CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Icon defaults precede utilities so hidden/dark:hidden can hide icons. -->
+    <link rel="stylesheet" href="{% static 'css/fontawesome-subset.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tailwind.build.css' %}">
     
     <!-- Base Styles -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
@@ -161,45 +162,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Tailwind Configuration -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Ubuntu', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            200: '#bbf7d0',
-                            300: '#86efac',
-                            400: '#4ade80',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
-                        },
-                        teal: {
-                            400: '#34d399',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                        },
-                        backdropBlur: {
-                            'xs': '2px',
-                        },
-                        backgroundImage: {
-                            'gradient-primary': 'linear-gradient(to right, var(--tw-gradient-stops))',
-                            'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+
 
     <!-- Custom Styles -->
     {% block extra_head %}{% endblock %}
@@ -239,6 +202,7 @@
         };
     </script>
     <script
+        defer
         src="https://js.sentry-cdn.com/160eca2c83c8178bb83d4af1eaa39f35.min.js"
         crossorigin="anonymous"
     ></script>
@@ -246,13 +210,13 @@
 
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 glass-effect dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800" x-data="{ isOpen: false }">
+    <nav class="fixed w-full z-50 glass-effect dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800" x-data="{ isOpen: false }" aria-label="{% translate 'Main navigation' %}">
         <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Left side -->
                 <div class="flex items-center flex-shrink-0">
                     <div class="flex items-center">
-                        <a href="{% url 'places:home' %}" class="text-lg sm:text-xl font-bold flex items-center">
+                        <a href="{% url 'places:home' %}" class="text-lg sm:text-xl font-bold flex items-center py-2">
                             <img src="{% static STATIC_INFO.logo_marker %}" alt="{{ STATIC_INFO.site_name }} Logo" class="h-6 sm:h-8 w-auto mr-1 sm:mr-2">
                             <span class="bg-gradient-to-r from-primary-500 via-primary-400 to-teal-400 bg-clip-text text-transparent truncate max-w-[120px] sm:max-w-none">
                                 {{ STATIC_INFO.site_name }}
@@ -261,7 +225,7 @@
                     </div>
 
                     <!-- Desktop Menu -->
-                    <div class="hidden xl:ml-6 xl:flex xl:space-x-8">
+                    <div class="hidden xl:ml-6 xl:flex xl:space-x-4">
                         <a href="{% url 'places:explore' %}" 
                            class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center transition-all duration-200">
                             <i class="fas fa-search mr-2"></i>{% translate "Explore" %}
@@ -316,8 +280,9 @@
                 <!-- Right side -->
                 <div class="flex items-center space-x-2 sm:space-x-4">
                     <!-- Theme Toggle -->
-                    <button onclick="toggleTheme()" 
-                            class="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                    <button type="button" onclick="toggleTheme()" 
+                            aria-label="{% translate 'Toggle color theme' %}"
+                            class="p-1.5 sm:p-2 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
                         <i class="fas fa-sun text-yellow-500 theme-toggle-icon hidden dark:inline-block"></i>
                         <i class="fas fa-moon text-gray-700 dark:text-gray-400 theme-toggle-icon dark:hidden"></i>
                     </button>
@@ -330,7 +295,7 @@
                         {% get_language_info for CURRENT_LANGUAGE_CODE as current_lang_info %}
 
                         <button @click="open = !open" 
-                                class="flex items-center space-x-1 px-2 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
+                                class="flex items-center space-x-1 px-2 py-2 min-h-[44px] rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
                             {% if current_lang_info.code == 'en' %}<span class="flag">🇺🇸</span>
                             {% elif current_lang_info.code == 'ko' %}<span class="flag">🇰🇷</span>
                             {% elif current_lang_info.code == 'uz' %}<span class="flag">🇺🇿</span>
@@ -360,11 +325,7 @@
                             <div class="py-1">
                                 {% for lang in languages_info %}
                                     {% if lang.code != CURRENT_LANGUAGE_CODE %}
-                                        <form action="{% url 'set_language' %}" method="post" class="w-full">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="next" value="{{ request.path }}">
-                                            <input type="hidden" name="language" value="{{ lang.code }}">
-                                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <button type="button" data-language="{{ lang.code }}" onclick="hkSetLanguage(this.dataset.language)" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
                                                 {% if lang.code == 'en' %}<span class="flag">🇺🇸</span>
                                                 {% elif lang.code == 'ko' %}<span class="flag">🇰🇷</span>
                                                 {% elif lang.code == 'uz' %}<span class="flag">🇺🇿</span>
@@ -376,7 +337,6 @@
                                                     {% else %}{{ lang.name_local }}{% endif %}
                                                 </span>
                                             </button>
-                                        </form>
                                     {% endif %}
                                 {% endfor %}
                             </div>
@@ -419,11 +379,7 @@
                             <div class="py-1">
                                 {% for lang in languages_info %}
                                     {% if lang.code != CURRENT_LANGUAGE_CODE %}
-                                        <form action="{% url 'set_language' %}" method="post" class="w-full">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="next" value="{{ request.path }}">
-                                            <input type="hidden" name="language" value="{{ lang.code }}">
-                                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                        <button type="button" data-language="{{ lang.code }}" onclick="hkSetLanguage(this.dataset.language)" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
                                                 {% if lang.code == 'en' %}<span class="flag">🇺🇸</span>
                                                 {% elif lang.code == 'ko' %}<span class="flag">🇰🇷</span>
                                                 {% elif lang.code == 'uz' %}<span class="flag">🇺🇿</span>
@@ -435,7 +391,6 @@
                                                     {% else %}{{ lang.name_local }}{% endif %}
                                                 </span>
                                             </button>
-                                        </form>
                                     {% endif %}
                                 {% endfor %}
                             </div>
@@ -447,7 +402,7 @@
                         {% if user.is_authenticated %}
                             <div class="relative" x-data="{ open: false }">
                                 <button @click="open = !open" 
-                                        class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900">
+                                        class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-700 dark:focus:ring-offset-gray-900">
                                     {% if user.profile.avatar %}
                                         <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="h-8 w-8 rounded-full">
                                     {% else %}
@@ -497,8 +452,10 @@
 
                     <!-- Mobile menu button -->
                     <div class="flex items-center xl:hidden ml-2 lg:ml-4">
-                        <button @click="isOpen = !isOpen" 
-                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
+                        <button type="button" @click="isOpen = !isOpen" 
+                                aria-label="{% translate 'Toggle navigation menu' %}"
+                                :aria-expanded="isOpen.toString()"
+                                class="inline-flex items-center justify-center p-2 min-w-[44px] min-h-[44px] rounded-md text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none">
                             <svg class="h-6 w-6" x-bind:class="{'hidden': isOpen, 'block': !isOpen }" 
                                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -587,11 +544,7 @@
                                 <div class="py-1">
                                     {% for lang in languages_info %}
                                         {% if lang.code != CURRENT_LANGUAGE_CODE %}
-                                            <form action="{% url 'set_language' %}" method="post" class="w-full">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="next" value="{{ request.path }}">
-                                                <input type="hidden" name="language" value="{{ lang.code }}">
-                                                <button type="submit" class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
+                                            <button type="button" data-language="{{ lang.code }}" onclick="hkSetLanguage(this.dataset.language)" class="w-full text-left px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2">
                                                     {% if lang.code == 'en' %}<span class="flag">🇺🇸</span>
                                                     {% elif lang.code == 'ko' %}<span class="flag">🇰🇷</span>
                                                     {% elif lang.code == 'uz' %}<span class="flag">🇺🇿</span>
@@ -603,7 +556,6 @@
                                                         {% else %}{{ lang.name_local }}{% endif %}
                                                     </span>
                                                 </button>
-                                            </form>
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -744,25 +696,25 @@
 
                 <!-- Quick Links -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Quick Links" %}</h3>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Quick Links" %}</h2>
                     <ul class="space-y-3">
                         <li>
-                            <a href="{% url 'places:explore' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <a href="{% url 'places:explore' %}" class="inline-block py-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                                 {% translate "Explore Places" %}
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'places:submit_place' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <a href="{% url 'places:submit_place' %}" class="inline-block py-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                                 {% translate "Submit a Place" %}
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'blog:home' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <a href="{% url 'blog:home' %}" class="inline-block py-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                                 {% translate "Blog" %}
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'places:about' %}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                            <a href="{% url 'places:about' %}" class="inline-block py-1.5 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                                 {% translate "About Us" %}
                             </a>
                         </li>
@@ -771,7 +723,7 @@
 
                 <!-- Contact Info -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Contact" %}</h3>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">{% translate "Contact" %}</h2>
                     <ul class="space-y-3">
                         <li class="flex items-start text-gray-600 dark:text-gray-400">
                             <i class="fas fa-envelope w-5 mt-1"></i>
@@ -800,13 +752,13 @@
                         {{ STATIC_INFO.copyright_text|safe }}
                     </p>
                     <div class="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
-                        <a href="{{ STATIC_INFO.footer_links.privacy_policy }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                        <a href="{{ STATIC_INFO.footer_links.privacy_policy }}" class="inline-block py-1.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
                             {% translate "Privacy Policy" %}
                         </a>
-                        <a href="{{ STATIC_INFO.footer_links.terms_of_service }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                        <a href="{{ STATIC_INFO.footer_links.terms_of_service }}" class="inline-block py-1.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
                             {% translate "Terms of Service" %}
                         </a>
-                        <a href="{{ STATIC_INFO.footer_links.cookie_policy }}" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
+                        <a href="{{ STATIC_INFO.footer_links.cookie_policy }}" class="inline-block py-1.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm">
                             {% translate "Cookie Policy" %}
                         </a>
                     </div>
@@ -828,9 +780,9 @@
         was never shown. This script sits at the end of <body>, so a blocking
         load costs nothing in first paint.
     -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-            onload="window.__turnstileApiLoaded = true"
-            onerror="window.__turnstileApiLoaded = false"></script>
+    <!-- Turnstile api.js is injected lazily by turnstile-helpers.js (ensureApi)
+         the first time a widget container nears the viewport. Do not re-add an
+         eager tag here: it costs ~84KB + ~1MB of challenge XHR on every page. -->
     <script src="{% static 'js/turnstile-helpers.js' %}"></script>
     <script src="{% static 'js/base.js' %}"></script>
     <script src="{% static 'js/feedback-widget.js' %}"></script>

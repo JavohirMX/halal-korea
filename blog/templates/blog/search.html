@@ -11,7 +11,7 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Breadcrumb -->
-        <nav class="mb-8">
+        <nav class="mb-8" aria-label="{% translate 'Breadcrumb' %}">
             <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                 <li><a href="{% url 'places:home' %}" class="hover:text-primary-600 dark:hover:text-primary-400">{% translate "Home" %}</a></li>
                 <li><i class="fas fa-chevron-right text-xs"></i></li>
@@ -40,14 +40,15 @@
                         <input type="text" 
                                name="q" 
                                value="{{ query }}"
+                               aria-label="{% translate 'Search articles, categories, tags' %}"
                                placeholder="{% translate 'Search articles, categories, tags...' %}"
-                               class="w-full pl-12 pr-4 py-4 text-lg border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                               class="w-full pl-12 pr-4 py-4 text-lg border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-700 focus:border-primary-500">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fas fa-search text-gray-400 text-xl"></i>
                         </div>
                     </div>
                     <button type="submit" 
-                            class="mt-4 w-full sm:w-auto px-8 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition duration-200">
+                            class="mt-4 w-full sm:w-auto px-8 py-3 bg-primary-700 text-white font-medium rounded-lg hover:bg-primary-800 transition duration-200">
                         {% translate "Search" %}
                     </button>
                 </form>
@@ -79,7 +80,7 @@
                          class="w-full h-48 object-cover">
                 </div>
                 {% else %}
-                <div class="w-full h-48 bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                <div class="w-full h-48 bg-gradient-to-br from-primary-400 to-primary-800 flex items-center justify-center">
                     <i class="fas fa-newspaper text-4xl text-white opacity-50"></i>
                 </div>
                 {% endif %}
@@ -146,7 +147,7 @@
         <!-- Pagination -->
         {% if posts.has_other_pages %}
         <div class="flex justify-center">
-            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="{% translate 'Pagination' %}">
                 {% if posts.has_previous %}
                 <a href="?{% if query %}q={{ query }}&{% endif %}page={{ posts.previous_page_number }}" 
                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
@@ -190,7 +191,7 @@
             </p>
             <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
                 <a href="{% url 'blog:home' %}" 
-                   class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition duration-200">
+                   class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-800 hover:bg-primary-900 transition duration-200">
                     <i class="fas fa-arrow-left mr-2"></i>
                     {% translate "Back to Blog" %}
                 </a>
@@ -205,9 +206,9 @@
         <!-- Search Tips -->
         <div class="max-w-3xl mx-auto">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     {% translate "Search Tips" %}
-                </h3>
+                </h2>
                 <ul class="space-y-2 text-gray-600 dark:text-gray-300">
                     <li class="flex items-start">
                         <i class="fas fa-check text-primary-600 dark:text-primary-400 mt-1 mr-3"></i>

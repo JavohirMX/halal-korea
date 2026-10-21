@@ -205,13 +205,13 @@
 {% endblock %}
 
 {% block content %}
-{% csrf_token %}
+{% if user.is_authenticated %}{% csrf_token %}{% endif %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
     <nav class="flex mb-4 overflow-x-auto scrollbar-hide" aria-label="{% translate 'Breadcrumb' %}">
         <ol class="inline-flex items-center space-x-1 md:space-x-3 whitespace-nowrap">
             <li class="inline-flex items-center">
-                <a href="{% url 'places:home' %}" class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+                <a href="{% url 'places:home' %}" aria-label="{% translate 'Home' %}" class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
                     </svg>
@@ -243,6 +243,8 @@
                             <img src="{{ photo_url }}" 
                                  alt="{{ place.name }}" 
                                  class="w-full h-64 sm:h-80 lg:h-96 object-cover"
+                                 {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                                 decoding="async"
                                  onclick="openImageModal({{ forloop.counter0 }})">
                         </div>
                         {% endfor %}
@@ -263,7 +265,7 @@
                 {% if user.is_authenticated %}
                 <div class="absolute bottom-4 right-4 z-10">
                     <a href="{% url 'places:suggest_place_edit' place.pk %}?tab=images" 
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 text-white rounded-full shadow-lg hover:shadow-xl hover:bg-primary-700 transition-all duration-200 text-sm font-medium backdrop-blur-sm"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-800 text-white rounded-full shadow-lg hover:shadow-xl hover:bg-primary-900 transition-all duration-200 text-sm font-medium backdrop-blur-sm"
                        title="{% translate 'Upload photos for this place' %}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -290,7 +292,7 @@
                     <div class="swiper-wrapper">
                         {% for photo_url in place.photo_urls %}
                         <div class="swiper-slide">
-                            <img src="{{ photo_url }}" alt="{{ place.name }}">
+                            <img src="{{ photo_url }}" alt="{{ place.name }}" loading="lazy" decoding="async">
                         </div>
                         {% endfor %}
                     </div>
@@ -350,7 +352,7 @@
                 <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                     <!-- Mobile: Collapsible -->
                     <div class="lg:hidden">
-                        <button onclick="toggleNotice()" class="w-full flex items-start justify-between text-left focus:outline-none group">
+                        <button onclick="toggleNotice()" class="w-full flex items-start justify-between text-left focus:outline-none group min-h-[44px]">
                             <div class="flex items-start flex-1">
                                 <div class="flex-shrink-0">
                                     <svg class="h-5 w-5 text-yellow-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
@@ -420,9 +422,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
-                        <h3 class="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
+                        <h2 class="ml-2 text-lg font-semibold text-gray-900 dark:text-white">
                             {% translate "About" %}
-                        </h3>
+                        </h2>
                     </div>
                     <p class="text-base leading-relaxed text-gray-700 dark:text-gray-300">{{ place.description }}</p>
                 </div>
@@ -444,7 +446,7 @@
                                 </div>
                                 <p class="text-sm text-gray-900 dark:text-white leading-snug">{{ place.address }}</p>
                             </div>
-                            <button class="p-2 rounded-lg text-gray-400 group-hover:text-primary-600 group-hover:bg-white dark:group-hover:bg-gray-700 dark:group-hover:text-primary-400 transition-all">
+                            <button type="button" aria-label="{% translate 'Copy address' %}" class="p-2 rounded-lg text-gray-400 group-hover:text-primary-600 group-hover:bg-white dark:group-hover:bg-gray-700 dark:group-hover:text-primary-400 transition-all">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
@@ -485,7 +487,7 @@
 
                 <!-- Last Updated (Small footer) -->
                 <div class="mt-4 flex items-center justify-end">
-                    <span class="inline-flex items-center text-xs text-gray-400 dark:text-gray-500">
+                    <span class="inline-flex items-center text-xs text-gray-500 dark:text-gray-400">
                         <i class="far fa-clock mr-1.5"></i>
                         {% translate "Updated" %} {{ place.updated_at|date:"M d, Y" }}
                     </span>
@@ -501,9 +503,9 @@
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30">
                                 <i class="fas fa-clock text-primary-600 dark:text-primary-400"></i>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                                 {% translate "Hours" %}
-                            </h3>
+                            </h2>
                         </div>
                         
                         <!-- Live Status Badge -->
@@ -578,21 +580,22 @@
                 </div>
                 {% endif %}
 
+                {% if place.google_map_link or place.naver_map_link or place.kakao_map_link %}
                 <!-- Map Links Section -->
                 <div id="map-links-section" class="mt-6">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
                         <svg class="w-4 h-4 mr-1.5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
                         </svg>
                         {% translate "Navigate with:" %}
-                    </h4>
+                    </h3>
                     
                     <div class="flex flex-wrap gap-2">
                         {% if place.google_map_link %}
                         <a href="{{ place.google_map_link }}" target="_blank" 
                            class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 border border-gray-300 dark:border-gray-600 shadow-sm hover:shadow"
                            title="{% translate 'Open in Google Maps' %}">
-                            <img src="{% static 'images/google-maps-logo.svg' %}" alt="Google Maps" class="w-5 h-5 object-contain">
+                            <img src="{% static 'images/google-maps-logo.svg' %}" alt="" class="w-5 h-5 object-contain">
                             <span>Google Maps</span>
                         </a>
                         {% endif %}
@@ -602,7 +605,7 @@
                             <a href="{{ place.naver_map_link }}" target="_blank" 
                                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 border border-gray-300 dark:border-gray-600 shadow-sm hover:shadow"
                                title="{% translate 'Open in Naver Maps' %}">
-                                <img src="{% static 'images/naver-maps-logo.png' %}" alt="Naver Maps" class="w-5 h-5 object-contain rounded-md">
+                                <img src="{% static 'images/naver-maps-logo.png' %}" alt="" class="w-5 h-5 object-contain rounded-md">
                                 <span>Naver Maps</span>
                             </a>
                             {% endif %}
@@ -611,7 +614,7 @@
                             <a href="{{ place.kakao_map_link }}" target="_blank" 
                                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 border border-gray-300 dark:border-gray-600 shadow-sm hover:shadow"
                                title="{% translate 'Open in Kakao Maps' %}">
-                                <img src="{% static 'images/kakao-map-logo.png' %}" alt="Kakao Maps" class="w-5 h-5 object-contain rounded-md">
+                                <img src="{% static 'images/kakao-map-logo.png' %}" alt="" class="w-5 h-5 object-contain rounded-md">
                                 <span>Kakao Maps</span>
                             </a>
                             {% endif %}
@@ -641,6 +644,7 @@
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
             </div>
 
             <!-- Desktop CTA: No Photos Banner (only shown on desktop when no photos) -->
@@ -661,9 +665,9 @@
                         <!-- Content -->
                         <div class="flex-1 space-y-3">
                             <div>
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">
+                                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">
                                     {% translate "No photos yet" %}
-                                </h3>
+                                </h2>
                                 <p class="text-base text-gray-600 dark:text-gray-400">
                                     {% translate "Help the community by sharing photos of this place" %}
                                 </p>
@@ -672,7 +676,7 @@
                             <!-- CTA Button -->
                             {% if user.is_authenticated %}
                             <a href="{% url 'places:suggest_place_edit' place.pk %}?tab=images" 
-                               class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 shadow-sm hover:shadow group">
+                               class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-700 to-primary-800 rounded-lg hover:from-primary-800 hover:to-primary-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-700 focus:ring-offset-2 shadow-sm hover:shadow group">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
@@ -683,7 +687,7 @@
                             </a>
                             {% else %}
                             <a href="{% url 'account_login' %}?next={% url 'places:suggest_place_edit' place.pk %}%3Ftab%3Dimages" 
-                               class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 shadow-sm hover:shadow group">
+                               class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary-700 to-primary-800 rounded-lg hover:from-primary-800 hover:to-primary-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-700 focus:ring-offset-2 shadow-sm hover:shadow group">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
@@ -720,7 +724,7 @@
                     </div>
                     {% if user.is_authenticated %}
                     <a href="{% url 'places:suggest_place_edit' place.pk %}?tab=images" 
-                       class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors shadow-sm">
+                       class="flex-shrink-0 inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0 px-3 py-1.5 text-xs font-medium text-white bg-primary-800 rounded-md hover:bg-primary-900 transition-colors shadow-sm">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -728,7 +732,7 @@
                     </a>
                     {% else %}
                     <a href="{% url 'account_login' %}?next={% url 'places:suggest_place_edit' place.pk %}%3Ftab%3Dimages" 
-                       class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors shadow-sm">
+                       class="flex-shrink-0 inline-flex items-center gap-1.5 min-h-[44px] sm:min-h-0 px-3 py-1.5 text-xs font-medium text-white bg-primary-800 rounded-md hover:bg-primary-900 transition-colors shadow-sm">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -746,7 +750,7 @@
 
             <!-- Reviews Section -->
             <div id="reviews-section" class="glass-card rounded-lg p-6">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">{% translate "Reviews" %}</h3>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">{% translate "Reviews" %}</h2>
                 
                 {% if user.is_authenticated %}
                     {% for review in place.reviews.all %}
@@ -754,7 +758,7 @@
                             <!-- User's existing review with edit/delete options -->
                             <div class="mb-6 border-b border-gray-200 dark:border-gray-700 pb-6">
                                 <div class="flex justify-between items-start mb-4">
-                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Your Review" %}</h4>
+                                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% translate "Your Review" %}</h3>
                                     <div class="flex space-x-2">
                                         <button onclick="toggleEditForm()" 
                                                 class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
@@ -819,7 +823,7 @@
                                         </label>
                                         <textarea name="comment" 
                                                   rows="4" 
-                                                  class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none">{{ review.comment }}</textarea>
+                                                  class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-700 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none">{{ review.comment }}</textarea>
                                     </div>
                                     <div class="flex space-x-3">
                                         <button type="submit" 
@@ -861,7 +865,7 @@
                                 {% translate "Your Review" %}
                             </label>
                             <textarea name="comment" rows="4" 
-                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none"
+                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-700 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400 transition-colors duration-200 resize-none"
                                       placeholder="{% translate 'Share your experience...' %}"></textarea>
                         </div>
                         <button type="submit" 

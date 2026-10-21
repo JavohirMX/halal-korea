@@ -14,7 +14,7 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.utils import translation
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
@@ -44,6 +44,12 @@ def set_language(request):
         supported_languages = dict(settings.LANGUAGES)
         if language not in supported_languages:
             logger.warning(f"Invalid language requested: {language}")
+            if not url_has_allowed_host_and_scheme(
+                url=next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                next_url = '/'
             return HttpResponseRedirect(next_url)
         
         # Validate next URL for security
@@ -60,8 +66,10 @@ def set_language(request):
         # Create response
         response = HttpResponseRedirect(next_url)
         
-        # Set session language
-        if hasattr(request, 'session'):
+        # Set session language only for authenticated users; anonymous
+        # visitors are served from the language cookie (LocaleMiddleware),
+        # keeping their responses free of a sessionid Set-Cookie.
+        if request.user.is_authenticated and hasattr(request, 'session'):
             request.session[LANGUAGE_SESSION_KEY] = language
         
         # Set language cookie as fallback (with fallback values)
@@ -105,6 +113,12 @@ def set_language(request):
         logger.error(f"Error in set_language view: {str(e)}", exc_info=True)
         # Fall back to original URL or home page
         fallback_url = request.POST.get('next', '/')
+        if not url_has_allowed_host_and_scheme(
+            url=fallback_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            fallback_url = '/'
         return HttpResponseRedirect(fallback_url)
 
 
@@ -131,8 +145,9 @@ def set_language_ajax(request):
         # Activate language
         translation.activate(language)
         
-        # Update session
-        if hasattr(request, 'session'):
+        # Update session (authenticated users only - anonymous visitors
+        # rely on the language cookie set below)
+        if request.user.is_authenticated and hasattr(request, 'session'):
             request.session[LANGUAGE_SESSION_KEY] = language
         
         # Update user preference if authenticated
@@ -270,3 +285,16 @@ def _get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip or 'unknown'
+
+
+@require_GET
+@ensure_csrf_cookie
+def csrf_token_ping(request):
+    """
+    Lightweight endpoint that only exists to issue the CSRF cookie on demand.
+
+    Anonymous-targeted pages render without {% csrf_token %} so first visits
+    do not set the csrftoken cookie; client JS calls this endpoint right
+    before it needs to POST (feedback widget, location updates, favorites).
+    """
+    return JsonResponse({"detail": "csrf cookie set"})
