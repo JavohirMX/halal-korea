@@ -92,12 +92,15 @@ body {
 }
 
 .gradient-bg {
-    background: linear-gradient(135deg, #22c55e, #10b981);
+    /* Darker stops (green-800 -> emerald-800): white text passes WCAG AA
+       (>=4.5:1) at 14px even at the hover state's 90% opacity; the old
+       #22c55e -> #10b981 stops measured ~2.3:1 normal / ~2.2:1 hover. */
+    background: linear-gradient(135deg, #166534, #065f46);
 }
 
 .gradient-bg-hover {
     background-size: 200% 200%;
-    background-image: linear-gradient(to right, #22c55e, #10b981, #22c55e);
+    background-image: linear-gradient(to right, #166534, #065f46, #166534);
     transition: all 0.5s ease;
 }
 
