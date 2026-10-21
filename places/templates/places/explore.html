@@ -365,7 +365,7 @@
                 <!-- Action Buttons -->
                 <div class="flex items-center gap-2 border-l border-gray-200 dark:border-gray-700 pl-3">
                     <button id="update-location-btn-desktop" type="button"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium shadow-sm"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary-800 dark:bg-primary-700 text-white hover:bg-primary-900 dark:hover:bg-primary-800 transition-colors text-sm font-medium shadow-sm"
                         title="{% translate 'Update my location' %}">
                         <i class="fas fa-crosshairs text-sm"></i>
                         <span>{% translate "Update" %}</span>
@@ -452,7 +452,7 @@
             </div>
             <div class="flex gap-2">
                 <button id="update-location-btn-mobile" type="button"
-                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm font-medium w-full">
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-800 dark:bg-primary-700 text-white hover:bg-primary-900 dark:hover:bg-primary-800 transition-colors text-sm font-medium w-full">
                     <i class="fas fa-crosshairs"></i>
                     <span>{% translate "Update" %}</span>
                 </button>
@@ -1009,7 +1009,7 @@
                 
                 <!-- CTA Button -->
                 <a href="/place/${place.id}/" 
-                   class="inline-flex items-center justify-center w-full px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors duration-200">
+                   class="inline-flex items-center justify-center w-full px-3 py-1.5 bg-primary-800 hover:bg-primary-900 text-white text-xs font-medium rounded-md transition-colors duration-200">
                     {% translate "View Details"|escapejs %}
                     <i class="fas fa-chevron-right ml-1 text-xs"></i>
                 </a>
@@ -2023,7 +2023,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="flex gap-1" id="tutorial-dots">
             <!-- Dots will be generated here -->
         </div>
-        <button id="tutorial-next-btn" class="px-3 py-1.5 min-h-[44px] bg-primary-600 hover:bg-primary-700 text-white text-xs font-medium rounded-md transition-colors">
+        <button id="tutorial-next-btn" class="px-3 py-1.5 min-h-[44px] bg-primary-800 hover:bg-primary-900 text-white text-xs font-medium rounded-md transition-colors">
             {% translate "Next" %}
         </button>
     </div>
@@ -2281,7 +2281,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.dotsContainer.innerHTML = '';
             for (let i = 0; i < this.steps.length; i++) {
                 const dot = document.createElement('div');
-                dot.className = `w-1.5 h-1.5 rounded-full transition-colors ${i === this.currentStepIndex ? 'bg-primary-600 dark:bg-primary-400' : 'bg-gray-300 dark:bg-gray-600'}`;
+                dot.className = `w-1.5 h-1.5 rounded-full transition-colors ${i === this.currentStepIndex ? 'bg-primary-800 dark:bg-primary-400' : 'bg-gray-300 dark:bg-gray-600'}`;
                 this.dotsContainer.appendChild(dot);
             }
         }
