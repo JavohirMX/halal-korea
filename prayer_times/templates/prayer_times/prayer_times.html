@@ -482,6 +482,17 @@
             </div>
         </div>
 
+        <!-- Location Needed State (expected when location is unknown) -->
+        <div id="location-needed-state" class="mt-4 max-w-md w-full mx-auto text-center hidden">
+            <div class="text-gray-600 dark:text-gray-300">
+                <i class="fas fa-location-dot text-2xl text-primary-600 dark:text-primary-400"></i>
+                <p class="mt-2">{% translate "Unable to determine your location. Please enable location services or set your location manually." %}</p>
+                <button onclick="const b = document.getElementById('location-button'); if (b) { b.click(); }" class="mt-2 text-sm text-primary-700 dark:text-primary-400 underline">
+                    {% translate "Set Location" %}
+                </button>
+            </div>
+        </div>
+
         <!-- Content Container -->
         <div id="content-container" class="hidden">
             <!-- Date and Time Display -->
@@ -560,6 +571,11 @@
 <script>
     // Store countdown interval ID to prevent memory leaks
     let countdownInterval = null;
+
+    // IANA timezone of the currently displayed prayer times, from the API's
+    // meta.timezone (e.g. "Asia/Seoul"). null until the first successful load,
+    // which keeps the historical browser-local behavior as the fallback.
+    let locationTimezone = null;
     
     // Method names mapping for Alpine.js
     const methodNames = {
@@ -623,11 +639,45 @@
         if (currentTimeElement) {
             const now = new Date();
             const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            if (locationTimezone) {
+                options.timeZone = locationTimezone;
+            }
             currentTimeElement.textContent = now.toLocaleTimeString([], options);
         }
     }
     setInterval(updateCurrentTime, 1000);
     updateCurrentTime();
+
+    // Real-epoch timezone helpers (DST-safe): all countdown/comparison math
+    // runs on true instants; only the *meaning* of "today" and the wall times
+    // come from the prayer-times location's zone.
+    function tzParts(date, tz) {
+        const dtf = new Intl.DateTimeFormat('en-US', {
+            timeZone: tz, hour12: false,
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        const o = {};
+        for (const part of dtf.formatToParts(date)) {
+            o[part.type] = part.value;
+        }
+        return o;
+    }
+
+    function tzOffsetMs(date, tz) {
+        const p = tzParts(date, tz);
+        return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - date.getTime();
+    }
+
+    function zonedWallTimeToDate(year, month, day, hours, minutes, tz) {
+        // The real instant of a wall-clock time in tz. Refining twice keeps
+        // this correct across DST transitions (offset depends on the instant).
+        let utc = Date.UTC(year, month - 1, day, hours, minutes, 0);
+        for (let i = 0; i < 2; i++) {
+            utc = Date.UTC(year, month - 1, day, hours, minutes, 0) - tzOffsetMs(new Date(utc), tz);
+        }
+        return new Date(utc);
+    }
 
     function parseTime(timeStr) {
         if (!timeStr || typeof timeStr !== 'string') {
@@ -642,8 +692,17 @@
         if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
             throw new Error('Invalid time values');
         }
-        const now = new Date();
-        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+        if (!locationTimezone) {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+        }
+        try {
+            const p = tzParts(new Date(), locationTimezone);
+            return zonedWallTimeToDate(+p.year, +p.month, +p.day, hours, minutes, locationTimezone);
+        } catch (e) {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+        }
     }
     
     function updateCountdown() {
@@ -701,8 +760,17 @@
         const firstPrayerElement = document.querySelector('td[data-time]');
         if (firstPrayerElement && firstPrayerElement.dataset.time) {
             try {
-                const fajrTimeTomorrow = parseTime(firstPrayerElement.dataset.time);
-                fajrTimeTomorrow.setDate(fajrTimeTomorrow.getDate() + 1);
+                let fajrTimeTomorrow = parseTime(firstPrayerElement.dataset.time);
+                if (locationTimezone) {
+                    const p = tzParts(new Date(), locationTimezone);
+                    const tomorrow = new Date(Date.UTC(+p.year, +p.month - 1, +p.day + 1));
+                    const parts = firstPrayerElement.dataset.time.split(':');
+                    fajrTimeTomorrow = zonedWallTimeToDate(
+                        tomorrow.getUTCFullYear(), tomorrow.getUTCMonth() + 1, tomorrow.getUTCDate(),
+                        parseInt(parts[0], 10), parseInt(parts[1], 10), locationTimezone);
+                } else {
+                    fajrTimeTomorrow.setDate(fajrTimeTomorrow.getDate() + 1);
+                }
                 prayerTimes.push(fajrTimeTomorrow);
                 prayerNames.push("{% translate 'Fajr (Tomorrow)'|escapejs %}");
             } catch (error) {
@@ -789,6 +857,7 @@
         const contentContainer = document.getElementById('content-container');
         const locationButton = document.getElementById('location-button');
         const locationSkeleton = document.getElementById('location-skeleton');
+        const locationNeededState = document.getElementById('location-needed-state');
         
         if (!loadingState || !errorState || !contentContainer || !locationButton || !locationSkeleton) {
             console.error('Required DOM elements not found');
@@ -800,6 +869,9 @@
         // Show loading state
         loadingState.classList.remove('hidden');
         errorState.classList.add('hidden');
+        if (locationNeededState) {
+            locationNeededState.classList.add('hidden');
+        }
         contentContainer.classList.add('hidden');
         
         // Show location skeleton
@@ -809,15 +881,29 @@
         try {
             const response = await fetch('/prayer/get-prayer-times/');
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
             let data;
             try {
                 data = await response.json();
             } catch (jsonError) {
                 throw new Error('Invalid JSON response from server');
+            }
+            
+            if (!response.ok) {
+                if (response.status === 400 && data && data.show_error_ui) {
+                    // Expected state, not a failure: the user's location is
+                    // unknown - prompt them to set it instead of showing the
+                    // generic error.
+                    loadingState.classList.add('hidden');
+                    if (locationNeededState) {
+                        locationNeededState.classList.remove('hidden');
+                    } else {
+                        errorState.classList.remove('hidden');
+                    }
+                    locationSkeleton.classList.add('hidden');
+                    locationButton.classList.remove('hidden');
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             if (!data || typeof data !== 'object') {
@@ -836,6 +922,13 @@
                 // Hide location skeleton, show button
                 locationSkeleton.classList.add('hidden');
                 locationButton.classList.remove('hidden');
+                
+                // Remember the zone these times belong to so the current-time
+                // display and the next-prayer countdown use it (not the
+                // browser's zone, which differs for travel-planning users).
+                if (data.data && data.data.meta && data.data.meta.timezone) {
+                    locationTimezone = data.data.meta.timezone;
+                }
                 
                 // Validate and update dates
                 if (data.data && data.data.date) {
