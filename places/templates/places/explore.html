@@ -216,7 +216,7 @@
 
         /* Popover Card */
         #tutorial-popover {
-            position: absolute;
+            position: fixed;
             z-index: 1002;
             width: 90%;
             max-width: 320px;
@@ -2262,7 +2262,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 popoverLeft = window.innerWidth - popoverRect.width - margin;
             }
 
-            this.popover.style.top = `${popoverTop + window.scrollY}px`;
+            // Keep controls reachable when a tall or off-screen target leaves
+            // neither side enough room, including during smooth scrolling.
+            const unclampedTop = popoverTop;
+            popoverTop = Math.max(margin, Math.min(
+                popoverTop, window.innerHeight - popoverRect.height - margin
+            ));
+            if (popoverTop !== unclampedTop) {
+                this.popover.classList.remove('arrow-top', 'arrow-bottom');
+            }
+
+            this.popover.style.top = `${popoverTop}px`;
             this.popover.style.left = `${popoverLeft}px`;
             this.popover.classList.add('active');
         }
