@@ -36,6 +36,7 @@ RUN mkdir -p media/places/photos
 RUN DJANGO_DEBUG=False \
     DJANGO_SECRET_KEY=collectstatic-build-only \
     ALLOWED_HOSTS=localhost \
+    GOOGLE_MAPS_API_KEY=collectstatic-build-only \
     DB_NAME=build DB_USER=build DB_PASSWORD=build DB_HOST=localhost \
     python manage.py collectstatic --noinput --clear
 
