@@ -161,24 +161,33 @@ Visit **[http://localhost:8000](http://localhost:8000)** and log into admin at *
 
 ---
 
-### Option B: Local Python Environment
+### Option B: Local Environment with `uv` & `Makefile`
+
+```bash
+# 1. Setup environment and install dependencies in one command
+make setup
+
+# 2. Run migrations
+make migrate
+
+# 3. Start development server
+make dev
+```
 
 <details>
-<summary><strong>Click to view native virtualenv setup steps</strong></summary>
+<summary><strong>Click to view manual virtualenv setup steps without Make</strong></summary>
 
 #### Prerequisites
 - **Python 3.12+**
+- **uv** (`curl -LsSf https://astral.sh/uv/install.sh | sh` or `brew install uv`)
 - **PostgreSQL 15+** with **PostGIS 3.3+**
 - System geospatial libraries: `gdal`, `geos`, `proj`
   - macOS: `brew install gdal geos proj postgresql postgis`
   - Ubuntu/Debian: `sudo apt-get install binutils libproj-dev gdal-bin libgdal-dev postgresql-postgis`
 
-#### 1. Initialize Virtual Environment
+#### 1. Initialize Virtual Environment with uv
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
+uv sync --all-groups
 ```
 
 #### 2. Configure Database
@@ -190,15 +199,15 @@ psql -d halal_korea -c "CREATE EXTENSION postgis;"
 #### 3. Setup Environment Variables
 ```bash
 cp .env.example .env
-# Edit .env with your local PostgreSQL user & credentials
+# Edit .env with your local PostgreSQL user & credentials (set DB_HOST=localhost)
 ```
 
 #### 4. Migrate, Collect Static & Run
 ```bash
-python manage.py migrate
-python manage.py collectstatic --noinput
-python manage.py compilemessages
-python manage.py runserver
+uv run python manage.py migrate
+uv run python manage.py collectstatic --noinput
+uv run python manage.py compilemessages
+uv run python manage.py runserver
 ```
 
 </details>
@@ -294,6 +303,35 @@ Deep-dive architectural, operational, and development guides are maintained in [
 | **Data Import/Export** | [`IMPORT_EXPORT_GUIDE.md`](docs/IMPORT_EXPORT_GUIDE.md) | Bulk place loading via GeoJSON, CSV, and Excel |
 | **i18n & Translations** | [`TRANSLATION_GUIDELINES.md`](docs/TRANSLATION_GUIDELINES.md) | Translating UI strings into Korean, English, and Uzbek |
 | **Testing Strategy** | [`TESTING.md`](docs/TESTING.md) | Unit, integration, and PostGIS spatial test guidelines |
+
+---
+
+## 🛠️ Makefile & Developer Automation
+
+Halal Korea includes a self-documenting [`Makefile`](Makefile) integrated with [`uv`](https://docs.astral.sh/uv/) for lightning-fast command execution. Run `make help` to display all available commands:
+
+| Command | Description |
+|---|---|
+| `make help` | Show interactive colorized command menu |
+| `make setup` | One-command onboarding: create `.env`, sync dependencies via uv, migrate |
+| `make dev` | Start Django development server at `http://localhost:8000` |
+| `make migrate` | Apply database migrations |
+| `make makemigrations` | Generate new migrations from model changes |
+| `make seed` | Populate 25 sample halal places across South Korea |
+| `make populate-search` | Rebuild full-text search and proximity index |
+| `make lint` | Run ultra-fast linting check using Ruff |
+| `make format` | Auto-format code with Ruff (`make format PATH=app/`) |
+| `make test` | Run complete automated test suite |
+| `make test-app APP=...` | Run test suite for a specific Django app |
+| `make coverage` | Run test coverage analysis in terminal |
+| `make docker-up` | Start background Docker services (`web`, `db`, `telegram-bot-api`) |
+| `make docker-down` | Stop and remove Docker containers |
+| `make docker-build` | Rebuild Docker container images with uv |
+| `make docker-test` | Execute test suite inside running Docker container |
+| `make messages` | Extract translation strings for `ko` and `uz` |
+| `make compilemessages` | Compile `.po` translation catalogs to `.mo` |
+| `make backup` | Trigger automated PostgreSQL database backup |
+| `make clean` | Purge Python bytecode, coverage, and cache artifacts |
 
 ---
 

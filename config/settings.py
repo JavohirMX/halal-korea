@@ -18,6 +18,29 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# GDAL / GEOS library paths for GeoDjango (auto-detected on macOS / Homebrew)
+import platform
+import os
+
+if platform.system() == "Darwin":
+    for _gdal_candidate in [
+        config("GDAL_LIBRARY_PATH", default=""),
+        "/opt/homebrew/opt/gdal/lib/libgdal.dylib",
+        "/usr/local/opt/gdal/lib/libgdal.dylib",
+    ]:
+        if _gdal_candidate and os.path.exists(_gdal_candidate):
+            GDAL_LIBRARY_PATH = _gdal_candidate
+            break
+
+    for _geos_candidate in [
+        config("GEOS_LIBRARY_PATH", default=""),
+        "/opt/homebrew/opt/geos/lib/libgeos_c.dylib",
+        "/usr/local/opt/geos/lib/libgeos_c.dylib",
+    ]:
+        if _geos_candidate and os.path.exists(_geos_candidate):
+            GEOS_LIBRARY_PATH = _geos_candidate
+            break
+
 # Create logs directory if it doesn't exist
 LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(exist_ok=True)
@@ -60,17 +83,13 @@ CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split()  # typ
 # Telegram Bot Notifications
 # Set TELEGRAM_NOTIFICATIONS_ENABLED=True in your .env file to enable notifications
 # Get bot token from @BotFather on Telegram and chat ID from your target channel/group
-TELEGRAM_NOTIFICATIONS_ENABLED = config(
-    "TELEGRAM_NOTIFICATIONS_ENABLED", default=False, cast=bool
-)
+TELEGRAM_NOTIFICATIONS_ENABLED = config("TELEGRAM_NOTIFICATIONS_ENABLED", default=False, cast=bool)
 TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
 TELEGRAM_CHAT_ID = config("TELEGRAM_CHAT_ID", default="")
 
 # Local Telegram Bot API Server (removes 50MB file size limit)
 # Uses local server by default when running in Docker, falls back to official API
-TELEGRAM_API_BASE_URL = config(
-    "TELEGRAM_API_BASE_URL", default="http://telegram-bot-api:8081"
-)
+TELEGRAM_API_BASE_URL = config("TELEGRAM_API_BASE_URL", default="http://telegram-bot-api:8081")
 
 # Site URL for admin links in notifications
 SITE_URL = config("SITE_URL", default="http://localhost:8000")
@@ -402,16 +421,12 @@ LOGGING = {
 }
 
 # Enhanced Logging Configuration
-ENVIRONMENT = config(
-    "ENVIRONMENT", default="development"
-)  # development, staging, production
+ENVIRONMENT = config("ENVIRONMENT", default="development")  # development, staging, production
 
 # Log sampling rates per logger (for high-volume endpoints)
 LOG_SAMPLE_RATES = {
     "places.views": config("LOG_SAMPLE_RATE_PLACES", default=0.1, cast=float),  # 10%
-    "utils.location": config(
-        "LOG_SAMPLE_RATE_LOCATION", default=0.01, cast=float
-    ),  # 1%
+    "utils.location": config("LOG_SAMPLE_RATE_LOCATION", default=0.01, cast=float),  # 1%
     "prayer_times": config("LOG_SAMPLE_RATE_PRAYER", default=0.1, cast=float),  # 10%
 }
 
@@ -545,14 +560,10 @@ TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverif
 TURNSTILE_TIMEOUT = 5  # seconds
 
 # Prayer Times API Configuration
-PRAYER_TIMES_API_BASE_URL = config(
-    "PRAYER_TIMES_API_BASE_URL", default="https://api.aladhan.com"
-)
+PRAYER_TIMES_API_BASE_URL = config("PRAYER_TIMES_API_BASE_URL", default="https://api.aladhan.com")
 
 LOGIN_URL = "users:login"  # URL where users will be redirected when login is required
-LOGIN_REDIRECT_URL = (
-    "places:home"  # URL where users will be redirected after successful login
-)
+LOGIN_REDIRECT_URL = "places:home"  # URL where users will be redirected after successful login
 LOGOUT_REDIRECT_URL = "places:home"  # URL where users will be redirected after logout
 
 # Email Configuration
@@ -561,9 +572,7 @@ if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
     # For production, use these settings with a service like SendGrid, Mailgun, etc.
-    EMAIL_BACKEND = config(
-        "EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
-    )
+    EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
     EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
     EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
     EMAIL_USE_SSL = config("EMAIL_USE_SSL", default=False, cast=bool)
@@ -581,9 +590,7 @@ BREVO_API_KEY = config(
     default=config("EMAIL_HOST_PASSWORD", default=""),
 )
 
-DEFAULT_FROM_EMAIL = config(
-    "DEFAULT_FROM_EMAIL", default="Halal Korea<noreply@halal-korea.com>"
-)
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Halal Korea<noreply@halal-korea.com>")
 
 # Email verification settings
 EMAIL_VERIFICATION_TIMEOUT = config(
@@ -666,9 +673,7 @@ SOCIALACCOUNT_ADAPTER = "users.adapters.CustomSocialAccountAdapter"
 
 # Additional Social Account Configuration
 SOCIALACCOUNT_AUTO_SIGNUP = True  # Auto-create accounts for social logins
-SOCIALACCOUNT_EMAIL_VERIFICATION = (
-    "none"  # Trust social providers for email verification
-)
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"  # Trust social providers for email verification
 
 # Provider-specific settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -780,12 +785,8 @@ WATERMARK_ENABLED = config("WATERMARK_ENABLED", default=True, cast=bool)
 
 # Watermark appearance settings
 WATERMARK_OPACITY = config("WATERMARK_OPACITY", default=0.25, cast=float)  # 0.0 to 1.0
-WATERMARK_ANGLE = config(
-    "WATERMARK_ANGLE", default=-45, cast=int
-)  # Rotation angle in degrees
-WATERMARK_SPACING = config(
-    "WATERMARK_SPACING", default=50, cast=int
-)  # Pixels between tiles
+WATERMARK_ANGLE = config("WATERMARK_ANGLE", default=-45, cast=int)  # Rotation angle in degrees
+WATERMARK_SPACING = config("WATERMARK_SPACING", default=50, cast=int)  # Pixels between tiles
 WATERMARK_SIZE = config(
     "WATERMARK_SIZE", default=200, cast=int
 )  # Width of watermark in pixels (height auto-scales)
