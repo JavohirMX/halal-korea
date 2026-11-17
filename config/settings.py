@@ -548,6 +548,8 @@ GOOGLE_MAPS_ID = config("GOOGLE_MAPS_ID", default="DEMO_MAP_ID")
 # Cloudflare Turnstile (CAPTCHA)
 # Defaults are Cloudflare always-pass dummy keys for local/CI.
 # Production must set real TURNSTILE_SITEKEY / TURNSTILE_SECRET.
+# TURNSTILE_ENABLED is unset by default: off while DJANGO_DEBUG is true,
+# on otherwise. Set TURNSTILE_ENABLED=true to exercise the widget locally.
 TURNSTILE_SITEKEY = config(
     "TURNSTILE_SITEKEY",
     default="1x00000000000000000000AA",  # Cloudflare always-pass dummy
@@ -556,6 +558,7 @@ TURNSTILE_SECRET = config(
     "TURNSTILE_SECRET",
     default="1x0000000000000000000000000000000AA",
 )
+TURNSTILE_ENABLED = config("TURNSTILE_ENABLED", default="")
 TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 TURNSTILE_TIMEOUT = 5  # seconds
 
@@ -591,6 +594,11 @@ BREVO_API_KEY = config(
 )
 
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Halal Korea<noreply@halal-korea.com>")
+# Admin compose "Contact" sender. Display name stays "Halal Korea".
+CONTACT_FROM_EMAIL = config(
+    "CONTACT_FROM_EMAIL",
+    default="Halal Korea <contact@halal-korea.com>",
+)
 
 # Email verification settings
 EMAIL_VERIFICATION_TIMEOUT = config(

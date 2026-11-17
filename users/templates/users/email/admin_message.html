@@ -24,9 +24,11 @@
                     </tr>
                     <tr>
                         <td style="padding: 40px 30px;">
+                            {% if greeting_html %}
                             <h2 style="margin: 0 0 20px 0; color: #1f2937; font-size: 20px; font-weight: 600;">
-                                {% trans "Hi" %} {{ greeting_name }},
+                                {{ greeting_html }}
                             </h2>
+                            {% endif %}
                             <div style="color: #4b5563; font-size: 16px; line-height: 1.6;">
                                 {{ message_html|safe }}
                             </div>
@@ -34,10 +36,11 @@
                     </tr>
                     <tr>
                         <td style="padding: 30px; background-color: #f8fafc; border-top: 1px solid #e5e7eb;">
+                            {% if signoff_html %}
                             <p style="margin: 0 0 12px 0; color: #374151; font-size: 16px; line-height: 1.5; text-align: center;">
-                                {% trans "Best regards," %}<br>
-                                <strong style="color: #22c55e;">{% trans "The Halal Korea Team" %}</strong>
+                                {{ signoff_html }}
                             </p>
+                            {% endif %}
                             {% if recipient_email %}
                             <p style="margin: 16px 0 0 0; color: #9ca3af; font-size: 12px; text-align: center;">
                                 {% trans "This email was sent to" %} <strong>{{ recipient_email }}</strong>

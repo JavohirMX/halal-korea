@@ -84,10 +84,12 @@
             </div>
         </div>
 
+        {% if TURNSTILE_ENABLED %}
         <div id="login-turnstile"
              class="cf-turnstile"
              data-sitekey="{{ TURNSTILE_SITEKEY }}"
              data-action="login"></div>
+        {% endif %}
 
         <div>
             <button type="submit" 
@@ -176,7 +178,7 @@ function togglePassword(inputId) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.HalalTurnstile) {
+    if (window.TURNSTILE_ENABLED && window.HalalTurnstile) {
         window.HalalTurnstile.render('#login-turnstile', { action: 'login' });
     }
 });

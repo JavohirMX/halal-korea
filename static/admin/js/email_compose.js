@@ -94,6 +94,7 @@
         var previewModal = root.querySelector('#email-preview-modal');
         var previewIframe = root.querySelector('#email-preview-iframe');
         var previewSubjectText = root.querySelector('#preview-modal-subject');
+        var previewFromText = root.querySelector('#preview-modal-from');
         var previewFrameContainer = root.querySelector('#preview-frame-container');
         var btnOpenPreview = root.querySelector('#btn-open-preview');
         var btnActionsPreview = root.querySelector('#btn-actions-preview');
@@ -119,9 +120,94 @@
 
         // ---- Audience mode -------------------------------------------------
 
+        function checkedValue(name) {
+            var checked = root.querySelector('input[name="' + name + '"]:checked');
+            return checked ? checked.value : '';
+        }
+
         function activeMode() {
-            var checked = root.querySelector('input[name="audience_mode"]:checked');
-            return checked ? checked.value : config.defaultMode;
+            return checkedValue('audience_mode') || config.defaultMode;
+        }
+
+        function appendSenderFields(formData) {
+            formData.append('from_choice', checkedValue('from_choice') || 'noreply');
+            var customFrom = root.querySelector('#id_custom_from_email');
+            formData.append('custom_from_email', customFrom ? customFrom.value : '');
+            formData.append('greeting_choice', checkedValue('greeting_choice') || 'hi');
+            var customGreeting = root.querySelector('#id_custom_greeting');
+            formData.append('custom_greeting', customGreeting ? customGreeting.value : '');
+            var signoff = root.querySelector('#id_signoff');
+            formData.append('signoff', signoff ? signoff.value : '');
+        }
+
+        var FROM_LABELS = {
+            noreply: 'No-reply',
+            contact: 'Contact',
+            custom: 'Custom'
+        };
+        var GREETING_LABELS = {
+            hi: 'Hi {name},',
+            hello: 'Hello {name},',
+            salam: 'Assalamu alaikum {name},',
+            none: 'No greeting',
+            custom: 'Custom'
+        };
+
+        function updateSenderSummary() {
+            var summary = root.querySelector('#sender-summary');
+            if (!summary) {
+                return;
+            }
+            var fromChoice = checkedValue('from_choice') || 'noreply';
+            var greetingChoice = checkedValue('greeting_choice') || 'hi';
+            var greeting = GREETING_LABELS[greetingChoice] || GREETING_LABELS.hi;
+            if (greetingChoice === 'custom') {
+                var customGreeting = root.querySelector('#id_custom_greeting');
+                greeting = (customGreeting && customGreeting.value.trim()) || 'Custom';
+            }
+            summary.textContent = (FROM_LABELS[fromChoice] || 'No-reply') + ' · ' + greeting;
+        }
+
+        function updateRecipientsSummary(count) {
+            var summary = root.querySelector('#recipients-summary');
+            if (!summary) {
+                return;
+            }
+            var mode = activeMode();
+            var total = count;
+            if (total === undefined || total === null) {
+                total = countEl ? countEl.textContent : '0';
+            }
+            summary.textContent = (MODE_LABELS[mode] || mode) + ' · ' + total;
+        }
+
+        function bindSectionToggles() {
+            root.querySelectorAll('.section-toggle').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var panel = document.getElementById(button.getAttribute('aria-controls'));
+                    var open = button.getAttribute('aria-expanded') !== 'true';
+                    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    if (panel) {
+                        panel.hidden = !open;
+                    }
+                    var section = button.closest('.compose-section');
+                    if (section) {
+                        section.classList.toggle('is-collapsed', !open);
+                    }
+                });
+            });
+        }
+
+        function syncSenderPanels() {
+            var fromChoice = checkedValue('from_choice');
+            var greetingChoice = checkedValue('greeting_choice');
+            root.querySelectorAll('[data-sender-panel]').forEach(function (panel) {
+                var kind = panel.getAttribute('data-sender-panel');
+                var show = (kind === 'custom-from' && fromChoice === 'custom') ||
+                    (kind === 'custom-greeting' && greetingChoice === 'custom');
+                panel.hidden = !show;
+            });
+            updateSenderSummary();
         }
 
         function modeInputs() {
@@ -163,6 +249,7 @@
             if (modeEl && MODE_LABELS[mode]) {
                 modeEl.textContent = MODE_LABELS[mode];
             }
+            updateRecipientsSummary();
 
             updateUserChipsVisibility();
             schedulePreview();
@@ -171,6 +258,16 @@
         modeInputs().forEach(function (input) {
             input.addEventListener('change', syncMode);
         });
+
+        root.querySelectorAll('input[name="from_choice"], input[name="greeting_choice"]').forEach(function (input) {
+            input.addEventListener('change', syncSenderPanels);
+        });
+        var customGreetingInput = root.querySelector('#id_custom_greeting');
+        if (customGreetingInput) {
+            customGreetingInput.addEventListener('input', updateSenderSummary);
+        }
+        bindSectionToggles();
+        updateSenderSummary();
 
         // ---- Live preview --------------------------------------------------
 
@@ -294,6 +391,7 @@
             if (countEl) {
                 countEl.textContent = data.count;
             }
+            updateRecipientsSummary(data.count);
             renderSample(data.sample || []);
             renderMeta(data);
 
@@ -882,6 +980,7 @@
             if (isHtml) {
                 formData.append('send_as_html', 'on');
             }
+            appendSenderFields(formData);
 
             if (previewIframe) {
                 previewIframe.srcdoc = '<p style="font-family:sans-serif;padding:20px;color:#666;">Rendering preview…</p>';
@@ -898,6 +997,9 @@
                     return res.json();
                 })
                 .then(function (data) {
+                    if (previewFromText && data.from_email) {
+                        previewFromText.textContent = data.from_email;
+                    }
                     if (previewIframe && data.html) {
                         previewIframe.srcdoc = data.html;
                     }
@@ -980,6 +1082,7 @@
             if (isHtml) {
                 formData.append('send_as_html', 'on');
             }
+            appendSenderFields(formData);
 
             btnDoTestSend.disabled = true;
             btnDoTestSend.textContent = 'Sending test…';
@@ -1041,16 +1144,15 @@
             }
         });
 
-        // Close modals when clicking backdrop
-        [previewModal, testSendModal].forEach(function (modal) {
-            if (modal) {
-                modal.addEventListener('click', function (e) {
-                    if (e.target === modal) {
-                        modal.hidden = true;
-                    }
-                });
-            }
-        });
+        // The preview stays open until the X button or Escape. Clicks inside
+        // the letter, on the frame, or on the dimmed backdrop must not dismiss it.
+        if (testSendModal) {
+            testSendModal.addEventListener('click', function (e) {
+                if (e.target === testSendModal) {
+                    testSendModal.hidden = true;
+                }
+            });
+        }
 
         // ---- Form submission & safety ---------------------------------------
 
@@ -1106,6 +1208,7 @@
 
         updateCounters();
         syncMode();
+        syncSenderPanels();
     }
 
     document.addEventListener('DOMContentLoaded', function () {

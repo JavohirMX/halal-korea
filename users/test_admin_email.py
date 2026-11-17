@@ -1,6 +1,7 @@
 """Tests for admin user email helpers and compose UI."""
 from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.core import mail
@@ -1112,6 +1113,7 @@ class AdminEmailDeepLinkTests(TestCase):
         response = self.client.get(f'{self.hub_url}?tab=compose')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self._checked_mode(response), 'segment')
+        self.assertContains(response, 'for="id_audience_mode_0"')
 
     def test_users_shortcut_redirects_to_hub(self):
         self._login_admin()
@@ -1296,6 +1298,8 @@ class AdminEmailEnhancedFeaturesTests(TestCase):
         self.assertIn('[TEST]', mail.outbox[0].subject)
 
     def test_stale_ids_tolerated_in_all_audience_mode(self):
+        from users.forms import AdminEmailComposeForm
+
         form = AdminEmailComposeForm(
             data={
                 'audience_mode': 'all',
@@ -1305,3 +1309,295 @@ class AdminEmailEnhancedFeaturesTests(TestCase):
             }
         )
         self.assertTrue(form.is_valid())
+
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class AdminEmailSenderAndGreetingTests(TestCase):
+    """From address, greeting, and closing on the admin compose flow."""
+
+    def setUp(self):
+        self.client = Client()
+        self.admin = User.objects.create_superuser(
+            username='admin', email='admin@example.com', password='adminpass123',
+        )
+        self.amina = User.objects.create_user(
+            username='amina',
+            email='amina@example.com',
+            password='pass12345',
+            first_name='Amina',
+            last_name='Khan',
+        )
+        self.hub_url = reverse('admin_email:hub')
+        self.preview_render_url = reverse('admin_email:render_preview')
+        self.test_send_url = reverse('admin_email:test_send')
+        self.client.login(username='admin', password='adminpass123')
+
+    def _send(self, **extra):
+        payload = {
+            'audience_mode': 'single',
+            'user_id': str(self.amina.pk),
+            'subject': 'A note',
+            'message': 'Body copy',
+        }
+        payload.update(extra)
+        return self.client.post(f'{self.hub_url}?tab=compose', payload)
+
+    def _html(self, message):
+        return message.alternatives[0][0]
+
+    def test_compose_page_renders_sender_card(self):
+        response = self.client.get(f'{self.hub_url}?tab=compose')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="sender-card"')
+        self.assertContains(response, 'name="from_choice"')
+        self.assertContains(response, 'name="greeting_choice"')
+        self.assertContains(response, 'name="signoff"')
+        self.assertContains(response, 'Brevo rejects a sender that is not verified on the account.')
+        self.assertContains(response, 'value="noreply"')
+        self.assertContains(response, 'value="contact"')
+        self.assertContains(response, 'value="hello"')
+        self.assertContains(response, 'value="salam"')
+        self.assertContains(response, 'value="none"')
+        self.assertContains(response, 'data-sender-panel="custom-from"')
+        self.assertContains(response, 'data-sender-panel="custom-greeting"')
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_omitted_sender_kwargs_keep_today_defaults(self, _mock_submit):
+        from users.utils import _deliver_email, queue_admin_emails, send_admin_email_to_address
+
+        ok = send_admin_email_to_address(
+            'guest@example.com', 'Hello', 'Plain body', display_name='Guest',
+        )
+        self.assertTrue(ok)
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertIn('Hi Guest,', mail.outbox[0].body)
+        self.assertIn('Best regards,', mail.outbox[0].body)
+        self.assertIn('The Halal Korea Team', mail.outbox[0].body)
+        self.assertIn('Hi Guest,', self._html(mail.outbox[0]))
+
+        mail.outbox.clear()
+        result = queue_admin_emails(
+            [{'email': 'queued@example.com', 'name': 'Que'}],
+            'Subject',
+            'Body',
+        )
+        self.assertEqual(result['sent'], 1)
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertIn('Hi Que,', mail.outbox[0].body)
+
+        mail.outbox.clear()
+        _deliver_email(
+            subject='Direct',
+            plain_message='Plain',
+            html_message='<p>Plain</p>',
+            recipient='direct@example.com',
+            success_log='ok',
+            error_log='bad',
+        )
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_compose_without_sender_fields_keeps_defaults(self, _mock_submit):
+        response = self.client.post(
+            f'{self.hub_url}?tab=compose',
+            {
+                'audience_mode': 'manual',
+                'additional_emails': 'guest@example.com',
+                'subject': 'Legacy',
+                'message': 'Still the old copy',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertIn('Hi there,', mail.outbox[0].body)
+        self.assertIn('Best regards,', mail.outbox[0].body)
+        self.assertIn('The Halal Korea Team', self._html(mail.outbox[0]))
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_from_choices(self, _mock_submit):
+        response = self._send(from_choice='noreply', custom_from_email='not-an-email')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+
+        mail.outbox.clear()
+        response = self._send(from_choice='contact')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(mail.outbox[0].from_email, settings.CONTACT_FROM_EMAIL)
+        action = AdminAction.objects.filter(action_type='email_users').latest('timestamp')
+        self.assertEqual(action.changes['from_email'], settings.CONTACT_FROM_EMAIL)
+
+        recent = self.client.get(f'{self.hub_url}?tab=recent')
+        self.assertContains(recent, 'contact@halal-korea.com')
+        self.assertContains(recent, 'A note')
+
+        mail.outbox.clear()
+        response = self._send(from_choice='custom', custom_from_email='news@halal-korea.com')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(mail.outbox[0].from_email, 'Halal Korea <news@halal-korea.com>')
+
+    def test_invalid_custom_from_is_rejected(self):
+        invalid = ['', 'not-an-email', 'a@b.com, c@d.com', 'Halal Korea <news@halal-korea.com>']
+        for address in invalid:
+            response = self._send(from_choice='custom', custom_from_email=address)
+            self.assertEqual(response.status_code, 200, address)
+            self.assertTrue(response.context['form'].errors.get('custom_from_email'), address)
+        self.assertEqual(len(mail.outbox), 0)
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_greeting_presets_substitute_name_or_there(self, _mock_submit):
+        presets = [
+            ('hi', 'Hi Amina Khan,'),
+            ('hello', 'Hello Amina Khan,'),
+            ('salam', 'Assalamu alaikum Amina Khan,'),
+        ]
+        for choice, expected in presets:
+            mail.outbox.clear()
+            response = self._send(greeting_choice=choice)
+            self.assertEqual(response.status_code, 302, choice)
+            self.assertIn(expected, mail.outbox[0].body)
+            self.assertIn(expected, self._html(mail.outbox[0]))
+
+        mail.outbox.clear()
+        response = self.client.post(
+            f'{self.hub_url}?tab=compose',
+            {
+                'audience_mode': 'manual',
+                'additional_emails': 'guest@example.com',
+                'subject': 'No name',
+                'message': 'Body copy',
+                'greeting_choice': 'hello',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('Hello there,', mail.outbox[0].body)
+        self.assertIn('Hello there,', self._html(mail.outbox[0]))
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_omitted_greeting_and_custom_closing(self, _mock_submit):
+        response = self._send(greeting_choice='none', signoff='With thanks,\nHalal Desk')
+        self.assertEqual(response.status_code, 302)
+        body = mail.outbox[0].body
+        html = self._html(mail.outbox[0])
+        self.assertNotIn('Hi Amina', body)
+        self.assertNotIn('<h2', html)
+        self.assertIn('With thanks,', body)
+        self.assertIn('Halal Desk', body)
+        self.assertIn('With thanks,', html)
+        self.assertNotIn('Best regards', body)
+        self.assertNotIn('The Halal Korea Team', html)
+
+        mail.outbox.clear()
+        response = self._send(greeting_choice='none', signoff='')
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn('Best regards', mail.outbox[0].body)
+        self.assertNotIn('The Halal Korea Team', self._html(mail.outbox[0]))
+        self.assertNotIn('<h2', self._html(mail.outbox[0]))
+
+    @patch('users.utils._email_executor.submit', side_effect=_sync_submit)
+    def test_custom_greeting_is_escaped_plain_text(self, _mock_submit):
+        response = self._send(
+            greeting_choice='custom',
+            custom_greeting='Dear {name} <script>alert(1)</script>',
+            signoff='Thanks <img src=x onerror=alert(1)>',
+        )
+        self.assertEqual(response.status_code, 302)
+        html = self._html(mail.outbox[0])
+        self.assertIn('Dear Amina Khan', html)
+        self.assertIn('&lt;script&gt;', html)
+        self.assertIn('&lt;img src=x', html)
+        self.assertNotIn('<script>', html)
+        self.assertNotIn('<img src=x', html)
+        self.assertIn('Dear Amina Khan <script>alert(1)</script>', mail.outbox[0].body)
+
+    def test_preview_and_test_send_carry_sender_fields(self):
+        preview = self.client.post(
+            self.preview_render_url,
+            {
+                'subject': 'Preview Subject',
+                'message': 'Preview body',
+                'from_choice': 'contact',
+                'greeting_choice': 'hello',
+                'signoff': 'See you,\nFriends',
+            },
+        )
+        self.assertEqual(preview.status_code, 200)
+        data = preview.json()
+        self.assertEqual(data['from_email'], settings.CONTACT_FROM_EMAIL)
+        self.assertIn('Hello admin,', data['html'])
+        self.assertIn('Hello admin,', data['plain'])
+        self.assertIn('See you,', data['html'])
+        self.assertIn('Friends', data['plain'])
+        self.assertNotIn('Best regards', data['plain'])
+
+        with patch('users.utils._email_executor.submit', side_effect=_sync_submit):
+            rejected = self.client.post(
+                self.test_send_url,
+                {
+                    'test_email': 'tester@example.com',
+                    'subject': 'Bad from',
+                    'message': 'Body',
+                    'from_choice': 'custom',
+                    'custom_from_email': 'not-an-email',
+                },
+            )
+            self.assertEqual(rejected.status_code, 400)
+            self.assertEqual(len(mail.outbox), 0)
+
+            sent = self.client.post(
+                self.test_send_url,
+                {
+                    'test_email': 'tester@example.com',
+                    'subject': 'Test Campaign',
+                    'message': 'Testing message body',
+                    'from_choice': 'custom',
+                    'custom_from_email': 'desk@halal-korea.com',
+                    'greeting_choice': 'none',
+                    'signoff': '',
+                },
+            )
+        self.assertEqual(sent.status_code, 200)
+        self.assertEqual(mail.outbox[0].from_email, 'Halal Korea <desk@halal-korea.com>')
+        self.assertNotIn('<h2', self._html(mail.outbox[0]))
+        self.assertNotIn('Best regards', mail.outbox[0].body)
+        self.assertNotIn('Hi admin', mail.outbox[0].body)
+
+    def test_draft_restores_sender_fields(self):
+        staged = self.client.post(
+            f'{self.hub_url}?tab=compose',
+            {
+                'audience_mode': 'manual',
+                'subject': '',
+                'message': 'Draft body',
+                'from_choice': 'contact',
+                'greeting_choice': 'salam',
+                'custom_greeting': 'Yo {name},',
+                'custom_from_email': 'kept@example.com',
+                'signoff': 'Peace,',
+            },
+        )
+        self.assertEqual(staged.status_code, 200)
+        after = self.client.get(f'{self.hub_url}?tab=compose')
+        initial = after.context['form'].initial
+        self.assertEqual(initial['from_choice'], 'contact')
+        self.assertEqual(initial['greeting_choice'], 'salam')
+        self.assertEqual(initial['custom_greeting'], 'Yo {name},')
+        self.assertEqual(initial['custom_from_email'], 'kept@example.com')
+        self.assertEqual(initial['signoff'], 'Peace,')
+        self.assertContains(after, 'Peace,')
+
+        cleared = self.client.post(
+            f'{self.hub_url}?tab=compose',
+            {
+                'audience_mode': 'manual',
+                'subject': '',
+                'message': 'Draft body',
+                'from_choice': 'noreply',
+                'greeting_choice': 'none',
+                'signoff': '',
+            },
+        )
+        self.assertEqual(cleared.status_code, 200)
+        restored = self.client.get(f'{self.hub_url}?tab=compose')
+        self.assertEqual(restored.context['form'].initial['signoff'], '')
+        self.assertEqual(restored.context['form'].initial['greeting_choice'], 'none')
+        self.assertEqual(restored.context['form'].initial['from_choice'], 'noreply')

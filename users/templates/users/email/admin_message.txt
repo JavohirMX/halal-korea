@@ -3,14 +3,14 @@
                     {{ site_name|upper }}
 ═══════════════════════════════════════════════════════════════════
 
-{% trans "Hi" %} {{ greeting_name }},
+{% if greeting_text %}{% autoescape off %}{{ greeting_text }}{% endautoescape %}
 
-{{ message }}
+{% endif %}{{ message }}
 
 ───────────────────────────────────────────────────────────────────
-
-{% trans "Best regards," %}
-{% trans "The Halal Korea Team" %}
+{% if signoff_text %}
+{% autoescape off %}{{ signoff_text }}{% endautoescape %}
+{% endif %}
 {% if recipient_email %}
 📧 {% trans "This email was sent to:" %} {{ recipient_email }}
 {% endif %}

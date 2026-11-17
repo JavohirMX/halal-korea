@@ -17,6 +17,24 @@ from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
 
+_TRUTHY = {"1", "true", "yes", "on"}
+
+
+def is_turnstile_enabled() -> bool:
+    """
+    Whether the security check should run.
+
+    An explicit TURNSTILE_ENABLED env value wins. When it is unset, the check
+    is off in local debug mode and on everywhere else (including the test
+    runner, which forces DEBUG off).
+    """
+    flag = getattr(settings, "TURNSTILE_ENABLED", "")
+    if isinstance(flag, bool):
+        return flag
+    if flag is None or str(flag).strip() == "":
+        return not settings.DEBUG
+    return str(flag).strip().lower() in _TRUTHY
+
 
 def get_client_ip(request) -> str | None:
     """
@@ -38,7 +56,12 @@ def verify_turnstile(token, remoteip=None, action=None) -> bool:
 
     Returns True only when the response reports success (and optional
     action matches). Empty tokens, timeouts, and HTTP errors return False.
+
+    Skipped entirely when the check is disabled (local debug by default).
     """
+    if not is_turnstile_enabled():
+        return True
+
     if not token:
         return False
 
@@ -93,6 +116,8 @@ class TurnstileWidget(forms.Widget):
         self.action = action
 
     def render(self, name, value, attrs=None, renderer=None):
+        if not is_turnstile_enabled():
+            return format_html("")
         final_attrs = self.build_attrs(self.attrs, attrs)
         action = final_attrs.pop("data-action", None) or self.action
         sitekey = settings.TURNSTILE_SITEKEY
@@ -129,6 +154,8 @@ class TurnstileField(forms.CharField):
         super().__init__(*args, **kwargs)
 
     def clean(self, value):
+        if not is_turnstile_enabled():
+            return value or ""
         value = super().clean(value)
         if not verify_turnstile(value, action=self.action):
             raise forms.ValidationError(

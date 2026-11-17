@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.conf import settings
 from django.utils.html import escape, linebreaks
+from django.utils.safestring import mark_safe
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from .tokens import email_verification_token, password_reset_token
@@ -16,10 +17,138 @@ logger = logging.getLogger(__name__)
 
 _email_executor = ThreadPoolExecutor(max_workers=4)
 
+# Admin compose sender and wording. Omitted helper kwargs keep these defaults
+# so activation, password reset, and older callers stay on today's copy.
+FROM_CHOICE_NOREPLY = 'noreply'
+FROM_CHOICE_CONTACT = 'contact'
+FROM_CHOICE_CUSTOM = 'custom'
 
-def _render_admin_email(subject, body_plain, *, body_html=None, display_name=None, recipient_email=None):
+GREETING_HI = 'hi'
+GREETING_HELLO = 'hello'
+GREETING_SALAM = 'salam'
+GREETING_NONE = 'none'
+GREETING_CUSTOM = 'custom'
+
+DEFAULT_GREETING_TEMPLATE = 'Hi {name},'
+DEFAULT_SIGNOFF = 'Best regards,\nThe Halal Korea Team'
+
+GREETING_TEMPLATES = {
+    GREETING_HI: 'Hi {name},',
+    GREETING_HELLO: 'Hello {name},',
+    GREETING_SALAM: 'Assalamu alaikum {name},',
+}
+
+
+def resolve_from_email(from_choice, custom_email=''):
+    """Map a compose From choice to the address passed to the mail backend."""
+    if from_choice == FROM_CHOICE_CONTACT:
+        return getattr(
+            settings,
+            'CONTACT_FROM_EMAIL',
+            'Halal Korea <contact@halal-korea.com>',
+        )
+    if from_choice == FROM_CHOICE_CUSTOM:
+        address = (custom_email or '').strip()
+        return f'Halal Korea <{address}>'
+    return settings.DEFAULT_FROM_EMAIL
+
+
+def validate_custom_from_address(custom_email):
+    """Return an error message, or '' when the custom sender is one valid address."""
+    address = (custom_email or '').strip()
+    if not address:
+        return 'Enter an email address for the custom sender.'
+    try:
+        validate_email(address)
+    except ValidationError:
+        return 'Enter one valid email address.'
+    return ''
+
+
+def resolve_greeting_template(greeting_choice, custom_greeting=None):
+    """Return the greeting template. '' omits the heading."""
+    choice = greeting_choice or GREETING_HI
+    if choice == GREETING_NONE:
+        return ''
+    if choice == GREETING_CUSTOM:
+        if custom_greeting is None:
+            return DEFAULT_GREETING_TEMPLATE
+        return custom_greeting
+    return GREETING_TEMPLATES.get(choice, DEFAULT_GREETING_TEMPLATE)
+
+
+def sender_kwargs_from_mapping(mapping):
+    """
+    from_email, greeting_template, and signoff for a compose payload.
+
+    Missing keys keep today's defaults. A present empty signoff or a "no
+    greeting" choice is intentional and is not replaced with the default.
+    """
+    mapping = mapping or {}
+    has_custom_greeting = 'custom_greeting' in mapping
+    has_signoff = 'signoff' in mapping
+    return {
+        'from_email': resolve_from_email(
+            mapping.get('from_choice') or FROM_CHOICE_NOREPLY,
+            mapping.get('custom_from_email') or '',
+        ),
+        'greeting_template': resolve_greeting_template(
+            mapping.get('greeting_choice') or GREETING_HI,
+            mapping.get('custom_greeting') if has_custom_greeting else None,
+        ),
+        'signoff': mapping.get('signoff') if has_signoff else None,
+    }
+
+
+def _greeting_text(greeting_template, display_name):
+    """Substitute {name}. None keeps the default line; a blank template omits it."""
+    name = (display_name or '').strip() or 'there'
+    if greeting_template is None:
+        greeting_template = DEFAULT_GREETING_TEMPLATE
+    template = str(greeting_template).strip()
+    if not template:
+        return ''
+    return template.replace('{name}', name)
+
+
+def _signoff_text(signoff):
+    """None keeps the default closing. A blank closing is omitted."""
+    if signoff is None:
+        signoff = DEFAULT_SIGNOFF
+    return str(signoff).replace('\r\n', '\n').replace('\r', '\n').strip()
+
+
+def _signoff_html(signoff_text):
+    """Escaped plain-text closing. The last line of a multi-line closing stays emphasized."""
+    if not signoff_text:
+        return ''
+    lines = signoff_text.split('\n')
+    last = len(lines) - 1
+    parts = []
+    for index, line in enumerate(lines):
+        escaped = escape(line)
+        if index == last and last > 0:
+            parts.append(f'<strong style="color: #22c55e;">{escaped}</strong>')
+        else:
+            parts.append(f'{escaped}')
+    return mark_safe('<br>'.join(parts))
+
+
+def _render_admin_email(
+    subject,
+    body_plain,
+    *,
+    body_html=None,
+    display_name=None,
+    recipient_email=None,
+    from_email=None,
+    greeting_template=None,
+    signoff=None,
+):
     """Render branded admin message templates. Returns (plain_message, html_message)."""
     greeting_name = (display_name or '').strip() or 'there'
+    greeting_text = _greeting_text(greeting_template, greeting_name)
+    signoff_text = _signoff_text(signoff)
     if body_html:
         message_html = body_html
     else:
@@ -28,6 +157,12 @@ def _render_admin_email(subject, body_plain, *, body_html=None, display_name=Non
     context = {
         'subject': subject,
         'greeting_name': greeting_name,
+        'greeting_text': greeting_text,
+        # Escaped before the HTML template so a custom line cannot inject markup.
+        'greeting_html': mark_safe(escape(greeting_text)) if greeting_text else '',
+        'signoff_text': signoff_text,
+        'signoff_html': _signoff_html(signoff_text),
+        'from_email': from_email or '',
         'message': body_plain,
         'message_html': message_html,
         'recipient_email': recipient_email or '',
@@ -38,7 +173,17 @@ def _render_admin_email(subject, body_plain, *, body_html=None, display_name=Non
     return plain_message, html_message
 
 
-def send_admin_email_to_address(email, subject, body_plain, *, body_html=None, display_name=None):
+def send_admin_email_to_address(
+    email,
+    subject,
+    body_plain,
+    *,
+    body_html=None,
+    display_name=None,
+    from_email=None,
+    greeting_template=None,
+    signoff=None,
+):
     """
     Validate an address, render the branded admin template, and queue delivery.
     Returns True when queued, False on validation or queue failure.
@@ -61,6 +206,9 @@ def send_admin_email_to_address(email, subject, body_plain, *, body_html=None, d
             body_html=body_html,
             display_name=display_name,
             recipient_email=email,
+            from_email=from_email,
+            greeting_template=greeting_template,
+            signoff=signoff,
         )
         _email_executor.submit(
             _deliver_email,
@@ -70,6 +218,7 @@ def send_admin_email_to_address(email, subject, body_plain, *, body_html=None, d
             recipient=email,
             success_log=f"Admin email sent to {email}",
             error_log=f"Failed to send admin email to {email}",
+            from_email=from_email,
         )
         return True
     except Exception as e:
@@ -92,7 +241,16 @@ def send_admin_email(user, subject, body_plain, *, body_html=None):
     )
 
 
-def queue_admin_emails(recipients, subject, body_plain, *, body_html=None):
+def queue_admin_emails(
+    recipients,
+    subject,
+    body_plain,
+    *,
+    body_html=None,
+    from_email=None,
+    greeting_template=None,
+    signoff=None,
+):
     """
     Queue branded admin emails to a list of {email, name?} dicts.
     De-duplicates by lowercased email. Skips blank addresses.
@@ -125,6 +283,9 @@ def queue_admin_emails(recipients, subject, body_plain, *, body_html=None):
             body_plain,
             body_html=body_html,
             display_name=name,
+            from_email=from_email,
+            greeting_template=greeting_template,
+            signoff=signoff,
         ):
             sent += 1
         else:
@@ -133,14 +294,24 @@ def queue_admin_emails(recipients, subject, body_plain, *, body_html=None):
     return {'sent': sent, 'skipped': skipped, 'failed': failed}
 
 
-def _deliver_email(subject, plain_message, html_message, recipient, success_log, error_log, max_retries=2):
+def _deliver_email(
+    subject,
+    plain_message,
+    html_message,
+    recipient,
+    success_log,
+    error_log,
+    max_retries=2,
+    from_email=None,
+):
     attempts = max_retries + 1
+    sender = from_email or settings.DEFAULT_FROM_EMAIL
     for attempt in range(1, attempts + 1):
         try:
             send_mail(
                 subject=subject,
                 message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=sender,
                 recipient_list=[recipient],
                 html_message=html_message,
                 fail_silently=False,

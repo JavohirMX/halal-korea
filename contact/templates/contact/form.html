@@ -60,12 +60,14 @@
     </div>
 
     <!-- Turnstile CAPTCHA (explicit render via HalalTurnstile) -->
+    {% if TURNSTILE_ENABLED %}
     <div>
         <div id="contact-turnstile"
              data-action="contact"
              {% if TURNSTILE_SITEKEY %}data-sitekey="{{ TURNSTILE_SITEKEY }}"{% endif %}></div>
         <div class="error-message text-red-500 text-sm mt-1 hidden" data-field="captcha"></div>
     </div>
+    {% endif %}
     
     <!-- Submit Button -->
     <div>

@@ -51,5 +51,10 @@ def static_info_context(request):
 
 
 def turnstile_context(request):
-    """Expose Cloudflare Turnstile sitekey to all templates."""
-    return {"TURNSTILE_SITEKEY": settings.TURNSTILE_SITEKEY}
+    """Expose Cloudflare Turnstile sitekey and whether the check is active."""
+    from utils.turnstile import is_turnstile_enabled
+
+    return {
+        "TURNSTILE_SITEKEY": settings.TURNSTILE_SITEKEY,
+        "TURNSTILE_ENABLED": is_turnstile_enabled(),
+    }

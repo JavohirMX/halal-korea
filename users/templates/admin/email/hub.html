@@ -66,6 +66,9 @@
                             </td>
                             <td>
                                 <div class="recent-subject">{{ action.changes.subject|default:action.object_repr }}</div>
+                                {% if action.changes.from_email %}
+                                    <div class="recent-from">{{ action.changes.from_email }}</div>
+                                {% endif %}
                             </td>
                             <td>
                                 <span class="badge-audience">{{ action.changes.audience_label|default:action.changes.mode|default:"broadcast" }}</span>

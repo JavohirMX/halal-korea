@@ -150,7 +150,7 @@ function initializeContactForm() {
     if (!form) return;
 
     // Explicit Turnstile render after AJAX form inject (no cf-turnstile auto-implicit).
-    if (window.HalalTurnstile) {
+    if (window.TURNSTILE_ENABLED && window.HalalTurnstile) {
         window.HalalTurnstile.render('#contact-turnstile', { action: 'contact' });
     }
     
