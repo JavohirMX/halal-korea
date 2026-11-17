@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    if (window.HalalTurnstile) {
+    if (window.TURNSTILE_ENABLED && window.HalalTurnstile) {
         window.HalalTurnstile.render('#id_captcha', { action: 'register' });
     }
 });

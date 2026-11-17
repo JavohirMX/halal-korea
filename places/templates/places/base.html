@@ -818,6 +818,7 @@
     <!-- Base Scripts -->
     <script>
         window.TURNSTILE_SITEKEY = "{{ TURNSTILE_SITEKEY|escapejs }}";
+        window.TURNSTILE_ENABLED = {{ TURNSTILE_ENABLED|yesno:"true,false" }};
     </script>
     <!--
         Turnstile api.js must NOT be loaded with async/defer: Cloudflare throws

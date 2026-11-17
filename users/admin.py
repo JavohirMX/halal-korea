@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+from django.core.validators import validate_email
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -24,7 +26,18 @@ from .forms import (
 )
 from .html_sanitizer import sanitize_email_html
 from .models import User
-from .utils import _render_admin_email, queue_admin_emails, send_admin_email_to_address
+from .utils import (
+    DEFAULT_GREETING_TEMPLATE,
+    DEFAULT_SIGNOFF,
+    FROM_CHOICE_CUSTOM,
+    FROM_CHOICE_NOREPLY,
+    GREETING_HI,
+    _render_admin_email,
+    queue_admin_emails,
+    send_admin_email_to_address,
+    sender_kwargs_from_mapping,
+    validate_custom_from_address,
+)
 
 
 LARGE_SEND_THRESHOLD = 50
@@ -50,7 +63,16 @@ DRAFT_KEYS = (
     'subject',
     'message',
     'send_as_html',
+    'from_choice',
+    'custom_from_email',
+    'greeting_choice',
+    'custom_greeting',
+    'signoff',
 )
+
+# Cleared on purpose. An empty closing or custom greeting must survive a reload
+# instead of snapping back to the field default.
+DRAFT_EMPTY_OK = ('signoff', 'custom_greeting', 'custom_from_email')
 
 # Query params that represent a deliberate choice. If any is present the saved
 # draft must not be restored on top of it — otherwise a stale draft silently
@@ -204,6 +226,12 @@ class UserAdmin(admin.ModelAdmin):
             'from_hub': hub_mode,
             'tab': 'compose',
             'recent_sends': recent_sends or [],
+            'default_from_email': settings.DEFAULT_FROM_EMAIL,
+            'contact_from_email': getattr(
+                settings,
+                'CONTACT_FROM_EMAIL',
+                'Halal Korea <contact@halal-korea.com>',
+            ),
             'compose_js_config': {
                 'previewUrl': reverse('admin_email:preview'),
                 'searchUrl': reverse('admin_email:user_search'),
@@ -266,11 +294,13 @@ class UserAdmin(admin.ModelAdmin):
             body_plain = body_input
             body_html = linebreaks(escape(body_plain))
 
+        sender = form.resolved_sender_kwargs()
         result = queue_admin_emails(
             recipients,
             form.cleaned_data['subject'],
             body_plain,
             body_html=body_html,
+            **sender,
         )
         result['skipped'] = result.get('skipped', 0) + skipped
 
@@ -282,6 +312,7 @@ class UserAdmin(admin.ModelAdmin):
             ad_hoc_count=ad_hoc_added,
             mode=mode,
             recipient_count=total,
+            from_email=sender['from_email'],
         )
 
         self._discard_draft(request)
@@ -320,6 +351,7 @@ class UserAdmin(admin.ModelAdmin):
             'subject': source.get('subject', ''),
             'message': source.get('message', ''),
             'send_as_html': _as_bool(source.get('send_as_html')),
+            **self._sender_initial(source),
         }
 
     def _request_is_explicit(self, request):
@@ -337,10 +369,30 @@ class UserAdmin(admin.ModelAdmin):
         # Bare GET: fall back to the saved draft so in-progress work is not lost.
         draft = request.session.get(f'{DRAFT_SESSION_PREFIX}{request.user.pk}') or {}
         for key in DRAFT_KEYS:
+            if key not in draft:
+                continue
             value = draft.get(key)
+            if key in DRAFT_EMPTY_OK:
+                initial[key] = '' if value is None else value
+                continue
             if value is None or value == '' or value is False:
                 continue
             initial[key] = value
+        return initial
+
+    def _sender_initial(self, source):
+        """Sender fields that were actually submitted. Absent keys keep field defaults."""
+        initial = {}
+        if source.get('from_choice'):
+            initial['from_choice'] = source.get('from_choice')
+        if source.get('greeting_choice'):
+            initial['greeting_choice'] = source.get('greeting_choice')
+        if 'custom_from_email' in source:
+            initial['custom_from_email'] = source.get('custom_from_email') or ''
+        if 'custom_greeting' in source:
+            initial['custom_greeting'] = source.get('custom_greeting')
+        if 'signoff' in source:
+            initial['signoff'] = source.get('signoff')
         return initial
 
     def _filters_from_mapping(self, mapping, *, include_staff):
@@ -445,6 +497,14 @@ class UserAdmin(admin.ModelAdmin):
         # Unchecked boxes are absent from a POST body, so normalise to real bools.
         draft['include_staff'] = _as_bool(source.get('include_staff'))
         draft['send_as_html'] = _as_bool(source.get('send_as_html'))
+        # A first visit has no sender keys yet. Store the defaults so a later
+        # reload does not treat "never chosen" as "closing cleared".
+        draft['from_choice'] = source.get('from_choice') or FROM_CHOICE_NOREPLY
+        draft['greeting_choice'] = source.get('greeting_choice') or GREETING_HI
+        if 'custom_greeting' not in source:
+            draft['custom_greeting'] = DEFAULT_GREETING_TEMPLATE
+        if 'signoff' not in source:
+            draft['signoff'] = DEFAULT_SIGNOFF
 
         request.session[f'{DRAFT_SESSION_PREFIX}{request.user.pk}'] = draft
         request.session.modified = True
@@ -626,17 +686,20 @@ class UserAdmin(admin.ModelAdmin):
             body_html = linebreaks(escape(body_plain))
 
         display_name = getattr(request.user, 'full_name', '') or request.user.username or 'Recipient'
+        sender = sender_kwargs_from_mapping(payload)
         plain_message, html_message = _render_admin_email(
             subject=subject,
             body_plain=body_plain,
             body_html=body_html,
             display_name=display_name,
             recipient_email=request.user.email or 'recipient@example.com',
+            **sender,
         )
         return {
             'subject': subject,
             'html': html_message,
             'plain': plain_message,
+            'from_email': sender['from_email'],
         }, 200
 
     def test_send_email(self, request):
@@ -647,10 +710,14 @@ class UserAdmin(admin.ModelAdmin):
             return {'error': 'No test email address provided.'}, 400
 
         try:
-            from django.core.validators import validate_email
             validate_email(target_email)
         except Exception:
             return {'error': f'Invalid email address: {target_email}'}, 400
+
+        if (payload.get('from_choice') or FROM_CHOICE_NOREPLY) == FROM_CHOICE_CUSTOM:
+            error = validate_custom_from_address(payload.get('custom_from_email'))
+            if error:
+                return {'error': error}, 400
 
         subject = (payload.get('subject') or '').strip() or 'Test: Admin message'
         body_input = (payload.get('message') or '').strip() or 'This is a test message from Halal Korea admin.'
@@ -666,18 +733,31 @@ class UserAdmin(admin.ModelAdmin):
             body_html = linebreaks(escape(body_plain))
 
         display_name = getattr(request.user, 'full_name', '') or request.user.username
+        sender = sender_kwargs_from_mapping(payload)
         ok = send_admin_email_to_address(
             target_email,
             f"[TEST] {subject}",
             body_plain,
             body_html=body_html,
             display_name=display_name,
+            **sender,
         )
         if ok:
             return {'ok': True, 'email': target_email}, 200
         return {'error': f'Failed to send test email to {target_email}.'}, 500
 
-    def _log_admin_action(self, request, *, subject, result, filters_meta, ad_hoc_count, mode, recipient_count):
+    def _log_admin_action(
+        self,
+        request,
+        *,
+        subject,
+        result,
+        filters_meta,
+        ad_hoc_count,
+        mode,
+        recipient_count,
+        from_email='',
+    ):
         try:
             content_type = ContentType.objects.get_for_model(User)
             AdminAction.objects.create(
@@ -688,6 +768,7 @@ class UserAdmin(admin.ModelAdmin):
                 object_repr=f'Email users ({mode}): {subject}'[:200],
                 changes={
                     'subject': subject,
+                    'from_email': from_email or settings.DEFAULT_FROM_EMAIL,
                     'mode': mode,
                     'audience_mode': mode,
                     'audience_label': AUDIENCE_MODE_LABELS.get(mode, mode),

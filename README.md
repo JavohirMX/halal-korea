@@ -53,7 +53,7 @@ contribution goes through an admin moderation workflow before it goes live.
 | Admin UI | django-jazzmin |
 | Auth | django-allauth (email, Google, GitHub) |
 | External services | Google Maps, Aladhan prayer times API, Brevo email, Telegram Bot API, Cloudflare Turnstile, Sentry (optional) |
-| Packaging | Docker + Docker Compose |
+| Packaging | Docker + Docker Compose, uv, Makefile |
 
 ```mermaid
 flowchart LR
@@ -106,6 +106,8 @@ cp .env.example .env        # set DJANGO_SECRET_KEY, DB_* and GOOGLE_MAPS_API_KE
 python manage.py migrate
 python manage.py runserver
 ```
+
+With [uv](https://docs.astral.sh/uv/) installed, `make setup` creates `.env`, installs dependencies, and the [Makefile](Makefile) covers migrate, test, Docker, and translations. Run `make help` for the full list.
 
 ## Tests
 

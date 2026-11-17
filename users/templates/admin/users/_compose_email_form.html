@@ -13,13 +13,24 @@
         {% endif %}
 
         {# ---------- Audience ---------- #}
-        <div class="card">
-            <h2 class="card-title">{% trans "Recipients" %}</h2>
+        <div class="card compose-section" id="recipients-section">
+            <button type="button"
+                    class="section-toggle"
+                    id="recipients-toggle"
+                    aria-expanded="true"
+                    aria-controls="recipients-panel">
+                <span>
+                    <span class="section-title">{% trans "Recipients" %}</span>
+                    <span class="section-summary" id="recipients-summary">{{ audience_mode_label }} · {{ recipient_count }}</span>
+                </span>
+                <span class="section-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="section-panel" id="recipients-panel">
 
             {{ form.audience_mode.errors }}
             <div class="audience-picker" role="radiogroup" aria-label="{{ form.audience_mode.label }}">
                 {% for radio in form.audience_mode %}
-                    <label class="audience-option" for="{{ radio.id }}">
+                    <label class="audience-option" for="{{ radio.id_for_label }}">
                         {{ radio.tag }}
                         <span class="audience-option-text">{{ radio.choice_label }}</span>
                     </label>
@@ -121,6 +132,87 @@
                     {% endif %}
                 </p>
             </div>
+            </div>
+        </div>
+
+        {# ---------- Sender ---------- #}
+        <div class="card compose-section{% if not form.from_choice.errors and not form.custom_from_email.errors and not form.greeting_choice.errors and not form.custom_greeting.errors and not form.signoff.errors %} is-collapsed{% endif %}" id="sender-card">
+            <button type="button"
+                    class="section-toggle"
+                    id="sender-toggle"
+                    aria-expanded="{% if form.from_choice.errors or form.custom_from_email.errors or form.greeting_choice.errors or form.custom_greeting.errors or form.signoff.errors %}true{% else %}false{% endif %}"
+                    aria-controls="sender-panel">
+                <span>
+                    <span class="section-title">{% trans "Sender" %}</span>
+                    <span class="section-summary" id="sender-summary">{% trans "No-reply · Hi {name}," %}</span>
+                </span>
+                <span class="section-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="section-panel" id="sender-panel"{% if not form.from_choice.errors and not form.custom_from_email.errors and not form.greeting_choice.errors and not form.custom_greeting.errors and not form.signoff.errors %} hidden{% endif %}>
+
+            <div class="sender-group">
+                <p class="sender-label" id="from-choice-label">{{ form.from_choice.label }}</p>
+                {{ form.from_choice.errors }}
+                <div class="audience-picker" role="radiogroup" aria-labelledby="from-choice-label">
+                    {% for radio in form.from_choice %}
+                        <label class="audience-option" for="{{ radio.id_for_label }}">
+                            {{ radio.tag }}
+                            <span class="audience-option-text">
+                                <span class="option-title">{{ radio.choice_label }}</span>
+                                {% if radio.choice_value == 'noreply' %}
+                                    <span class="option-detail">{{ default_from_email }}</span>
+                                {% elif radio.choice_value == 'contact' %}
+                                    <span class="option-detail">{{ contact_from_email }}</span>
+                                {% else %}
+                                    <span class="option-detail">{% trans "Halal Korea <your address>" %}</span>
+                                {% endif %}
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+                {% if form.from_choice.help_text %}
+                    <p class="help">{{ form.from_choice.help_text }}</p>
+                {% endif %}
+                <div class="sender-panel" data-sender-panel="custom-from" {% if form.from_choice.value != 'custom' %}hidden{% endif %}>
+                    <label for="{{ form.custom_from_email.id_for_label }}">{{ form.custom_from_email.label }}</label>
+                    {{ form.custom_from_email.errors }}
+                    {{ form.custom_from_email }}
+                    {% if form.custom_from_email.help_text %}
+                        <p class="help">{{ form.custom_from_email.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="sender-group">
+                <p class="sender-label" id="greeting-choice-label">{{ form.greeting_choice.label }}</p>
+                {{ form.greeting_choice.errors }}
+                <div class="audience-picker" role="radiogroup" aria-labelledby="greeting-choice-label">
+                    {% for radio in form.greeting_choice %}
+                        <label class="audience-option" for="{{ radio.id_for_label }}">
+                            {{ radio.tag }}
+                            <span class="audience-option-text">{{ radio.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                {% if form.greeting_choice.help_text %}
+                    <p class="help">{{ form.greeting_choice.help_text }}</p>
+                {% endif %}
+                <div class="sender-panel" data-sender-panel="custom-greeting" {% if form.greeting_choice.value != 'custom' %}hidden{% endif %}>
+                    <label for="{{ form.custom_greeting.id_for_label }}">{{ form.custom_greeting.label }}</label>
+                    {{ form.custom_greeting.errors }}
+                    {{ form.custom_greeting }}
+                </div>
+            </div>
+
+            <div class="sender-group">
+                <label for="{{ form.signoff.id_for_label }}">{{ form.signoff.label }}</label>
+                {{ form.signoff.errors }}
+                {{ form.signoff }}
+                {% if form.signoff.help_text %}
+                    <p class="help">{{ form.signoff.help_text }}</p>
+                {% endif %}
+            </div>
+            </div>
         </div>
 
         {# ---------- Message ---------- #}
@@ -150,7 +242,7 @@
             <div class="form-row">
                 <div class="label-with-meta">
                     <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
-                    <span class="word-counter" id="message-word-counter">0 words</span>
+                    <span class="word-counter" id="message-word-counter">0 words, 0 chars</span>
                 </div>
                 <div class="format-toolbar" role="toolbar" aria-label="{% trans 'Text formatting tools' %}">
                     <button type="button" class="toolbar-btn" data-format="b" title="{% trans 'Bold' %}"><strong>B</strong></button>
@@ -229,9 +321,11 @@
 
         <div class="actions">
             <input type="submit" class="default btn-send" id="btn-submit-send" value="{% trans 'Send email' %}">
-            <button type="button" class="btn btn-outline-info" id="btn-actions-preview">{% trans "Preview Email" %}</button>
-            <a href="{% url 'admin_email:hub' %}?tab=recent" class="btn-cancel">{% trans 'Cancel' %}</a>
-            <a href="{% url 'admin_email:hub' %}?tab=compose&amp;discard=1" class="discard-draft" id="discard-draft">{% trans 'Discard draft' %}</a>
+            <div class="actions-secondary">
+                <button type="button" class="btn btn-outline-info" id="btn-actions-preview">{% trans "Preview Email" %}</button>
+                <a href="{% url 'admin_email:hub' %}?tab=recent" class="btn-cancel">{% trans 'Cancel' %}</a>
+                <a href="{% url 'admin_email:hub' %}?tab=compose&amp;discard=1" class="discard-draft" id="discard-draft">{% trans 'Discard draft' %}</a>
+            </div>
         </div>
     </form>
 
@@ -253,6 +347,10 @@
                 <button type="button" class="modal-close" id="btn-close-preview" aria-label="{% trans 'Close' %}">&times;</button>
             </div>
             <div class="modal-meta">
+                <div class="preview-subject-line">
+                    <span class="preview-label">{% trans "From:" %}</span>
+                    <strong id="preview-modal-from">—</strong>
+                </div>
                 <div class="preview-subject-line">
                     <span class="preview-label">{% trans "Subject:" %}</span>
                     <strong id="preview-modal-subject">—</strong>

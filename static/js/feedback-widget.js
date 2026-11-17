@@ -267,7 +267,7 @@ class FeedbackWidget {
     }
 
     renderTurnstile() {
-        if (!window.HalalTurnstile) {
+        if (window.TURNSTILE_ENABLED === false || !window.HalalTurnstile) {
             return;
         }
         window.HalalTurnstile.render('#feedback-turnstile', {
@@ -452,8 +452,8 @@ class FeedbackWidget {
         this.hideError();
         this.setSubmitLoading(true);
 
-        const turnstileToken = this.getTurnstileToken();
-        if (!turnstileToken) {
+        const turnstileToken = window.TURNSTILE_ENABLED === false ? '' : this.getTurnstileToken();
+        if (window.TURNSTILE_ENABLED !== false && !turnstileToken) {
             this.setSubmitLoading(false);
             this.showError('Please complete the security check.');
             this.resetTurnstile();

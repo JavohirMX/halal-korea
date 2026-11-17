@@ -1,0 +1,69 @@
+[project]
+name = "halal-korea"
+version = "1.0.0"
+description = "Your trusted guide to halal places, mosques, and prayer rooms in South Korea"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "arabic-reshaper==3.0.0",
+    "asgiref==3.8.1",
+    "certifi==2025.1.31",
+    "charset-normalizer==3.4.1",
+    "dj-database-url==3.0.0",
+    "django==5.1.6",
+    "django-allauth==0.57.0",
+    "django-jazzmin==3.0.1",
+    "django-js-asset==3.1.2",
+    "django-rosetta==0.10.2",
+    "django-tinymce==4.1.0",
+    "geographiclib==2.0",
+    "geopy==2.4.1",
+    "google-analytics-data",
+    "gunicorn==23.0.0",
+    "idna==3.10",
+    "nh3>=0.2.15",
+    "openpyxl>=3.1.2",
+    "packaging==25.0",
+    "pandas>=2.1.0",
+    "pillow==11.3.0",
+    "polib==1.2.0",
+    "psycopg2-binary==2.9.10",
+    "python-bidi==0.6.6",
+    "python-decouple==3.8",
+    "python-json-logger==2.0.7",
+    "pytz==2025.2",
+    "requests==2.32.3",
+    "sentry-sdk==2.46.0",
+    "sqlparse==0.5.3",
+    "typing-extensions==4.14.0",
+    "urllib3==2.3.0",
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.6.0",
+    "ruff>=0.9.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = [
+    "E501",  # Line too long
+    "W291",  # Trailing whitespace
+    "W293",  # Blank line whitespace
+    "F401",  # Unused imports in legacy code
+    "F841",  # Unused variables in legacy code
+    "E402",  # Module import not at top
+    "F811",  # Redefined variables
+    "E722",  # Bare except
+    "E741",  # Ambiguous variable name
+    "F541",  # Unformatted f-strings
+    "F821",  # Undefined names in legacy test files
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["config", "places", "users", "prayer_times", "reviews", "blog", "contact", "feedback", "utils"]

@@ -23,6 +23,7 @@ Halal Korea is a comprehensive location-based web application designed to help M
 
 ### Tech Stack:
 - **Backend**: Django 5.1.6 with Python 3.12
+- **Package Manager & Tooling**: uv (pyproject.toml, uv.lock), Ruff, Makefile automation
 - **Database**: PostgreSQL with PostGIS extension for geospatial queries
 - **Frontend**: HTML5, Tailwind CSS 3.x, Alpine.js, Vanilla JavaScript
 - **Maps**: Google Maps JavaScript API with custom markers

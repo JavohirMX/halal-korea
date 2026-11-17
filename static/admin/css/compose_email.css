@@ -1,11 +1,19 @@
-/* Admin compose email + Email hub — theme-token styles (Jazzmin light/dark) */
+/* Admin compose email + Email hub.
+   Jazzmin's cyborg theme does not define Django's --body-bg / --body-fg,
+   so these pages set their own dark surfaces instead of falling back to white. */
 
 .compose-email,
 .email-hub,
 .email-compose {
+    --email-surface: #2b3035;
+    --email-raised: #343a40;
+    --email-text: #f1f3f5;
+    --email-muted: #c5ced6;
+    --email-border: rgba(255, 255, 255, 0.16);
+    --email-input: #1a1d20;
     max-width: 900px;
     margin: 20px auto;
-    color: var(--body-fg, inherit);
+    color: var(--email-text);
 }
 
 .email-hub {
@@ -15,18 +23,18 @@
 .compose-email .card,
 .email-hub .card,
 .email-compose .card {
-    background: var(--body-bg, transparent);
-    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    background: var(--email-surface);
+    border: 1px solid var(--email-border);
     border-radius: 8px;
     padding: 24px;
     margin-bottom: 20px;
-    color: var(--body-fg, inherit);
+    color: var(--email-text);
 }
 
 .compose-email h1,
 .email-hub h1 {
     margin-top: 0;
-    color: var(--body-fg, inherit);
+    color: var(--email-text);
 }
 
 .compose-email .form-row,
@@ -35,31 +43,43 @@
 }
 
 .compose-email label,
-.email-hub label {
+.email-hub label,
+.email-compose label {
     display: block;
     font-weight: 600;
     margin-bottom: 6px;
-    color: var(--body-fg, inherit);
+    color: var(--email-text);
 }
 
 .compose-email .help,
-.email-hub .help {
-    color: var(--secondary, var(--body-quiet-color, #6c757d));
+.email-hub .help,
+.email-compose .help {
+    color: #d5dde3;
     font-size: 0.85rem;
     margin-top: 4px;
 }
 
 .compose-email .form-control,
 .compose-email input[type="text"],
+.compose-email input[type="email"],
 .compose-email textarea,
 .compose-email select,
 .email-hub .form-control,
 .email-hub input[type="text"],
+.email-hub input[type="email"],
 .email-hub textarea,
-.email-hub select {
+.email-hub select,
+.email-compose .form-control,
+.email-compose input[type="text"],
+.email-compose input[type="email"],
+.email-compose textarea,
+.email-compose select {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    background: var(--email-input);
+    color: var(--email-text);
+    border: 1px solid var(--email-border);
 }
 
 .compose-email .filters-grid,
@@ -220,8 +240,13 @@
 }
 
 .email-compose .audience-option:has(input:checked) {
-    border-color: var(--primary, #007bff);
-    background: var(--selected-bg, rgba(0, 123, 255, 0.08));
+    border-color: #7cb7ff;
+    background: rgba(90, 169, 255, 0.22);
+    box-shadow: inset 4px 0 0 #7cb7ff;
+}
+
+.email-compose .audience-option:has(input:checked) .audience-option-text {
+    font-weight: 600;
 }
 
 .email-compose .audience-option input[type="radio"] {
@@ -271,7 +296,7 @@
     list-style: none;
     max-height: 280px;
     overflow-y: auto;
-    background: var(--body-bg, #fff);
+    background: var(--email-raised);
     border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
     border-radius: 8px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
@@ -339,7 +364,7 @@
     padding: 6px 8px 6px 12px;
     border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
     border-radius: 999px;
-    background: var(--body-bg, transparent);
+    background: var(--email-surface);
     font-size: 0.88rem;
 }
 
@@ -350,7 +375,7 @@
 
 /* Single-user panel chips are informational — nothing to remove. */
 .email-compose .audience-panel[data-audience-panel="single"] .chip {
-    background: var(--body-bg, transparent);
+    background: var(--email-surface);
 }
 
 .email-compose .chip-label {
@@ -450,9 +475,31 @@
     max-width: 240px;
 }
 
-.email-compose .actions .discard-draft {
-    margin-left: auto;
-    color: var(--secondary, var(--body-quiet-color, #6c757d));
+.email-compose .actions {
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.email-compose .actions .btn-send {
+    margin-right: 4px;
+    font-weight: 700;
+    padding-left: 22px;
+    padding-right: 22px;
+}
+
+.email-compose .actions-secondary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 16px;
+    padding-left: 16px;
+    border-left: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.email-compose .actions .discard-draft,
+.email-compose .actions-secondary .discard-draft {
+    margin-left: 0;
+    color: #d5dde3;
     font-size: 0.9rem;
 }
 
@@ -515,13 +562,24 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    gap: 12px 16px;
+    flex-wrap: wrap;
     margin-bottom: 4px;
+}
+
+.label-with-meta label {
+    margin-bottom: 0;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .char-counter,
 .word-counter {
+    flex: 0 0 auto;
+    margin-left: auto;
+    white-space: nowrap;
     font-size: 0.8rem;
-    color: var(--secondary, var(--body-quiet-color, #6c757d));
+    color: #d5dde3;
     font-weight: 500;
 }
 
@@ -533,27 +591,29 @@
 .format-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
-    background: var(--body-bg, #f8f9fa);
-    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.22);
     border-bottom: none;
     border-radius: 6px 6px 0 0;
-    padding: 6px 8px;
+    padding: 8px 10px;
 }
 
 .email-compose .format-toolbar + textarea,
-.email-compose textarea {
+.email-compose .format-toolbar + .errorlist + textarea,
+.email-compose textarea.compose-message {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
 
 .toolbar-btn {
-    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
-    background: var(--body-bg, #fff);
-    color: var(--body-fg, #333);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.1);
+    color: #f4f7f9;
     padding: 4px 10px;
     border-radius: 4px;
     font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
     line-height: 1.2;
     transition: background 0.15s ease, border-color 0.15s ease;
@@ -620,151 +680,170 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Modals (Preview & Test Send)                                        */
+/* Modals (Preview & Test Send) — scoped so they do not restyle admin */
 /* ------------------------------------------------------------------ */
 
-.modal-backdrop {
+.email-compose .modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.72);
     z-index: 1050;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 24px;
     backdrop-filter: blur(2px);
 }
 
-.modal-backdrop[hidden] {
+.email-compose .modal-backdrop[hidden] {
     display: none !important;
 }
 
-.modal-dialog {
-    background: var(--body-bg, #fff);
-    color: var(--body-fg, inherit);
-    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.35));
+.email-compose .modal-dialog {
+    background: var(--email-surface);
+    color: var(--email-text);
+    border: 1px solid var(--email-border);
     border-radius: 12px;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
     width: 100%;
-    max-width: 680px;
-    max-height: 90vh;
+    max-width: 480px;
+    max-height: calc(100vh - 48px);
+    margin: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    /* AdminLTE sets pointer-events: none on .modal-dialog and only
+       restores them on .modal-content, which this dialog does not use. */
+    pointer-events: auto;
 }
 
-.modal-preview-dialog {
-    max-width: 760px;
-    height: 85vh;
+.email-compose .modal-preview-dialog {
+    width: calc(100vw - 48px);
+    max-width: calc(100vw - 48px);
+    height: calc(100vh - 48px);
+    max-height: calc(100vh - 48px);
 }
 
-.modal-test-dialog {
+.email-compose .modal-test-dialog {
     max-width: 480px;
 }
 
-.modal-header {
+.email-compose .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 2;
     padding: 16px 20px;
-    border-bottom: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
+    border-bottom: 1px solid var(--email-border);
+    pointer-events: auto;
 }
 
-.modal-title {
+.email-compose .modal-title {
     margin: 0;
     font-size: 1.15rem;
     font-weight: 600;
+    color: var(--email-text);
 }
 
-.modal-close {
+.email-compose .modal-close {
     background: transparent;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     line-height: 1;
-    color: var(--secondary, #6c757d);
+    color: var(--email-muted);
     cursor: pointer;
-    padding: 0 4px;
+    padding: 4px 10px;
+    pointer-events: auto;
 }
 
-.modal-close:hover {
-    color: var(--body-fg, #000);
+.email-compose .modal-close:hover {
+    color: var(--email-text);
 }
 
-.modal-viewport-toggle {
+.email-compose .modal-viewport-toggle {
     display: flex;
     gap: 4px;
-    background: var(--border-color, rgba(128, 128, 128, 0.15));
+    background: rgba(255, 255, 255, 0.08);
     padding: 3px;
     border-radius: 6px;
 }
 
-.modal-viewport-toggle button {
+.email-compose .modal-viewport-toggle button {
     border: none;
     background: transparent;
-    color: var(--body-fg, inherit);
+    color: var(--email-text);
     padding: 4px 10px;
     border-radius: 4px;
     font-size: 0.82rem;
     cursor: pointer;
+    pointer-events: auto;
 }
 
-.modal-viewport-toggle button.active {
-    background: var(--body-bg, #fff);
+.email-compose .modal-viewport-toggle button.active {
+    background: var(--email-raised);
     font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
-.modal-meta {
+.email-compose .modal-meta {
+    flex: 0 0 auto;
     padding: 10px 20px;
-    background: rgba(128, 128, 128, 0.05);
-    border-bottom: 1px solid var(--border-color, rgba(128, 128, 128, 0.2));
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--email-border);
     font-size: 0.9rem;
+    color: var(--email-text);
 }
 
-.preview-subject-line .preview-label {
-    color: var(--secondary, #6c757d);
+.email-compose .preview-subject-line .preview-label {
+    color: var(--email-muted);
     margin-right: 6px;
 }
 
-.preview-frame-container {
-    flex: 1;
+.email-compose .preview-frame-container {
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     justify-content: center;
-    background: #e9ecef;
-    padding: 16px;
-    overflow-y: auto;
+    background: #121416;
+    padding: 20px;
+    overflow: auto;
 }
 
-.preview-frame-container iframe {
+.email-compose .preview-frame-container iframe {
     background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 0;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     height: 100%;
+    min-height: 480px;
     transition: width 0.25s ease;
 }
 
-.preview-frame-container.desktop iframe {
-    width: 620px;
+.email-compose .preview-frame-container.desktop iframe {
+    width: min(680px, 100%);
 }
 
-.preview-frame-container.mobile iframe {
-    width: 380px;
+.email-compose .preview-frame-container.mobile iframe {
+    width: min(390px, 100%);
 }
 
-.modal-body {
+.email-compose .modal-test-dialog .modal-body {
     padding: 20px;
+    color: var(--email-text);
 }
 
-.modal-footer {
+.email-compose .modal-footer {
     padding: 14px 20px;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    border-top: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
+    border-top: 1px solid var(--email-border);
 }
 
 .test-status-box {
@@ -839,6 +918,121 @@
 .recent-subject {
     font-weight: 600;
     color: var(--body-fg, inherit);
+}
+
+.email-hub .recent-from {
+    margin-top: 2px;
+    color: #d5dde3;
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+/* ------------------------------------------------------------------ */
+/* Sender card                                                         */
+/* ------------------------------------------------------------------ */
+
+.email-compose .sender-group + .sender-group {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--email-border);
+}
+
+.email-compose .sender-group .audience-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+}
+
+.email-compose .sender-group .audience-option {
+    padding: 8px 12px;
+}
+
+.email-compose .section-toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    color: var(--email-text);
+    text-align: left;
+    cursor: pointer;
+}
+
+.email-compose .section-toggle:focus-visible {
+    outline: 2px solid #7cb7ff;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+.email-compose .section-title {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.email-compose .section-summary {
+    display: block;
+    margin-top: 2px;
+    color: var(--email-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.email-compose .section-chevron {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid var(--email-muted);
+    border-bottom: 2px solid var(--email-muted);
+    transform: rotate(45deg);
+    margin-top: -4px;
+}
+
+.email-compose .compose-section.is-collapsed .section-chevron {
+    transform: rotate(-45deg);
+    margin-top: 4px;
+}
+
+.email-compose .section-panel {
+    margin-top: 16px;
+}
+
+.email-compose .section-panel[hidden] {
+    display: none;
+}
+
+.email-compose .sender-label {
+    margin: 0 0 8px;
+    font-weight: 600;
+}
+
+.email-compose .option-title {
+    display: block;
+}
+
+.email-compose .option-detail,
+.email-compose .chip-email,
+.email-compose .summary .summary-loading,
+.email-compose .summary .summary-meta,
+.email-compose .autosave-indicator {
+    color: #d5dde3;
+}
+
+.email-compose .sender-panel {
+    margin-top: 12px;
+}
+
+.email-compose .sender-panel[hidden] {
+    display: none;
+}
+
+.email-compose .sender-panel[data-sender-panel="custom-from"] label::after {
+    content: " *";
+    color: var(--danger, #dc3545);
 }
 
 .nowrap {

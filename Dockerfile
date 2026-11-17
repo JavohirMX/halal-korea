@@ -20,10 +20,12 @@ RUN apt-get update && apt-get install -y \
 # Set work directory
 WORKDIR /app
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Install uv for fast, reliable package management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Install Python dependencies using uv
+COPY pyproject.toml requirements.txt ./
+RUN uv pip install --system --no-cache -r requirements.txt
 
 # Copy project
 COPY . .

@@ -13,6 +13,7 @@ from django.utils.safestring import SafeData
 from utils.turnstile import (
     TurnstileField,
     get_client_ip,
+    is_turnstile_enabled,
     require_turnstile,
     verify_turnstile,
 )
@@ -27,6 +28,7 @@ VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
     TURNSTILE_SECRET=DUMMY_SECRET,
     TURNSTILE_VERIFY_URL=VERIFY_URL,
     TURNSTILE_TIMEOUT=5,
+    TURNSTILE_ENABLED=True,
 )
 class VerifyTurnstileTests(SimpleTestCase):
     """verify_turnstile() with mocked requests.post."""
@@ -114,12 +116,28 @@ class VerifyTurnstileTests(SimpleTestCase):
 
         self.assertTrue(verify_turnstile("valid-token", action="register"))
 
+    @override_settings(DEBUG=True, TURNSTILE_ENABLED="")
+    def test_debug_without_explicit_flag_skips_verification(self):
+        self.assertFalse(is_turnstile_enabled())
+        with patch("utils.turnstile.requests.post") as mock_post:
+            self.assertTrue(verify_turnstile(""))
+            self.assertTrue(require_turnstile(RequestFactory().post("/login/", {})))
+            mock_post.assert_not_called()
+
+    @override_settings(DEBUG=True, TURNSTILE_ENABLED="true")
+    def test_explicit_flag_keeps_verification_in_debug(self):
+        self.assertTrue(is_turnstile_enabled())
+        with patch("utils.turnstile.requests.post") as mock_post:
+            self.assertFalse(verify_turnstile(""))
+            mock_post.assert_not_called()
+
 
 @override_settings(
     TURNSTILE_SITEKEY=DUMMY_SITEKEY,
     TURNSTILE_SECRET=DUMMY_SECRET,
     TURNSTILE_VERIFY_URL=VERIFY_URL,
     TURNSTILE_TIMEOUT=5,
+    TURNSTILE_ENABLED=True,
 )
 class RequireTurnstileTests(SimpleTestCase):
     def setUp(self):
@@ -148,6 +166,7 @@ class RequireTurnstileTests(SimpleTestCase):
     TURNSTILE_SECRET=DUMMY_SECRET,
     TURNSTILE_VERIFY_URL=VERIFY_URL,
     TURNSTILE_TIMEOUT=5,
+    TURNSTILE_ENABLED=True,
 )
 class TurnstileFieldTests(SimpleTestCase):
     @patch("utils.turnstile.requests.post")
@@ -177,6 +196,12 @@ class TurnstileFieldTests(SimpleTestCase):
             {"cf-turnstile-response": "abc"}, {}, "captcha"
         )
         self.assertEqual(value, "abc")
+
+    @override_settings(DEBUG=True, TURNSTILE_ENABLED="")
+    def test_disabled_field_accepts_empty_value_and_hides_widget(self):
+        field = TurnstileField(action="register")
+        self.assertEqual(field.clean(""), "")
+        self.assertEqual(field.widget.render("captcha", None), "")
 
     def test_widget_includes_sitekey_and_action(self):
         field = TurnstileField(action="register")
